@@ -1,0 +1,19 @@
+name: Remove old package versions
+on:
+  schedule:
+    - cron:  '12 20 * * *'
+  workflow_dispatch:
+jobs:
+  remove-package-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: purge packages
+        uses: dylanratcliffe/delete-untagged-containers@main
+        with:
+          # Note that you'll need to change the `package_name` and `user` fields
+          # here to whatever your new source's package is going to be called,
+          # otherwise it'll try to clean up the packages from the template repo,
+          # which you won't have permission to do, and it'll fail
+          package_name: source-template
+          user: overmindtech
+          token: ${{ secrets.CR_PAT }}
