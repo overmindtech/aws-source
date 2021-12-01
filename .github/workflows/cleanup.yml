@@ -14,6 +14,6 @@ jobs:
           # here to whatever your new source's package is going to be called,
           # otherwise it'll try to clean up the packages from the template repo,
           # which you won't have permission to do, and it'll fail
-          package_name: source-template
+          package_name: aws-source
           user: overmindtech
           token: ${{ secrets.CR_PAT }}

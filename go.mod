@@ -1,4 +1,4 @@
-module github.com/overmindtech/source-template
+module github.com/overmindtech/aws-source
 
 go 1.17
 
