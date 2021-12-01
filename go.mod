@@ -5,7 +5,7 @@ go 1.17
 // Direct dependencies
 require (
 	github.com/overmindtech/discovery v0.6.0
-	github.com/overmindtech/sdp-go v0.5.3
+	github.com/overmindtech/sdp-go v0.6.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
@@ -40,4 +40,23 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.64.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+)
+
+require (
+	github.com/aws/aws-sdk-go-v2 v1.11.1
+	github.com/aws/aws-sdk-go-v2/config v1.10.3
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.9.1
+	github.com/aws/aws-sdk-go-v2/service/sts v1.11.0
+)
+
+require (
+	github.com/aws/aws-sdk-go-v2/credentials v1.6.3 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.6.1 // indirect
+	github.com/aws/smithy-go v1.9.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 )
