@@ -13,6 +13,8 @@ import (
 )
 
 func TestELB(t *testing.T) {
+	t.Parallel()
+
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 
 	if err != nil {
