@@ -6,12 +6,12 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
-	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"github.com/overmindtech/sdp-go"
 )
 
-type ELBSource struct {
+type ELBv2Source struct {
 	// Config AWS Config including region and credentials
 	Config aws.Config
 
@@ -20,12 +20,12 @@ type ELBSource struct {
 	AccountID string
 
 	// client The AWS client to use when making requests
-	client        *elb.Client
+	client        *elbv2.Client
 	clientCreated bool
 	clientMutex   sync.Mutex
 }
 
-func (s *ELBSource) Client() *elb.Client {
+func (s *ELBv2Source) Client() *elbv2.Client {
 	s.clientMutex.Lock()
 	defer s.clientMutex.Unlock()
 
@@ -35,25 +35,25 @@ func (s *ELBSource) Client() *elb.Client {
 	}
 
 	// Otherwise create a new client from the config
-	s.client = elb.NewFromConfig(s.Config)
+	s.client = elbv2.NewFromConfig(s.Config)
 	s.clientCreated = true
 
 	return s.client
 }
 
 // Type The type of items that this source is capable of finding
-func (s *ELBSource) Type() string {
-	return "elasticloadbalancer"
+func (s *ELBv2Source) Type() string {
+	return "elasticloadbalancerv2"
 }
 
 // Descriptive name for the source, used in logging and metadata
-func (s *ELBSource) Name() string {
-	return "elasticloadbalancing-aws-source"
+func (s *ELBv2Source) Name() string {
+	return "elasticloadbalancing-v2-aws-source"
 }
 
 // List of contexts that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *ELBSource) Contexts() []string {
+func (s *ELBv2Source) Contexts() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
@@ -64,7 +64,7 @@ func (s *ELBSource) Contexts() []string {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
+func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
 	if itemContext != s.Contexts()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
@@ -75,8 +75,8 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 
 	lbs, err := s.Client().DescribeLoadBalancers(
 		ctx,
-		&elb.DescribeLoadBalancersInput{
-			LoadBalancerNames: []string{
+		&elbv2.DescribeLoadBalancersInput{
+			Names: []string{
 				query,
 			},
 		},
@@ -90,7 +90,7 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 		}
 	}
 
-	switch len(lbs.LoadBalancerDescriptions) {
+	switch len(lbs.LoadBalancers) {
 	case 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
@@ -98,18 +98,18 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 			Context:     itemContext,
 		}
 	case 1:
-		return mapElasticloadbalancerToItem(lbs.LoadBalancerDescriptions[0], itemContext)
+		return mapElasticLoadBalancerV2ToItem(lbs.LoadBalancers[0], itemContext)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancer found, found: %v", len(lbs.LoadBalancerDescriptions)),
+			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancer found, found: %v", len(lbs.LoadBalancers)),
 			Context:     itemContext,
 		}
 	}
 }
 
 // Find Finds all items in a given context
-func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
+func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
 	if itemContext != s.Contexts()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
@@ -122,7 +122,7 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 
 	lbs, err := s.Client().DescribeLoadBalancers(
 		ctx,
-		&elb.DescribeLoadBalancersInput{},
+		&elbv2.DescribeLoadBalancersInput{},
 	)
 
 	if err != nil {
@@ -133,8 +133,8 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 		}
 	}
 
-	for _, lb := range lbs.LoadBalancerDescriptions {
-		item, err := mapElasticloadbalancerToItem(lb, itemContext)
+	for _, lb := range lbs.LoadBalancers {
+		item, err := mapElasticLoadBalancerV2ToItem(lb, itemContext)
 
 		if err == nil {
 			items = append(items, item)
@@ -148,12 +148,12 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // sen on, so the one with the higher weight value will win.
-func (s *ELBSource) Weight() int {
+func (s *ELBv2Source) Weight() int {
 	return 100
 }
 
-// mapElasticloadbalancerToItem Maps a load balancer to an item
-func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext string) (*sdp.Item, error) {
+// mapElasticLoadBalancerV2ToItem Maps a load balancer to an item
+func mapElasticLoadBalancerV2ToItem(lb types.LoadBalancer, itemContext string) (*sdp.Item, error) {
 	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
@@ -165,37 +165,32 @@ func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext 
 	}
 
 	item := sdp.Item{
-		Type:            "elasticloadbalancer",
+		Type:            "elasticloadbalancerv2",
 		UniqueAttribute: "name",
 		Context:         itemContext,
 	}
 
 	attrMap["name"] = lb.LoadBalancerName
 	attrMap["availabilityZones"] = lb.AvailabilityZones
-	attrMap["backendServerDescriptions"] = lb.BackendServerDescriptions
-	attrMap["instances"] = lb.Instances
-	attrMap["listenerDescriptions"] = lb.ListenerDescriptions
-	attrMap["subnets"] = lb.Subnets
+	attrMap["ipAddressType"] = lb.IpAddressType
+	attrMap["scheme"] = lb.Scheme
 	attrMap["securityGroups"] = lb.SecurityGroups
+	attrMap["type"] = lb.Type
 
-	if lb.CanonicalHostedZoneName != nil {
-		attrMap["canonicalHostedZoneName"] = lb.CanonicalHostedZoneName
+	if lb.CanonicalHostedZoneId != nil {
+		attrMap["canonicalHostedZoneId"] = lb.CanonicalHostedZoneId
 	}
-	if lb.CanonicalHostedZoneNameID != nil {
-		attrMap["canonicalHostedZoneNameID"] = lb.CanonicalHostedZoneNameID
 
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "hostedzone",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *lb.CanonicalHostedZoneNameID,
-			Context: itemContext,
-		})
-	}
 	if lb.CreatedTime != nil {
 		attrMap["createdTime"] = lb.CreatedTime.String()
 	}
+
+	if lb.CustomerOwnedIpv4Pool != nil {
+		attrMap["customerOwnedIpv4Pool"] = lb.CustomerOwnedIpv4Pool
+	}
+
 	if lb.DNSName != nil {
-		attrMap["DNSName"] = lb.DNSName
+		attrMap["dNSName"] = lb.DNSName
 
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 			Type:    "dns",
@@ -204,20 +199,19 @@ func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext 
 			Context: "global",
 		})
 	}
-	if lb.HealthCheck != nil {
-		attrMap["healthCheck"] = lb.HealthCheck
+
+	if lb.LoadBalancerArn != nil {
+		attrMap["loadBalancerArn"] = lb.LoadBalancerArn
 	}
-	if lb.Policies != nil {
-		attrMap["policies"] = lb.Policies
+
+	if lb.State != nil {
+		attrMap["state"] = lb.State
 	}
-	if lb.Scheme != nil {
-		attrMap["scheme"] = lb.Scheme
-	}
-	if lb.SourceSecurityGroup != nil {
-		attrMap["sourceSecurityGroup"] = lb.SourceSecurityGroup
-	}
-	if lb.VPCId != nil {
-		attrMap["VPCId"] = lb.VPCId
+
+	if lb.VpcId != nil {
+		attrMap["vpcId"] = lb.VpcId
+
+		// TODO: Linked item request to VPC
 	}
 
 	attributes, err := sdp.ToAttributes(attrMap)

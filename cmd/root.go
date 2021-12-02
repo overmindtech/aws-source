@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,7 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/overmindtech/aws-source/sources"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -74,10 +77,46 @@ Edit this once you have created your source
 			MaxParallelExecutions: maxParallel,
 		}
 
-		// ⚠️ Here is where you add your sources
-		colourNameSource := sources.ColourNameSource{}
+		// TODO: Create a way to load config for auth that will work within srcman ⚠️
+		// Load config and create client which will be re-used for all connections
+		configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-		e.AddSources(&colourNameSource)
+		cfg, err := config.LoadDefaultConfig(configCtx)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("Error loading config")
+
+			os.Exit(1)
+		}
+
+		// Work out what account we're using. This will be used in item contexts
+		stsClient := sts.NewFromConfig(cfg)
+
+		var callerID *sts.GetCallerIdentityOutput
+
+		callerID, err = stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("Error retrieving account information")
+
+			os.Exit(1)
+		}
+
+		// Cancel config load context and release resources
+		configCancel()
+
+		sources := []discovery.Source{
+			&elasticloadbalancing.ELBSource{
+				Config:    cfg,
+				AccountID: *callerID.Account,
+			},
+		}
+
+		e.AddSources(sources...)
 
 		// Start HTTP server for status
 		healthCheckPort := 8080

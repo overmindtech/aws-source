@@ -32,7 +32,7 @@ func TestELB(t *testing.T) {
 		&elb.CreateLoadBalancerInput{
 			LoadBalancerName: &name,
 			AvailabilityZones: []string{
-				"eu-west-2a",
+				TestVPC.Subnets[0].AvailabilityZone,
 			},
 			Listeners: []types.Listener{
 				{
@@ -79,7 +79,7 @@ func TestELB(t *testing.T) {
 		AccountID: *callerID.Account,
 	}
 
-	testContext := fmt.Sprintf("%v.%v", callerID.Account, cfg.Region)
+	testContext := fmt.Sprintf("%v.%v", *callerID.Account, cfg.Region)
 
 	t.Run("get elb details", func(t *testing.T) {
 		item, err := src.Get(context.Background(), testContext, name)
