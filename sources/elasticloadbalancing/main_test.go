@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
 type Subnet struct {
@@ -33,6 +34,13 @@ type VPCConfig struct {
 	cleanupFunctions []func()
 }
 
+var tagKey = "purpose"
+var tagValue = "automated-testing-" + time.Now().String()
+var tags = types.Tag{
+	Key:   &tagKey,
+	Value: &tagValue,
+}
+
 func (v *VPCConfig) Cleanup(f func()) {
 	v.cleanupFunctions = append(v.cleanupFunctions, f)
 }
@@ -45,7 +53,6 @@ func (v *VPCConfig) RunCleanup() {
 
 		v.cleanupFunctions = v.cleanupFunctions[:n] // Pop
 	}
-
 }
 
 // Create Creates the VPC and subnets and registers cleanup actions for them
@@ -57,6 +64,12 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 		context.Background(),
 		&ec2.CreateVpcInput{
 			CidrBlock: &v.CidrBlock,
+			TagSpecifications: []types.TagSpecification{
+				{
+					ResourceType: types.ResourceTypeVpc,
+					Tags:         []types.Tag{tags},
+				},
+			},
 		},
 	)
 
@@ -84,7 +97,14 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 
 	gatewayOutput, err = client.CreateInternetGateway(
 		context.Background(),
-		&ec2.CreateInternetGatewayInput{},
+		&ec2.CreateInternetGatewayInput{
+			TagSpecifications: []types.TagSpecification{
+				{
+					ResourceType: types.ResourceTypeInternetGateway,
+					Tags:         []types.Tag{tags},
+				},
+			},
+		},
 	)
 
 	if err != nil {
@@ -143,6 +163,12 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 				VpcId:            v.ID,
 				AvailabilityZone: &subnet.AvailabilityZone,
 				CidrBlock:        &subnet.CIDR,
+				TagSpecifications: []types.TagSpecification{
+					{
+						ResourceType: types.ResourceTypeSubnet,
+						Tags:         []types.Tag{tags},
+					},
+				},
 			},
 		)
 
@@ -219,6 +245,9 @@ func TestMain(m *testing.M) {
 
 	if err != nil {
 		log.Fatalf("Config load failed: %v", err)
+		log.Println("Tests will be skipped as AWS config could not be loaded")
+
+		os.Exit(1)
 	}
 
 	ec2Client := ec2.NewFromConfig(TestAWSConfig)
