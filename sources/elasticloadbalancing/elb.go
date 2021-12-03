@@ -98,7 +98,17 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 			Context:     itemContext,
 		}
 	case 1:
-		return mapElasticloadbalancerToItem(lbs.LoadBalancerDescriptions[0], itemContext)
+		expanded, err := s.ExpandLB(ctx, lbs.LoadBalancerDescriptions[0])
+
+		if err != nil {
+			return nil, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_OTHER,
+				ErrorString: err.Error(),
+				Context:     itemContext,
+			}
+		}
+
+		return mapElasticloadbalancerToItem(expanded, itemContext)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
@@ -134,7 +144,17 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 	}
 
 	for _, lb := range lbs.LoadBalancerDescriptions {
-		item, err := mapElasticloadbalancerToItem(lb, itemContext)
+		expanded, err := s.ExpandLB(ctx, lb)
+
+		if err != nil {
+			return nil, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_OTHER,
+				ErrorString: err.Error(),
+				Context:     itemContext,
+			}
+		}
+
+		item, err := mapElasticloadbalancerToItem(expanded, itemContext)
 
 		if err == nil {
 			items = append(items, item)
@@ -152,8 +172,39 @@ func (s *ELBSource) Weight() int {
 	return 100
 }
 
+type ExpandedELB struct {
+	types.LoadBalancerDescription
+
+	// Store instance state instead of just the name
+	Instances []types.InstanceState
+}
+
+func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescription) (*ExpandedELB, error) {
+	var instanceHealthOutout *elb.DescribeInstanceHealthOutput
+	var err error
+
+	expandedLb := ExpandedELB{
+		LoadBalancerDescription: lb,
+	}
+
+	instanceHealthOutout, err = s.Client().DescribeInstanceHealth(
+		ctx,
+		&elb.DescribeInstanceHealthInput{
+			LoadBalancerName: lb.LoadBalancerName,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	expandedLb.Instances = instanceHealthOutout.InstanceStates
+
+	return &expandedLb, nil
+}
+
 // mapElasticloadbalancerToItem Maps a load balancer to an item
-func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext string) (*sdp.Item, error) {
+func mapElasticloadbalancerToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
 	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
@@ -177,10 +228,14 @@ func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext 
 	attrMap["listenerDescriptions"] = lb.ListenerDescriptions
 	attrMap["subnets"] = lb.Subnets
 	attrMap["securityGroups"] = lb.SecurityGroups
+	attrMap["instances"] = lb.Instances
+	attrMap["healthCheck"] = lb.HealthCheck
+	attrMap["policies"] = lb.Policies
+	attrMap["scheme"] = lb.Scheme
+	attrMap["sourceSecurityGroup"] = lb.SourceSecurityGroup
+	attrMap["VPCId"] = lb.VPCId
+	attrMap["canonicalHostedZoneName"] = lb.CanonicalHostedZoneName
 
-	if lb.CanonicalHostedZoneName != nil {
-		attrMap["canonicalHostedZoneName"] = lb.CanonicalHostedZoneName
-	}
 	if lb.CanonicalHostedZoneNameID != nil {
 		attrMap["canonicalHostedZoneNameID"] = lb.CanonicalHostedZoneNameID
 
@@ -191,9 +246,11 @@ func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext 
 			Context: itemContext,
 		})
 	}
+
 	if lb.CreatedTime != nil {
 		attrMap["createdTime"] = lb.CreatedTime.String()
 	}
+
 	if lb.DNSName != nil {
 		attrMap["DNSName"] = lb.DNSName
 
@@ -203,21 +260,6 @@ func mapElasticloadbalancerToItem(lb types.LoadBalancerDescription, itemContext 
 			Query:   *lb.DNSName,
 			Context: "global",
 		})
-	}
-	if lb.HealthCheck != nil {
-		attrMap["healthCheck"] = lb.HealthCheck
-	}
-	if lb.Policies != nil {
-		attrMap["policies"] = lb.Policies
-	}
-	if lb.Scheme != nil {
-		attrMap["scheme"] = lb.Scheme
-	}
-	if lb.SourceSecurityGroup != nil {
-		attrMap["sourceSecurityGroup"] = lb.SourceSecurityGroup
-	}
-	if lb.VPCId != nil {
-		attrMap["VPCId"] = lb.VPCId
 	}
 
 	attributes, err := sdp.ToAttributes(attrMap)

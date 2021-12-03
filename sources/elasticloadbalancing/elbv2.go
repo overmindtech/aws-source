@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -98,7 +99,17 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 			Context:     itemContext,
 		}
 	case 1:
-		return mapElasticLoadBalancerV2ToItem(lbs.LoadBalancers[0], itemContext)
+		expanded, err := s.ExpandLB(ctx, lbs.LoadBalancers[0])
+
+		if err != nil {
+			return nil, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_OTHER,
+				ErrorString: fmt.Sprintf("error during details expansion: %v", err.Error()),
+				Context:     itemContext,
+			}
+		}
+
+		return mapExpandedELBv2ToItem(expanded, itemContext)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
@@ -134,11 +145,21 @@ func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item
 	}
 
 	for _, lb := range lbs.LoadBalancers {
-		item, err := mapElasticLoadBalancerV2ToItem(lb, itemContext)
+		expanded, err := s.ExpandLB(ctx, lb)
 
-		if err == nil {
-			items = append(items, item)
+		if err != nil {
+			continue
 		}
+
+		var item *sdp.Item
+
+		item, err = mapExpandedELBv2ToItem(expanded, itemContext)
+
+		if err != nil {
+			continue
+		}
+
+		items = append(items, item)
 	}
 
 	return items, nil
@@ -152,8 +173,85 @@ func (s *ELBv2Source) Weight() int {
 	return 100
 }
 
-// mapElasticLoadBalancerV2ToItem Maps a load balancer to an item
-func mapElasticLoadBalancerV2ToItem(lb types.LoadBalancer, itemContext string) (*sdp.Item, error) {
+type ExpandedTargetGroup struct {
+	types.TargetGroup
+
+	TargetHealthDescriptions []types.TargetHealthDescription
+}
+
+type ExpandedELBv2 struct {
+	types.LoadBalancer
+
+	Listeners    []types.Listener
+	TargetGroups []ExpandedTargetGroup
+}
+
+func (s *ELBv2Source) ExpandLB(ctx context.Context, lb types.LoadBalancer) (*ExpandedELBv2, error) {
+	var listenersOutput *elbv2.DescribeListenersOutput
+	var targetGroupsOutput *elbv2.DescribeTargetGroupsOutput
+	var targetHealthOutput *elbv2.DescribeTargetHealthOutput
+	var err error
+
+	// Copy all fields from LB
+	expandedELB := ExpandedELBv2{
+		LoadBalancer: lb,
+	}
+
+	// Get listeners
+	listenersOutput, err = s.Client().DescribeListeners(
+		ctx,
+		&elbv2.DescribeListenersInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	expandedELB.Listeners = listenersOutput.Listeners
+
+	// Get target groups
+	targetGroupsOutput, err = s.Client().DescribeTargetGroups(
+		ctx,
+		&elbv2.DescribeTargetGroupsInput{
+			LoadBalancerArn: lb.LoadBalancerArn,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	expandedELB.TargetGroups = make([]ExpandedTargetGroup, 0)
+
+	// For each target group get targets and their health
+	for _, tg := range targetGroupsOutput.TargetGroups {
+		etg := ExpandedTargetGroup{
+			TargetGroup: tg,
+		}
+
+		targetHealthOutput, err = s.Client().DescribeTargetHealth(
+			ctx,
+			&elbv2.DescribeTargetHealthInput{
+				TargetGroupArn: tg.TargetGroupArn,
+			},
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		etg.TargetHealthDescriptions = targetHealthOutput.TargetHealthDescriptions
+
+		expandedELB.TargetGroups = append(expandedELB.TargetGroups, etg)
+	}
+
+	return &expandedELB, nil
+}
+
+// mapExpandedELBv2ToItem Maps a load balancer to an item
+func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, error) {
 	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
@@ -176,17 +274,15 @@ func mapElasticLoadBalancerV2ToItem(lb types.LoadBalancer, itemContext string) (
 	attrMap["scheme"] = lb.Scheme
 	attrMap["securityGroups"] = lb.SecurityGroups
 	attrMap["type"] = lb.Type
-
-	if lb.CanonicalHostedZoneId != nil {
-		attrMap["canonicalHostedZoneId"] = lb.CanonicalHostedZoneId
-	}
+	attrMap["listeners"] = lb.Listeners
+	attrMap["targetGroups"] = lb.TargetGroups
+	attrMap["canonicalHostedZoneId"] = lb.CanonicalHostedZoneId
+	attrMap["loadBalancerArn"] = lb.LoadBalancerArn
+	attrMap["customerOwnedIpv4Pool"] = lb.CustomerOwnedIpv4Pool
+	attrMap["state"] = lb.State
 
 	if lb.CreatedTime != nil {
 		attrMap["createdTime"] = lb.CreatedTime.String()
-	}
-
-	if lb.CustomerOwnedIpv4Pool != nil {
-		attrMap["customerOwnedIpv4Pool"] = lb.CustomerOwnedIpv4Pool
 	}
 
 	if lb.DNSName != nil {
@@ -200,21 +296,13 @@ func mapElasticLoadBalancerV2ToItem(lb types.LoadBalancer, itemContext string) (
 		})
 	}
 
-	if lb.LoadBalancerArn != nil {
-		attrMap["loadBalancerArn"] = lb.LoadBalancerArn
-	}
-
-	if lb.State != nil {
-		attrMap["state"] = lb.State
-	}
-
 	if lb.VpcId != nil {
 		attrMap["vpcId"] = lb.VpcId
 
 		// TODO: Linked item request to VPC
 	}
 
-	attributes, err := sdp.ToAttributes(attrMap)
+	attributes, err := sources.ToAttributesCase(attrMap)
 
 	if err != nil {
 		return nil, &sdp.ItemRequestError{

@@ -32,7 +32,7 @@ func TestELBv2(t *testing.T) {
 			Name:          &name,
 			IpAddressType: types.IpAddressTypeIpv4,
 			Scheme:        types.LoadBalancerSchemeEnumInternetFacing,
-			Type:          types.LoadBalancerTypeEnumApplication,
+			Type:          types.LoadBalancerTypeEnumNetwork,
 			Subnets:       subnetIDs,
 		},
 	)

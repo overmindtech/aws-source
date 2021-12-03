@@ -80,12 +80,20 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 	v.ID = vpcOutput.Vpc.VpcId
 
 	v.Cleanup(func() {
-		_, err := client.DeleteVpc(
-			context.Background(),
-			&ec2.DeleteVpcInput{
-				VpcId: v.ID,
-			},
-		)
+		var err error
+
+		delete := func() error {
+			_, err := client.DeleteVpc(
+				context.Background(),
+				&ec2.DeleteVpcInput{
+					VpcId: v.ID,
+				},
+			)
+
+			return err
+		}
+
+		retry(5, time.Second, delete)
 
 		if err != nil {
 			log.Println(err)
