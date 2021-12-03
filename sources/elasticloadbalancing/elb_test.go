@@ -22,7 +22,7 @@ func TestELB(t *testing.T) {
 	}
 
 	elbClient := elb.NewFromConfig(cfg)
-	name := "test-elb"
+	name := *TestVPC.ID + "test-elb"
 	tag1key := "test-id"
 	tag1value := "test"
 	protocol := "TCP"

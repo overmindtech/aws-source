@@ -93,7 +93,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 			return err
 		}
 
-		retry(5, time.Second, delete)
+		retry(10, time.Second, delete)
 
 		if err != nil {
 			log.Println(err)
@@ -122,12 +122,18 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 	v.InternetGatewayId = gatewayOutput.InternetGateway.InternetGatewayId
 
 	v.Cleanup(func() {
-		_, err := client.DeleteInternetGateway(
-			context.Background(),
-			&ec2.DeleteInternetGatewayInput{
-				InternetGatewayId: v.InternetGatewayId,
-			},
-		)
+		delete := func() error {
+			_, err := client.DeleteInternetGateway(
+				context.Background(),
+				&ec2.DeleteInternetGatewayInput{
+					InternetGatewayId: v.InternetGatewayId,
+				},
+			)
+
+			return err
+		}
+
+		err := retry(10, time.Second, delete)
 
 		if err != nil {
 			log.Println(err)
@@ -147,13 +153,19 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 	}
 
 	v.Cleanup(func() {
-		_, err := client.DetachInternetGateway(
-			context.Background(),
-			&ec2.DetachInternetGatewayInput{
-				InternetGatewayId: v.InternetGatewayId,
-				VpcId:             v.ID,
-			},
-		)
+		delete := func() error {
+			_, err := client.DetachInternetGateway(
+				context.Background(),
+				&ec2.DetachInternetGatewayInput{
+					InternetGatewayId: v.InternetGatewayId,
+					VpcId:             v.ID,
+				},
+			)
+
+			return err
+		}
+
+		err := retry(10, time.Second, delete)
 
 		if err != nil {
 			log.Println(err)
@@ -201,7 +213,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 				return err
 			}
 
-			retry(5, time.Second, delete)
+			retry(10, time.Second, delete)
 
 			if err != nil {
 				log.Println(err)

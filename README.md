@@ -2,6 +2,154 @@
 
 This source integrates with AWS, allowing Overmind to pull data about many types of AWS resources.
 
+## Sources
+
+### elasticloadbalancerv2
+
+Gathers information about Elastic Load Balancers (v2) and their target groups, health checks etc. e.g.
+
+```json
+{
+    "type": "elasticloadbalancerv2",
+    "uniqueAttribute": "name",
+    "attributes": {
+        "attrStruct": {
+            "availabilityZones": [
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-021f8be6388f11fcd",
+                    "zoneName": "eu-west-2a"
+                },
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-0260e9e4e333abd62",
+                    "zoneName": "eu-west-2c"
+                },
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-092453eee2eea7611",
+                    "zoneName": "eu-west-2b"
+                }
+            ],
+            "canonicalHostedZoneId": "ZD4D7Y8KGAS4G",
+            "createdTime": "2021-12-03 17:07:15.334 +0000 UTC",
+            "dNSName": "vpc-0fe83a8d71bd1803ctest-elbv2-d88c129308d731ef.elb.eu-west-2.amazonaws.com",
+            "ipAddressType": "ipv4",
+            "listeners": [
+                {
+                    "defaultActions": [
+                        {
+                            "forwardConfig": {
+                                "targetGroups": [
+                                    {
+                                        "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003"
+                                    }
+                                ]
+                            },
+                            "order": 1,
+                            "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003",
+                            "type": "forward"
+                        }
+                    ],
+                    "listenerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:listener/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef/40157d5d032e19fd",
+                    "loadBalancerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef",
+                    "port": 80,
+                    "protocol": "TCP"
+                }
+            ],
+            "loadBalancerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef",
+            "name": "vpc-0fe83a8d71bd1803ctest-elbv2",
+            "scheme": "internet-facing",
+            "state": {
+                "code": "active"
+            },
+            "targetGroups": [
+                {
+                    "healthCheckEnabled": true,
+                    "healthCheckIntervalSeconds": 30,
+                    "healthCheckPort": "traffic-port",
+                    "healthCheckProtocol": "TCP",
+                    "healthCheckTimeoutSeconds": 10,
+                    "healthyThresholdCount": 3,
+                    "ipAddressType": "ipv4",
+                    "loadBalancerArns": [
+                        "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef"
+                    ],
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003",
+                    "targetGroupName": "fake-targets",
+                    "targetHealthDescriptions": [
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2c",
+                                "id": "10.174.145.37",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Health checks failed",
+                                "reason": "Target.FailedHealthChecks",
+                                "state": "unhealthy"
+                            }
+                        },
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2a",
+                                "id": "10.174.145.5",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Health checks failed",
+                                "reason": "Target.FailedHealthChecks",
+                                "state": "unhealthy"
+                            }
+                        },
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2b",
+                                "id": "10.174.145.21",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Initial health checks in progress",
+                                "reason": "Elb.InitialHealthChecking",
+                                "state": "initial"
+                            }
+                        }
+                    ],
+                    "targetType": "ip",
+                    "unhealthyThresholdCount": 3,
+                    "vpcId": "vpc-0fe83a8d71bd1803c"
+                }
+            ],
+            "type": "network",
+            "vpcId": "vpc-0fe83a8d71bd1803c"
+        }
+    },
+    "context": "177828803798.eu-west-2",
+    "linkedItemRequests": [
+        {
+            "type": "dns",
+            "query": "vpc-0fe83a8d71bd1803ctest-elbv2-d88c129308d731ef.elb.eu-west-2.amazonaws.com",
+            "context": "global"
+        }
+    ]
+}
+```
+
+#### `Get`
+
+Gets a specific ELB by name.
+
+**Query format:** The name of the ELB
+
+#### `Find`
+
+Finds all ELBs
+
 ## Config
 
 All configuration options can be provided via the command line or as environment variables:

@@ -5,22 +5,27 @@ import (
 	"testing"
 )
 
-func TestCamelCaseMap(t *testing.T) {
+func TestCamelCase(t *testing.T) {
 	exampleMap := make(map[string]interface{})
 
 	exampleMap["Name"] = "Dylan"
-	exampleMap["Nested"] = map[string]string{
+	exampleMap["Nested"] = map[string]interface{}{
 		"NestedKeyName":    "Value",
 		"NestedAWSAcronym": "Wow",
+		"NestedArray": []map[string]string{
+			{
+				"FooBar": "Baz",
+			},
+		},
 	}
 
 	i := interface{}(exampleMap)
 
-	camel := CamelCaseMap(i)
+	camel := CamelCase(i)
 
 	b, _ := json.Marshal(camel)
 
-	expected := `{"name":"Dylan","nested":{"nestedAWSAcronym":"Wow","nestedKeyName":"Value"}}`
+	expected := `{"name":"Dylan","nested":{"nestedAWSAcronym":"Wow","nestedArray":[{"fooBar":"Baz"}],"nestedKeyName":"Value"}}`
 
 	if string(b) != expected {
 		t.Fatalf("expected %v got %v", expected, string(b))

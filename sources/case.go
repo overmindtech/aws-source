@@ -132,7 +132,7 @@ func ToAttributesCase(i interface{}) (*sdp.ItemAttributes, error) {
 		return &sdp.ItemAttributes{}, err
 	}
 
-	camel := CamelCaseMap(m)
+	camel := CamelCase(m)
 
 	if camelMap, ok := camel.(map[string]interface{}); ok {
 		return sdp.ToAttributes(camelMap)
@@ -141,35 +141,42 @@ func ToAttributesCase(i interface{}) (*sdp.ItemAttributes, error) {
 	}
 }
 
-// CamelCaseMap converts all keys in a map to camel case recursively, this
+// CamelCase converts all keys in an object to camel case recursively, this
 // includes ignoring known acronyms
-func CamelCaseMap(m interface{}) interface{} {
-	if m == nil {
+func CamelCase(i interface{}) interface{} {
+	if i == nil {
 		return nil
 	}
 
-	newMap := make(map[string]interface{})
+	v := reflect.ValueOf(i)
 
-	v := reflect.ValueOf(m)
-	t := reflect.TypeOf(m)
+	switch v.Kind() {
+	case reflect.Map:
+		newMap := make(map[string]interface{})
 
-	// If it's not a mep then we can't do anything
-	if t.Kind() != reflect.Map {
-		return m
-	}
+		iter := v.MapRange()
+		for iter.Next() {
+			k := iter.Key()
+			v := iter.Value()
+			vi := v.Interface()
 
-	iter := v.MapRange()
-	for iter.Next() {
-		k := iter.Key()
-		v := iter.Value()
-		vi := v.Interface()
+			if vi != nil {
+				keyCamel := strcase.ToLowerCamel(k.String())
 
-		if vi != nil {
-			keyCamel := strcase.ToLowerCamel(k.String())
-
-			newMap[keyCamel] = CamelCaseMap(vi)
+				newMap[keyCamel] = CamelCase(vi)
+			}
 		}
-	}
 
-	return newMap
+		return newMap
+	case reflect.Array, reflect.Slice:
+		newSlice := make([]interface{}, v.Len())
+
+		for index := 0; index < v.Len(); index++ {
+			newSlice[index] = CamelCase(v.Index(index).Interface())
+		}
+
+		return newSlice
+	default:
+		return i
+	}
 }
