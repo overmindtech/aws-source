@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,7 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/overmindtech/aws-source/sources"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -47,17 +53,22 @@ Edit this once you have created your source
 			os.Exit(1)
 		}
 
-		// ⚠️ Your custom configration goes here
-		yourCustomFlag := viper.GetString("your-custom-flag")
+		region := viper.GetString("aws-region")
+		accessKeyID := viper.GetString("aws-access-key-id")
+		secretAccessKey := viper.GetString("aws-secret-access-key")
+		autoConfig := viper.GetBool("auto-config")
 
 		log.WithFields(log.Fields{
-			"nats-servers":     natsServers,
-			"nats-name-prefix": natsNamePrefix,
-			"nats-ca-file":     natsCAFile,
-			"nats-jwt-file":    natsJWTFile,
-			"nats-nkey-file":   natsNKeyFile,
-			"max-parallel":     maxParallel,
-			"your-custom-flag": yourCustomFlag,
+			"nats-servers":          natsServers,
+			"nats-name-prefix":      natsNamePrefix,
+			"nats-ca-file":          natsCAFile,
+			"nats-jwt-file":         natsJWTFile,
+			"nats-nkey-file":        natsNKeyFile,
+			"max-parallel":          maxParallel,
+			"aws-region":            region,
+			"aws-access-key-id":     accessKeyID,
+			"aws-secret-access-key": secretAccessKey,
+			"auto-config":           autoConfig,
 		}).Info("Got config")
 
 		e := discovery.Engine{
@@ -74,10 +85,46 @@ Edit this once you have created your source
 			MaxParallelExecutions: maxParallel,
 		}
 
-		// ⚠️ Here is where you add your sources
-		colourNameSource := sources.ColourNameSource{}
+		// TODO: Create a way to load config for auth that will work within srcman ⚠️
+		// Load config and create client which will be re-used for all connections
+		configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-		e.AddSources(&colourNameSource)
+		cfg, err := getAWSConfig(region, accessKeyID, secretAccessKey, autoConfig)
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("Error loading config")
+
+			os.Exit(1)
+		}
+
+		// Work out what account we're using. This will be used in item contexts
+		stsClient := sts.NewFromConfig(cfg)
+
+		var callerID *sts.GetCallerIdentityOutput
+
+		callerID, err = stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
+
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatal("Error retrieving account information")
+
+			os.Exit(1)
+		}
+
+		// Cancel config load context and release resources
+		configCancel()
+
+		sources := []discovery.Source{
+			&elasticloadbalancing.ELBSource{
+				Config:    cfg,
+				AccountID: *callerID.Account,
+			},
+		}
+
+		e.AddSources(sources...)
 
 		// Start HTTP server for status
 		healthCheckPort := 8080
@@ -180,11 +227,13 @@ func init() {
 	rootCmd.PersistentFlags().String("nats-ca-file", "", "Path to the CA file that NATS should use when connecting over TLS")
 	rootCmd.PersistentFlags().String("nats-jwt-file", "", "Path to the file containing the user JWT")
 	rootCmd.PersistentFlags().String("nats-nkey-file", "", "Path to the file containing the NKey seed")
-	rootCmd.PersistentFlags().Int("max-parallel", (runtime.NumCPU() * 2), "Max number of requests to run in parallel")
+	rootCmd.PersistentFlags().Int("max-parallel", (runtime.NumCPU() * 10), "Max number of requests to run in parallel")
 
-	// ⚠️ Add your own custom config options below, the example "your-custom-flag"
-	// should be replaced with your own config or deleted
-	rootCmd.PersistentFlags().String("your-custom-flag", "someDefaultValue.conf", "Description of what your option is meant to do")
+	// Custom flags for this source
+	rootCmd.PersistentFlags().String("aws-region", "", "The AWS region that this source should operate in")
+	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
+	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
+	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 
 	// Bind these to viper
 	viper.BindPFlags(rootCmd.PersistentFlags())
@@ -220,4 +269,27 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Infof("Using config file: %v", viper.ConfigFileUsed())
 	}
+}
+
+func getAWSConfig(region string, accessKeyID string, secretAccessKey string, autoConfig bool) (aws.Config, error) {
+	if autoConfig {
+		return config.LoadDefaultConfig(context.Background())
+	}
+	// Vaidate inputs
+	if region == "" {
+		return aws.Config{}, errors.New("aws-region cannot be blank")
+	}
+	if accessKeyID == "" {
+		return aws.Config{}, errors.New("aws-access-key-id cannot be blank")
+	}
+	if secretAccessKey == "" {
+		return aws.Config{}, errors.New("aws-secret-access-key cannot be blank")
+	}
+
+	config := aws.Config{
+		Region:      region,
+		Credentials: credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, ""),
+	}
+
+	return config, nil
 }

@@ -1,27 +1,154 @@
-# Source Template
+# AWS Source
 
-The template repository is used for creating secondary sources written in Golang.
+This source integrates with AWS, allowing Overmind to pull data about many types of AWS resources.
 
-## Getting Started
+## Sources
 
-Follow this getting started guide to copy this template and customize it to your own requirements. Once you have followed all the steps in this process you can delete this section from the `README.md`.
+### elasticloadbalancerv2
 
-1. Make a copy of this template using the **Use this template** button ![use this template](https://docs.github.com/assets/images/help/repository/use-this-template-button.png)
-1. Give the new repo a name and description ![name](https://docs.github.com/assets/images/help/repository/create-repository-name.png)
-1. Click **Create repository from template**. Then [clone the new repo locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
-1. In order for our code to work, we need to replace all instances of `github.com/overmindtech/aws-source` with the name of your new repo e.g. `github.com/your-username/your-source`. Use find and replace in your editor (or CLI) to do this e.g. [VSCode](https://code.visualstudio.com/docs/editor/codebasics#_find-and-replace)
-1. Install all required modules:
-    ```shell
-    go mod vendor
-    ```
-1. Run the tests to make sure the codebase works
-    ```shell
-    go test ./...
-    ```
-1. You're now ready to start writing your sources, have look in the `sources/` folder for some working example sources that you can base your source on. Remember to delete these though once you're done
-1. While you're going you should be writing tests to ensure that your source behaves the way you expect in different scenarios.
-1. In order for automatic Docker builds and pushes to work, you must create a repository secret called `CR_PAT` which contains a token that can push ti Github Container Registry. Instructions for creating this cn be found [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry)
+Gathers information about Elastic Load Balancers (v2) and their target groups, health checks etc. e.g.
 
+```json
+{
+    "type": "elasticloadbalancerv2",
+    "uniqueAttribute": "name",
+    "attributes": {
+        "attrStruct": {
+            "availabilityZones": [
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-021f8be6388f11fcd",
+                    "zoneName": "eu-west-2a"
+                },
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-0260e9e4e333abd62",
+                    "zoneName": "eu-west-2c"
+                },
+                {
+                    "loadBalancerAddresses": [],
+                    "subnetId": "subnet-092453eee2eea7611",
+                    "zoneName": "eu-west-2b"
+                }
+            ],
+            "canonicalHostedZoneId": "ZD4D7Y8KGAS4G",
+            "createdTime": "2021-12-03 17:07:15.334 +0000 UTC",
+            "dNSName": "vpc-0fe83a8d71bd1803ctest-elbv2-d88c129308d731ef.elb.eu-west-2.amazonaws.com",
+            "ipAddressType": "ipv4",
+            "listeners": [
+                {
+                    "defaultActions": [
+                        {
+                            "forwardConfig": {
+                                "targetGroups": [
+                                    {
+                                        "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003"
+                                    }
+                                ]
+                            },
+                            "order": 1,
+                            "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003",
+                            "type": "forward"
+                        }
+                    ],
+                    "listenerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:listener/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef/40157d5d032e19fd",
+                    "loadBalancerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef",
+                    "port": 80,
+                    "protocol": "TCP"
+                }
+            ],
+            "loadBalancerArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef",
+            "name": "vpc-0fe83a8d71bd1803ctest-elbv2",
+            "scheme": "internet-facing",
+            "state": {
+                "code": "active"
+            },
+            "targetGroups": [
+                {
+                    "healthCheckEnabled": true,
+                    "healthCheckIntervalSeconds": 30,
+                    "healthCheckPort": "traffic-port",
+                    "healthCheckProtocol": "TCP",
+                    "healthCheckTimeoutSeconds": 10,
+                    "healthyThresholdCount": 3,
+                    "ipAddressType": "ipv4",
+                    "loadBalancerArns": [
+                        "arn:aws:elasticloadbalancing:eu-west-2:177828803798:loadbalancer/net/vpc-0fe83a8d71bd1803ctest-elbv2/d88c129308d731ef"
+                    ],
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:eu-west-2:177828803798:targetgroup/fake-targets/dcf0f1f60163c003",
+                    "targetGroupName": "fake-targets",
+                    "targetHealthDescriptions": [
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2c",
+                                "id": "10.174.145.37",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Health checks failed",
+                                "reason": "Target.FailedHealthChecks",
+                                "state": "unhealthy"
+                            }
+                        },
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2a",
+                                "id": "10.174.145.5",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Health checks failed",
+                                "reason": "Target.FailedHealthChecks",
+                                "state": "unhealthy"
+                            }
+                        },
+                        {
+                            "healthCheckPort": "80",
+                            "target": {
+                                "availabilityZone": "eu-west-2b",
+                                "id": "10.174.145.21",
+                                "port": 80
+                            },
+                            "targetHealth": {
+                                "description": "Initial health checks in progress",
+                                "reason": "Elb.InitialHealthChecking",
+                                "state": "initial"
+                            }
+                        }
+                    ],
+                    "targetType": "ip",
+                    "unhealthyThresholdCount": 3,
+                    "vpcId": "vpc-0fe83a8d71bd1803c"
+                }
+            ],
+            "type": "network",
+            "vpcId": "vpc-0fe83a8d71bd1803c"
+        }
+    },
+    "context": "177828803798.eu-west-2",
+    "linkedItemRequests": [
+        {
+            "type": "dns",
+            "query": "vpc-0fe83a8d71bd1803ctest-elbv2-d88c129308d731ef.elb.eu-west-2.amazonaws.com",
+            "context": "global"
+        }
+    ]
+}
+```
+
+#### `Get`
+
+Gets a specific ELB by name.
+
+**Query format:** The name of the ELB
+
+#### `Find`
+
+Finds all ELBs
 
 ## Config
 
@@ -36,8 +163,11 @@ All configuration options can be provided via the command line or as environment
 | `NATS_CA_FILE`| `--nats-ca-file` | ✅ | Path to the CA file that NATS should use when connecting over TLS |
 | `NATS_JWT_FILE`| `--nats-jwt-file` | ✅ | Path to the file containing the user JWT |
 | `NATS_NKEY_FILE`| `--nats-nkey-file` | ✅ | Path to the file containing the NKey seed |
-| `MAX-PARALLEL`| `--max-parallel` | ✅ | Max number of requests to run in parallel |
-| `YOUR_CUSTOM_FLAG`| `--your-custom-flag` |   | Configuration that you add should be documented here |
+| `MAX_PARALLEL`| `--max-parallel` | ✅ | Max number of requests to run in parallel |
+| `AUTO_CONFIG` | `--auto-config` | | Use the local AWS config, the same as the AWS CLI could use. This can be set up with `aws configure` |
+| `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
+| `AWS_REGION` | `--aws-region` | | The AWS region that this source should operate in |
+| `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` | | The secret access key to use for auth |
 
 ### `srcman` config
 
@@ -53,21 +183,11 @@ spec:
   replicas: 2
   manager: manager-sample
   config:
-    # This is the default name of the config file read when the container is
-    # started. Any parameters that are acceptable at the commend line can and
-    # should be passed here
+    # Example config values (not real credentials, don't panic)
     source.yaml: |
-      your-custom-flag: "Some value!"
-    # You can add any additional keys here that your source might require and
-    # they will also become files in the `/etc/srcman/config` directory. For
-    # example the below will create a file called
-    # `/etc/srcman/config/weather.txt` which contains the string "sunny".
-    #
-    # Remember that if you add anything here, you also need to tell your source
-    # to read it. Usually this could be used for things that would otherwise
-    # make the config unwieldy such as certificates. Simple config values
-    # should just go in `source.yaml` since that is read automatically
-    weather.txt: sunny
+      aws-access-key-id: HEGMPEX0232FKZ45FSGV
+      aws-region: eu-west-2
+      aws-secret-access-key: ATOXsYtO1xBG3GjbPIWi7iIN0hZYY3gdmUhaEEC5
 
 ```
 
@@ -101,6 +221,8 @@ Tests in this package can be run using:
 ```shell
 go test ./...
 ```
+
+Note that these tests require building real AWS resources in order to test against them. This mean you'll need local credentials and running the test will actually build real resources (and clean them up). At time of writing the tests cost approx $0.03 per run.
 
 ### Packaging
 
