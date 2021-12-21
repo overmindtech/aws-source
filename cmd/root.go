@@ -122,6 +122,10 @@ Edit this once you have created your source
 				Config:    cfg,
 				AccountID: *callerID.Account,
 			},
+			&elasticloadbalancing.ELBv2Source{
+				Config:    cfg,
+				AccountID: *callerID.Account,
+			},
 		}
 
 		e.AddSources(sources...)
