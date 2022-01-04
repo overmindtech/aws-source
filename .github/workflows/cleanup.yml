@@ -15,5 +15,5 @@ jobs:
           # otherwise it'll try to clean up the packages from the template repo,
           # which you won't have permission to do, and it'll fail
           package_name: aws-source
-          user: overmindtech
+          org: overmindtech
           token: ${{ secrets.CR_PAT }}
