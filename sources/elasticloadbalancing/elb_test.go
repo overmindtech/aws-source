@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
@@ -15,13 +14,8 @@ import (
 func TestELB(t *testing.T) {
 	t.Parallel()
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-
-	if err != nil {
-		t.Skipf("Config load failed: %v", err)
-	}
-
-	elbClient := elb.NewFromConfig(cfg)
+	var err error
+	elbClient := elb.NewFromConfig(TestAWSConfig)
 	name := *TestVPC.ID + "test-elb"
 	tag1key := "test-id"
 	tag1value := "test"
@@ -61,7 +55,7 @@ func TestELB(t *testing.T) {
 		})
 	})
 
-	stsClient := sts.NewFromConfig(cfg)
+	stsClient := sts.NewFromConfig(TestAWSConfig)
 
 	var callerID *sts.GetCallerIdentityOutput
 
@@ -75,11 +69,11 @@ func TestELB(t *testing.T) {
 	}
 
 	src := ELBSource{
-		Config:    cfg,
+		Config:    TestAWSConfig,
 		AccountID: *callerID.Account,
 	}
 
-	testContext := fmt.Sprintf("%v.%v", *callerID.Account, cfg.Region)
+	testContext := fmt.Sprintf("%v.%v", *callerID.Account, TestAWSConfig.Region)
 
 	t.Run("get elb details", func(t *testing.T) {
 		item, err := src.Get(context.Background(), testContext, name)

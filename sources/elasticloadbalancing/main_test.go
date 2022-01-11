@@ -270,6 +270,9 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
+	// Override region since the tests require this at the moment
+	TestAWSConfig.Region = "eu-west-2"
+
 	ec2Client := ec2.NewFromConfig(TestAWSConfig)
 
 	err = TestVPC.Create(ec2Client)
