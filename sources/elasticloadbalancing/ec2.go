@@ -43,7 +43,7 @@ func (s *EC2Source) Client() *ec2.Client {
 
 // Type The type of items that this source is capable of finding
 func (s *EC2Source) Type() string {
-	return "ec2_instance"
+	return "ec2-instance"
 }
 
 // Descriptive name for the source, used in logging and metadata

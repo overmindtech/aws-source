@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.15.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.13.0
 	github.com/iancoleman/strcase v0.2.0
-	github.com/overmindtech/discovery v0.9.4
+	github.com/overmindtech/discovery v0.10.0
 	github.com/overmindtech/sdp-go v0.6.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.3.0

@@ -4,13 +4,13 @@ This source integrates with AWS, allowing Overmind to pull data about many types
 
 ## Sources
 
-### elasticloadbalancing_loadbalancer_v2
+### elasticloadbalancing-loadbalancer-v2
 
 Gathers information about Elastic Load Balancers (v2) and their target groups, health checks etc. e.g.
 
 ```json
 {
-    "type": "elasticloadbalancing_loadbalancer_v2",
+    "type": "elasticloadbalancing-loadbalancer-v2",
     "uniqueAttribute": "name",
     "attributes": {
         "attrStruct": {
@@ -210,7 +210,7 @@ readinessProbe:
 
 The naming convention for types is as follows:
 
-`{api}_{described_thing}_{version (optional)}`
+`{api}-{described_thing}-{version (optional)}`
 
 **API:** The name of the api as it appears when making requests e.g. if you make requests to `https://ec2.amazonaws.com/?Action=CreateRouteTable` then the API name would be `ec2`. 
 
@@ -220,8 +220,8 @@ The naming convention for types is as follows:
 
 Some full examples of this naming convention therefore are:
 
-* ec2_instance
-* elasticloadbalancing_loadbalancer_v2
+* ec2-instance
+* elasticloadbalancing-loadbalancer-v2
 
 Check the [AWS API Documentation](https://docs.aws.amazon.com/) in order to predict other names.
 
