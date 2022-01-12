@@ -44,7 +44,7 @@ func (s *ELBv2Source) Client() *elbv2.Client {
 
 // Type The type of items that this source is capable of finding
 func (s *ELBv2Source) Type() string {
-	return "elasticloadbalancerv2"
+	return "elasticloadbalancing-loadbalancer-v2"
 }
 
 // Descriptive name for the source, used in logging and metadata
@@ -95,7 +95,7 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 	case 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
-			ErrorString: "elasticloadbalancer not found",
+			ErrorString: "elasticloadbalancing-loadbalancer-v2 not found",
 			Context:     itemContext,
 		}
 	case 1:
@@ -113,7 +113,7 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancer found, found: %v", len(lbs.LoadBalancers)),
+			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancing-loadbalancer-v2 found, found: %v", len(lbs.LoadBalancers)),
 			Context:     itemContext,
 		}
 	}
@@ -257,13 +257,13 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: "elasticloadbalancer was returned with an empty name",
+			ErrorString: "elasticloadbalancing-loadbalancer-v2 was returned with an empty name",
 			Context:     itemContext,
 		}
 	}
 
 	item := sdp.Item{
-		Type:            "elasticloadbalancerv2",
+		Type:            "elasticloadbalancing-loadbalancer-v2",
 		UniqueAttribute: "name",
 		Context:         itemContext,
 	}

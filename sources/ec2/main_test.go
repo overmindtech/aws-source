@@ -1,4 +1,4 @@
-package elasticloadbalancing
+package ec2
 
 import (
 	"context"
@@ -20,18 +20,18 @@ var TestAWSConfig aws.Config
 var TestAccountID string
 var TestContext string
 var TestVPC = sources.VPCConfig{
-	CidrBlock: "10.174.146.0/24",
+	CidrBlock: "10.174.145.0/24",
 	Subnets: []*sources.Subnet{
 		{
-			CIDR:             "10.174.146.0/28",
+			CIDR:             "10.174.145.0/28",
 			AvailabilityZone: "eu-west-2a",
 		},
 		{
-			CIDR:             "10.174.146.16/28",
+			CIDR:             "10.174.145.16/28",
 			AvailabilityZone: "eu-west-2b",
 		},
 		{
-			CIDR:             "10.174.146.32/28",
+			CIDR:             "10.174.145.32/28",
 			AvailabilityZone: "eu-west-2c",
 		},
 	},

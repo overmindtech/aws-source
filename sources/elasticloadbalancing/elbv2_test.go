@@ -11,7 +11,6 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/discovery"
 )
 
@@ -191,28 +190,13 @@ func TestNLBv2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stsClient := sts.NewFromConfig(TestAWSConfig)
-
-	var callerID *sts.GetCallerIdentityOutput
-
-	callerID, err = stsClient.GetCallerIdentity(
-		context.Background(),
-		&sts.GetCallerIdentityInput{},
-	)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	src := ELBv2Source{
 		Config:    TestAWSConfig,
-		AccountID: *callerID.Account,
+		AccountID: TestAccountID,
 	}
 
-	testContext := fmt.Sprintf("%v.%v", *callerID.Account, TestAWSConfig.Region)
-
 	t.Run("get NLB details", func(t *testing.T) {
-		item, err := src.Get(context.Background(), testContext, name)
+		item, err := src.Get(context.Background(), TestContext, name)
 
 		if err != nil {
 			t.Fatal(err)
@@ -228,7 +212,7 @@ func TestNLBv2(t *testing.T) {
 	})
 
 	t.Run("get NLB that doesn't exist", func(t *testing.T) {
-		_, err := src.Get(context.Background(), testContext, "foobar")
+		_, err := src.Get(context.Background(), TestContext, "foobar")
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -237,7 +221,7 @@ func TestNLBv2(t *testing.T) {
 	})
 
 	t.Run("find all NLBs", func(t *testing.T) {
-		items, err := src.Find(context.Background(), testContext)
+		items, err := src.Find(context.Background(), TestContext)
 
 		if err != nil {
 			t.Fatal(err)

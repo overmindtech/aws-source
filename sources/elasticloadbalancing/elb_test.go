@@ -2,26 +2,18 @@ package elasticloadbalancing
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/discovery"
 )
 
 func TestELB(t *testing.T) {
 	t.Parallel()
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-
-	if err != nil {
-		t.Skipf("Config load failed: %v", err)
-	}
-
-	elbClient := elb.NewFromConfig(cfg)
+	var err error
+	elbClient := elb.NewFromConfig(TestAWSConfig)
 	name := *TestVPC.ID + "test-elb"
 	tag1key := "test-id"
 	tag1value := "test"
@@ -61,28 +53,13 @@ func TestELB(t *testing.T) {
 		})
 	})
 
-	stsClient := sts.NewFromConfig(cfg)
-
-	var callerID *sts.GetCallerIdentityOutput
-
-	callerID, err = stsClient.GetCallerIdentity(
-		context.Background(),
-		&sts.GetCallerIdentityInput{},
-	)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	src := ELBSource{
-		Config:    cfg,
-		AccountID: *callerID.Account,
+		Config:    TestAWSConfig,
+		AccountID: TestAccountID,
 	}
-
-	testContext := fmt.Sprintf("%v.%v", *callerID.Account, cfg.Region)
 
 	t.Run("get elb details", func(t *testing.T) {
-		item, err := src.Get(context.Background(), testContext, name)
+		item, err := src.Get(context.Background(), TestContext, name)
 
 		if err != nil {
 			t.Fatal(err)
@@ -92,7 +69,7 @@ func TestELB(t *testing.T) {
 	})
 
 	t.Run("get elb that doesn't exist", func(t *testing.T) {
-		_, err := src.Get(context.Background(), testContext, "foobar")
+		_, err := src.Get(context.Background(), TestContext, "foobar")
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -101,7 +78,7 @@ func TestELB(t *testing.T) {
 	})
 
 	t.Run("find all ELBs", func(t *testing.T) {
-		items, err := src.Find(context.Background(), testContext)
+		items, err := src.Find(context.Background(), TestContext)
 
 		if err != nil {
 			t.Fatal(err)
