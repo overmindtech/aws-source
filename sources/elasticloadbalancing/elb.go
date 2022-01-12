@@ -43,7 +43,7 @@ func (s *ELBSource) Client() *elb.Client {
 
 // Type The type of items that this source is capable of finding
 func (s *ELBSource) Type() string {
-	return "elasticloadbalancer"
+	return "elasticloadbalancing_loadbalancer_v1"
 }
 
 // Descriptive name for the source, used in logging and metadata
@@ -94,7 +94,7 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 	case 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
-			ErrorString: "elasticloadbalancer not found",
+			ErrorString: "elasticloadbalancing_loadbalancer_v1 not found",
 			Context:     itemContext,
 		}
 	case 1:
@@ -108,11 +108,11 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 			}
 		}
 
-		return mapElasticloadbalancerToItem(expanded, itemContext)
+		return mapELBv1ToItem(expanded, itemContext)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancer found, found: %v", len(lbs.LoadBalancerDescriptions)),
+			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancing_loadbalancer_v1 found, found: %v", len(lbs.LoadBalancerDescriptions)),
 			Context:     itemContext,
 		}
 	}
@@ -154,7 +154,7 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 			}
 		}
 
-		item, err := mapElasticloadbalancerToItem(expanded, itemContext)
+		item, err := mapELBv1ToItem(expanded, itemContext)
 
 		if err == nil {
 			items = append(items, item)
@@ -203,20 +203,20 @@ func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescripti
 	return &expandedLb, nil
 }
 
-// mapElasticloadbalancerToItem Maps a load balancer to an item
-func mapElasticloadbalancerToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
+// mapELBv1ToItem Maps a load balancer to an item
+func mapELBv1ToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
 	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: "elasticloadbalancer was returned with an empty name",
+			ErrorString: "elasticloadbalancing_loadbalancer_v1 was returned with an empty name",
 			Context:     itemContext,
 		}
 	}
 
 	item := sdp.Item{
-		Type:            "elasticloadbalancer",
+		Type:            "elasticloadbalancing_loadbalancer_v1",
 		UniqueAttribute: "name",
 		Context:         itemContext,
 	}

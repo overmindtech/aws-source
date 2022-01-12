@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type Subnet struct {
@@ -34,11 +35,18 @@ type VPCConfig struct {
 	cleanupFunctions []func()
 }
 
-var tagKey = "purpose"
-var tagValue = "automated-testing-" + time.Now().String()
-var tags = types.Tag{
-	Key:   &tagKey,
-	Value: &tagValue,
+var purposeKey = "Purpose"
+var nameKey = "Name"
+var tagValue = "automated-testing-" + time.Now().Format("2006-01-02T15:04:05.000Z")
+var TestTags = []types.Tag{
+	{
+		Key:   &purposeKey,
+		Value: &tagValue,
+	},
+	{
+		Key:   &nameKey,
+		Value: &tagValue,
+	},
 }
 
 func (v *VPCConfig) Cleanup(f func()) {
@@ -67,7 +75,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 			TagSpecifications: []types.TagSpecification{
 				{
 					ResourceType: types.ResourceTypeVpc,
-					Tags:         []types.Tag{tags},
+					Tags:         TestTags,
 				},
 			},
 		},
@@ -109,7 +117,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 			TagSpecifications: []types.TagSpecification{
 				{
 					ResourceType: types.ResourceTypeInternetGateway,
-					Tags:         []types.Tag{tags},
+					Tags:         TestTags,
 				},
 			},
 		},
@@ -186,7 +194,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 				TagSpecifications: []types.TagSpecification{
 					{
 						ResourceType: types.ResourceTypeSubnet,
-						Tags:         []types.Tag{tags},
+						Tags:         TestTags,
 					},
 				},
 			},
@@ -256,7 +264,11 @@ var TestVPC = VPCConfig{
 	},
 }
 
+// Shared variables that are populated before tests are run. These can be used
+// to that each doesn't need to load config each time
 var TestAWSConfig aws.Config
+var TestAccountID string
+var TestContext string
 
 func TestMain(m *testing.M) {
 	var err error
@@ -280,6 +292,23 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	stsClient := sts.NewFromConfig(TestAWSConfig)
+
+	var callerID *sts.GetCallerIdentityOutput
+
+	callerID, err = stsClient.GetCallerIdentity(
+		context.Background(),
+		&sts.GetCallerIdentityInput{},
+	)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	TestAccountID = *callerID.Account
+
+	TestContext = fmt.Sprintf("%v.%v", TestAccountID, TestAWSConfig.Region)
 
 	exitVal := m.Run()
 
