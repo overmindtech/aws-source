@@ -150,6 +150,185 @@ Gets a specific ELB by name.
 
 Finds all ELBs
 
+### ec2-instance
+
+Get instance info
+
+```json
+{
+    "type": "ec2-instance",
+    "uniqueAttribute": "instanceId",
+    "attributes": {
+        "attrStruct": {
+            "amiLaunchIndex": 0,
+            "architecture": "x86_64",
+            "blockDeviceMappings": [
+                {
+                    "deviceName": "/dev/xvda",
+                    "ebs": {
+                        "attachTime": "2022-01-12T15:21:19Z",
+                        "deleteOnTermination": true,
+                        "status": "attached",
+                        "volumeId": "vol-02d2952cd8fd23a62"
+                    }
+                }
+            ],
+            "bootMode": "",
+            "capacityReservationSpecification": {
+                "capacityReservationPreference": "open"
+            },
+            "clientToken": "0b501817-8c52-4c6c-b5dd-6f4a336ccd04",
+            "cpuOptions": {
+                "coreCount": 1,
+                "threadsPerCore": 2
+            },
+            "ebsOptimized": false,
+            "enaSupport": true,
+            "enclaveOptions": {
+                "enabled": false
+            },
+            "hibernationOptions": {
+                "configured": false
+            },
+            "hypervisor": "xen",
+            "imageId": "ami-0fdbd8587b1cf431e",
+            "instanceId": "i-09b0c0768577775ef",
+            "instanceLifecycle": "",
+            "instanceType": "t3.micro",
+            "launchTime": "2022-01-12T15:21:18Z",
+            "metadataOptions": {
+                "httpEndpoint": "enabled",
+                "httpProtocolIpv6": "disabled",
+                "httpPutResponseHopLimit": 1,
+                "httpTokens": "optional",
+                "state": "applied"
+            },
+            "monitoring": {
+                "state": "disabled"
+            },
+            "networkInterfaces": [
+                {
+                    "attachment": {
+                        "attachTime": "2022-01-12T15:21:18Z",
+                        "attachmentId": "eni-attach-056b3d8e583a24eb2",
+                        "deleteOnTermination": true,
+                        "deviceIndex": 0,
+                        "networkCardIndex": 0,
+                        "status": "attached"
+                    },
+                    "description": "",
+                    "groups": [
+                        {
+                            "groupId": "sg-012c2822f90f34249",
+                            "groupName": "default"
+                        }
+                    ],
+                    "interfaceType": "interface",
+                    "ipv6Addresses": [],
+                    "macAddress": "06:68:1f:90:08:70",
+                    "networkInterfaceId": "eni-0379384dd689e7afc",
+                    "ownerId": "177828803798",
+                    "privateIpAddress": "10.174.145.13",
+                    "privateIpAddresses": [
+                        {
+                            "primary": true,
+                            "privateIpAddress": "10.174.145.13"
+                        }
+                    ],
+                    "sourceDestCheck": true,
+                    "status": "in-use",
+                    "subnetId": "subnet-0889bae2a717b3ab9",
+                    "vpcId": "vpc-0e506f1a2e3074376"
+                }
+            ],
+            "placement": {
+                "availabilityZone": "eu-west-2a",
+                "groupName": "",
+                "tenancy": "default"
+            },
+            "platform": "",
+            "platformDetails": "Linux/UNIX",
+            "privateDnsName": "ip-10-174-145-13.eu-west-2.compute.internal",
+            "privateDnsNameOptions": {
+                "enableResourceNameDnsAAAARecord": false,
+                "enableResourceNameDnsARecord": false,
+                "hostnameType": "ip-name"
+            },
+            "privateIpAddress": "10.174.145.13",
+            "productCodes": [],
+            "publicDnsName": "",
+            "rootDeviceName": "/dev/xvda",
+            "rootDeviceType": "ebs",
+            "securityGroups": [
+                {
+                    "groupId": "sg-012c2822f90f34249",
+                    "groupName": "default"
+                }
+            ],
+            "sourceDestCheck": true,
+            "state": {
+                "code": 16,
+                "name": "running"
+            },
+            "stateTransitionReason": "",
+            "subnetId": "subnet-0889bae2a717b3ab9",
+            "tags": [
+                {
+                    "key": "Purpose",
+                    "value": "automated-testing-2022-01-12T15:21:16.012Z"
+                },
+                {
+                    "key": "Name",
+                    "value": "automated-testing-2022-01-12T15:21:16.012Z"
+                }
+            ],
+            "usageOperation": "RunInstances",
+            "usageOperationUpdateTime": "2022-01-12T15:21:18Z",
+            "virtualizationType": "hvm",
+            "vpcId": "vpc-0e506f1a2e3074376"
+        }
+    },
+    "context": "177828803798.eu-west-2",
+    "linkedItemRequests": [
+        {
+            "type": "ec2-image",
+            "query": "ami-0fdbd8587b1cf431e",
+            "context": "177828803798.eu-west-2"
+        },
+        {
+            "type": "ip",
+            "query": "10.174.145.13",
+            "context": "global"
+        },
+        {
+            "type": "ec2-subnet",
+            "query": "subnet-0889bae2a717b3ab9",
+            "context": "177828803798.eu-west-2"
+        },
+        {
+            "type": "ec2-vpc",
+            "query": "vpc-0e506f1a2e3074376",
+            "context": "177828803798.eu-west-2"
+        },
+        {
+            "type": "ec2-securitygroup",
+            "query": "sg-012c2822f90f34249",
+            "context": "177828803798.eu-west-2"
+        }
+    ]
+}
+```
+
+#### `Get`
+
+Gets a specific instance by ID.
+
+**Query format:** The ID of the instance e.g. `i-09b0c0768577775ef`
+
+#### `Find`
+
+Finds all instances
+
 ## Config
 
 All configuration options can be provided via the command line or as environment variables:

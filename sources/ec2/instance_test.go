@@ -114,7 +114,7 @@ func TestEC2(t *testing.T) {
 		AccountID: TestAccountID,
 	}
 
-	t.Run("with correct instance ID", func(t *testing.T) {
+	t.Run("Get with correct instance ID", func(t *testing.T) {
 		item, err := src.Get(context.Background(), TestContext, tr.InstanceID)
 
 		if err != nil {
@@ -124,12 +124,26 @@ func TestEC2(t *testing.T) {
 		discovery.TestValidateItem(t, item)
 	})
 
-	t.Run("with incorrect instance ID", func(t *testing.T) {
+	t.Run("Get with incorrect instance ID", func(t *testing.T) {
 		_, err := src.Get(context.Background(), TestContext, "i-0ecfa0a234cbc132")
 
 		if err == nil {
 			t.Error("expected error but got nil")
 		}
+	})
+
+	t.Run("Find", func(t *testing.T) {
+		items, err := src.Find(context.Background(), TestContext)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if len(items) == 0 {
+			t.Error("Expected items to be found but got nothing")
+		}
+
+		discovery.TestValidateItems(t, items)
 	})
 
 }

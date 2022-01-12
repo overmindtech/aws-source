@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -142,6 +143,63 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 	// Pull the first instance
 	instance := reservation.Instances[0]
 
+	return mapInstanceToItem(instance, itemContext)
+}
+
+// Find Finds all items in a given context
+func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
+	if itemContext != s.Contexts()[0] {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
+			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
+			Context:     itemContext,
+		}
+	}
+
+	items := make([]*sdp.Item, 0)
+	instances := make([]types.Instance, 0)
+	var maxResults int32 = 100
+	var nextToken *string
+
+	for morePages := true; morePages; {
+		describeInstancesOutput, err := s.Client().DescribeInstances(
+			ctx,
+			&ec2.DescribeInstancesInput{
+				MaxResults: &maxResults,
+				NextToken:  nextToken,
+			},
+		)
+
+		if err != nil {
+			return items, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_OTHER,
+				ErrorString: err.Error(),
+				Context:     itemContext,
+			}
+		}
+
+		for _, reservation := range describeInstancesOutput.Reservations {
+			instances = append(instances, reservation.Instances...)
+		}
+
+		// If there is more data we should store the token so that we can use
+		// that. We also need to set morePages to true so that the loop runs
+		// again
+		nextToken = describeInstancesOutput.NextToken
+		morePages = (nextToken != nil)
+	}
+
+	// Convert to items
+	for _, instance := range instances {
+		item, _ := mapInstanceToItem(instance, itemContext)
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, error) {
+	var err error
 	var attrs *sdp.ItemAttributes
 	attrs, err = sources.ToAttributesCase(instance)
 
@@ -154,7 +212,7 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 	}
 
 	item := sdp.Item{
-		Type:            s.Type(),
+		Type:            "ec2-instance",
 		UniqueAttribute: "instanceId",
 		Context:         itemContext,
 		Attributes:      attrs,
@@ -245,21 +303,6 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 	}
 
 	return &item, nil
-}
-
-// Find Finds all items in a given context
-func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
-		}
-	}
-
-	items := make([]*sdp.Item, 0)
-
-	return items, nil
 }
 
 // Weight Returns the priority weighting of items returned by this source.
