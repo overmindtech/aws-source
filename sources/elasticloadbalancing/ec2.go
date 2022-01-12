@@ -154,19 +154,95 @@ func (s *EC2Source) Get(ctx context.Context, itemContext string, query string) (
 	}
 
 	item := sdp.Item{
-		Type:            "ec2instance",
-		UniqueAttribute: "id",
+		Type:            s.Type(),
+		UniqueAttribute: "instanceId",
 		Context:         itemContext,
 		Attributes:      attrs,
 	}
 
 	if instance.ImageId != nil {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type: "",
+			Type:    "ec2-image",
+			Method:  sdp.RequestMethod_GET,
+			Query:   *instance.ImageId,
+			Context: itemContext,
 		})
 	}
 
-	// TODO: Linked item requests
+	for _, nic := range instance.NetworkInterfaces {
+		// IPs
+		for _, ip := range nic.Ipv6Addresses {
+			if ip.Ipv6Address != nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:    "ip",
+					Method:  sdp.RequestMethod_GET,
+					Query:   *ip.Ipv6Address,
+					Context: "global",
+				})
+			}
+		}
+
+		for _, ip := range nic.PrivateIpAddresses {
+			if ip.PrivateIpAddress != nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:    "ip",
+					Method:  sdp.RequestMethod_GET,
+					Query:   *ip.PrivateIpAddress,
+					Context: "global",
+				})
+			}
+		}
+
+		// Subnet
+		if nic.SubnetId != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:    "ec2-subnet",
+				Method:  sdp.RequestMethod_GET,
+				Query:   *nic.SubnetId,
+				Context: itemContext,
+			})
+		}
+
+		// VPC
+		if nic.VpcId != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:    "ec2-vpc",
+				Method:  sdp.RequestMethod_GET,
+				Query:   *nic.VpcId,
+				Context: itemContext,
+			})
+		}
+	}
+
+	if instance.PublicDnsName != nil {
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "dns",
+			Method:  sdp.RequestMethod_GET,
+			Query:   *instance.PublicDnsName,
+			Context: "global",
+		})
+	}
+
+	if instance.PublicIpAddress != nil {
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "ip",
+			Method:  sdp.RequestMethod_GET,
+			Query:   *instance.PublicIpAddress,
+			Context: "global",
+		})
+	}
+
+	// Security groups
+	for _, group := range instance.SecurityGroups {
+		if group.GroupId != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:    "ec2-securitygroup",
+				Method:  sdp.RequestMethod_GET,
+				Query:   *group.GroupId,
+				Context: itemContext,
+			})
+		}
+	}
 
 	return &item, nil
 }
