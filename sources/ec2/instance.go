@@ -1,4 +1,4 @@
-package elasticloadbalancing
+package ec2
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-type EC2Source struct {
+type InstanceSource struct {
 	// Config AWS Config including region and credentials
 	Config aws.Config
 
@@ -25,7 +25,7 @@ type EC2Source struct {
 	clientMutex   sync.Mutex
 }
 
-func (s *EC2Source) Client() *ec2.Client {
+func (s *InstanceSource) Client() *ec2.Client {
 	s.clientMutex.Lock()
 	defer s.clientMutex.Unlock()
 
@@ -42,18 +42,18 @@ func (s *EC2Source) Client() *ec2.Client {
 }
 
 // Type The type of items that this source is capable of finding
-func (s *EC2Source) Type() string {
+func (s *InstanceSource) Type() string {
 	return "ec2-instance"
 }
 
 // Descriptive name for the source, used in logging and metadata
-func (s *EC2Source) Name() string {
+func (s *InstanceSource) Name() string {
 	return "ec2-aws-source"
 }
 
 // List of contexts that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *EC2Source) Contexts() []string {
+func (s *InstanceSource) Contexts() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
@@ -64,7 +64,7 @@ func (s *EC2Source) Contexts() []string {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *EC2Source) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
+func (s *InstanceSource) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
 	if itemContext != s.Contexts()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
@@ -214,7 +214,7 @@ func (s *EC2Source) Get(ctx context.Context, itemContext string, query string) (
 		}
 	}
 
-	if instance.PublicDnsName != nil {
+	if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 			Type:    "dns",
 			Method:  sdp.RequestMethod_GET,
@@ -248,7 +248,7 @@ func (s *EC2Source) Get(ctx context.Context, itemContext string, query string) (
 }
 
 // Find Finds all items in a given context
-func (s *EC2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
+func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
 	if itemContext != s.Contexts()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
@@ -266,6 +266,6 @@ func (s *EC2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // sen on, so the one with the higher weight value will win.
-func (s *EC2Source) Weight() int {
+func (s *InstanceSource) Weight() int {
 	return 100
 }

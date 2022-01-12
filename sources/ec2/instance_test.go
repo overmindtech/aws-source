@@ -1,4 +1,4 @@
-package elasticloadbalancing
+package ec2
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/discovery"
 )
 
@@ -71,7 +72,7 @@ func createEC2(t *testing.T) TestResources {
 			TagSpecifications: []types.TagSpecification{
 				{
 					ResourceType: types.ResourceTypeInstance,
-					Tags:         TestTags,
+					Tags:         sources.TestTags,
 				},
 			},
 		},
@@ -108,7 +109,7 @@ func TestEC2(t *testing.T) {
 
 	tr := createEC2(t)
 
-	src := EC2Source{
+	src := InstanceSource{
 		Config:    TestAWSConfig,
 		AccountID: TestAccountID,
 	}
@@ -121,6 +122,14 @@ func TestEC2(t *testing.T) {
 		}
 
 		discovery.TestValidateItem(t, item)
+	})
+
+	t.Run("with incorrect instance ID", func(t *testing.T) {
+		_, err := src.Get(context.Background(), TestContext, "i-0ecfa0a234cbc132")
+
+		if err == nil {
+			t.Error("expected error but got nil")
+		}
 	})
 
 }
