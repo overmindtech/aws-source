@@ -3,6 +3,8 @@ package elasticloadbalancing
 import (
 	"context"
 	"fmt"
+	"net"
+	"strings"
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -299,7 +301,60 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 	if lb.VpcId != nil {
 		attrMap["vpcId"] = lb.VpcId
 
-		// TODO: Linked item request to VPC
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "ec2-vpc",
+			Method:  sdp.RequestMethod_GET,
+			Query:   *lb.VpcId,
+			Context: itemContext,
+		})
+	}
+
+	for _, tg := range lb.TargetGroups {
+		for _, healthDescription := range tg.TargetHealthDescriptions {
+			if target := healthDescription.Target; target != nil {
+				if id := target.Id; id != nil {
+					// The ID of the target. If the target type of the target group is instance,
+					// specify an instance ID. If the target type is ip, specify an IP address. If the
+					// target type is lambda, specify the ARN of the Lambda function. If the target
+					// type is alb, specify the ARN of the Application Load Balancer target.
+					if net.ParseIP(*id) != nil {
+						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+							Type:    "ip",
+							Method:  sdp.RequestMethod_GET,
+							Query:   *id,
+							Context: "global",
+						})
+					}
+
+					if strings.HasPrefix(*id, "i-") {
+						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+							Type:    "ec2-instance",
+							Method:  sdp.RequestMethod_GET,
+							Query:   *id,
+							Context: itemContext,
+						})
+					}
+
+					if strings.HasPrefix(*id, "arn:aws:lambda") {
+						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+							Type:    "lambda-function",
+							Method:  sdp.RequestMethod_GET,
+							Query:   *id,
+							Context: itemContext,
+						})
+					}
+
+					if strings.HasPrefix(*id, "arn:aws:elasticloadbalancing") {
+						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+							Type:    "elasticloadbalancing-loadbalancer-v2",
+							Method:  sdp.RequestMethod_GET,
+							Query:   *id,
+							Context: itemContext,
+						})
+					}
+				}
+			}
+		}
 	}
 
 	attributes, err := sources.ToAttributesCase(attrMap)
