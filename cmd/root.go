@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
@@ -123,6 +124,10 @@ Edit this once you have created your source
 				AccountID: *callerID.Account,
 			},
 			&elasticloadbalancing.ELBv2Source{
+				Config:    cfg,
+				AccountID: *callerID.Account,
+			},
+			&ec2.InstanceSource{
 				Config:    cfg,
 				AccountID: *callerID.Account,
 			},
