@@ -22,12 +22,9 @@ jobs:
 
     - name: Check for updates
       run: go get -t -u ./...
-  
+
     - name: Tidy go.mod
       run: go mod tidy
-
-    - name: Download new modules
-      run: go mod vendor
     
     - name: Commit changes
       uses: devops-infra/action-commit-push@master
