@@ -1,0 +1,50 @@
+name: Upgrade Dependencies
+on:
+  schedule:
+    # Monthly
+    - cron:  '36 13 1 * *'
+  workflow_dispatch:
+jobs:
+  upgrade:
+    name: Upgrade
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.x
+    
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Check for updates
+      run: go get -t -u ./...
+  
+    - name: Tidy go.mod
+      run: go mod tidy
+
+    - name: Download new modules
+      run: go mod vendor
+
+    - name: Run Tests
+      run: go test ./... -race
+    
+    - name: Commit changes
+      uses: devops-infra/action-commit-push@master
+      with:
+        github_token: "${{ secrets.GITHUB_TOKEN }}"
+        commit_prefix: "[AUTO]"
+        commit_message: "Updated dependencies"
+        force: false
+        target_branch: updated_deps
+
+    - name: Create pull request
+      uses: devops-infra/action-pull-request@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        source_branch: updated_deps
+        target_branch: main
+        title: "[AUTO] Updated Dependencies"
+        body: "Dependencies have been automatically updated\n\n**Note:** Automatic tests will not run on this dut to it being created by an action. However the following has already passed:\n\n```\ngo test ./... -race\n```"
+        get_diff: true
