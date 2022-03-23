@@ -331,7 +331,7 @@ func createTokenClient(natsJWT string, natsNKeySeed string) (discovery.TokenClie
 		return nil, fmt.Errorf("could not parse nats-jwt: %v", err)
 	}
 
-	if kp, err = nkeys.FromRawSeed(nkeys.PrefixByteUser, []byte(natsNKeySeed)); err != nil {
+	if kp, err = nkeys.FromSeed([]byte(natsNKeySeed)); err != nil {
 		return nil, fmt.Errorf("could not parse nats-nkey-seed: %v", err)
 	}
 
