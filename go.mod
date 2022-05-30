@@ -12,8 +12,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.6
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.2.1-0.20220330180145-442af02fd36a
-	github.com/overmindtech/discovery v0.12.6
-	github.com/overmindtech/multiconn v0.3.1
+	github.com/overmindtech/discovery v0.12.7
+	github.com/overmindtech/multiconn v0.3.2
 	github.com/overmindtech/sdp-go v0.9.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
@@ -66,4 +66,10 @@ require (
 	gopkg.in/ini.v1 v1.66.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+require (
+	github.com/kr/pretty v0.3.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.6.1 // indirect
 )
