@@ -16,4 +16,4 @@ jobs:
           # which you won't have permission to do, and it'll fail
           package_name: aws-source
           org: overmindtech
-          token: ${{ secrets.CR_PAT }}
+          token: ${{ secrets.GHCR_PUSH }}
