@@ -13,7 +13,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.17.3
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
-	github.com/overmindtech/discovery v0.13.1
+	github.com/nats-io/nkeys v0.3.0
+	github.com/overmindtech/discovery v0.13.2
 	github.com/overmindtech/multiconn v0.3.6
 	github.com/overmindtech/sdp-go v0.13.7
 	github.com/sirupsen/logrus v1.9.0
@@ -43,7 +44,6 @@ require (
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/nats-io/nats.go v1.20.0 // indirect
-	github.com/nats-io/nkeys v0.3.0
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/sdpcache v0.3.2 // indirect
 	github.com/overmindtech/tokenx-client v0.3.0 // indirect
