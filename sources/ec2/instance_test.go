@@ -23,7 +23,7 @@ func createEC2(t *testing.T) TestResources {
 
 	filterName := "name"
 
-	// FInd the image ID
+	// Find the image ID
 	imagesOutput, err := ec2Client.DescribeImages(
 		context.Background(),
 		&ec2.DescribeImagesInput{
