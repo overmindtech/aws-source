@@ -308,7 +308,7 @@ func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, 
 // Weight Returns the priority weighting of items returned by this source.
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
-// sen on, so the one with the higher weight value will win.
+// seen on, so the one with the higher weight value will win.
 func (s *InstanceSource) Weight() int {
 	return 100
 }

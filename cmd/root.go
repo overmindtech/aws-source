@@ -20,6 +20,7 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
+	"github.com/overmindtech/aws-source/sources/securitygroup"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/multiconn"
 	"github.com/spf13/cobra"
@@ -154,6 +155,10 @@ Edit this once you have created your source
 				AccountID: *callerID.Account,
 			},
 			&ec2.InstanceSource{
+				Config:    cfg,
+				AccountID: *callerID.Account,
+			},
+			&securitygroup.SecurityGroupSource{
 				Config:    cfg,
 				AccountID: *callerID.Account,
 			},
