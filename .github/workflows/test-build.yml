@@ -30,6 +30,9 @@ jobs:
         run: |
           go get -v -t -d ./...
 
+      - name: Vet
+        run: go vet
+
       - name: Run tests
         run: go test ./...
         env:
