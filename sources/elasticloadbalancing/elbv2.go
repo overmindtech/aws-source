@@ -357,6 +357,15 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 		}
 	}
 
+	// Security groups
+	for _, group := range lb.SecurityGroups {
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "ec2-securitygroup",
+			Method:  sdp.RequestMethod_GET,
+			Query:   group,
+			Context: itemContext,
+		})
+	}
 	attributes, err := sources.ToAttributesCase(attrMap)
 
 	if err != nil {

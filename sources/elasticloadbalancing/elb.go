@@ -180,14 +180,14 @@ type ExpandedELB struct {
 }
 
 func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescription) (*ExpandedELB, error) {
-	var instanceHealthOutout *elb.DescribeInstanceHealthOutput
+	var instanceHealthOutput *elb.DescribeInstanceHealthOutput
 	var err error
 
 	expandedLb := ExpandedELB{
 		LoadBalancerDescription: lb,
 	}
 
-	instanceHealthOutout, err = s.Client().DescribeInstanceHealth(
+	instanceHealthOutput, err = s.Client().DescribeInstanceHealth(
 		ctx,
 		&elb.DescribeInstanceHealthInput{
 			LoadBalancerName: lb.LoadBalancerName,
@@ -198,7 +198,7 @@ func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescripti
 		return nil, err
 	}
 
-	expandedLb.Instances = instanceHealthOutout.InstanceStates
+	expandedLb.Instances = instanceHealthOutput.InstanceStates
 
 	return &expandedLb, nil
 }
@@ -259,6 +259,27 @@ func mapELBv1ToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
 			Method:  sdp.RequestMethod_GET,
 			Query:   *lb.DNSName,
 			Context: "global",
+		})
+	}
+
+	if lb.VPCId != nil {
+		attrMap["VPCId"] = lb.VPCId
+
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "ec2-vpc",
+			Method:  sdp.RequestMethod_GET,
+			Query:   *lb.VPCId,
+			Context: itemContext,
+		})
+	}
+
+	// Security groups
+	for _, group := range lb.SecurityGroups {
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:    "ec2-securitygroup",
+			Method:  sdp.RequestMethod_GET,
+			Query:   group,
+			Context: itemContext,
 		})
 	}
 
