@@ -17,14 +17,10 @@ type Subnet struct {
 }
 
 type VPCConfig struct {
-	// These are populated after creation
-	ID                *string
-	InternetGatewayId *string
+	// These are populated after Fetching
+	ID *string
 
-	// CIDR to allocate *Required for create*
-	CidrBlock string
-
-	// Subnets to create
+	// Subnets in this VPC
 	Subnets []*Subnet
 
 	cleanupFunctions []func()
@@ -58,19 +54,19 @@ func (v *VPCConfig) RunCleanup() {
 	}
 }
 
-// Create Creates the VPC and subnets and registers cleanup actions for them
-func (v *VPCConfig) Create(client *ec2.Client) error {
-	var vpcOutput *ec2.CreateVpcOutput
-	var err error
-
-	vpcOutput, err = client.CreateVpc(
+// Fetch Fetches the VPC and subnets and registers cleanup actions for them
+func (v *VPCConfig) Fetch(client *ec2.Client) error {
+	// manually configured VPC in eu-west-2
+	vpcid := "vpc-061f0bb58acec88ad"
+	v.ID = &vpcid // vpcOutput.Vpc.VpcId
+	filterName := "vpc-id"
+	subnetOutput, err := client.DescribeSubnets(
 		context.Background(),
-		&ec2.CreateVpcInput{
-			CidrBlock: &v.CidrBlock,
-			TagSpecifications: []types.TagSpecification{
+		&ec2.DescribeSubnetsInput{
+			Filters: []types.Filter{
 				{
-					ResourceType: types.ResourceTypeVpc,
-					Tags:         TestTags,
+					Name:   &filterName,
+					Values: []string{vpcid},
 				},
 			},
 		},
@@ -80,28 +76,20 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 		return err
 	}
 
-	v.ID = vpcOutput.Vpc.VpcId
+	for _, subnet := range subnetOutput.Subnets {
+		v.Subnets = append(v.Subnets, &Subnet{
+			ID:               subnet.SubnetId,
+			CIDR:             *subnet.CidrBlock,
+			AvailabilityZone: *subnet.AvailabilityZone,
+		})
+	}
 
-	v.Cleanup(func() {
-		var err error
+	return nil
+}
 
-		delete := func() error {
-			_, err := client.DeleteVpc(
-				context.Background(),
-				&ec2.DeleteVpcInput{
-					VpcId: v.ID,
-				},
-			)
-
-			return err
-		}
-
-		retry(10, time.Second, delete)
-
-		if err != nil {
-			log.Println(err)
-		}
-	})
+// CreateGateway Creates a new internet gateway for the duration of the test to save 40$ per month vs running it 24/7
+func (v *VPCConfig) CreateGateway(client *ec2.Client) error {
+	var err error
 
 	// Create internet gateway and assign to VPC
 	var gatewayOutput *ec2.CreateInternetGatewayOutput
@@ -122,14 +110,14 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 		return err
 	}
 
-	v.InternetGatewayId = gatewayOutput.InternetGateway.InternetGatewayId
+	internetGatewayId := gatewayOutput.InternetGateway.InternetGatewayId
 
 	v.Cleanup(func() {
 		delete := func() error {
 			_, err := client.DeleteInternetGateway(
 				context.Background(),
 				&ec2.DeleteInternetGatewayInput{
-					InternetGatewayId: v.InternetGatewayId,
+					InternetGatewayId: internetGatewayId,
 				},
 			)
 
@@ -146,7 +134,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 	_, err = client.AttachInternetGateway(
 		context.Background(),
 		&ec2.AttachInternetGatewayInput{
-			InternetGatewayId: v.InternetGatewayId,
+			InternetGatewayId: internetGatewayId,
 			VpcId:             v.ID,
 		},
 	)
@@ -160,7 +148,7 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 			_, err := client.DetachInternetGateway(
 				context.Background(),
 				&ec2.DetachInternetGatewayInput{
-					InternetGatewayId: v.InternetGatewayId,
+					InternetGatewayId: internetGatewayId,
 					VpcId:             v.ID,
 				},
 			)
@@ -174,56 +162,6 @@ func (v *VPCConfig) Create(client *ec2.Client) error {
 			log.Println(err)
 		}
 	})
-
-	for _, subnet := range v.Subnets {
-		// Create subnets
-		var subnetOutput *ec2.CreateSubnetOutput
-		var err error
-
-		subnetOutput, err = client.CreateSubnet(
-			context.Background(),
-			&ec2.CreateSubnetInput{
-				VpcId:            v.ID,
-				AvailabilityZone: &subnet.AvailabilityZone,
-				CidrBlock:        &subnet.CIDR,
-				TagSpecifications: []types.TagSpecification{
-					{
-						ResourceType: types.ResourceTypeSubnet,
-						Tags:         TestTags,
-					},
-				},
-			},
-		)
-
-		if err != nil {
-			return err
-		}
-
-		subnet.ID = subnetOutput.Subnet.SubnetId
-
-	}
-
-	v.Cleanup(func() {
-		for _, subnet := range v.Subnets {
-			delete := func() error {
-				_, err := client.DeleteSubnet(
-					context.Background(),
-					&ec2.DeleteSubnetInput{
-						SubnetId: subnet.ID,
-					},
-				)
-
-				return err
-			}
-
-			retry(10, time.Second, delete)
-
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	})
-
 	return nil
 }
 
