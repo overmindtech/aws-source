@@ -21,8 +21,8 @@ import (
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/aws-source/sources/securitygroup"
+	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
-	"github.com/overmindtech/multiconn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -63,7 +63,7 @@ Edit this once you have created your source
 		autoConfig := viper.GetBool("auto-config")
 
 		var natsNKeySeedLog string
-		var tokenClient multiconn.TokenClient
+		var tokenClient connect.TokenClient
 
 		if natsNKeySeed != "" {
 			natsNKeySeedLog = "[REDACTED]"
@@ -97,11 +97,9 @@ Edit this once you have created your source
 
 		e := discovery.Engine{
 			Name: "kubernetes-source",
-			NATSOptions: &multiconn.NATSConnectionOptions{
-				CommonOptions: multiconn.CommonOptions{
-					NumRetries: -1,
-					RetryDelay: 5 * time.Second,
-				},
+			NATSOptions: &connect.NATSOptions{
+				NumRetries:        -1,
+				RetryDelay:        5 * time.Second,
 				Servers:           natsServers,
 				ConnectionName:    fmt.Sprintf("%v.%v", natsNamePrefix, hostname),
 				ConnectionTimeout: (10 * time.Second), // TODO: Make configurable
@@ -325,7 +323,7 @@ func getAWSConfig(region string, accessKeyID string, secretAccessKey string, aut
 
 // createTokenClient Creates a basic token client that will authenticate to NATS
 // using the given values
-func createTokenClient(natsJWT string, natsNKeySeed string) (multiconn.TokenClient, error) {
+func createTokenClient(natsJWT string, natsNKeySeed string) (connect.TokenClient, error) {
 	var kp nkeys.KeyPair
 	var err error
 
@@ -345,5 +343,5 @@ func createTokenClient(natsJWT string, natsNKeySeed string) (multiconn.TokenClie
 		return nil, fmt.Errorf("could not parse nats-nkey-seed: %v", err)
 	}
 
-	return multiconn.NewBasicTokenClient(natsJWT, kp), nil
+	return connect.NewBasicTokenClient(natsJWT, kp), nil
 }
