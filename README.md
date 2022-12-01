@@ -344,7 +344,7 @@ All configuration options can be provided via the command line or as environment
 | `MAX_PARALLEL`| `--max-parallel` | ✅ | Max number of requests to run in parallel |
 | `AUTO_CONFIG` | `--auto-config` | | Use the local AWS config, the same as the AWS CLI could use. This can be set up with `aws configure` |
 | `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
-| `AWS_REGION` | `--aws-region` | | The AWS region that this source should operate in |
+| `AWS_REGIONS` | `--aws-region` | | Comma-separated list of AWS regions that this source should operate in |
 | `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` | | The secret access key to use for auth |
 
 ### `srcman` config
@@ -364,7 +364,7 @@ spec:
     # Example config values (not real credentials, don't panic)
     source.yaml: |
       aws-access-key-id: HEGMPEX0232FKZ45FSGV
-      aws-region: eu-west-2
+      aws-regions: eu-west-2,us-west-2
       aws-secret-access-key: ATOXsYtO1xBG3GjbPIWi7iIN0hZYY3gdmUhaEEC5
 
 ```

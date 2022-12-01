@@ -35,10 +35,12 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "aws-source",
-	Short: "Remote primary source for kubernetes",
-	Long: `A template for building sources.
+	Short: "Remote primary source for AWS",
+	Long: `This sources looks for AWS resources in your account.
 
-Edit this once you have created your source
+Currently supported:
+  * ELB
+  * EC2: instances, security groups
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Get srcman supplied config
@@ -57,16 +59,20 @@ Edit this once you have created your source
 			os.Exit(1)
 		}
 
-		region := viper.GetString("aws-region")
+		regions := viper.GetString("aws-regions")
 		accessKeyID := viper.GetString("aws-access-key-id")
 		secretAccessKey := viper.GetString("aws-secret-access-key")
 		autoConfig := viper.GetBool("auto-config")
 
-		var natsNKeySeedLog string
+		var natsNKeySeedLog, secretAccessKeyLog string
 		var tokenClient multiconn.TokenClient
 
 		if natsNKeySeed != "" {
 			natsNKeySeedLog = "[REDACTED]"
+		}
+
+		if secretAccessKey != "" {
+			secretAccessKeyLog = "[REDACTED]"
 		}
 
 		log.WithFields(log.Fields{
@@ -75,9 +81,9 @@ Edit this once you have created your source
 			"nats-jwt":              natsJWT,
 			"nats-nkey-seed":        natsNKeySeedLog,
 			"max-parallel":          maxParallel,
-			"aws-region":            region,
+			"aws-regions":           regions,
 			"aws-access-key-id":     accessKeyID,
-			"aws-secret-access-key": secretAccessKey,
+			"aws-secret-access-key": secretAccessKeyLog,
 			"auto-config":           autoConfig,
 		}).Info("Got config")
 
@@ -96,7 +102,7 @@ Edit this once you have created your source
 		}
 
 		e := discovery.Engine{
-			Name: "kubernetes-source",
+			Name: "aws-source",
 			NATSOptions: &multiconn.NATSConnectionOptions{
 				CommonOptions: multiconn.CommonOptions{
 					NumRetries: -1,
@@ -113,58 +119,63 @@ Edit this once you have created your source
 			MaxParallelExecutions: maxParallel,
 		}
 
-		// TODO: Create a way to load config for auth that will work within srcman ⚠️
-		// Load config and create client which will be re-used for all connections
-		configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		aws_regions := strings.Split(regions, ",")
+		for _, region := range aws_regions {
+			region = strings.Trim(region, " ")
 
-		cfg, err := getAWSConfig(region, accessKeyID, secretAccessKey, autoConfig)
+			// TODO: Create a way to load config for auth that will work within srcman ⚠️
+			// Load config and create client which will be re-used for all connections
+			configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err,
-			}).Fatal("Error loading config")
+			cfg, err := getAWSConfig(region, accessKeyID, secretAccessKey, autoConfig)
 
-			os.Exit(1)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err,
+				}).Fatal("Error loading config")
+
+				os.Exit(1)
+			}
+
+			// Work out what account we're using. This will be used in item contexts
+			stsClient := sts.NewFromConfig(cfg)
+
+			var callerID *sts.GetCallerIdentityOutput
+
+			callerID, err = stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
+
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err,
+				}).Fatal("Error retrieving account information")
+
+				os.Exit(1)
+			}
+
+			// Cancel config load context and release resources
+			configCancel()
+
+			sources := []discovery.Source{
+				&elasticloadbalancing.ELBSource{
+					Config:    cfg,
+					AccountID: *callerID.Account,
+				},
+				&elasticloadbalancing.ELBv2Source{
+					Config:    cfg,
+					AccountID: *callerID.Account,
+				},
+				&ec2.InstanceSource{
+					Config:    cfg,
+					AccountID: *callerID.Account,
+				},
+				&securitygroup.SecurityGroupSource{
+					Config:    cfg,
+					AccountID: *callerID.Account,
+				},
+			}
+
+			e.AddSources(sources...)
 		}
-
-		// Work out what account we're using. This will be used in item contexts
-		stsClient := sts.NewFromConfig(cfg)
-
-		var callerID *sts.GetCallerIdentityOutput
-
-		callerID, err = stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
-
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err,
-			}).Fatal("Error retrieving account information")
-
-			os.Exit(1)
-		}
-
-		// Cancel config load context and release resources
-		configCancel()
-
-		sources := []discovery.Source{
-			&elasticloadbalancing.ELBSource{
-				Config:    cfg,
-				AccountID: *callerID.Account,
-			},
-			&elasticloadbalancing.ELBv2Source{
-				Config:    cfg,
-				AccountID: *callerID.Account,
-			},
-			&ec2.InstanceSource{
-				Config:    cfg,
-				AccountID: *callerID.Account,
-			},
-			&securitygroup.SecurityGroupSource{
-				Config:    cfg,
-				AccountID: *callerID.Account,
-			},
-		}
-
-		e.AddSources(sources...)
 
 		// Start HTTP server for status
 		healthCheckPort := 8080
@@ -259,7 +270,7 @@ func init() {
 	rootCmd.PersistentFlags().Int("max-parallel", (runtime.NumCPU() * 10), "Max number of requests to run in parallel")
 
 	// Custom flags for this source
-	rootCmd.PersistentFlags().String("aws-region", "", "The AWS region that this source should operate in")
+	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
 	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
@@ -304,7 +315,7 @@ func getAWSConfig(region string, accessKeyID string, secretAccessKey string, aut
 	if autoConfig {
 		return config.LoadDefaultConfig(context.Background())
 	}
-	// Vaidate inputs
+	// Validate inputs
 	if region == "" {
 		return aws.Config{}, errors.New("aws-region cannot be blank")
 	}
