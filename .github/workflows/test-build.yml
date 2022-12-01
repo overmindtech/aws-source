@@ -5,7 +5,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - 'v*'
   pull_request:
@@ -90,7 +90,7 @@ jobs:
           # Environment variables so that AWS resources can be created
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-west-2
+          AWS_REGION: eu-west-2,us-west-2
 
       - name: Build and push
         uses: docker/build-push-action@v2

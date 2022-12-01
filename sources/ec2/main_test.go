@@ -19,23 +19,7 @@ import (
 var TestAWSConfig aws.Config
 var TestAccountID string
 var TestContext string
-var TestVPC = sources.VPCConfig{
-	CidrBlock: "10.174.145.0/24",
-	Subnets: []*sources.Subnet{
-		{
-			CIDR:             "10.174.145.0/28",
-			AvailabilityZone: "eu-west-2a",
-		},
-		{
-			CIDR:             "10.174.145.16/28",
-			AvailabilityZone: "eu-west-2b",
-		},
-		{
-			CIDR:             "10.174.145.32/28",
-			AvailabilityZone: "eu-west-2c",
-		},
-	},
-}
+var TestVPC = sources.VPCConfig{}
 
 func TestMain(m *testing.M) {
 	var err error
@@ -54,7 +38,7 @@ func TestMain(m *testing.M) {
 
 	ec2Client := ec2.NewFromConfig(TestAWSConfig)
 
-	err = TestVPC.Create(ec2Client)
+	err = TestVPC.Fetch(ec2Client)
 
 	if err != nil {
 		log.Println(err)
