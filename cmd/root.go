@@ -59,7 +59,9 @@ Currently supported:
 			os.Exit(1)
 		}
 
-		regions := viper.GetString("aws-regions")
+		var regions []string
+		viper.UnmarshalKey("aws-regions", &regions)
+
 		accessKeyID := viper.GetString("aws-access-key-id")
 		secretAccessKey := viper.GetString("aws-secret-access-key")
 		autoConfig := viper.GetBool("auto-config")
@@ -119,8 +121,7 @@ Currently supported:
 			MaxParallelExecutions: maxParallel,
 		}
 
-		aws_regions := strings.Split(regions, ",")
-		for _, region := range aws_regions {
+		for _, region := range regions {
 			region = strings.Trim(region, " ")
 
 			// TODO: Create a way to load config for auth that will work within srcman ⚠️
