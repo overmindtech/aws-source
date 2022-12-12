@@ -131,7 +131,6 @@ func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, quer
 			Context:     itemContext,
 		}
 	}
-	return nil, nil
 }
 
 // Find Finds all items in a given context
@@ -223,6 +222,7 @@ func ExpandLBv2(ctx context.Context, client ELBv2Client, lb types.LoadBalancer) 
 			ctx,
 			&elbv2.DescribeListenersInput{
 				LoadBalancerArn: lb.LoadBalancerArn,
+				Marker:          nextMarker,
 			},
 		)
 
