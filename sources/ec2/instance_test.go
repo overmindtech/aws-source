@@ -145,5 +145,62 @@ func TestEC2(t *testing.T) {
 
 		discovery.TestValidateItems(t, items)
 	})
+}
 
+// self-referential struct to test mapInstanceToItem error handling
+type Invalid struct {
+	Self *Invalid
+}
+
+func TestInstanceMapping(t *testing.T) {
+	t.Parallel()
+	// t.Run("ToAttributesCase error", func(t *testing.T) {
+	// 	instance := Invalid{}
+	// 	instance.Self = &instance
+	// 	item, err := mapInstanceToItem(instance, "foo.bar")
+	// 	if item != nil {
+	// 		t.Errorf("unexpected on error: item is ", item)
+	// 	}
+
+	// })
+	t.Run("empty", func(t *testing.T) {
+		instance := types.Instance{}
+		item, err := mapInstanceToItem(instance, "foo.bar")
+		if err != nil {
+			t.Error(err)
+		}
+		if item == nil {
+			t.Error("item is nil")
+		}
+	})
+	t.Run("with attrs", func(t *testing.T) {
+		imageId := "imageId"
+		instance := types.Instance{ImageId: &imageId}
+		item, err := mapInstanceToItem(instance, "foo.bar")
+		if err != nil {
+			t.Error(err)
+		}
+		if item == nil {
+			t.Error("item is nil")
+		} else {
+			if len(item.LinkedItemRequests) == 0 {
+				t.Errorf("no LinkedItemRequests: %v", item)
+			}
+		}
+	})
+}
+
+func TestFind(t *testing.T) {
+	t.Parallel()
+	t.Run("empty", func(t *testing.T) {
+		src := InstanceSource{}
+
+		items, err := src.Find(context.Background(), "foo.bar")
+		if items != nil {
+			t.Errorf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Error("expected err, got nil")
+		}
+	})
 }
