@@ -146,6 +146,10 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 	return mapInstanceToItem(instance, itemContext)
 }
 
+type EC2Client interface {
+	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
+}
+
 // Find Finds all items in a given context
 func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
 	if itemContext != s.Contexts()[0] {
@@ -156,13 +160,19 @@ func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.I
 		}
 	}
 
+	client := s.Client()
+
+	return findImpl(ctx, itemContext, client)
+}
+
+func findImpl(ctx context.Context, itemContext string, client EC2Client) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	instances := make([]types.Instance, 0)
 	var maxResults int32 = 100
 	var nextToken *string
 
 	for morePages := true; morePages; {
-		describeInstancesOutput, err := s.Client().DescribeInstances(
+		describeInstancesOutput, err := client.DescribeInstances(
 			ctx,
 			&ec2.DescribeInstancesInput{
 				MaxResults: &maxResults,

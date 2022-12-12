@@ -3,6 +3,7 @@ package ec2
 import (
 	"context"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -190,9 +191,15 @@ func TestInstanceMapping(t *testing.T) {
 	})
 }
 
+type fakeClient func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
+
+func (m fakeClient) DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
+	return m(ctx, params, optFns...)
+}
+
 func TestFind(t *testing.T) {
 	t.Parallel()
-	t.Run("empty", func(t *testing.T) {
+	t.Run("empty (context mismatch)", func(t *testing.T) {
 		src := InstanceSource{}
 
 		items, err := src.Find(context.Background(), "foo.bar")
@@ -201,6 +208,49 @@ func TestFind(t *testing.T) {
 		}
 		if err == nil {
 			t.Error("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+	t.Run("with client", func(t *testing.T) {
+		var testClient fakeClient = func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
+			if params.NextToken == nil {
+				nextToken := "page2"
+				firstId := "first"
+				return &ec2.DescribeInstancesOutput{
+					NextToken: &nextToken,
+					Reservations: []types.Reservation{
+						{
+							Instances: []types.Instance{
+								{InstanceId: &firstId},
+							},
+						},
+					},
+				}, nil
+			} else if *params.NextToken == "page2" {
+				secondId := "second"
+				return &ec2.DescribeInstancesOutput{
+					Reservations: []types.Reservation{
+						{
+							Instances: []types.Instance{
+								{InstanceId: &secondId},
+							},
+						},
+					},
+				}, nil
+			}
+			return nil, nil
+		}
+		items, err := findImpl(context.Background(), "foo.bar", testClient)
+		if len(items) != 2 {
+			t.Errorf("unexpected items (len=%v): %v", len(items), items)
+		}
+		if items[0].Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", items[0])
+		}
+		if err != nil {
+			t.Errorf("unexpected err: %v", err)
 		}
 	})
 }
