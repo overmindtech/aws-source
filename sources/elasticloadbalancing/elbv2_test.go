@@ -85,40 +85,41 @@ func TestGetv2(t *testing.T) {
 }
 
 type fakeV2Client struct {
-	DescribeLoadBalancersMock func(ctx context.Context, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error)
-	DescribeListenersMock     func(ctx context.Context, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error)
-	DescribeTargetGroupsMock  func(ctx context.Context, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error)
-	DescribeTargetHealthMock  func(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error)
+	lbClientCalls           int
+	listenerClientCalls     int
+	targetGroupsClientCalls int
+
+	DescribeLoadBalancersMock func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error)
+	DescribeListenersMock     func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error)
+	DescribeTargetGroupsMock  func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error)
+	DescribeTargetHealthMock  func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error)
 }
 
 // DescribeListeners implements ELBv2Client
 func (m fakeV2Client) DescribeListeners(ctx context.Context, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error) {
-	return m.DescribeListenersMock(ctx, params, optFns...)
+	return m.DescribeListenersMock(ctx, m, params, optFns...)
 }
 
 // DescribeLoadBalancers implements ELBv2Client
 func (m fakeV2Client) DescribeLoadBalancers(ctx context.Context, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
-	return m.DescribeLoadBalancersMock(ctx, params, optFns...)
+	return m.DescribeLoadBalancersMock(ctx, m, params, optFns...)
 }
 
 // DescribeTargetGroups implements ELBv2Client
 func (m fakeV2Client) DescribeTargetGroups(ctx context.Context, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
-	return m.DescribeTargetGroupsMock(ctx, params, optFns...)
+	return m.DescribeTargetGroupsMock(ctx, m, params, optFns...)
 }
 
 // DescribeTargetHealth implements ELBv2Client
 func (m fakeV2Client) DescribeTargetHealth(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error) {
-	return m.DescribeTargetHealthMock(ctx, params, optFns...)
+	return m.DescribeTargetHealthMock(ctx, m, params, optFns...)
 }
 
 func createFakeV2Client(t *testing.T) ELBv2Client {
-	lbClientCalls := 0
-	listenerClientCalls := 0
-	targetGroupsClientCalls := 0
 	return fakeV2Client{
-		DescribeLoadBalancersMock: func(ctx context.Context, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
-			lbClientCalls += 1
-			if lbClientCalls > 2 {
+		DescribeLoadBalancersMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
+			m.lbClientCalls += 1
+			if m.lbClientCalls > 2 {
 				t.Error("Called DescribeLoadBalancersMock too often (>2)")
 				return nil, nil
 			}
@@ -145,9 +146,9 @@ func createFakeV2Client(t *testing.T) ELBv2Client {
 			}
 			return nil, nil
 		},
-		DescribeListenersMock: func(ctx context.Context, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error) {
-			listenerClientCalls += 1
-			if listenerClientCalls > 2 {
+		DescribeListenersMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error) {
+			m.listenerClientCalls += 1
+			if m.listenerClientCalls > 2 {
 				t.Error("Called DescribeListenersMock too often (>2)")
 				return nil, nil
 			}
@@ -170,9 +171,9 @@ func createFakeV2Client(t *testing.T) ELBv2Client {
 			}
 			return nil, nil
 		},
-		DescribeTargetGroupsMock: func(ctx context.Context, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
-			targetGroupsClientCalls += 1
-			if targetGroupsClientCalls > 2 {
+		DescribeTargetGroupsMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
+			m.targetGroupsClientCalls += 1
+			if m.targetGroupsClientCalls > 2 {
 				t.Error("Called DescribeTargetGroupsMock too often (>2)")
 				return nil, nil
 			}
@@ -188,13 +189,13 @@ func createFakeV2Client(t *testing.T) ELBv2Client {
 			}
 			return nil, nil
 		},
-		DescribeTargetHealthMock: func(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error) {
+		DescribeTargetHealthMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error) {
 			return nil, nil
 		},
 	}
 }
 
-func TestGetv2Impl(t *testing.T) {
+func TestGetV2Impl(t *testing.T) {
 	t.Parallel()
 	t.Run("with client", func(t *testing.T) {
 		item, err := getv2Impl(context.Background(), createFakeV2Client(t), "foo.bar", "query")

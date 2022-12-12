@@ -70,24 +70,25 @@ func TestELBMapping(t *testing.T) {
 }
 
 type fakeClient struct {
-	DescribeLoadBalancersMock  func(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error)
-	DescribeInstanceHealthMock func(ctx context.Context, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error)
+	clientCalls int
+
+	DescribeLoadBalancersMock  func(ctx context.Context, m fakeClient, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error)
+	DescribeInstanceHealthMock func(ctx context.Context, m fakeClient, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error)
 }
 
 func (m fakeClient) DescribeLoadBalancers(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
-	return m.DescribeLoadBalancersMock(ctx, params, optFns...)
+	return m.DescribeLoadBalancersMock(ctx, m, params, optFns...)
 }
 
 func (m fakeClient) DescribeInstanceHealth(ctx context.Context, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error) {
-	return m.DescribeInstanceHealthMock(ctx, params, optFns...)
+	return m.DescribeInstanceHealthMock(ctx, m, params, optFns...)
 }
 
 func createFakeClient(t *testing.T) fakeClient {
-	clientCalls := 0
 	return fakeClient{
-		DescribeLoadBalancersMock: func(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
-			clientCalls += 1
-			if clientCalls > 2 {
+		DescribeLoadBalancersMock: func(ctx context.Context, m fakeClient, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
+			m.clientCalls += 1
+			if m.clientCalls > 2 {
 				t.Error("Called DescribeLoadBalancersMock too often (>2)")
 				return nil, nil
 			}
@@ -110,7 +111,7 @@ func createFakeClient(t *testing.T) fakeClient {
 			}
 			return nil, nil
 		},
-		DescribeInstanceHealthMock: func(ctx context.Context, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error) {
+		DescribeInstanceHealthMock: func(ctx context.Context, m fakeClient, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error) {
 			return &elb.DescribeInstanceHealthOutput{
 				InstanceStates: []types.InstanceState{},
 			}, nil
