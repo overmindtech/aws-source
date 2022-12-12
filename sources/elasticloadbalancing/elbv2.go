@@ -147,39 +147,53 @@ func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item
 	return findV2Impl(ctx, client, itemContext)
 }
 
-func findV2Impl(ctx context.Context, client *elbv2.Client, itemContext string) ([]*sdp.Item, error) {
+func findV2Impl(ctx context.Context, client ELBv2Client, itemContext string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
-	lbs, err := client.DescribeLoadBalancers(
-		ctx,
-		&elbv2.DescribeLoadBalancersInput{},
-	)
+	var maxResults int32 = 100
+	var nextToken *string
 
-	if err != nil {
-		return items, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: err.Error(),
-			Context:     itemContext,
-		}
-	}
+	for morePages := true; morePages; {
 
-	for _, lb := range lbs.LoadBalancers {
-		expanded, err := ExpandLBv2(ctx, client, lb)
+		lbs, err := client.DescribeLoadBalancers(
+			ctx,
+			&elbv2.DescribeLoadBalancersInput{
+				Marker:   nextToken,
+				PageSize: &maxResults,
+			},
+		)
 
 		if err != nil {
-			continue
+			return items, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_OTHER,
+				ErrorString: err.Error(),
+				Context:     itemContext,
+			}
 		}
 
-		var item *sdp.Item
+		for _, lb := range lbs.LoadBalancers {
+			expanded, err := ExpandLBv2(ctx, client, lb)
 
-		item, err = mapExpandedELBv2ToItem(expanded, itemContext)
+			if err != nil {
+				continue
+			}
 
-		if err != nil {
-			continue
+			var item *sdp.Item
+
+			item, err = mapExpandedELBv2ToItem(expanded, itemContext)
+
+			if err != nil {
+				continue
+			}
+
+			items = append(items, item)
 		}
 
-		items = append(items, item)
+		// If there is more data we should store the token so that we can use
+		// that. We also need to set morePages to true so that the loop runs
+		// again
+		nextToken = lbs.NextMarker
+		morePages = (nextToken != nil)
 	}
-
 	return items, nil
 }
 

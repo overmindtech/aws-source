@@ -212,5 +212,38 @@ func TestGetV2Impl(t *testing.T) {
 }
 
 func TestFindV2(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := ELBv2Source{}
 
+		items, err := src.Find(context.Background(), "foo.bar")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Fatalf("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+}
+
+func TestFindV2Impl(t *testing.T) {
+	t.Parallel()
+	t.Run("with client", func(t *testing.T) {
+		items, err := findV2Impl(context.Background(), createFakeV2Client(t), "foo.bar")
+		if err != nil {
+			t.Fatalf("unexpected err: %v", err)
+		}
+		if len(items) != 2 {
+			t.Fatalf("unexpected items (len=%v): %v", len(items), items)
+		}
+		if items[0].Attributes.AttrStruct.Fields["name"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", items[0])
+		}
+		if items[1].Attributes.AttrStruct.Fields["name"].GetStringValue() != "second" {
+			t.Errorf("unexpected second item: %v", items[0])
+		}
+	})
 }
