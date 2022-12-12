@@ -10,19 +10,19 @@ import (
 	"github.com/overmindtech/aws-source/sources"
 )
 
-func TestInstanceMapping(t *testing.T) {
+func TestELBMapping(t *testing.T) {
 	t.Parallel()
 
 	t.Run("empty", func(t *testing.T) {
 		lbName := "lbName"
-		instance := ExpandedELB{
+		lb := ExpandedELB{
 			LoadBalancerDescription: types.LoadBalancerDescription{
 				LoadBalancerName: &lbName,
 			},
 			Instances: []types.InstanceState{},
 		}
 
-		item, err := mapELBv1ToItem(&instance, "foo.bar")
+		item, err := mapELBv1ToItem(&lb, "foo.bar")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -32,14 +32,14 @@ func TestInstanceMapping(t *testing.T) {
 	})
 	t.Run("name check", func(t *testing.T) {
 		lbName := ""
-		instance := ExpandedELB{
+		lb := ExpandedELB{
 			LoadBalancerDescription: types.LoadBalancerDescription{
 				LoadBalancerName: &lbName,
 			},
 			Instances: []types.InstanceState{},
 		}
 
-		_, err := mapELBv1ToItem(&instance, "foo.bar")
+		_, err := mapELBv1ToItem(&lb, "foo.bar")
 		if err == nil {
 			t.Fatal("didn't get expected error")
 		}
@@ -47,7 +47,7 @@ func TestInstanceMapping(t *testing.T) {
 	t.Run("with hostedzone", func(t *testing.T) {
 		lbName := "lbName"
 		hostedZoneId := "hostedZoneId"
-		instance := ExpandedELB{
+		lb := ExpandedELB{
 			LoadBalancerDescription: types.LoadBalancerDescription{
 				LoadBalancerName:          &lbName,
 				CanonicalHostedZoneNameID: &hostedZoneId,
@@ -55,7 +55,7 @@ func TestInstanceMapping(t *testing.T) {
 			Instances: []types.InstanceState{},
 		}
 
-		item, err := mapELBv1ToItem(&instance, "foo.bar")
+		item, err := mapELBv1ToItem(&lb, "foo.bar")
 		if err != nil {
 			t.Fatal(err)
 		}
