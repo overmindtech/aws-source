@@ -60,6 +60,11 @@ func (s *SecurityGroupSource) Contexts() []string {
 	}
 }
 
+// SecurityGroupClient Collects all functions this code uses from the AWS SDK, for test replacement.
+type SecurityGroupClient interface {
+	DescribeSecurityGroups(ctx context.Context, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error)
+}
+
 // Get Get a single item with a given context and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
@@ -74,7 +79,11 @@ func (s *SecurityGroupSource) Get(ctx context.Context, itemContext string, query
 		}
 	}
 
-	describeSecurityGroupsOutput, err := s.Client().DescribeSecurityGroups(
+	return getImpl(ctx, s.Client(), query, itemContext)
+}
+
+func getImpl(ctx context.Context, client SecurityGroupClient, query string, itemContext string) (*sdp.Item, error) {
+	describeSecurityGroupsOutput, err := client.DescribeSecurityGroups(
 		ctx,
 		&ec2.DescribeSecurityGroupsInput{
 			GroupIds: []string{
@@ -114,7 +123,7 @@ func (s *SecurityGroupSource) Get(ctx context.Context, itemContext string, query
 		}
 	}
 
-	return mapSecurityGroupToItem(describeSecurityGroupsOutput.SecurityGroups[0], itemContext)
+	return mapSecurityGroupToItem(&describeSecurityGroupsOutput.SecurityGroups[0], itemContext)
 }
 
 // Find Finds all items in a given context
@@ -127,13 +136,17 @@ func (s *SecurityGroupSource) Find(ctx context.Context, itemContext string) ([]*
 		}
 	}
 
+	return findImpl(ctx, s.Client(), itemContext)
+}
+
+func findImpl(ctx context.Context, client SecurityGroupClient, itemContext string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	securityGroups := make([]types.SecurityGroup, 0)
 	var maxResults int32 = 100
 	var nextToken *string
 
 	for morePages := true; morePages; {
-		describeSecurityGroupsOutput, err := s.Client().DescribeSecurityGroups(
+		describeSecurityGroupsOutput, err := client.DescribeSecurityGroups(
 			ctx,
 			&ec2.DescribeSecurityGroupsInput{
 				MaxResults: &maxResults,
@@ -160,14 +173,14 @@ func (s *SecurityGroupSource) Find(ctx context.Context, itemContext string) ([]*
 
 	// Convert to items
 	for _, securityGroup := range securityGroups {
-		item, _ := mapSecurityGroupToItem(securityGroup, itemContext)
+		item, _ := mapSecurityGroupToItem(&securityGroup, itemContext)
 		items = append(items, item)
 	}
 
 	return items, nil
 }
 
-func mapSecurityGroupToItem(securityGroup types.SecurityGroup, itemContext string) (*sdp.Item, error) {
+func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, itemContext string) (*sdp.Item, error) {
 	var err error
 	var attrs *sdp.ItemAttributes
 	attrs, err = sources.ToAttributesCase(securityGroup)

@@ -1,51 +1,169 @@
 package securitygroup
 
-// import (
-// 	"context"
-// 	"testing"
+import (
+	"context"
+	"strings"
+	"testing"
 
-// 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-// 	"github.com/overmindtech/discovery"
-// )
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/overmindtech/aws-source/sources"
+)
 
-// func TestSG(t *testing.T) {
-// 	t.Parallel()
-// 	tr := createSG(t)
+func TestSecurityGroupsMapping(t *testing.T) {
+	t.Parallel()
 
-// 	src := SecurityGroupSource{
-// 		Config:    TestAWSConfig,
-// 		AccountID: TestAccountID,
-// 	}
+	t.Run("empty", func(t *testing.T) {
+		sgName := "sgName"
+		sg := types.SecurityGroup{
+			GroupName: &sgName,
+		}
 
-// 	t.Run("Get with correct security group ID", func(t *testing.T) {
-// 		item, err := src.Get(context.Background(), TestContext, tr.GroupID)
+		item, err := mapSecurityGroupToItem(&sg, "foo.bar")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item == nil {
+			t.Error("item is nil")
+		}
+		if item.Attributes == nil || item.Attributes.AttrStruct.Fields["groupName"].GetStringValue() != sgName {
+			t.Errorf("unexpected item: %v", item)
+		}
+	})
+	t.Run("with VPC", func(t *testing.T) {
+		sgName := "sgName"
+		vpcId := "vpcId"
+		sg := types.SecurityGroup{
+			GroupName: &sgName,
+			VpcId:     &vpcId,
+		}
 
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
+		item, err := mapSecurityGroupToItem(&sg, "foo.bar")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item == nil {
+			t.Fatal("item is nil")
+		}
+		if len(item.LinkedItemRequests) != 1 {
+			t.Fatalf("unexpected LinkedItemRequests: %v", item)
+		}
+		sources.CheckItem(t, item.LinkedItemRequests[0], "vpc", "ec2-vpc", vpcId, "foo.bar")
+	})
+}
 
-// 		discovery.TestValidateItem(t, item)
-// 	})
+func TestGet(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := SecurityGroupSource{}
 
-// 	t.Run("Get with incorrect security group ID", func(t *testing.T) {
-// 		_, err := src.Get(context.Background(), TestContext, "i-0ecfa0a234cbc132")
+		items, err := src.Get(context.Background(), "foo.bar", "query")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Fatalf("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+}
 
-// 		if err == nil {
-// 			t.Error("expected error but got nil")
-// 		}
-// 	})
+type fakeClient struct {
+	sgClientCalls int
 
-// 	t.Run("Find", func(t *testing.T) {
-// 		items, err := src.Find(context.Background(), TestContext)
+	DescribeSecurityGroupsMock func(ctx context.Context, m fakeClient, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error)
+}
 
-// 		if err != nil {
-// 			t.Error(err)
-// 		}
+// DescribeSecurityGroups implements SecurityGroupsClient
+func (m fakeClient) DescribeSecurityGroups(ctx context.Context, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
+	return m.DescribeSecurityGroupsMock(ctx, m, params, optFns...)
+}
 
-// 		if len(items) == 0 {
-// 			t.Error("Expected items to be found but got nothing")
-// 		}
+func createFakeClient(t *testing.T) SecurityGroupClient {
+	return fakeClient{
+		DescribeSecurityGroupsMock: func(ctx context.Context, m fakeClient, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
+			m.sgClientCalls += 1
+			if m.sgClientCalls > 2 {
+				t.Error("Called DescribeSecurityGroupsMock too often (>2)")
+				return nil, nil
+			}
+			if params.NextToken == nil {
+				firstName := "first"
+				nextToken := "page2"
+				return &ec2.DescribeSecurityGroupsOutput{
+					SecurityGroups: []types.SecurityGroup{
+						{
+							GroupName: &firstName,
+						},
+					},
+					NextToken: &nextToken,
+				}, nil
+			} else if *params.NextToken == "page2" {
+				secondName := "second"
+				return &ec2.DescribeSecurityGroupsOutput{
+					SecurityGroups: []types.SecurityGroup{
+						{
+							GroupName: &secondName,
+						},
+					},
+				}, nil
+			}
+			return nil, nil
+		},
+	}
+}
 
-// 		discovery.TestValidateItems(t, items)
-// 	})
-// }
+func TestGetV2Impl(t *testing.T) {
+	t.Parallel()
+	t.Run("with client", func(t *testing.T) {
+		item, err := getImpl(context.Background(), createFakeClient(t), "foo.bar", "query")
+		if err != nil {
+			t.Fatalf("unexpected err: %v", err)
+		}
+		if item == nil {
+			t.Fatalf("item is nil")
+		}
+		if item.Attributes.AttrStruct.Fields["groupName"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", item)
+		}
+	})
+}
+
+func TestFind(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := SecurityGroupSource{}
+
+		items, err := src.Find(context.Background(), "foo.bar")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Fatalf("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+}
+
+func TestFindV2Impl(t *testing.T) {
+	t.Parallel()
+	t.Run("with client", func(t *testing.T) {
+		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
+		if err != nil {
+			t.Fatalf("unexpected err: %v", err)
+		}
+		if len(items) != 2 {
+			t.Fatalf("unexpected items (len=%v): %v", len(items), items)
+		}
+		if items[0].Attributes.AttrStruct.Fields["groupName"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", items[0])
+		}
+		if items[1].Attributes.AttrStruct.Fields["groupName"].GetStringValue() != "second" {
+			t.Errorf("unexpected second item: %v", items[0])
+		}
+	})
+}
