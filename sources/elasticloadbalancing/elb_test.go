@@ -86,6 +86,7 @@ func createFakeClient(t *testing.T) fakeClient {
 	clientCalls := 0
 	return fakeClient{
 		DescribeLoadBalancersMock: func(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
+			clientCalls += 1
 			if clientCalls > 2 {
 				t.Error("Called DescribeLoadBalancersMock too often (>2)")
 				return nil, nil

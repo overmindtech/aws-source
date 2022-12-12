@@ -62,6 +62,14 @@ func (s *ELBv2Source) Contexts() []string {
 	}
 }
 
+// ELBv2Client Collects all functions this code uses from the AWS SDK, for test replacement.
+type ELBv2Client interface {
+	DescribeLoadBalancers(ctx context.Context, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error)
+	DescribeListeners(ctx context.Context, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error)
+	DescribeTargetGroups(ctx context.Context, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error)
+	DescribeTargetHealth(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error)
+}
+
 // Get Get a single item with a given context and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
@@ -76,7 +84,11 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 		}
 	}
 
-	lbs, err := s.Client().DescribeLoadBalancers(
+	return getv2Impl(ctx, s.Client(), itemContext, query)
+}
+
+func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, query string) (*sdp.Item, error) {
+	lbs, err := client.DescribeLoadBalancers(
 		ctx,
 		&elbv2.DescribeLoadBalancersInput{
 			Names: []string{
@@ -101,7 +113,7 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 			Context:     itemContext,
 		}
 	case 1:
-		expanded, err := s.ExpandLB(ctx, lbs.LoadBalancers[0])
+		expanded, err := ExpandLBv2(ctx, client, lbs.LoadBalancers[0])
 
 		if err != nil {
 			return nil, &sdp.ItemRequestError{
@@ -119,6 +131,7 @@ func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string)
 			Context:     itemContext,
 		}
 	}
+	return nil, nil
 }
 
 // Find Finds all items in a given context
@@ -131,9 +144,13 @@ func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item
 		}
 	}
 
-	items := make([]*sdp.Item, 0)
+	client := s.Client()
+	return findV2Impl(ctx, client, itemContext)
+}
 
-	lbs, err := s.Client().DescribeLoadBalancers(
+func findV2Impl(ctx context.Context, client *elbv2.Client, itemContext string) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	lbs, err := client.DescribeLoadBalancers(
 		ctx,
 		&elbv2.DescribeLoadBalancersInput{},
 	)
@@ -147,7 +164,7 @@ func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item
 	}
 
 	for _, lb := range lbs.LoadBalancers {
-		expanded, err := s.ExpandLB(ctx, lb)
+		expanded, err := ExpandLBv2(ctx, client, lb)
 
 		if err != nil {
 			continue
@@ -188,7 +205,7 @@ type ExpandedELBv2 struct {
 	TargetGroups []ExpandedTargetGroup
 }
 
-func (s *ELBv2Source) ExpandLB(ctx context.Context, lb types.LoadBalancer) (*ExpandedELBv2, error) {
+func ExpandLBv2(ctx context.Context, client ELBv2Client, lb types.LoadBalancer) (*ExpandedELBv2, error) {
 	var listenersOutput *elbv2.DescribeListenersOutput
 	var targetGroupsOutput *elbv2.DescribeTargetGroupsOutput
 	var targetHealthOutput *elbv2.DescribeTargetHealthOutput
@@ -200,21 +217,33 @@ func (s *ELBv2Source) ExpandLB(ctx context.Context, lb types.LoadBalancer) (*Exp
 	}
 
 	// Get listeners
-	listenersOutput, err = s.Client().DescribeListeners(
-		ctx,
-		&elbv2.DescribeListenersInput{
-			LoadBalancerArn: lb.LoadBalancerArn,
-		},
-	)
+	var nextMarker *string
+	for morePages := true; morePages; {
+		listenersOutput, err = client.DescribeListeners(
+			ctx,
+			&elbv2.DescribeListenersInput{
+				LoadBalancerArn: lb.LoadBalancerArn,
+			},
+		)
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+
+		if expandedELB.Listeners == nil {
+			expandedELB.Listeners = listenersOutput.Listeners
+		} else {
+			expandedELB.Listeners = append(expandedELB.Listeners, listenersOutput.Listeners...)
+		}
+		// If there is more data we should store the marker so that we can use
+		// that. We also need to set morePages to true so that the loop runs
+		// again
+		nextMarker = listenersOutput.NextMarker
+		morePages = (nextMarker != nil)
 	}
 
-	expandedELB.Listeners = listenersOutput.Listeners
-
 	// Get target groups
-	targetGroupsOutput, err = s.Client().DescribeTargetGroups(
+	targetGroupsOutput, err = client.DescribeTargetGroups(
 		ctx,
 		&elbv2.DescribeTargetGroupsInput{
 			LoadBalancerArn: lb.LoadBalancerArn,
@@ -233,7 +262,7 @@ func (s *ELBv2Source) ExpandLB(ctx context.Context, lb types.LoadBalancer) (*Exp
 			TargetGroup: tg,
 		}
 
-		targetHealthOutput, err = s.Client().DescribeTargetHealth(
+		targetHealthOutput, err = client.DescribeTargetHealth(
 			ctx,
 			&elbv2.DescribeTargetHealthInput{
 				TargetGroupArn: tg.TargetGroupArn,
