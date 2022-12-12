@@ -59,6 +59,12 @@ func (s *ELBSource) Contexts() []string {
 	}
 }
 
+// ELBClient Collects all functions this code uses from the AWS SDK, for test replacement.
+type ELBClient interface {
+	DescribeLoadBalancers(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error)
+	DescribeInstanceHealth(ctx context.Context, params *elb.DescribeInstanceHealthInput, optFns ...func(*elb.Options)) (*elb.DescribeInstanceHealthOutput, error)
+}
+
 // Get Get a single item with a given context and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
@@ -73,7 +79,11 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 		}
 	}
 
-	lbs, err := s.Client().DescribeLoadBalancers(
+	return getImpl(ctx, s.Client(), itemContext, query)
+}
+
+func getImpl(ctx context.Context, client ELBClient, itemContext string, query string) (*sdp.Item, error) {
+	lbs, err := client.DescribeLoadBalancers(
 		ctx,
 		&elb.DescribeLoadBalancersInput{
 			LoadBalancerNames: []string{
@@ -98,7 +108,7 @@ func (s *ELBSource) Get(ctx context.Context, itemContext string, query string) (
 			Context:     itemContext,
 		}
 	case 1:
-		expanded, err := s.ExpandLB(ctx, lbs.LoadBalancerDescriptions[0])
+		expanded, err := ExpandLB(ctx, client, lbs.LoadBalancerDescriptions[0])
 
 		if err != nil {
 			return nil, &sdp.ItemRequestError{
@@ -128,39 +138,54 @@ func (s *ELBSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, 
 		}
 	}
 
+	return findImpl(ctx, s.Client(), itemContext)
+}
+
+func findImpl(ctx context.Context, client ELBClient, itemContext string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+	var maxResults int32 = 100
+	var nextToken *string
 
-	lbs, err := s.Client().DescribeLoadBalancers(
-		ctx,
-		&elb.DescribeLoadBalancersInput{},
-	)
-
-	if err != nil {
-		return items, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: err.Error(),
-			Context:     itemContext,
-		}
-	}
-
-	for _, lb := range lbs.LoadBalancerDescriptions {
-		expanded, err := s.ExpandLB(ctx, lb)
+	for morePages := true; morePages; {
+		lbs, err := client.DescribeLoadBalancers(
+			ctx,
+			&elb.DescribeLoadBalancersInput{
+				Marker:   nextToken,
+				PageSize: &maxResults,
+			})
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
+			return items, &sdp.ItemRequestError{
 				ErrorType:   sdp.ItemRequestError_OTHER,
 				ErrorString: err.Error(),
 				Context:     itemContext,
 			}
 		}
 
-		item, err := mapELBv1ToItem(expanded, itemContext)
+		for _, lb := range lbs.LoadBalancerDescriptions {
+			expanded, err := ExpandLB(ctx, client, lb)
 
-		if err == nil {
-			items = append(items, item)
+			if err != nil {
+				return nil, &sdp.ItemRequestError{
+					ErrorType:   sdp.ItemRequestError_OTHER,
+					ErrorString: err.Error(),
+					Context:     itemContext,
+				}
+			}
+
+			item, err := mapELBv1ToItem(expanded, itemContext)
+
+			if err == nil {
+				items = append(items, item)
+			}
 		}
-	}
 
+		// If there is more data we should store the token so that we can use
+		// that. We also need to set morePages to true so that the loop runs
+		// again
+		nextToken = lbs.NextMarker
+		morePages = (nextToken != nil)
+	}
 	return items, nil
 }
 
@@ -179,15 +204,12 @@ type ExpandedELB struct {
 	Instances []types.InstanceState
 }
 
-func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescription) (*ExpandedELB, error) {
-	var instanceHealthOutput *elb.DescribeInstanceHealthOutput
-	var err error
-
+func ExpandLB(ctx context.Context, client ELBClient, lb types.LoadBalancerDescription) (*ExpandedELB, error) {
 	expandedLb := ExpandedELB{
 		LoadBalancerDescription: lb,
 	}
 
-	instanceHealthOutput, err = s.Client().DescribeInstanceHealth(
+	instanceHealthOutput, err := client.DescribeInstanceHealth(
 		ctx,
 		&elb.DescribeInstanceHealthInput{
 			LoadBalancerName: lb.LoadBalancerName,
@@ -205,7 +227,6 @@ func (s *ELBSource) ExpandLB(ctx context.Context, lb types.LoadBalancerDescripti
 
 // mapELBv1ToItem Maps a load balancer to an item
 func mapELBv1ToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
-	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
 		return nil, &sdp.ItemRequestError{
@@ -221,6 +242,7 @@ func mapELBv1ToItem(lb *ExpandedELB, itemContext string) (*sdp.Item, error) {
 		Context:         itemContext,
 	}
 
+	attrMap := make(map[string]interface{})
 	attrMap["name"] = lb.LoadBalancerName
 	attrMap["availabilityZones"] = lb.AvailabilityZones
 	attrMap["backendServerDescriptions"] = lb.BackendServerDescriptions

@@ -79,11 +79,7 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 		}
 	}
 
-	client := s.Client()
-
-	// Pull out the first and only reservation
-	// Pull the first instance
-	return getImpl(ctx, client, itemContext, query)
+	return getImpl(ctx, s.Client(), itemContext, query)
 }
 
 func getImpl(ctx context.Context, client EC2Client, itemContext string, query string) (*sdp.Item, error) {
@@ -127,6 +123,7 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		}
 	}
 
+	// Pull out the first and only reservation
 	reservation := describeInstancesOutput.Reservations[0]
 
 	numInstances := len(reservation.Instances)
@@ -152,6 +149,7 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		}
 	}
 
+	// Pull the first instance
 	instance := reservation.Instances[0]
 
 	return mapInstanceToItem(instance, itemContext)
@@ -167,9 +165,7 @@ func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.I
 		}
 	}
 
-	client := s.Client()
-
-	return findImpl(ctx, client, itemContext)
+	return findImpl(ctx, s.Client(), itemContext)
 }
 
 func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp.Item, error) {
@@ -216,9 +212,7 @@ func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp
 }
 
 func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, error) {
-	var err error
-	var attrs *sdp.ItemAttributes
-	attrs, err = sources.ToAttributesCase(instance)
+	attrs, err := sources.ToAttributesCase(instance)
 
 	if err != nil {
 		return nil, &sdp.ItemRequestError{
