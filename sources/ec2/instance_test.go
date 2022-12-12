@@ -2,168 +2,32 @@ package ec2
 
 import (
 	"context"
-	"sort"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/sources"
-	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/sdp-go"
 )
 
-type TestResources struct {
-	InstanceID string
-}
-
-// createEC2 Creates the EC2 resource required for testing
-func createEC2(t *testing.T) TestResources {
-	var err error
-	ec2Client := ec2.NewFromConfig(TestAWSConfig)
-
-	filterName := "name"
-
-	// Find the image ID
-	imagesOutput, err := ec2Client.DescribeImages(
-		context.Background(),
-		&ec2.DescribeImagesInput{
-			Filters: []types.Filter{
-				{
-					Name: &filterName,
-					Values: []string{
-						"amzn2-ami-kernel-*-x86_64-gp2",
-					},
-				},
-			},
-			Owners: []string{
-				"amazon",
-			},
-		},
-	)
-
-	if err != nil {
-		t.Fatal(err)
+func checkItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedContext string) {
+	if item.Type != expectedType {
+		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}
-
-	images := imagesOutput.Images
-
-	sort.Slice(
-		images,
-		func(i, j int) bool {
-			iCreation, _ := time.Parse("2006-01-02T15:04:05.000Z", *images[i].CreationDate)
-			jCreation, _ := time.Parse("2006-01-02T15:04:05.000Z", *images[j].CreationDate)
-			return iCreation.After(jCreation)
-		},
-	)
-
-	// Get the most recent image
-	image := images[0]
-	var count int32 = 1
-	var runInstancesOutput *ec2.RunInstancesOutput
-
-	runInstancesOutput, err = ec2Client.RunInstances(
-		context.Background(),
-		&ec2.RunInstancesInput{
-			MaxCount:     &count,
-			MinCount:     &count,
-			ImageId:      image.ImageId,
-			InstanceType: types.InstanceTypeT3Micro,
-			SubnetId:     TestVPC.Subnets[0].ID,
-			TagSpecifications: []types.TagSpecification{
-				{
-					ResourceType: types.ResourceTypeInstance,
-					Tags:         sources.TestTags,
-				},
-			},
-		},
-	)
-
-	if err != nil {
-		t.Fatal(err)
+	if item.Method != sdp.RequestMethod_GET {
+		t.Errorf("%s.Method '%v' != '%v'", itemName, item.Method, sdp.RequestMethod_GET)
 	}
-
-	instanceID := runInstancesOutput.Instances[0].InstanceId
-
-	t.Cleanup(func() {
-		_, err := ec2Client.TerminateInstances(
-			context.Background(),
-			&ec2.TerminateInstancesInput{
-				InstanceIds: []string{
-					*instanceID,
-				},
-			},
-		)
-
-		if err != nil {
-			t.Error(err)
-		}
-	})
-
-	return TestResources{
-		InstanceID: *instanceID,
+	if item.Query != expectedQuery {
+		t.Errorf("%s.Query '%v' != '%v'", itemName, item.Query, expectedQuery)
 	}
-}
-
-func TestEC2(t *testing.T) {
-	t.Parallel()
-
-	tr := createEC2(t)
-
-	src := InstanceSource{
-		Config:    TestAWSConfig,
-		AccountID: TestAccountID,
+	if item.Context != expectedContext {
+		t.Errorf("%s.Context '%v' != '%v'", itemName, item.Context, expectedContext)
 	}
-
-	t.Run("Get with correct instance ID", func(t *testing.T) {
-		item, err := src.Get(context.Background(), TestContext, tr.InstanceID)
-
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		discovery.TestValidateItem(t, item)
-	})
-
-	t.Run("Get with incorrect instance ID", func(t *testing.T) {
-		_, err := src.Get(context.Background(), TestContext, "i-0ecfa0a234cbc132")
-
-		if err == nil {
-			t.Error("expected error but got nil")
-		}
-	})
-
-	t.Run("Find", func(t *testing.T) {
-		items, err := src.Find(context.Background(), TestContext)
-
-		if err != nil {
-			t.Error(err)
-		}
-
-		if len(items) == 0 {
-			t.Error("Expected items to be found but got nothing")
-		}
-
-		discovery.TestValidateItems(t, items)
-	})
-}
-
-// self-referential struct to test mapInstanceToItem error handling
-type Invalid struct {
-	Self *Invalid
 }
 
 func TestInstanceMapping(t *testing.T) {
 	t.Parallel()
-	// t.Run("ToAttributesCase error", func(t *testing.T) {
-	// 	instance := Invalid{}
-	// 	instance.Self = &instance
-	// 	item, err := mapInstanceToItem(instance, "foo.bar")
-	// 	if item != nil {
-	// 		t.Errorf("unexpected on error: item is ", item)
-	// 	}
 
-	// })
 	t.Run("empty", func(t *testing.T) {
 		instance := types.Instance{}
 		item, err := mapInstanceToItem(instance, "foo.bar")
@@ -174,7 +38,7 @@ func TestInstanceMapping(t *testing.T) {
 			t.Error("item is nil")
 		}
 	})
-	t.Run("with attrs", func(t *testing.T) {
+	t.Run("with imageId", func(t *testing.T) {
 		imageId := "imageId"
 		instance := types.Instance{ImageId: &imageId}
 		item, err := mapInstanceToItem(instance, "foo.bar")
@@ -182,12 +46,70 @@ func TestInstanceMapping(t *testing.T) {
 			t.Error(err)
 		}
 		if item == nil {
-			t.Error("item is nil")
-		} else {
-			if len(item.LinkedItemRequests) == 0 {
-				t.Errorf("no LinkedItemRequests: %v", item)
-			}
+			t.Fatal("item is nil")
 		}
+		if len(item.LinkedItemRequests) != 1 {
+			t.Fatalf("unexpected LinkedItemRequests: %v", item)
+		}
+		checkItem(t, item.LinkedItemRequests[0], "image", "ec2-image", imageId, "foo.bar")
+	})
+	t.Run("with network interfaces", func(t *testing.T) {
+		ipv6 := "2600::0"
+		privateIp := "private ip"
+		subnetId := "subnetId"
+		vpcId := "vpcId"
+		instance := types.Instance{
+			NetworkInterfaces: []types.InstanceNetworkInterface{
+				{
+					Ipv6Addresses: []types.InstanceIpv6Address{{Ipv6Address: &ipv6}},
+				},
+				{
+					PrivateIpAddresses: []types.InstancePrivateIpAddress{{PrivateIpAddress: &privateIp}},
+				},
+				{
+					SubnetId: &subnetId,
+				},
+				{
+					VpcId: &vpcId,
+				},
+			},
+		}
+
+		item, err := mapInstanceToItem(instance, "foo.bar")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item == nil {
+			t.Fatal("item is nil")
+		}
+		if len(item.LinkedItemRequests) != 4 {
+			t.Fatalf("unexpected LinkedItemRequests: %v", item)
+		}
+		checkItem(t, item.LinkedItemRequests[0], "ipv6Request", "ip", ipv6, "global")
+		checkItem(t, item.LinkedItemRequests[1], "privateIpRequest", "ip", privateIp, "global")
+		checkItem(t, item.LinkedItemRequests[2], "subnetRequest", "ec2-subnet", subnetId, "foo.bar")
+		checkItem(t, item.LinkedItemRequests[3], "vpcRequest", "ec2-vpc", vpcId, "foo.bar")
+	})
+	t.Run("with public info", func(t *testing.T) {
+		publicDns := "publicDns"
+		publicIp := "publicIp"
+		instance := types.Instance{
+			PublicDnsName:   &publicDns,
+			PublicIpAddress: &publicIp,
+		}
+
+		item, err := mapInstanceToItem(instance, "foo.bar")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item == nil {
+			t.Fatal("item is nil")
+		}
+		if len(item.LinkedItemRequests) != 2 {
+			t.Fatalf("unexpected LinkedItemRequests: %v", item)
+		}
+		checkItem(t, item.LinkedItemRequests[0], "publicDns", "dns", publicDns, "global")
+		checkItem(t, item.LinkedItemRequests[1], "publicIp", "ip", publicIp, "global")
 	})
 }
 
@@ -197,6 +119,73 @@ func (m fakeClient) DescribeInstances(ctx context.Context, params *ec2.DescribeI
 	return m(ctx, params, optFns...)
 }
 
+func createFakeClient(t *testing.T) fakeClient {
+	clientCalls := 0
+	return func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
+		clientCalls += 1
+		if clientCalls > 2 {
+			t.Error("Called fake client too often (>2)")
+			return nil, nil
+		}
+		if params.NextToken == nil {
+			nextToken := "page2"
+			firstId := "first"
+			return &ec2.DescribeInstancesOutput{
+				NextToken: &nextToken,
+				Reservations: []types.Reservation{
+					{
+						Instances: []types.Instance{
+							{InstanceId: &firstId},
+						},
+					},
+				},
+			}, nil
+		} else if *params.NextToken == "page2" {
+			secondId := "second"
+			return &ec2.DescribeInstancesOutput{
+				Reservations: []types.Reservation{
+					{
+						Instances: []types.Instance{
+							{InstanceId: &secondId},
+						},
+					},
+				},
+			}, nil
+		}
+		return nil, nil
+	}
+}
+
+func TestGet(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := InstanceSource{}
+
+		items, err := src.Get(context.Background(), "foo.bar", "query")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Fatalf("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+	t.Run("with client", func(t *testing.T) {
+		item, err := getImpl(context.Background(), createFakeClient(t), "foo.bar", "query")
+		if err != nil {
+			t.Fatalf("unexpected err: %v", err)
+		}
+		if item == nil {
+			t.Fatalf("item is nil")
+		}
+		if item.Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", item)
+		}
+	})
+}
+
 func TestFind(t *testing.T) {
 	t.Parallel()
 	t.Run("empty (context mismatch)", func(t *testing.T) {
@@ -204,53 +193,28 @@ func TestFind(t *testing.T) {
 
 		items, err := src.Find(context.Background(), "foo.bar")
 		if items != nil {
-			t.Errorf("unexpected items: %v", items)
+			t.Fatalf("unexpected items: %v", items)
 		}
 		if err == nil {
-			t.Error("expected err, got nil")
+			t.Fatalf("expected err, got nil")
 		}
 		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
 			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
 		}
 	})
 	t.Run("with client", func(t *testing.T) {
-		var testClient fakeClient = func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
-			if params.NextToken == nil {
-				nextToken := "page2"
-				firstId := "first"
-				return &ec2.DescribeInstancesOutput{
-					NextToken: &nextToken,
-					Reservations: []types.Reservation{
-						{
-							Instances: []types.Instance{
-								{InstanceId: &firstId},
-							},
-						},
-					},
-				}, nil
-			} else if *params.NextToken == "page2" {
-				secondId := "second"
-				return &ec2.DescribeInstancesOutput{
-					Reservations: []types.Reservation{
-						{
-							Instances: []types.Instance{
-								{InstanceId: &secondId},
-							},
-						},
-					},
-				}, nil
-			}
-			return nil, nil
+		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
+		if err != nil {
+			t.Fatalf("unexpected err: %v", err)
 		}
-		items, err := findImpl(context.Background(), "foo.bar", testClient)
 		if len(items) != 2 {
-			t.Errorf("unexpected items (len=%v): %v", len(items), items)
+			t.Fatalf("unexpected items (len=%v): %v", len(items), items)
 		}
 		if items[0].Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "first" {
 			t.Errorf("unexpected first item: %v", items[0])
 		}
-		if err != nil {
-			t.Errorf("unexpected err: %v", err)
+		if items[1].Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "second" {
+			t.Errorf("unexpected second item: %v", items[0])
 		}
 	})
 }

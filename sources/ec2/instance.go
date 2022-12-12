@@ -60,6 +60,11 @@ func (s *InstanceSource) Contexts() []string {
 	}
 }
 
+// EC2Client Collects all functions this code uses from the AWS SDK, for test replacement.
+type EC2Client interface {
+	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
+}
+
 // Get Get a single item with a given context and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
@@ -74,7 +79,15 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 		}
 	}
 
-	describeInstancesOutput, err := s.Client().DescribeInstances(
+	client := s.Client()
+
+	// Pull out the first and only reservation
+	// Pull the first instance
+	return getImpl(ctx, client, itemContext, query)
+}
+
+func getImpl(ctx context.Context, client EC2Client, itemContext string, query string) (*sdp.Item, error) {
+	describeInstancesOutput, err := client.DescribeInstances(
 		ctx,
 		&ec2.DescribeInstancesInput{
 			InstanceIds: []string{
@@ -114,7 +127,6 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 		}
 	}
 
-	// Pull out the first and only reservation
 	reservation := describeInstancesOutput.Reservations[0]
 
 	numInstances := len(reservation.Instances)
@@ -140,14 +152,9 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 		}
 	}
 
-	// Pull the first instance
 	instance := reservation.Instances[0]
 
 	return mapInstanceToItem(instance, itemContext)
-}
-
-type EC2Client interface {
-	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
 }
 
 // Find Finds all items in a given context
@@ -162,10 +169,10 @@ func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.I
 
 	client := s.Client()
 
-	return findImpl(ctx, itemContext, client)
+	return findImpl(ctx, client, itemContext)
 }
 
-func findImpl(ctx context.Context, itemContext string, client EC2Client) ([]*sdp.Item, error) {
+func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	instances := make([]types.Instance, 0)
 	var maxResults int32 = 100
