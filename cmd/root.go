@@ -136,7 +136,7 @@ Currently supported:
 				os.Exit(1)
 			}
 
-			// Work out what account we're using. This will be used in item contexts
+			// Work out what account we're using. This will be used in item scopes
 			stsClient := sts.NewFromConfig(cfg)
 
 			var callerID *sts.GetCallerIdentityOutput

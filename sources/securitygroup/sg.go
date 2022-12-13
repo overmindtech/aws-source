@@ -17,7 +17,7 @@ type SecurityGroupSource struct {
 	Config aws.Config
 
 	// AccountID The id of the account that is being used. This is used by
-	// sources as the first element in the context
+	// sources as the first element in the scope
 	AccountID string
 
 	// client The AWS client to use when making requests
@@ -52,9 +52,9 @@ func (s *SecurityGroupSource) Name() string {
 	return "sg-aws-source"
 }
 
-// List of contexts that this source is capable of find items for. This will be
+// List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *SecurityGroupSource) Contexts() []string {
+func (s *SecurityGroupSource) Scopes() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
@@ -65,24 +65,24 @@ type SecurityGroupClient interface {
 	DescribeSecurityGroups(ctx context.Context, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error)
 }
 
-// Get Get a single item with a given context and query. The item returned
+// Get Get a single item with a given scope and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *SecurityGroupSource) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+func (s *SecurityGroupSource) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
-	return getImpl(ctx, s.Client(), query, itemContext)
+	return getImpl(ctx, s.Client(), query, scope)
 }
 
-func getImpl(ctx context.Context, client SecurityGroupClient, query string, itemContext string) (*sdp.Item, error) {
+func getImpl(ctx context.Context, client SecurityGroupClient, query string, scope string) (*sdp.Item, error) {
 	describeSecurityGroupsOutput, err := client.DescribeSecurityGroups(
 		ctx,
 		&ec2.DescribeSecurityGroupsInput{
@@ -96,7 +96,7 @@ func getImpl(ctx context.Context, client SecurityGroupClient, query string, item
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: err.Error(),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
@@ -113,33 +113,33 @@ func getImpl(ctx context.Context, client SecurityGroupClient, query string, item
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: fmt.Sprintf("Request returned > 1 SecurityGroup, cannot determine instance. SecurityGroups: %v", securityGroupIDs),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	case numSecurityGroups == 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
 			ErrorString: fmt.Sprintf("SecurityGroup %v not found", query),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
-	return mapSecurityGroupToItem(&describeSecurityGroupsOutput.SecurityGroups[0], itemContext)
+	return mapSecurityGroupToItem(&describeSecurityGroupsOutput.SecurityGroups[0], scope)
 }
 
-// Find Finds all items in a given context
-func (s *SecurityGroupSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+// List Lists all items in a given scope
+func (s *SecurityGroupSource) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
-	return findImpl(ctx, s.Client(), itemContext)
+	return findImpl(ctx, s.Client(), scope)
 }
 
-func findImpl(ctx context.Context, client SecurityGroupClient, itemContext string) ([]*sdp.Item, error) {
+func findImpl(ctx context.Context, client SecurityGroupClient, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	securityGroups := make([]types.SecurityGroup, 0)
 	var maxResults int32 = 100
@@ -158,7 +158,7 @@ func findImpl(ctx context.Context, client SecurityGroupClient, itemContext strin
 			return items, &sdp.ItemRequestError{
 				ErrorType:   sdp.ItemRequestError_OTHER,
 				ErrorString: err.Error(),
-				Context:     itemContext,
+				Scope:       scope,
 			}
 		}
 
@@ -173,14 +173,14 @@ func findImpl(ctx context.Context, client SecurityGroupClient, itemContext strin
 
 	// Convert to items
 	for _, securityGroup := range securityGroups {
-		item, _ := mapSecurityGroupToItem(&securityGroup, itemContext)
+		item, _ := mapSecurityGroupToItem(&securityGroup, scope)
 		items = append(items, item)
 	}
 
 	return items, nil
 }
 
-func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, itemContext string) (*sdp.Item, error) {
+func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, scope string) (*sdp.Item, error) {
 	var err error
 	var attrs *sdp.ItemAttributes
 	attrs, err = sources.ToAttributesCase(securityGroup)
@@ -189,24 +189,24 @@ func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, itemContext stri
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: err.Error(),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
 	item := sdp.Item{
 		Type:            "ec2-securitygroup",
 		UniqueAttribute: "groupId",
-		Context:         itemContext,
+		Scope:           scope,
 		Attributes:      attrs,
 	}
 
 	// VPC
 	if securityGroup.VpcId != nil {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "ec2-vpc",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *securityGroup.VpcId,
-			Context: itemContext,
+			Type:   "ec2-vpc",
+			Method: sdp.RequestMethod_GET,
+			Query:  *securityGroup.VpcId,
+			Scope:  scope,
 		})
 	}
 

@@ -121,7 +121,7 @@ func createFakeClient(t *testing.T) fakeClient {
 
 func TestGet(t *testing.T) {
 	t.Parallel()
-	t.Run("empty (context mismatch)", func(t *testing.T) {
+	t.Run("empty (scope mismatch)", func(t *testing.T) {
 		src := ELBSource{}
 
 		items, err := src.Get(context.Background(), "foo.bar", "query")
@@ -131,8 +131,8 @@ func TestGet(t *testing.T) {
 		if err == nil {
 			t.Fatalf("expected err, got nil")
 		}
-		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
-			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
+			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
 		}
 	})
 }
@@ -153,25 +153,25 @@ func TestGetImpl(t *testing.T) {
 	})
 }
 
-func TestFind(t *testing.T) {
+func TestList(t *testing.T) {
 	t.Parallel()
-	t.Run("empty (context mismatch)", func(t *testing.T) {
+	t.Run("empty (scope mismatch)", func(t *testing.T) {
 		src := ELBSource{}
 
-		items, err := src.Find(context.Background(), "foo.bar")
+		items, err := src.List(context.Background(), "foo.bar")
 		if items != nil {
 			t.Fatalf("unexpected items: %v", items)
 		}
 		if err == nil {
 			t.Fatalf("expected err, got nil")
 		}
-		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
-			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
+			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
 		}
 	})
 }
 
-func TestFindImpl(t *testing.T) {
+func TestListImpl(t *testing.T) {
 	t.Parallel()
 	t.Run("with client", func(t *testing.T) {
 		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")

@@ -17,7 +17,7 @@ type InstanceSource struct {
 	Config aws.Config
 
 	// AccountID The id of the account that is being used. This is used by
-	// sources as the first element in the context
+	// sources as the first element in the scope
 	AccountID string
 
 	// client The AWS client to use when making requests
@@ -52,9 +52,9 @@ func (s *InstanceSource) Name() string {
 	return "ec2-aws-source"
 }
 
-// List of contexts that this source is capable of find items for. This will be
+// List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *InstanceSource) Contexts() []string {
+func (s *InstanceSource) Scopes() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
@@ -65,24 +65,24 @@ type EC2Client interface {
 	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
 }
 
-// Get Get a single item with a given context and query. The item returned
+// Get Get a single item with a given scope and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *InstanceSource) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+func (s *InstanceSource) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
-	return getImpl(ctx, s.Client(), itemContext, query)
+	return getImpl(ctx, s.Client(), scope, query)
 }
 
-func getImpl(ctx context.Context, client EC2Client, itemContext string, query string) (*sdp.Item, error) {
+func getImpl(ctx context.Context, client EC2Client, scope string, query string) (*sdp.Item, error) {
 	describeInstancesOutput, err := client.DescribeInstances(
 		ctx,
 		&ec2.DescribeInstancesInput{
@@ -96,7 +96,7 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: err.Error(),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
@@ -113,13 +113,13 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: fmt.Sprintf("Request returned > 1 reservation, cannot determine instance. Reservations: %v", reservationIDs),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	case numReservations == 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
 			ErrorString: fmt.Sprintf("Instance %v not found", query),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
@@ -133,7 +133,7 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
 			ErrorString: fmt.Sprintf("Instance %v not found", query),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	case numInstances > 1:
 		instanceIDs := make([]string, numInstances)
@@ -145,30 +145,30 @@ func getImpl(ctx context.Context, client EC2Client, itemContext string, query st
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: fmt.Sprintf("Request returned > 1 instance. Instance IDs: %v", instanceIDs),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
 	// Pull the first instance
 	instance := reservation.Instances[0]
 
-	return mapInstanceToItem(instance, itemContext)
+	return mapInstanceToItem(instance, scope)
 }
 
-// Find Finds all items in a given context
-func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+// List Lists all items in a given scope
+func (s *InstanceSource) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
-	return findImpl(ctx, s.Client(), itemContext)
+	return findImpl(ctx, s.Client(), scope)
 }
 
-func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp.Item, error) {
+func findImpl(ctx context.Context, client EC2Client, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	instances := make([]types.Instance, 0)
 	var maxResults int32 = 100
@@ -187,7 +187,7 @@ func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp
 			return items, &sdp.ItemRequestError{
 				ErrorType:   sdp.ItemRequestError_OTHER,
 				ErrorString: err.Error(),
-				Context:     itemContext,
+				Scope:       scope,
 			}
 		}
 
@@ -204,37 +204,37 @@ func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp
 
 	// Convert to items
 	for _, instance := range instances {
-		item, _ := mapInstanceToItem(instance, itemContext)
+		item, _ := mapInstanceToItem(instance, scope)
 		items = append(items, item)
 	}
 
 	return items, nil
 }
 
-func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, error) {
+func mapInstanceToItem(instance types.Instance, scope string) (*sdp.Item, error) {
 	attrs, err := sources.ToAttributesCase(instance)
 
 	if err != nil {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: err.Error(),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
 	item := sdp.Item{
 		Type:            "ec2-instance",
 		UniqueAttribute: "instanceId",
-		Context:         itemContext,
+		Scope:           scope,
 		Attributes:      attrs,
 	}
 
 	if instance.ImageId != nil {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "ec2-image",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *instance.ImageId,
-			Context: itemContext,
+			Type:   "ec2-image",
+			Method: sdp.RequestMethod_GET,
+			Query:  *instance.ImageId,
+			Scope:  scope,
 		})
 	}
 
@@ -243,10 +243,10 @@ func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, 
 		for _, ip := range nic.Ipv6Addresses {
 			if ip.Ipv6Address != nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-					Type:    "ip",
-					Method:  sdp.RequestMethod_GET,
-					Query:   *ip.Ipv6Address,
-					Context: "global",
+					Type:   "ip",
+					Method: sdp.RequestMethod_GET,
+					Query:  *ip.Ipv6Address,
+					Scope:  "global",
 				})
 			}
 		}
@@ -254,10 +254,10 @@ func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, 
 		for _, ip := range nic.PrivateIpAddresses {
 			if ip.PrivateIpAddress != nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-					Type:    "ip",
-					Method:  sdp.RequestMethod_GET,
-					Query:   *ip.PrivateIpAddress,
-					Context: "global",
+					Type:   "ip",
+					Method: sdp.RequestMethod_GET,
+					Query:  *ip.PrivateIpAddress,
+					Scope:  "global",
 				})
 			}
 		}
@@ -265,39 +265,39 @@ func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, 
 		// Subnet
 		if nic.SubnetId != nil {
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:    "ec2-subnet",
-				Method:  sdp.RequestMethod_GET,
-				Query:   *nic.SubnetId,
-				Context: itemContext,
+				Type:   "ec2-subnet",
+				Method: sdp.RequestMethod_GET,
+				Query:  *nic.SubnetId,
+				Scope:  scope,
 			})
 		}
 
 		// VPC
 		if nic.VpcId != nil {
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:    "ec2-vpc",
-				Method:  sdp.RequestMethod_GET,
-				Query:   *nic.VpcId,
-				Context: itemContext,
+				Type:   "ec2-vpc",
+				Method: sdp.RequestMethod_GET,
+				Query:  *nic.VpcId,
+				Scope:  scope,
 			})
 		}
 	}
 
 	if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "dns",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *instance.PublicDnsName,
-			Context: "global",
+			Type:   "dns",
+			Method: sdp.RequestMethod_GET,
+			Query:  *instance.PublicDnsName,
+			Scope:  "global",
 		})
 	}
 
 	if instance.PublicIpAddress != nil {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "ip",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *instance.PublicIpAddress,
-			Context: "global",
+			Type:   "ip",
+			Method: sdp.RequestMethod_GET,
+			Query:  *instance.PublicIpAddress,
+			Scope:  "global",
 		})
 	}
 
@@ -305,10 +305,10 @@ func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, 
 	for _, group := range instance.SecurityGroups {
 		if group.GroupId != nil {
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:    "ec2-securitygroup",
-				Method:  sdp.RequestMethod_GET,
-				Query:   *group.GroupId,
-				Context: itemContext,
+				Type:   "ec2-securitygroup",
+				Method: sdp.RequestMethod_GET,
+				Query:  *group.GroupId,
+				Scope:  scope,
 			})
 		}
 	}
