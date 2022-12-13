@@ -129,12 +129,12 @@ Gathers information about Elastic Load Balancers (v2) and their target groups, h
             "vpcId": "vpc-0fe83a8d71bd1803c"
         }
     },
-    "context": "177828803798.eu-west-2",
+    "scope": "177828803798.eu-west-2",
     "linkedItemRequests": [
         {
             "type": "dns",
             "query": "vpc-0fe83a8d71bd1803ctest-elbv2-d88c129308d731ef.elb.eu-west-2.amazonaws.com",
-            "context": "global"
+            "scope": "global"
         }
     ]
 }
@@ -146,9 +146,9 @@ Gets a specific ELB by name.
 
 **Query format:** The name of the ELB
 
-#### `Find`
+#### `List`
 
-Finds all ELBs
+Lists all ELBs
 
 ### ec2-instance
 
@@ -288,32 +288,32 @@ Get instance info
             "vpcId": "vpc-0e506f1a2e3074376"
         }
     },
-    "context": "177828803798.eu-west-2",
+    "scope": "177828803798.eu-west-2",
     "linkedItemRequests": [
         {
             "type": "ec2-image",
             "query": "ami-0fdbd8587b1cf431e",
-            "context": "177828803798.eu-west-2"
+            "scope": "177828803798.eu-west-2"
         },
         {
             "type": "ip",
             "query": "10.174.145.13",
-            "context": "global"
+            "scope": "global"
         },
         {
             "type": "ec2-subnet",
             "query": "subnet-0889bae2a717b3ab9",
-            "context": "177828803798.eu-west-2"
+            "scope": "177828803798.eu-west-2"
         },
         {
             "type": "ec2-vpc",
             "query": "vpc-0e506f1a2e3074376",
-            "context": "177828803798.eu-west-2"
+            "scope": "177828803798.eu-west-2"
         },
         {
             "type": "ec2-securitygroup",
             "query": "sg-012c2822f90f34249",
-            "context": "177828803798.eu-west-2"
+            "scope": "177828803798.eu-west-2"
         }
     ]
 }
@@ -325,9 +325,9 @@ Gets a specific instance by ID.
 
 **Query format:** The ID of the instance e.g. `i-09b0c0768577775ef`
 
-#### `Find`
+#### `List`
 
-Finds all instances
+Lists all instances
 
 ## Config
 

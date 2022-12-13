@@ -19,7 +19,7 @@ type ELBv2Source struct {
 	Config aws.Config
 
 	// AccountID The id of the account that is being used. This is used by
-	// sources as the first element in the context
+	// sources as the first element in the scope
 	AccountID string
 
 	// client The AWS client to use when making requests
@@ -54,9 +54,9 @@ func (s *ELBv2Source) Name() string {
 	return "elasticloadbalancing-v2-aws-source"
 }
 
-// List of contexts that this source is capable of find items for. This will be
+// List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *ELBv2Source) Contexts() []string {
+func (s *ELBv2Source) Scopes() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
@@ -70,24 +70,24 @@ type ELBv2Client interface {
 	DescribeTargetHealth(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error)
 }
 
-// Get Get a single item with a given context and query. The item returned
+// Get Get a single item with a given scope and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *ELBv2Source) Get(ctx context.Context, itemContext string, query string) (*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+func (s *ELBv2Source) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
-	return getv2Impl(ctx, s.Client(), itemContext, query)
+	return getv2Impl(ctx, s.Client(), scope, query)
 }
 
-func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, query string) (*sdp.Item, error) {
+func getv2Impl(ctx context.Context, client ELBv2Client, scope string, query string) (*sdp.Item, error) {
 	lbs, err := client.DescribeLoadBalancers(
 		ctx,
 		&elbv2.DescribeLoadBalancersInput{
@@ -101,7 +101,7 @@ func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, quer
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: err.Error(),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
@@ -110,7 +110,7 @@ func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, quer
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
 			ErrorString: "elasticloadbalancing-loadbalancer-v2 not found",
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	case 1:
 		expanded, err := ExpandLBv2(ctx, client, lbs.LoadBalancers[0])
@@ -119,35 +119,35 @@ func getv2Impl(ctx context.Context, client ELBv2Client, itemContext string, quer
 			return nil, &sdp.ItemRequestError{
 				ErrorType:   sdp.ItemRequestError_OTHER,
 				ErrorString: fmt.Sprintf("error during details expansion: %v", err.Error()),
-				Context:     itemContext,
+				Scope:       scope,
 			}
 		}
 
-		return mapExpandedELBv2ToItem(expanded, itemContext)
+		return mapExpandedELBv2ToItem(expanded, scope)
 	default:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: fmt.Sprintf("more than 1 elasticloadbalancing-loadbalancer-v2 found, found: %v", len(lbs.LoadBalancers)),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 }
 
-// Find Finds all items in a given context
-func (s *ELBv2Source) Find(ctx context.Context, itemContext string) ([]*sdp.Item, error) {
-	if itemContext != s.Contexts()[0] {
+// List Lists all items in a given scope
+func (s *ELBv2Source) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOCONTEXT,
-			ErrorString: fmt.Sprintf("requested context %v does not match source context %v", itemContext, s.Contexts()[0]),
-			Context:     itemContext,
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
 		}
 	}
 
 	client := s.Client()
-	return findV2Impl(ctx, client, itemContext)
+	return findV2Impl(ctx, client, scope)
 }
 
-func findV2Impl(ctx context.Context, client ELBv2Client, itemContext string) ([]*sdp.Item, error) {
+func findV2Impl(ctx context.Context, client ELBv2Client, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	var maxResults int32 = 100
 	var nextToken *string
@@ -166,7 +166,7 @@ func findV2Impl(ctx context.Context, client ELBv2Client, itemContext string) ([]
 			return items, &sdp.ItemRequestError{
 				ErrorType:   sdp.ItemRequestError_OTHER,
 				ErrorString: err.Error(),
-				Context:     itemContext,
+				Scope:       scope,
 			}
 		}
 
@@ -179,7 +179,7 @@ func findV2Impl(ctx context.Context, client ELBv2Client, itemContext string) ([]
 
 			var item *sdp.Item
 
-			item, err = mapExpandedELBv2ToItem(expanded, itemContext)
+			item, err = mapExpandedELBv2ToItem(expanded, scope)
 
 			if err != nil {
 				continue
@@ -296,21 +296,21 @@ func ExpandLBv2(ctx context.Context, client ELBv2Client, lb types.LoadBalancer) 
 }
 
 // mapExpandedELBv2ToItem Maps a load balancer to an item
-func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, error) {
+func mapExpandedELBv2ToItem(lb *ExpandedELBv2, scope string) (*sdp.Item, error) {
 	attrMap := make(map[string]interface{})
 
 	if lb.LoadBalancerName == nil || *lb.LoadBalancerName == "" {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: "elasticloadbalancing-loadbalancer-v2 was returned with an empty name",
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 
 	item := sdp.Item{
 		Type:            "elasticloadbalancing-loadbalancer-v2",
 		UniqueAttribute: "name",
-		Context:         itemContext,
+		Scope:           scope,
 	}
 
 	attrMap["name"] = lb.LoadBalancerName
@@ -334,10 +334,10 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 		attrMap["dNSName"] = lb.DNSName
 
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "dns",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *lb.DNSName,
-			Context: "global",
+			Type:   "dns",
+			Method: sdp.RequestMethod_GET,
+			Query:  *lb.DNSName,
+			Scope:  "global",
 		})
 	}
 
@@ -345,10 +345,10 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 		attrMap["vpcId"] = lb.VpcId
 
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "ec2-vpc",
-			Method:  sdp.RequestMethod_GET,
-			Query:   *lb.VpcId,
-			Context: itemContext,
+			Type:   "ec2-vpc",
+			Method: sdp.RequestMethod_GET,
+			Query:  *lb.VpcId,
+			Scope:  scope,
 		})
 	}
 
@@ -362,37 +362,37 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 					// type is alb, specify the ARN of the Application Load Balancer target.
 					if net.ParseIP(*id) != nil {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:    "ip",
-							Method:  sdp.RequestMethod_GET,
-							Query:   *id,
-							Context: "global",
+							Type:   "ip",
+							Method: sdp.RequestMethod_GET,
+							Query:  *id,
+							Scope:  "global",
 						})
 					}
 
 					if strings.HasPrefix(*id, "i-") {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:    "ec2-instance",
-							Method:  sdp.RequestMethod_GET,
-							Query:   *id,
-							Context: itemContext,
+							Type:   "ec2-instance",
+							Method: sdp.RequestMethod_GET,
+							Query:  *id,
+							Scope:  scope,
 						})
 					}
 
 					if strings.HasPrefix(*id, "arn:aws:lambda") {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:    "lambda-function",
-							Method:  sdp.RequestMethod_GET,
-							Query:   *id,
-							Context: itemContext,
+							Type:   "lambda-function",
+							Method: sdp.RequestMethod_GET,
+							Query:  *id,
+							Scope:  scope,
 						})
 					}
 
 					if strings.HasPrefix(*id, "arn:aws:elasticloadbalancing") {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:    "elasticloadbalancing-loadbalancer-v2",
-							Method:  sdp.RequestMethod_GET,
-							Query:   *id,
-							Context: itemContext,
+							Type:   "elasticloadbalancing-loadbalancer-v2",
+							Method: sdp.RequestMethod_GET,
+							Query:  *id,
+							Scope:  scope,
 						})
 					}
 				}
@@ -403,10 +403,10 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 	// Security groups
 	for _, group := range lb.SecurityGroups {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:    "ec2-securitygroup",
-			Method:  sdp.RequestMethod_GET,
-			Query:   group,
-			Context: itemContext,
+			Type:   "ec2-securitygroup",
+			Method: sdp.RequestMethod_GET,
+			Query:  group,
+			Scope:  scope,
 		})
 	}
 	attributes, err := sources.ToAttributesCase(attrMap)
@@ -415,7 +415,7 @@ func mapExpandedELBv2ToItem(lb *ExpandedELBv2, itemContext string) (*sdp.Item, e
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
 			ErrorString: fmt.Sprintf("error creating attributes: %v", err),
-			Context:     itemContext,
+			Scope:       scope,
 		}
 	}
 

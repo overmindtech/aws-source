@@ -181,7 +181,7 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
 }
 
-func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedContext string) {
+func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}
@@ -191,7 +191,7 @@ func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedTyp
 	if item.Query != expectedQuery {
 		t.Errorf("%s.Query '%v' != '%v'", itemName, item.Query, expectedQuery)
 	}
-	if item.Context != expectedContext {
-		t.Errorf("%s.Context '%v' != '%v'", itemName, item.Context, expectedContext)
+	if item.Scope != expectedScope {
+		t.Errorf("%s.Scope '%v' != '%v'", itemName, item.Scope, expectedScope)
 	}
 }
