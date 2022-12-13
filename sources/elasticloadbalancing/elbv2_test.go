@@ -2,233 +2,248 @@ package elasticloadbalancing
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"regexp"
-	"strconv"
+	"strings"
 	"testing"
-	"time"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/aws-source/sources"
 )
 
-func TestNLBv2(t *testing.T) {
+func TestELBv2Mapping(t *testing.T) {
 	t.Parallel()
 
-	var err error
-	elbClient := elbv2.NewFromConfig(TestAWSConfig)
-	name := *TestVPC.ID + "test-elbv2"
-	subnetIDs := make([]string, 0)
-
-	for _, subnet := range TestVPC.Subnets {
-		subnetIDs = append(subnetIDs, *subnet.ID)
-	}
-
-	var createLoadBalancerOutput *elbv2.CreateLoadBalancerOutput
-
-	createLoadBalancerOutput, err = elbClient.CreateLoadBalancer(
-		context.Background(),
-		&elbv2.CreateLoadBalancerInput{
-			Name:          &name,
-			IpAddressType: types.IpAddressTypeIpv4,
-			Scheme:        types.LoadBalancerSchemeEnumInternetFacing,
-			Type:          types.LoadBalancerTypeEnumNetwork,
-			Subnets:       subnetIDs,
-		},
-	)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Cleanup(func() {
-		_, err := elbClient.DeleteLoadBalancer(context.Background(), &elbv2.DeleteLoadBalancerInput{
-			LoadBalancerArn: createLoadBalancerOutput.LoadBalancers[0].LoadBalancerArn,
-		})
-
-		if err != nil {
-			t.Error(err)
+	t.Run("empty", func(t *testing.T) {
+		lbName := "lbName"
+		lb := ExpandedELBv2{
+			LoadBalancer: types.LoadBalancer{
+				LoadBalancerName: &lbName,
+			},
 		}
 
-		// Wait in order to avoid race conditions where the load balancer hasn't
-		// yet been fully deleted and subnet deletion fails
-		time.Sleep(3 * time.Second)
-	})
-
-	var targetGroupOutput *elbv2.CreateTargetGroupOutput
-	targetGroupName := "fake-targets"
-	targetHealthCheckEnabled := true
-	targetPort := int32(80)
-
-	targetGroupOutput, err = elbClient.CreateTargetGroup(
-		context.Background(),
-		&elbv2.CreateTargetGroupInput{
-			Name:                &targetGroupName,
-			HealthCheckEnabled:  &targetHealthCheckEnabled,
-			HealthCheckProtocol: types.ProtocolEnumTcp,
-			Port:                &targetPort,
-			TargetType:          types.TargetTypeEnumIp,
-			Protocol:            types.ProtocolEnumTcp,
-			VpcId:               TestVPC.ID,
-		},
-	)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Cleanup(func() {
-		_, err := elbClient.DeleteTargetGroup(
-			context.Background(),
-			&elbv2.DeleteTargetGroupInput{
-				TargetGroupArn: targetGroupOutput.TargetGroups[0].TargetGroupArn,
-			},
-		)
-
-		if err != nil {
-			t.Error(err)
-		}
-	})
-
-	cidrRegexp := regexp.MustCompile(`(\d+)\/\d+$`)
-
-	for _, subnet := range TestVPC.Subnets {
-		startNumber, _ := strconv.Atoi(cidrRegexp.FindStringSubmatch(subnet.CIDR)[1])
-
-		targetIP := cidrRegexp.ReplaceAllString(subnet.CIDR, fmt.Sprint(startNumber+5))
-
-		_, err = elbClient.RegisterTargets(
-			context.Background(),
-			&elbv2.RegisterTargetsInput{
-				TargetGroupArn: targetGroupOutput.TargetGroups[0].TargetGroupArn,
-				Targets: []types.TargetDescription{
-					{
-						Id:   &targetIP,
-						Port: &targetPort,
-					},
-				},
-			},
-		)
-
+		item, err := mapExpandedELBv2ToItem(&lb, "foo.bar")
 		if err != nil {
 			t.Fatal(err)
 		}
+		if item == nil {
+			t.Error("item is nil")
+		}
+	})
+	t.Run("name check", func(t *testing.T) {
+		lbName := ""
+		lb := ExpandedELBv2{
+			LoadBalancer: types.LoadBalancer{
+				LoadBalancerName: &lbName,
+			},
+		}
 
-		t.Cleanup(func() {
-			_, err := elbClient.DeregisterTargets(
-				context.Background(),
-				&elbv2.DeregisterTargetsInput{
-					TargetGroupArn: targetGroupOutput.TargetGroups[0].TargetGroupArn,
-					Targets: []types.TargetDescription{
+		_, err := mapExpandedELBv2ToItem(&lb, "foo.bar")
+		if err == nil {
+			t.Fatal("didn't get expected error")
+		}
+	})
+	t.Run("with DNSName", func(t *testing.T) {
+		lbName := "lbName"
+		dNSName := "dNSName"
+		lb := ExpandedELBv2{
+			LoadBalancer: types.LoadBalancer{
+				LoadBalancerName: &lbName,
+				DNSName:          &dNSName,
+			},
+		}
+
+		item, err := mapExpandedELBv2ToItem(&lb, "foo.bar")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if item == nil {
+			t.Fatal("item is nil")
+		}
+		if len(item.LinkedItemRequests) != 1 {
+			t.Fatalf("unexpected LinkedItemRequests: %v", item)
+		}
+		sources.CheckItem(t, item.LinkedItemRequests[0], "dNSName", "dns", dNSName, "global")
+	})
+}
+
+func TestGetv2(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := ELBv2Source{}
+
+		items, err := src.Get(context.Background(), "foo.bar", "query")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
+		}
+		if err == nil {
+			t.Fatalf("expected err, got nil")
+		}
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
+	})
+}
+
+type fakeV2Client struct {
+	lbClientCalls           int
+	listenerClientCalls     int
+	targetGroupsClientCalls int
+
+	DescribeLoadBalancersMock func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error)
+	DescribeListenersMock     func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error)
+	DescribeTargetGroupsMock  func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error)
+	DescribeTargetHealthMock  func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error)
+}
+
+// DescribeListeners implements ELBv2Client
+func (m fakeV2Client) DescribeListeners(ctx context.Context, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error) {
+	return m.DescribeListenersMock(ctx, m, params, optFns...)
+}
+
+// DescribeLoadBalancers implements ELBv2Client
+func (m fakeV2Client) DescribeLoadBalancers(ctx context.Context, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
+	return m.DescribeLoadBalancersMock(ctx, m, params, optFns...)
+}
+
+// DescribeTargetGroups implements ELBv2Client
+func (m fakeV2Client) DescribeTargetGroups(ctx context.Context, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
+	return m.DescribeTargetGroupsMock(ctx, m, params, optFns...)
+}
+
+// DescribeTargetHealth implements ELBv2Client
+func (m fakeV2Client) DescribeTargetHealth(ctx context.Context, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error) {
+	return m.DescribeTargetHealthMock(ctx, m, params, optFns...)
+}
+
+func createFakeV2Client(t *testing.T) ELBv2Client {
+	return fakeV2Client{
+		DescribeLoadBalancersMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeLoadBalancersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeLoadBalancersOutput, error) {
+			m.lbClientCalls += 1
+			if m.lbClientCalls > 2 {
+				t.Error("Called DescribeLoadBalancersMock too often (>2)")
+				return nil, nil
+			}
+			if params.Marker == nil {
+				firstName := "first"
+				nextMarker := "page2"
+				return &elbv2.DescribeLoadBalancersOutput{
+					LoadBalancers: []types.LoadBalancer{
 						{
-							Id:   &targetIP,
-							Port: &targetPort,
+							LoadBalancerName: &firstName,
 						},
 					},
-				},
-			)
-
-			if err != nil {
-				t.Error(err)
+					NextMarker: &nextMarker,
+				}, nil
+			} else if *params.Marker == "page2" {
+				secondName := "second"
+				return &elbv2.DescribeLoadBalancersOutput{
+					LoadBalancers: []types.LoadBalancer{
+						{
+							LoadBalancerName: &secondName,
+						},
+					},
+				}, nil
 			}
-		})
-	}
-
-	var createListenerOutput *elbv2.CreateListenerOutput
-	order := int32(1)
-
-	createListenerOutput, err = elbClient.CreateListener(
-		context.Background(),
-		&elbv2.CreateListenerInput{
-			LoadBalancerArn: createLoadBalancerOutput.LoadBalancers[0].LoadBalancerArn,
-			Port:            &targetPort,
-			Protocol:        types.ProtocolEnumTcp,
-			DefaultActions: []types.Action{
-				{
-					Type:           types.ActionTypeEnumForward,
-					TargetGroupArn: targetGroupOutput.TargetGroups[0].TargetGroupArn,
-					Order:          &order,
-				},
-			},
+			return nil, nil
 		},
-	)
-
-	if err != nil {
-		t.Fatal(err)
+		DescribeListenersMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeListenersInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeListenersOutput, error) {
+			m.listenerClientCalls += 1
+			if m.listenerClientCalls > 2 {
+				t.Error("Called DescribeListenersMock too often (>2)")
+				return nil, nil
+			}
+			if params.Marker == nil {
+				// firstName := "first"
+				nextMarker := "page2"
+				return &elbv2.DescribeListenersOutput{
+					Listeners: []types.Listener{
+						{},
+					},
+					NextMarker: &nextMarker,
+				}, nil
+			} else if *params.Marker == "page2" {
+				// secondName := "second"
+				return &elbv2.DescribeListenersOutput{
+					Listeners: []types.Listener{
+						{},
+					},
+				}, nil
+			}
+			return nil, nil
+		},
+		DescribeTargetGroupsMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetGroupsInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetGroupsOutput, error) {
+			m.targetGroupsClientCalls += 1
+			if m.targetGroupsClientCalls > 2 {
+				t.Error("Called DescribeTargetGroupsMock too often (>2)")
+				return nil, nil
+			}
+			if params.Marker == nil {
+				// firstName := "first"
+				nextMarker := "page2"
+				return &elbv2.DescribeTargetGroupsOutput{
+					NextMarker: &nextMarker,
+				}, nil
+			} else if *params.Marker == "page2" {
+				// secondName := "second"
+				return &elbv2.DescribeTargetGroupsOutput{}, nil
+			}
+			return nil, nil
+		},
+		DescribeTargetHealthMock: func(ctx context.Context, m fakeV2Client, params *elbv2.DescribeTargetHealthInput, optFns ...func(*elbv2.Options)) (*elbv2.DescribeTargetHealthOutput, error) {
+			return nil, nil
+		},
 	}
+}
 
-	t.Cleanup(func() {
-		_, err := elbClient.DeleteListener(
-			context.Background(),
-			&elbv2.DeleteListenerInput{
-				ListenerArn: createListenerOutput.Listeners[0].ListenerArn,
-			},
-		)
-
+func TestGetV2Impl(t *testing.T) {
+	t.Parallel()
+	t.Run("with client", func(t *testing.T) {
+		item, err := getv2Impl(context.Background(), createFakeV2Client(t), "foo.bar", "query")
 		if err != nil {
-			t.Error(err)
+			t.Fatalf("unexpected err: %v", err)
+		}
+		if item == nil {
+			t.Fatalf("item is nil")
+		}
+		if item.Attributes.AttrStruct.Fields["name"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", item)
 		}
 	})
+}
 
-	elbWait := elbv2.NewLoadBalancerAvailableWaiter(
-		elbClient,
-	)
+func TestFindV2(t *testing.T) {
+	t.Parallel()
+	t.Run("empty (context mismatch)", func(t *testing.T) {
+		src := ELBv2Source{}
 
-	err = elbWait.Wait(
-		context.Background(),
-		&elbv2.DescribeLoadBalancersInput{
-			Names: []string{
-				name,
-			},
-		},
-		5*time.Minute,
-	)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	src := ELBv2Source{
-		Config:    TestAWSConfig,
-		AccountID: TestAccountID,
-	}
-
-	t.Run("get NLB details", func(t *testing.T) {
-		item, err := src.Get(context.Background(), TestContext, name)
-
-		if err != nil {
-			t.Fatal(err)
+		items, err := src.Find(context.Background(), "foo.bar")
+		if items != nil {
+			t.Fatalf("unexpected items: %v", items)
 		}
-
-		discovery.TestValidateItem(t, item)
-
-		b, _ := json.Marshal(item)
-
-		fmt.Println("---")
-		fmt.Println(string(b))
-		fmt.Println("---")
-	})
-
-	t.Run("get NLB that doesn't exist", func(t *testing.T) {
-		_, err := src.Get(context.Background(), TestContext, "foobar")
-
 		if err == nil {
-			t.Error("expected error but got nil")
+			t.Fatalf("expected err, got nil")
 		}
-
+		if !strings.HasPrefix(err.Error(), "requested context foo.bar does not match source context .") {
+			t.Errorf("expected 'requested context foo.bar does not match source context .', got '%v'", err.Error())
+		}
 	})
+}
 
-	t.Run("find all NLBs", func(t *testing.T) {
-		items, err := src.Find(context.Background(), TestContext)
-
+func TestFindV2Impl(t *testing.T) {
+	t.Parallel()
+	t.Run("with client", func(t *testing.T) {
+		items, err := findV2Impl(context.Background(), createFakeV2Client(t), "foo.bar")
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("unexpected err: %v", err)
 		}
-
-		if len(items) < 1 {
-			t.Errorf("expected >=1 NLB but got %v", len(items))
+		if len(items) != 2 {
+			t.Fatalf("unexpected items (len=%v): %v", len(items), items)
+		}
+		if items[0].Attributes.AttrStruct.Fields["name"].GetStringValue() != "first" {
+			t.Errorf("unexpected first item: %v", items[0])
+		}
+		if items[1].Attributes.AttrStruct.Fields["name"].GetStringValue() != "second" {
+			t.Errorf("unexpected second item: %v", items[0])
 		}
 	})
 }

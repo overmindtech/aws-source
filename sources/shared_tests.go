@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"testing"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/overmindtech/sdp-go"
 )
 
 type Subnet struct {
@@ -177,4 +179,19 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 		}
 	}
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
+}
+
+func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedContext string) {
+	if item.Type != expectedType {
+		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
+	}
+	if item.Method != sdp.RequestMethod_GET {
+		t.Errorf("%s.Method '%v' != '%v'", itemName, item.Method, sdp.RequestMethod_GET)
+	}
+	if item.Query != expectedQuery {
+		t.Errorf("%s.Query '%v' != '%v'", itemName, item.Query, expectedQuery)
+	}
+	if item.Context != expectedContext {
+		t.Errorf("%s.Context '%v' != '%v'", itemName, item.Context, expectedContext)
+	}
 }

@@ -114,7 +114,7 @@ func init() {
 	}
 }
 
-// ToAttributesCase Converts any interace to SDP attributes and also fixes case
+// ToAttributesCase Converts any interface to SDP attributes and also fixes case
 // to be the correct `camelCase`
 func ToAttributesCase(i interface{}) (*sdp.ItemAttributes, error) {
 	var m map[string]interface{}

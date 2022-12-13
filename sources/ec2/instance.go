@@ -60,6 +60,11 @@ func (s *InstanceSource) Contexts() []string {
 	}
 }
 
+// EC2Client Collects all functions this code uses from the AWS SDK, for test replacement.
+type EC2Client interface {
+	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
+}
+
 // Get Get a single item with a given context and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
@@ -74,7 +79,11 @@ func (s *InstanceSource) Get(ctx context.Context, itemContext string, query stri
 		}
 	}
 
-	describeInstancesOutput, err := s.Client().DescribeInstances(
+	return getImpl(ctx, s.Client(), itemContext, query)
+}
+
+func getImpl(ctx context.Context, client EC2Client, itemContext string, query string) (*sdp.Item, error) {
+	describeInstancesOutput, err := client.DescribeInstances(
 		ctx,
 		&ec2.DescribeInstancesInput{
 			InstanceIds: []string{
@@ -156,13 +165,17 @@ func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.I
 		}
 	}
 
+	return findImpl(ctx, s.Client(), itemContext)
+}
+
+func findImpl(ctx context.Context, client EC2Client, itemContext string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	instances := make([]types.Instance, 0)
 	var maxResults int32 = 100
 	var nextToken *string
 
 	for morePages := true; morePages; {
-		describeInstancesOutput, err := s.Client().DescribeInstances(
+		describeInstancesOutput, err := client.DescribeInstances(
 			ctx,
 			&ec2.DescribeInstancesInput{
 				MaxResults: &maxResults,
@@ -199,9 +212,7 @@ func (s *InstanceSource) Find(ctx context.Context, itemContext string) ([]*sdp.I
 }
 
 func mapInstanceToItem(instance types.Instance, itemContext string) (*sdp.Item, error) {
-	var err error
-	var attrs *sdp.ItemAttributes
-	attrs, err = sources.ToAttributesCase(instance)
+	attrs, err := sources.ToAttributesCase(instance)
 
 	if err != nil {
 		return nil, &sdp.ItemRequestError{
