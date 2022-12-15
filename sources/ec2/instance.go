@@ -165,10 +165,10 @@ func (s *InstanceSource) List(ctx context.Context, scope string) ([]*sdp.Item, e
 		}
 	}
 
-	return findImpl(ctx, s.Client(), scope)
+	return listImpl(ctx, s.Client(), scope)
 }
 
-func findImpl(ctx context.Context, client EC2Client, scope string) ([]*sdp.Item, error) {
+func listImpl(ctx context.Context, client EC2Client, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	instances := make([]types.Instance, 0)
 	var maxResults int32 = 100

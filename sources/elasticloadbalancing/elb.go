@@ -138,10 +138,10 @@ func (s *ELBSource) List(ctx context.Context, scope string) ([]*sdp.Item, error)
 		}
 	}
 
-	return findImpl(ctx, s.Client(), scope)
+	return listImpl(ctx, s.Client(), scope)
 }
 
-func findImpl(ctx context.Context, client ELBClient, scope string) ([]*sdp.Item, error) {
+func listImpl(ctx context.Context, client ELBClient, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 	var maxResults int32 = 100
 	var nextToken *string

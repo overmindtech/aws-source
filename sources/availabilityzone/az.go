@@ -1,4 +1,4 @@
-package securitygroup
+package availabilityzone
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-type SecurityGroupSource struct {
+type AvailabilityZoneSource struct {
 	// Config AWS Config including region and credentials
 	Config aws.Config
 
@@ -26,7 +26,7 @@ type SecurityGroupSource struct {
 	clientMutex   sync.Mutex
 }
 
-func (s *SecurityGroupSource) Client() *ec2.Client {
+func (s *AvailabilityZoneSource) Client() *ec2.Client {
 	s.clientMutex.Lock()
 	defer s.clientMutex.Unlock()
 
@@ -43,26 +43,26 @@ func (s *SecurityGroupSource) Client() *ec2.Client {
 }
 
 // Type The type of items that this source is capable of finding
-func (s *SecurityGroupSource) Type() string {
-	return "ec2-securitygroup"
+func (s *AvailabilityZoneSource) Type() string {
+	return "ec2-availabilityzone"
 }
 
 // Descriptive name for the source, used in logging and metadata
-func (s *SecurityGroupSource) Name() string {
-	return "sg-aws-source"
+func (s *AvailabilityZoneSource) Name() string {
+	return "az-aws-source"
 }
 
 // List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *SecurityGroupSource) Scopes() []string {
+func (s *AvailabilityZoneSource) Scopes() []string {
 	return []string{
 		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
 	}
 }
 
-// SecurityGroupClient Collects all functions this code uses from the AWS SDK, for test replacement.
-type SecurityGroupClient interface {
-	DescribeSecurityGroups(ctx context.Context, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error)
+// AvailabilityZoneClient Collects all functions this code uses from the AWS SDK, for test replacement.
+type AvailabilityZoneClient interface {
+	DescribeAvailabilityZones(ctx context.Context, params *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error)
 }
 
 // Get Get a single item with a given scope and query. The item returned
@@ -70,7 +70,7 @@ type SecurityGroupClient interface {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *SecurityGroupSource) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *AvailabilityZoneSource) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -82,11 +82,11 @@ func (s *SecurityGroupSource) Get(ctx context.Context, scope string, query strin
 	return getImpl(ctx, s.Client(), query, scope)
 }
 
-func getImpl(ctx context.Context, client SecurityGroupClient, query string, scope string) (*sdp.Item, error) {
-	describeSecurityGroupsOutput, err := client.DescribeSecurityGroups(
+func getImpl(ctx context.Context, client AvailabilityZoneClient, query string, scope string) (*sdp.Item, error) {
+	describeAvailabilityZonesOutput, err := client.DescribeAvailabilityZones(
 		ctx,
-		&ec2.DescribeSecurityGroupsInput{
-			GroupIds: []string{
+		&ec2.DescribeAvailabilityZonesInput{
+			ZoneNames: []string{
 				query,
 			},
 		},
@@ -100,34 +100,34 @@ func getImpl(ctx context.Context, client SecurityGroupClient, query string, scop
 		}
 	}
 
-	numSecurityGroups := len(describeSecurityGroupsOutput.SecurityGroups)
+	numAvailabilityZones := len(describeAvailabilityZonesOutput.AvailabilityZones)
 
 	switch {
-	case numSecurityGroups > 1:
-		securityGroupIDs := make([]string, numSecurityGroups)
+	case numAvailabilityZones > 1:
+		AvailabilityZoneNames := make([]string, numAvailabilityZones)
 
-		for i, securityGroup := range describeSecurityGroupsOutput.SecurityGroups {
-			securityGroupIDs[i] = *securityGroup.GroupId
+		for i, AvailabilityZone := range describeAvailabilityZonesOutput.AvailabilityZones {
+			AvailabilityZoneNames[i] = *AvailabilityZone.ZoneName
 		}
 
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: fmt.Sprintf("Request returned > 1 SecurityGroup, cannot determine instance. SecurityGroups: %v", securityGroupIDs),
+			ErrorString: fmt.Sprintf("Request returned > 1 AvailabilityZone, cannot determine instance. AvailabilityZones: %v", AvailabilityZoneNames),
 			Scope:       scope,
 		}
-	case numSecurityGroups == 0:
+	case numAvailabilityZones == 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
-			ErrorString: fmt.Sprintf("SecurityGroup %v not found", query),
+			ErrorString: fmt.Sprintf("AvailabilityZone %v not found", query),
 			Scope:       scope,
 		}
 	}
 
-	return mapSecurityGroupToItem(&describeSecurityGroupsOutput.SecurityGroups[0], scope)
+	return mapAvailabilityZoneToItem(&describeAvailabilityZonesOutput.AvailabilityZones[0], scope)
 }
 
 // List Lists all items in a given scope
-func (s *SecurityGroupSource) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *AvailabilityZoneSource) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -139,51 +139,35 @@ func (s *SecurityGroupSource) List(ctx context.Context, scope string) ([]*sdp.It
 	return listImpl(ctx, s.Client(), scope)
 }
 
-func listImpl(ctx context.Context, client SecurityGroupClient, scope string) ([]*sdp.Item, error) {
+func listImpl(ctx context.Context, client AvailabilityZoneClient, scope string) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
-	securityGroups := make([]types.SecurityGroup, 0)
-	var maxResults int32 = 100
-	var nextToken *string
 
-	for morePages := true; morePages; {
-		describeSecurityGroupsOutput, err := client.DescribeSecurityGroups(
-			ctx,
-			&ec2.DescribeSecurityGroupsInput{
-				MaxResults: &maxResults,
-				NextToken:  nextToken,
-			},
-		)
+	describeAvailabilityZonesOutput, err := client.DescribeAvailabilityZones(
+		ctx,
+		&ec2.DescribeAvailabilityZonesInput{},
+	)
 
-		if err != nil {
-			return items, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
-				ErrorString: err.Error(),
-				Scope:       scope,
-			}
+	if err != nil {
+		return items, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_OTHER,
+			ErrorString: err.Error(),
+			Scope:       scope,
 		}
-
-		securityGroups = append(securityGroups, describeSecurityGroupsOutput.SecurityGroups...)
-
-		// If there is more data we should store the token so that we can use
-		// that. We also need to set morePages to true so that the loop runs
-		// again
-		nextToken = describeSecurityGroupsOutput.NextToken
-		morePages = (nextToken != nil)
 	}
 
 	// Convert to items
-	for _, securityGroup := range securityGroups {
-		item, _ := mapSecurityGroupToItem(&securityGroup, scope)
+	for _, AvailabilityZone := range describeAvailabilityZonesOutput.AvailabilityZones {
+		item, _ := mapAvailabilityZoneToItem(&AvailabilityZone, scope)
 		items = append(items, item)
 	}
 
 	return items, nil
 }
 
-func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, scope string) (*sdp.Item, error) {
+func mapAvailabilityZoneToItem(az *types.AvailabilityZone, scope string) (*sdp.Item, error) {
 	var err error
 	var attrs *sdp.ItemAttributes
-	attrs, err = sources.ToAttributesCase(securityGroup)
+	attrs, err = sources.ToAttributesCase(az)
 
 	if err != nil {
 		return nil, &sdp.ItemRequestError{
@@ -194,18 +178,18 @@ func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, scope string) (*
 	}
 
 	item := sdp.Item{
-		Type:            "ec2-securitygroup",
-		UniqueAttribute: "groupId",
+		Type:            "ec2-availabilityzone",
+		UniqueAttribute: "zoneName",
 		Scope:           scope,
 		Attributes:      attrs,
 	}
 
-	// VPC
-	if securityGroup.VpcId != nil {
+	// Link to region
+	if az.RegionName != nil {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:   "ec2-vpc",
+			Type:   "ec2-region",
 			Method: sdp.RequestMethod_GET,
-			Query:  *securityGroup.VpcId,
+			Query:  *az.RegionName,
 			Scope:  scope,
 		})
 	}
@@ -217,6 +201,6 @@ func mapSecurityGroupToItem(securityGroup *types.SecurityGroup, scope string) (*
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (s *SecurityGroupSource) Weight() int {
+func (s *AvailabilityZoneSource) Weight() int {
 	return 100
 }

@@ -65,7 +65,7 @@ func TestELBMapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 1 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "hostedzone", "hostedzone", hostedZoneId, "foo.bar")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "hostedzone", "hostedzone", hostedZoneId, "foo.bar")
 	})
 }
 
@@ -174,7 +174,7 @@ func TestList(t *testing.T) {
 func TestListImpl(t *testing.T) {
 	t.Parallel()
 	t.Run("with client", func(t *testing.T) {
-		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
+		items, err := listImpl(context.Background(), createFakeClient(t), "foo.bar")
 		if err != nil {
 			t.Fatalf("unexpected err: %v", err)
 		}

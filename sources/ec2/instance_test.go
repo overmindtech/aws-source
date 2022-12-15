@@ -36,7 +36,7 @@ func TestInstanceMapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 1 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "image", "ec2-image", imageId, "foo.bar")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "image", "ec2-image", imageId, "foo.bar")
 	})
 	t.Run("with network interfaces", func(t *testing.T) {
 		ipv6 := "2600::0"
@@ -70,10 +70,10 @@ func TestInstanceMapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 4 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "ipv6Request", "ip", ipv6, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[1], "privateIpRequest", "ip", privateIp, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[2], "subnetRequest", "ec2-subnet", subnetId, "foo.bar")
-		sources.CheckItem(t, item.LinkedItemRequests[3], "vpcRequest", "ec2-vpc", vpcId, "foo.bar")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "ipv6Request", "ip", ipv6, "global")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[1], "privateIpRequest", "ip", privateIp, "global")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[2], "subnetRequest", "ec2-subnet", subnetId, "foo.bar")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[3], "vpcRequest", "ec2-vpc", vpcId, "foo.bar")
 	})
 	t.Run("with public info", func(t *testing.T) {
 		publicDns := "publicDns"
@@ -93,8 +93,8 @@ func TestInstanceMapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 2 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "publicDns", "dns", publicDns, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[1], "publicIp", "ip", publicIp, "global")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "publicDns", "dns", publicDns, "global")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[1], "publicIp", "ip", publicIp, "global")
 	})
 }
 
@@ -196,7 +196,7 @@ func TestList(t *testing.T) {
 func TestListImpl(t *testing.T) {
 	t.Parallel()
 	t.Run("with client", func(t *testing.T) {
-		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
+		items, err := listImpl(context.Background(), createFakeClient(t), "foo.bar")
 		if err != nil {
 			t.Fatalf("unexpected err: %v", err)
 		}

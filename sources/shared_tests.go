@@ -181,7 +181,8 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
 }
 
-func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
+// CheckItemRequest Checks that an item request matches the expected params
+func CheckItemRequest(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}

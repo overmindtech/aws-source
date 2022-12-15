@@ -24,7 +24,7 @@ func TestSecurityGroupsMapping(t *testing.T) {
 			t.Fatal(err)
 		}
 		if item == nil {
-			t.Error("item is nil")
+			t.Fatal("item is nil")
 		}
 		if item.Attributes == nil || item.Attributes.AttrStruct.Fields["groupName"].GetStringValue() != sgName {
 			t.Errorf("unexpected item: %v", item)
@@ -48,7 +48,7 @@ func TestSecurityGroupsMapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 1 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "vpc", "ec2-vpc", vpcId, "foo.bar")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "vpc", "ec2-vpc", vpcId, "foo.bar")
 	})
 }
 
@@ -152,7 +152,7 @@ func TestList(t *testing.T) {
 func TestListV2Impl(t *testing.T) {
 	t.Parallel()
 	t.Run("with client", func(t *testing.T) {
-		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
+		items, err := listImpl(context.Background(), createFakeClient(t), "foo.bar")
 		if err != nil {
 			t.Fatalf("unexpected err: %v", err)
 		}
