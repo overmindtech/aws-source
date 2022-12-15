@@ -12,6 +12,14 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+func PtrString(v string) *string {
+	return &v
+}
+
+func PtrBool(v bool) *bool {
+	return &v
+}
+
 type Subnet struct {
 	ID               *string
 	CIDR             string
