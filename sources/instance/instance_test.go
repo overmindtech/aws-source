@@ -1,4 +1,4 @@
-package ec2
+package instance
 
 import (
 	"context"
