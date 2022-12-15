@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
-	"github.com/overmindtech/aws-source/sources/availabilityzone"
+	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/aws-source/sources/instance"
 	"github.com/overmindtech/aws-source/sources/securitygroup"
@@ -173,14 +173,11 @@ Currently supported:
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
-				&availabilityzone.AvailabilityZoneSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
 				&vpc.VpcSource{
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
+				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
