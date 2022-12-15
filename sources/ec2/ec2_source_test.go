@@ -100,6 +100,58 @@ func TestGet(t *testing.T) {
 			t.Error("nil item")
 		}
 	})
+
+	t.Run("with too many results", func(t *testing.T) {
+		s := EC2Source[string, string]{
+			Config: aws.Config{
+				Region: "eu-west-2",
+			},
+			AccountID: "foo",
+			InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+				return "input", nil
+			},
+			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+				return []*sdp.Item{
+					{},
+					{},
+					{},
+				}, nil
+			},
+			DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+				return "", nil
+			},
+		}
+
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+
+		if err == nil {
+			t.Error("expected error")
+		}
+	})
+
+	t.Run("with no results", func(t *testing.T) {
+		s := EC2Source[string, string]{
+			Config: aws.Config{
+				Region: "eu-west-2",
+			},
+			AccountID: "foo",
+			InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+				return "input", nil
+			},
+			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+				return []*sdp.Item{}, nil
+			},
+			DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+				return "", nil
+			},
+		}
+
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+
+		if err == nil {
+			t.Error("expected error")
+		}
+	})
 }
 
 func TestNoInputMapper(t *testing.T) {
