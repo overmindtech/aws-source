@@ -167,6 +167,7 @@ Currently supported:
 				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
 				ec2.NewVpcSource(cfg, *callerID.Account),
 				ec2.NewVolumeSource(cfg, *callerID.Account),
+				ec2.NewImageSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)

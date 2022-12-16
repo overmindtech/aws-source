@@ -52,6 +52,24 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 				})
 			}
 
+			if instance.KeyName != nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:   "ec2-key-pair",
+					Method: sdp.RequestMethod_GET,
+					Query:  *instance.KeyName,
+					Scope:  scope,
+				})
+			}
+
+			if instance.Placement != nil && instance.Placement.AvailabilityZone != nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:   "ec2-availability-zone",
+					Method: sdp.RequestMethod_GET,
+					Query:  *instance.Placement.AvailabilityZone,
+					Scope:  scope,
+				})
+			}
+
 			for _, nic := range instance.NetworkInterfaces {
 				// IPs
 				for _, ip := range nic.Ipv6Addresses {

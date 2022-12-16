@@ -42,8 +42,8 @@ func AvailabilityZoneOutputMapper(scope string, output *ec2.DescribeAvailability
 		}
 
 		item := sdp.Item{
-			Type:            "ec2-availabilityzone",
-			UniqueAttribute: "zoneId",
+			Type:            "ec2-availability-zone",
+			UniqueAttribute: "zoneName",
 			Scope:           scope,
 			Attributes:      attrs,
 		}
@@ -69,7 +69,7 @@ func NewAvailabilityZoneSource(config aws.Config, accountID string) *EC2Source[*
 	return &EC2Source[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput]{
 		Config:    config,
 		AccountID: accountID,
-		ItemType:  "ec2-availabilityzone",
+		ItemType:  "ec2-availability-zone",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
 			return client.DescribeAvailabilityZones(ctx, input)
 		},
