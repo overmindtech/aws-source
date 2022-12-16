@@ -43,7 +43,7 @@ func AvailabilityZoneOutputMapper(scope string, output *ec2.DescribeAvailability
 
 		item := sdp.Item{
 			Type:            "ec2-availabilityzone",
-			UniqueAttribute: "zoneName",
+			UniqueAttribute: "zoneId",
 			Scope:           scope,
 			Attributes:      attrs,
 		}
