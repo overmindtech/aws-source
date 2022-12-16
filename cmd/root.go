@@ -170,6 +170,7 @@ Currently supported:
 				ec2.NewImageSource(cfg, *callerID.Account),
 				ec2.NewAddressSource(cfg, *callerID.Account),
 				ec2.NewInternetGatewaySource(cfg, *callerID.Account),
+				ec2.NewKeyPairSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
