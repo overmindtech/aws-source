@@ -3,11 +3,13 @@ package ec2
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -388,7 +390,8 @@ func TestFailingDescribeFunc(t *testing.T) {
 }
 
 func TestPaginated(t *testing.T) {
-	// TODO: I'm up to here, need to test that the pagination works
+	var nextToken *string
+	var nextPage int
 
 	s := EC2Source[string, string]{
 		MaxResultsPerPage: 1,
@@ -399,13 +402,43 @@ func TestPaginated(t *testing.T) {
 		InputMapperPaginated: func(scope, query string, method sdp.RequestMethod, maxResults *int32, nextToken *string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapperPaginated: func(scope, output string) ([]*sdp.Item, *string, error) {
+			nextPage++
+			nextToken = sources.PtrString(fmt.Sprint(nextPage))
+
+			// Limit to 3 pages
+			if nextPage == 3 {
+				nextToken = nil
+			}
+
 			return []*sdp.Item{
 				{},
-			}, nil
+			}, nextToken, nil
 		},
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
-			return "", errors.New("foobar")
+			return "", nil
 		},
 	}
+
+	t.Run("detecting pagination", func(t *testing.T) {
+		if !s.Paginated() {
+			t.Error("pagination not detected")
+		}
+
+		if err := s.Validate(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("paginsting a List query", func(t *testing.T) {
+		items, err := s.List(context.Background(), "foo.eu-west-2")
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if len(items) != 3 {
+			t.Errorf("expected 3 items, got %v", len(items))
+		}
+	})
 }

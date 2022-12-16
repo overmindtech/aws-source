@@ -92,20 +92,20 @@ func (e *EC2Source[Input, Output]) Validate() error {
 	}
 
 	if e.Paginated() {
-		if e.InputMapper == nil {
-			return errors.New("ec2 source input mapper is nil")
-		}
-
-		if e.OutputMapper == nil {
-			return errors.New("ec2 source output mapper is nil")
-		}
-	} else {
 		if e.InputMapperPaginated == nil {
 			return errors.New("ec2 source input mapper (paginated) is nil")
 		}
 
 		if e.OutputMapperPaginated == nil {
 			return errors.New("ec2 source output mapper (paginated) is nil")
+		}
+	} else {
+		if e.InputMapper == nil {
+			return errors.New("ec2 source input mapper is nil")
+		}
+
+		if e.OutputMapper == nil {
+			return errors.New("ec2 source output mapper is nil")
 		}
 	}
 
