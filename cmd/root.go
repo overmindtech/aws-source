@@ -20,8 +20,6 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
-	"github.com/overmindtech/aws-source/sources/instance"
-	"github.com/overmindtech/aws-source/sources/securitygroup"
 	"github.com/overmindtech/aws-source/sources/vpc"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
@@ -165,19 +163,13 @@ Currently supported:
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
-				&instance.InstanceSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
-				&securitygroup.SecurityGroupSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
 				&vpc.VpcSource{
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
 				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account),
+				ec2.NewInstanceSource(cfg, *callerID.Account),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
