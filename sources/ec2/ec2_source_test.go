@@ -386,3 +386,26 @@ func TestFailingDescribeFunc(t *testing.T) {
 		}
 	})
 }
+
+func TestPaginated(t *testing.T) {
+	// TODO: I'm up to here, need to test that the pagination works
+
+	s := EC2Source[string, string]{
+		MaxResultsPerPage: 1,
+		Config: aws.Config{
+			Region: "eu-west-2",
+		},
+		AccountID: "foo",
+		InputMapperPaginated: func(scope, query string, method sdp.RequestMethod, maxResults *int32, nextToken *string) (string, error) {
+			return "input", nil
+		},
+		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+			return []*sdp.Item{
+				{},
+			}, nil
+		},
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+			return "", errors.New("foobar")
+		},
+	}
+}

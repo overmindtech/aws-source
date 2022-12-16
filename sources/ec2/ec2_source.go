@@ -12,8 +12,16 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+const DefaultMaxResultsPerPage = 100
+
+// EC2Souirce This Struct allows us to create sources easily despite the
+// differeneces between the many EC2 APIs. Not that pagniated APIs should
+// populate the `InputMapperPaginated` and `OutputMapperPaginated` fields, where
+// non-paginated APIs should use `InputMapper` and `OutputMapper`. The source
+// will return an error if you use any other combination
 type EC2Source[Input any, Output any] struct {
-	ItemType string // The type of items that will be returned
+	MaxResultsPerPage int32  // Max results per page when making API queries
+	ItemType          string // The type of items that will be returned
 
 	// The funciton that should be used to describe the resources that this
 	// source is related to
@@ -21,12 +29,27 @@ type EC2Source[Input any, Output any] struct {
 
 	// A function that returns the input object that will be passed to
 	// DescribeFunc for a given set of scope, query and method
-	InputMapper func(scope string, query string, method sdp.RequestMethod) (Input, error)
+	InputMapper func(scope, query string, method sdp.RequestMethod) (Input, error)
+
+	// A function that returns the input object will be passed to DescribeFunc
+	// for a given set of scope, query and method. This also includes a
+	// maxResults param which should be fed to the API to mean "page size", and
+	// a nextToken string pointer: If this is the first page this will be nil,
+	// however for subsequest pages this will be populated with the appropriate
+	// token
+	InputMapperPaginated func(scope, query string, method sdp.RequestMethod, maxResults *int32, nextToken *string) (Input, error)
 
 	// A function that returns a slice of items for a given output. If this is a
 	// GET request the EC2 source itself will handle errors if there are too
 	// many items returned, so no need to worry about handling that
 	OutputMapper func(scope string, output Output) ([]*sdp.Item, error)
+
+	// A function that returns a slice of items for a given output, along with
+	// the nextToken for the next page of results if there are any, and an
+	// error. If this is a GET request the EC2 source itself will handle errors
+	// if there are too many items returned, so no need to worry about handling
+	// that.
+	OutputMapperPaginated func(scope string, output Output) ([]*sdp.Item, *string, error)
 
 	// Config AWS Config including region and credentials
 	Config aws.Config
@@ -64,15 +87,38 @@ func (e *EC2Source[Input, Output]) Validate() error {
 		return errors.New("ec2 source describe func is nil")
 	}
 
-	if e.InputMapper == nil {
-		return errors.New("ec2 source input mapper is nil")
+	if e.MaxResultsPerPage == 0 {
+		e.MaxResultsPerPage = DefaultMaxResultsPerPage
 	}
 
-	if e.OutputMapper == nil {
-		return errors.New("ec2 source output mapper is nil")
+	if e.Paginated() {
+		if e.InputMapper == nil {
+			return errors.New("ec2 source input mapper is nil")
+		}
+
+		if e.OutputMapper == nil {
+			return errors.New("ec2 source output mapper is nil")
+		}
+	} else {
+		if e.InputMapperPaginated == nil {
+			return errors.New("ec2 source input mapper (paginated) is nil")
+		}
+
+		if e.OutputMapperPaginated == nil {
+			return errors.New("ec2 source output mapper (paginated) is nil")
+		}
 	}
 
 	return nil
+}
+
+// Paginated returns whether or not this source is using a paginated API
+func (e *EC2Source[Input, Output]) Paginated() bool {
+	if e.InputMapperPaginated != nil && e.OutputMapperPaginated != nil {
+		return true
+	}
+
+	return false
 }
 
 func (e *EC2Source[Input, Output]) Type() string {
@@ -172,7 +218,8 @@ func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*s
 	var input Input
 	var output Output
 	var err error
-	var items []*sdp.Item
+	var newItems []*sdp.Item
+	items := make([]*sdp.Item, 0)
 
 	err = e.Validate()
 
@@ -180,24 +227,44 @@ func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*s
 		return nil, sdp.NewItemRequestError(err)
 	}
 
-	// Get the input object
-	input, err = e.InputMapper(scope, "", sdp.RequestMethod_LIST)
+	var nextToken *string
 
-	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
-	}
+	for {
+		// Get the input object
+		if e.Paginated() {
+			input, err = e.InputMapperPaginated(scope, "", sdp.RequestMethod_LIST, &e.MaxResultsPerPage, nextToken)
+		} else {
+			input, err = e.InputMapper(scope, "", sdp.RequestMethod_LIST)
+		}
 
-	// Call the API using the object
-	output, err = e.DescribeFunc(ctx, e.Client(), input)
+		if err != nil {
+			return nil, sdp.NewItemRequestError(err)
+		}
 
-	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
-	}
+		// Call the API using the object
+		output, err = e.DescribeFunc(ctx, e.Client(), input)
 
-	items, err = e.OutputMapper(scope, output)
+		if err != nil {
+			return nil, sdp.NewItemRequestError(err)
+		}
 
-	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		if e.Paginated() {
+			newItems, nextToken, err = e.OutputMapperPaginated(scope, output)
+		} else {
+			newItems, err = e.OutputMapper(scope, output)
+		}
+
+		if err != nil {
+			return nil, sdp.NewItemRequestError(err)
+		}
+
+		items = append(items, newItems...)
+
+		// If we're using a paginated API, and there is another page, nextToken
+		// will have been set to something. If not, we can break
+		if nextToken == nil {
+			break
+		}
 	}
 
 	return items, nil
