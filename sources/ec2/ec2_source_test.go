@@ -3,13 +3,11 @@ package ec2
 import (
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -389,31 +387,37 @@ func TestFailingDescribeFunc(t *testing.T) {
 	})
 }
 
-func TestPaginated(t *testing.T) {
-	var nextToken *string
-	var nextPage int
+type TestPaginator struct {
+	page int
+}
 
+func (t *TestPaginator) HasMorePages() bool {
+	return t.page < 3
+}
+
+func (t *TestPaginator) NextPage(context.Context, ...func(*ec2.Options)) (string, error) {
+	t.page++
+
+	return "", nil
+}
+
+func TestPaginated(t *testing.T) {
 	s := EC2Source[string, string]{
 		MaxResultsPerPage: 1,
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapperPaginated: func(scope, query string, method sdp.RequestMethod, maxResults *int32, nextToken *string) (string, error) {
-			return "input", nil
+		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+			return "foo", nil
 		},
-		OutputMapperPaginated: func(scope, output string) ([]*sdp.Item, *string, error) {
-			nextPage++
-			nextToken = sources.PtrString(fmt.Sprint(nextPage))
-
-			// Limit to 3 pages
-			if nextPage == 3 {
-				nextToken = nil
-			}
-
+		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
-			}, nextToken, nil
+			}, nil
+		},
+		PaginatorBuilder: func(client *ec2.Client, params string) Paginator[string] {
+			return &TestPaginator{}
 		},
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
 			return "", nil
