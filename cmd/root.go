@@ -20,7 +20,6 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
-	"github.com/overmindtech/aws-source/sources/vpc"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
@@ -163,13 +162,10 @@ Currently supported:
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
-				&vpc.VpcSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
 				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account),
 				ec2.NewInstanceSource(cfg, *callerID.Account),
 				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
+				ec2.NewVpcSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)

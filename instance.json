@@ -1,38 +1,40 @@
 {
-    "SecurityGroups": [
+    "Vpcs": [
         {
-            "Description": "default VPC security group",
-            "GroupName": "default",
-            "IpPermissions": [
-                {
-                    "IpProtocol": "-1",
-                    "IpRanges": [],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": [],
-                    "UserIdGroupPairs": [
-                        {
-                            "GroupId": "sg-094e151c9fc5da181",
-                            "UserId": "052392120703"
-                        }
-                    ]
-                }
-            ],
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "dopt-0959b838bf4a4c7b8",
+            "State": "available",
+            "VpcId": "vpc-0d7892e00e573e701",
             "OwnerId": "052392120703",
-            "GroupId": "sg-094e151c9fc5da181",
-            "IpPermissionsEgress": [
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
                 {
-                    "IpProtocol": "-1",
-                    "IpRanges": [
-                        {
-                            "CidrIp": "0.0.0.0/0"
-                        }
-                    ],
-                    "Ipv6Ranges": [],
-                    "PrefixListIds": [],
-                    "UserIdGroupPairs": []
+                    "AssociationId": "vpc-cidr-assoc-0b77866f37f500af6",
+                    "CidrBlock": "172.31.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
                 }
             ],
-            "VpcId": "vpc-0d7892e00e573e701"
+            "IsDefault": false,
+            "Tags": [
+                {
+                    "Key": "aws:cloudformation:logical-id",
+                    "Value": "VPC"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-id",
+                    "Value": "arn:aws:cloudformation:eu-west-2:052392120703:stack/StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243/ccde3240-7afa-11ed-81ff-02845d4c2702"
+                },
+                {
+                    "Key": "aws:cloudformation:stack-name",
+                    "Value": "StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243"
+                },
+                {
+                    "Key": "Name",
+                    "Value": "aws-controltower-VPC"
+                }
+            ]
         }
     ]
 }
