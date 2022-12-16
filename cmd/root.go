@@ -168,6 +168,7 @@ Currently supported:
 				ec2.NewVpcSource(cfg, *callerID.Account),
 				ec2.NewVolumeSource(cfg, *callerID.Account),
 				ec2.NewImageSource(cfg, *callerID.Account),
+				ec2.NewAddressSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
