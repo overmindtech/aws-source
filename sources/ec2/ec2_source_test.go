@@ -62,8 +62,11 @@ func TestGet(t *testing.T) {
 				Region: "eu-west-2",
 			},
 			AccountID: "foo",
-			InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+			InputMapperGet: func(scope, query string) (string, error) {
 				inputMapperCalled = true
+				return "input", nil
+			},
+			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
 			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -107,7 +110,10 @@ func TestGet(t *testing.T) {
 				Region: "eu-west-2",
 			},
 			AccountID: "foo",
-			InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+			InputMapperGet: func(scope, query string) (string, error) {
+				return "input", nil
+			},
+			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
 			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -135,7 +141,10 @@ func TestGet(t *testing.T) {
 				Region: "eu-west-2",
 			},
 			AccountID: "foo",
-			InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+			InputMapperGet: func(scope, query string) (string, error) {
+				return "input", nil
+			},
+			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
 			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -193,7 +202,10 @@ func TestNoOutputMapper(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
@@ -224,7 +236,10 @@ func TestNoDescribeFunc(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -257,7 +272,10 @@ func TestFailingInputMapper(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", errors.New("foobar")
+		},
+		InputMapperList: func(scope string) (string, error) {
 			return "input", errors.New("foobar")
 		},
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -303,7 +321,10 @@ func TestFailingOutputMapper(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -347,7 +368,10 @@ func TestFailingDescribeFunc(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
@@ -408,8 +432,11 @@ func TestPaginated(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		InputMapper: func(scope, query string, method sdp.RequestMethod) (string, error) {
-			return "foo", nil
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
+			return "input", nil
 		},
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{

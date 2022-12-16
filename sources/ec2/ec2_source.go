@@ -37,8 +37,12 @@ type EC2Source[Input any, Output any] struct {
 	DescribeFunc func(ctx context.Context, client *ec2.Client, input Input, optFns ...func(*ec2.Options)) (Output, error)
 
 	// A function that returns the input object that will be passed to
-	// DescribeFunc for a given set of scope, query and method
-	InputMapper func(scope, query string, method sdp.RequestMethod) (Input, error)
+	// DescribeFunc for a GET request
+	InputMapperGet func(scope, query string) (Input, error)
+
+	// A function that returns the input object that will be passed to
+	// DescribeFunc for a LIST request
+	InputMapperList func(scope string) (Input, error)
 
 	// A function that returns a paginator for this API. If this is nil, we will
 	// assume that the API is not paginated
@@ -89,8 +93,12 @@ func (e *EC2Source[Input, Output]) Validate() error {
 		e.MaxResultsPerPage = DefaultMaxResultsPerPage
 	}
 
-	if e.InputMapper == nil {
-		return errors.New("ec2 source input mapper is nil")
+	if e.InputMapperGet == nil {
+		return errors.New("ec2 source get input mapper is nil")
+	}
+
+	if e.InputMapperList == nil {
+		return errors.New("ec2 source list input mapper is nil")
 	}
 
 	if e.OutputMapper == nil {
@@ -146,7 +154,7 @@ func (e *EC2Source[Input, Output]) Get(ctx context.Context, scope string, query 
 	}
 
 	// Get the input object
-	input, err = e.InputMapper(scope, query, sdp.RequestMethod_GET)
+	input, err = e.InputMapperGet(scope, query)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
@@ -228,7 +236,7 @@ func (e *EC2Source[Input, Output]) listRegular(ctx context.Context, scope string
 	var err error
 	var items []*sdp.Item
 
-	input, err = e.InputMapper(scope, "", sdp.RequestMethod_LIST)
+	input, err = e.InputMapperList(scope)
 
 	if err != nil {
 		return nil, err
@@ -258,7 +266,7 @@ func (e *EC2Source[Input, Output]) listPaginated(ctx context.Context, scope stri
 	var newItems []*sdp.Item
 	items := make([]*sdp.Item, 0)
 
-	input, err = e.InputMapper(scope, "", sdp.RequestMethod_LIST)
+	input, err = e.InputMapperList(scope)
 
 	if err != nil {
 		return nil, err

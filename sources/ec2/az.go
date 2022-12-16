@@ -10,24 +10,18 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// AvailabilityZoneInputMapper Maps source calls to the correct input for the AZ API
-func AvailabilityZoneInputMapper(scope, query string, method sdp.RequestMethod) (*ec2.DescribeAvailabilityZonesInput, error) {
-	var input ec2.DescribeAvailabilityZonesInput
+// AvailabilityZoneInputMapperGet Maps source calls to the correct input for the AZ API
+func AvailabilityZoneInputMapperGet(scope, query string) (*ec2.DescribeAvailabilityZonesInput, error) {
+	return &ec2.DescribeAvailabilityZonesInput{
+		ZoneNames: []string{
+			query,
+		},
+	}, nil
+}
 
-	switch method {
-	case sdp.RequestMethod_GET:
-		input = ec2.DescribeAvailabilityZonesInput{
-			ZoneNames: []string{
-				query,
-			},
-		}
-	case sdp.RequestMethod_LIST:
-		input = ec2.DescribeAvailabilityZonesInput{}
-	default:
-		return nil, errors.New("unsupported method")
-	}
-
-	return &input, nil
+// AvailabilityZoneInputMapperList Maps source calls to the correct input for the AZ API
+func AvailabilityZoneInputMapperList(scope string) (*ec2.DescribeAvailabilityZonesInput, error) {
+	return &ec2.DescribeAvailabilityZonesInput{}, nil
 }
 
 // AvailabilityZoneOutputMapper Maps API output to items
@@ -79,7 +73,8 @@ func NewAvailabilityZoneSource(config aws.Config, accountID string) *EC2Source[*
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
 			return client.DescribeAvailabilityZones(ctx, input)
 		},
-		InputMapper:  AvailabilityZoneInputMapper,
-		OutputMapper: AvailabilityZoneOutputMapper,
+		InputMapperGet:  AvailabilityZoneInputMapperGet,
+		InputMapperList: AvailabilityZoneInputMapperList,
+		OutputMapper:    AvailabilityZoneOutputMapper,
 	}
 }

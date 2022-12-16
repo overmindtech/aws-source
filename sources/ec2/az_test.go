@@ -6,37 +6,35 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
-	"github.com/overmindtech/sdp-go"
 )
 
-func TestAvailabilityZoneInputMapper(t *testing.T) {
-	t.Run("GET query", func(t *testing.T) {
-		input, err := AvailabilityZoneInputMapper("foo", "az-name", sdp.RequestMethod_GET)
+func TestAvailabilityZoneInputMapperGet(t *testing.T) {
+	input, err := AvailabilityZoneInputMapperGet("foo", "az-name")
 
-		if err != nil {
-			t.Error(err)
-		}
+	if err != nil {
+		t.Error(err)
+	}
 
-		if len(input.ZoneNames) != 1 {
-			t.Fatalf("expected 1 zone names, got %v", len(input.ZoneNames))
-		}
+	if len(input.ZoneNames) != 1 {
+		t.Fatalf("expected 1 zone names, got %v", len(input.ZoneNames))
+	}
 
-		if input.ZoneNames[0] != "az-name" {
-			t.Errorf("expected zone name to be to be az-name, got %v", input.ZoneNames[0])
-		}
-	})
+	if input.ZoneNames[0] != "az-name" {
+		t.Errorf("expected zone name to be to be az-name, got %v", input.ZoneNames[0])
+	}
+}
 
-	t.Run("LIST query", func(t *testing.T) {
-		input, err := AvailabilityZoneInputMapper("foo", "bar", sdp.RequestMethod_LIST)
+func TestAvailabilityZoneInputMapperList(t *testing.T) {
 
-		if err != nil {
-			t.Error(err)
-		}
+	input, err := AvailabilityZoneInputMapperList("foo")
 
-		if len(input.ZoneNames) != 0 {
-			t.Fatalf("expected 0 zone names, got %v", len(input.ZoneNames))
-		}
-	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(input.ZoneNames) != 0 {
+		t.Fatalf("expected 0 zone names, got %v", len(input.ZoneNames))
+	}
 }
 
 func TestAvailabilityZoneOutputMapper(t *testing.T) {
