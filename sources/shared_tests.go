@@ -16,6 +16,14 @@ func PtrString(v string) *string {
 	return &v
 }
 
+func PtrInt32(v int32) *int32 {
+	return &v
+}
+
+func PtrTime(v time.Time) *time.Time {
+	return &v
+}
+
 func PtrBool(v bool) *bool {
 	return &v
 }
@@ -187,6 +195,39 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 		}
 	}
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
+}
+
+type ItemRequestTest struct {
+	ExpectedType   string
+	ExpectedMethod sdp.RequestMethod
+	ExpectedQuery  string
+	ExpectedScope  string
+}
+
+type ItemRequestTests []ItemRequestTest
+
+func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
+	for _, test := range i {
+		var found bool
+
+		for _, lir := range item.LinkedItemRequests {
+			if lirMatches(test, lir) {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\n", len(item.LinkedItemRequests), test.ExpectedType, test.ExpectedQuery)
+		}
+	}
+}
+
+func lirMatches(test ItemRequestTest, req *sdp.ItemRequest) bool {
+	return (test.ExpectedMethod == req.Method &&
+		test.ExpectedQuery == req.Query &&
+		test.ExpectedScope == req.Scope &&
+		test.ExpectedType == req.Type)
 }
 
 // CheckItemRequest Checks that an item request matches the expected params

@@ -45,7 +45,8 @@ type EC2Source[Input any, Output any] struct {
 	InputMapperList func(scope string) (Input, error)
 
 	// A function that returns a paginator for this API. If this is nil, we will
-	// assume that the API is not paginated
+	// assume that the API is not paginated e.g.
+	// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
 	PaginatorBuilder func(client *ec2.Client, params Input) Paginator[Output]
 
 	// A function that returns a slice of items for a given output. If this is a
