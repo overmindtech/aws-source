@@ -137,7 +137,7 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 			for _, group := range instance.SecurityGroups {
 				if group.GroupId != nil {
 					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "ec2-securitygroup",
+						Type:   "ec2-security-group",
 						Method: sdp.RequestMethod_GET,
 						Query:  *group.GroupId,
 						Scope:  scope,

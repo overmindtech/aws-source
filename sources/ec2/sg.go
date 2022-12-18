@@ -38,7 +38,7 @@ func SecurityGroupOutputMapper(scope string, output *ec2.DescribeSecurityGroupsO
 		}
 
 		item := sdp.Item{
-			Type:            "ec2-securitygroup",
+			Type:            "ec2-security-group",
 			UniqueAttribute: "groupId",
 			Scope:           scope,
 			Attributes:      attrs,
@@ -64,7 +64,7 @@ func NewSecurityGroupSource(config aws.Config, accountID string) *EC2Source[*ec2
 	return &EC2Source[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput]{
 		Config:    config,
 		AccountID: accountID,
-		ItemType:  "ec2-SecurityGroup",
+		ItemType:  "ec2-security-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error) {
 			return client.DescribeSecurityGroups(ctx, input)
 		},

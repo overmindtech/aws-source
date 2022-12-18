@@ -298,7 +298,7 @@ func mapELBv1ToItem(lb *ExpandedELB, scope string) (*sdp.Item, error) {
 	// Security groups
 	for _, group := range lb.SecurityGroups {
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-			Type:   "ec2-securitygroup",
+			Type:   "ec2-security-group",
 			Method: sdp.RequestMethod_GET,
 			Query:  group,
 			Scope:  scope,

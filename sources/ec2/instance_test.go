@@ -229,7 +229,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedScope:  "global",
 		},
 		{
-			ExpectedType:   "ec2-securitygroup",
+			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "sg-094e151c9fc5da181",
 			ExpectedScope:  item.Scope,

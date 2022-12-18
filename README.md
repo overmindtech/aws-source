@@ -2,6 +2,20 @@
 
 This source integrates with AWS, allowing Overmind to pull data about many types of AWS resources.
 
+## Naming Conventions
+
+Types are named to match the `describe-*` command within the AWS CLI, with the service that they are part of as a prefix. For example to get the details if a security group you would run:
+
+```
+aws ec2 describe-security-groups
+```
+
+Meaning that the type in Overmind should be:
+
+```
+ec2-security-group
+```
+
 ## Sources
 
 ### elasticloadbalancing-loadbalancer-v2
@@ -311,7 +325,7 @@ Get instance info
             "scope": "177828803798.eu-west-2"
         },
         {
-            "type": "ec2-securitygroup",
+            "type": "ec2-security-group",
             "query": "sg-012c2822f90f34249",
             "scope": "177828803798.eu-west-2"
         }
