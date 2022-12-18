@@ -171,6 +171,7 @@ Currently supported:
 				ec2.NewAddressSource(cfg, *callerID.Account),
 				ec2.NewInternetGatewaySource(cfg, *callerID.Account),
 				ec2.NewKeyPairSource(cfg, *callerID.Account),
+				ec2.NewNatGatewaySource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
