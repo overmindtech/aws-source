@@ -174,6 +174,7 @@ Currently supported:
 				ec2.NewNatGatewaySource(cfg, *callerID.Account),
 				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account),
 				ec2.NewRegionSource(cfg, *callerID.Account),
+				ec2.NewSubnetSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
