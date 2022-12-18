@@ -61,6 +61,12 @@ func TestAddressOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+	}
+
 	if len(items) != 1 {
 		t.Errorf("expected 1 item, got %v", len(items))
 	}

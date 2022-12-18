@@ -84,6 +84,12 @@ func TestVpcOutputMapper(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+	}
+
 	if len(items) != 1 {
 		t.Fatalf("expected 1 item, got %v", len(items))
 	}

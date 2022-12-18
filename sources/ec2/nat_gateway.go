@@ -39,7 +39,7 @@ func NatGatewayOutputMapper(scope string, output *ec2.DescribeNatGatewaysOutput)
 
 		item := sdp.Item{
 			Type:            "ec2-nat-gateway",
-			UniqueAttribute: "groupId",
+			UniqueAttribute: "natGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
 		}

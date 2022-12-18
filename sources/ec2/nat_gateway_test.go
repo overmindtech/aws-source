@@ -96,6 +96,12 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+	}
+
 	if len(items) != 2 {
 		t.Fatalf("expected 2 items, got %v", len(items))
 	}

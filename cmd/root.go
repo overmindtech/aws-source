@@ -172,6 +172,7 @@ Currently supported:
 				ec2.NewInternetGatewaySource(cfg, *callerID.Account),
 				ec2.NewKeyPairSource(cfg, *callerID.Account),
 				ec2.NewNatGatewaySource(cfg, *callerID.Account),
+				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)

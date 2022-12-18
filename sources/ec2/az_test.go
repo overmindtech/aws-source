@@ -75,6 +75,12 @@ func TestAvailabilityZoneOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+	}
+
 	if len(items) != 2 {
 		t.Errorf("expected 2 items, got %v", len(items))
 	}
