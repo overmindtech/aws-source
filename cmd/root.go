@@ -181,6 +181,7 @@ Currently supported:
 				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account),
 				ec2.NewLaunchTemplateSource(cfg, *callerID.Account),
 				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account),
+				ec2.NewNetworkAclSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
