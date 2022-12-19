@@ -183,6 +183,7 @@ Currently supported:
 				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account),
 				ec2.NewNetworkAclSource(cfg, *callerID.Account),
 				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account),
+				ec2.NewPlacementGroupSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)

@@ -70,13 +70,24 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 				})
 			}
 
-			if instance.Placement != nil && instance.Placement.AvailabilityZone != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-					Type:   "ec2-availability-zone",
-					Method: sdp.RequestMethod_GET,
-					Query:  *instance.Placement.AvailabilityZone,
-					Scope:  scope,
-				})
+			if instance.Placement != nil {
+				if instance.Placement.AvailabilityZone != nil {
+					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						Type:   "ec2-availability-zone",
+						Method: sdp.RequestMethod_GET,
+						Query:  *instance.Placement.AvailabilityZone,
+						Scope:  scope,
+					})
+				}
+
+				if instance.Placement.GroupId != nil {
+					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						Type:   "ec2-placement-group",
+						Method: sdp.RequestMethod_GET,
+						Query:  *instance.Placement.GroupId,
+						Scope:  scope,
+					})
+				}
 			}
 
 			for _, nic := range instance.NetworkInterfaces {

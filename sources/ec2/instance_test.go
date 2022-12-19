@@ -57,6 +57,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 						Placement: &types.Placement{
 							AvailabilityZone: sources.PtrString("eu-west-2c"),
 							GroupName:        sources.PtrString(""),
+							GroupId:          sources.PtrString("groupId"),
 							Tenancy:          types.TenancyDefault,
 						},
 						PrivateDnsName:   sources.PtrString("ip-172-31-95-79.eu-west-2.compute.internal"),
@@ -245,6 +246,12 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "vol-06c7211d9e79a355e",
 			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-placement-group",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "groupId",
+			ExpectedScope:  "foo",
 		},
 	}
 
