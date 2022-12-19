@@ -39,7 +39,7 @@ func SecurityGroupRuleOutputMapper(scope string, output *ec2.DescribeSecurityGro
 
 		item := sdp.Item{
 			Type:            "ec2-security-group-rule",
-			UniqueAttribute: "groupId",
+			UniqueAttribute: "securityGroupRuleId",
 			Scope:           scope,
 			Attributes:      attrs,
 		}

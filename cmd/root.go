@@ -178,6 +178,7 @@ Currently supported:
 				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account),
 				ec2.NewInstanceStatusSource(cfg, *callerID.Account),
 				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
+				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
