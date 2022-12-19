@@ -41,6 +41,15 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 				UniqueAttribute: "instanceId",
 				Scope:           scope,
 				Attributes:      attrs,
+				LinkedItemRequests: []*sdp.ItemRequest{
+					{
+						// Always get the status
+						Type:   "ec2-instance-status",
+						Method: sdp.RequestMethod_GET,
+						Query:  *instance.InstanceId,
+						Scope:  scope,
+					},
+				},
 			}
 
 			if instance.ImageId != nil {

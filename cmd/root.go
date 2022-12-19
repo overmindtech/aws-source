@@ -176,6 +176,7 @@ Currently supported:
 				ec2.NewRegionSource(cfg, *callerID.Account),
 				ec2.NewSubnetSource(cfg, *callerID.Account),
 				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account),
+				ec2.NewInstanceStatusSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
