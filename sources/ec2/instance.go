@@ -154,6 +154,17 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 				}
 			}
 
+			for _, mapping := range instance.BlockDeviceMappings {
+				if mapping.Ebs != nil && mapping.Ebs.VolumeId != nil {
+					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						Type:   "ec2-volume",
+						Method: sdp.RequestMethod_GET,
+						Query:  *mapping.Ebs.VolumeId,
+						Scope:  scope,
+					})
+				}
+			}
+
 			items = append(items, &item)
 		}
 	}

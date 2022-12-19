@@ -20,6 +20,10 @@ func PtrInt32(v int32) *int32 {
 	return &v
 }
 
+func PtrInt64(v int64) *int64 {
+	return &v
+}
+
 func PtrTime(v time.Time) *time.Time {
 	return &v
 }

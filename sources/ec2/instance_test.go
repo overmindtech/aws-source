@@ -240,6 +240,12 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedQuery:  "i-04c7b2794f7bc3d6a",
 			ExpectedScope:  item.Scope,
 		},
+		{
+			ExpectedType:   "ec2-volume",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "vol-06c7211d9e79a355e",
+			ExpectedScope:  item.Scope,
+		},
 	}
 
 	tests.Execute(t, item)
