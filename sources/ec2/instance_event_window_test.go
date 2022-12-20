@@ -1,0 +1,106 @@
+package ec2
+
+import (
+	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
+)
+
+func TestInstanceEventWindowInputMapperGet(t *testing.T) {
+	input, err := InstanceEventWindowInputMapperGet("foo", "bar")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(input.InstanceEventWindowIds) != 1 {
+		t.Fatalf("expected 1 InstanceEventWindow ID, got %v", len(input.InstanceEventWindowIds))
+	}
+
+	if input.InstanceEventWindowIds[0] != "bar" {
+		t.Errorf("expected InstanceEventWindow ID to be bar, got %v", input.InstanceEventWindowIds[0])
+	}
+}
+
+func TestInstanceEventWindowInputMapperList(t *testing.T) {
+	input, err := InstanceEventWindowInputMapperList("foo")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(input.Filters) != 0 || len(input.InstanceEventWindowIds) != 0 {
+		t.Errorf("non-empty input: %v", input)
+	}
+}
+
+func TestInstanceEventWindowOutputMapper(t *testing.T) {
+	output := &ec2.DescribeInstanceEventWindowsOutput{
+		InstanceEventWindows: []types.InstanceEventWindow{
+			{
+				AssociationTarget: &types.InstanceEventWindowAssociationTarget{
+					DedicatedHostIds: []string{
+						"dedicated",
+					},
+					InstanceIds: []string{
+						"instance",
+					},
+				},
+				CronExpression:        sources.PtrString("something"),
+				InstanceEventWindowId: sources.PtrString("window-123"),
+				Name:                  sources.PtrString("test"),
+				State:                 types.InstanceEventWindowStateActive,
+				TimeRanges: []types.InstanceEventWindowTimeRange{
+					{
+						StartHour:    sources.PtrInt32(1),
+						EndHour:      sources.PtrInt32(2),
+						EndWeekDay:   types.WeekDayFriday,
+						StartWeekDay: types.WeekDayMonday,
+					},
+				},
+				Tags: []types.Tag{},
+			},
+		},
+	}
+
+	items, err := InstanceEventWindowOutputMapper("foo", output)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+	}
+
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %v", len(items))
+	}
+
+	item := items[0]
+
+	// It doesn't really make sense to test anything other than the linked items
+	// since the attributes are converted automatically
+	tests := sources.ItemRequestTests{
+		{
+			ExpectedType:   "ec2-host",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "dedicated",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-instance",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "instance",
+			ExpectedScope:  "foo",
+		},
+	}
+
+	tests.Execute(t, item)
+
+}

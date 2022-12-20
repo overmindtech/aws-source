@@ -62,7 +62,7 @@ func TestELBv2Mapping(t *testing.T) {
 		if len(item.LinkedItemRequests) != 1 {
 			t.Fatalf("unexpected LinkedItemRequests: %v", item)
 		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "dNSName", "dns", dNSName, "global")
+		sources.CheckItemRequest(t, item.LinkedItemRequests[0], "dNSName", "dns", dNSName, "global")
 	})
 }
 

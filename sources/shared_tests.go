@@ -12,6 +12,34 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+func PtrString(v string) *string {
+	return &v
+}
+
+func PtrInt32(v int32) *int32 {
+	return &v
+}
+
+func PtrInt64(v int64) *int64 {
+	return &v
+}
+
+func PtrFloat32(v float32) *float32 {
+	return &v
+}
+
+func PtrFloat64(v float64) *float64 {
+	return &v
+}
+
+func PtrTime(v time.Time) *time.Time {
+	return &v
+}
+
+func PtrBool(v bool) *bool {
+	return &v
+}
+
 type Subnet struct {
 	ID               *string
 	CIDR             string
@@ -181,7 +209,41 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
 }
 
-func CheckItem(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
+type ItemRequestTest struct {
+	ExpectedType   string
+	ExpectedMethod sdp.RequestMethod
+	ExpectedQuery  string
+	ExpectedScope  string
+}
+
+type ItemRequestTests []ItemRequestTest
+
+func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
+	for _, test := range i {
+		var found bool
+
+		for _, lir := range item.LinkedItemRequests {
+			if lirMatches(test, lir) {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\n", len(item.LinkedItemRequests), test.ExpectedType, test.ExpectedQuery)
+		}
+	}
+}
+
+func lirMatches(test ItemRequestTest, req *sdp.ItemRequest) bool {
+	return (test.ExpectedMethod == req.Method &&
+		test.ExpectedQuery == req.Query &&
+		test.ExpectedScope == req.Scope &&
+		test.ExpectedType == req.Type)
+}
+
+// CheckItemRequest Checks that an item request matches the expected params
+func CheckItemRequest(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}

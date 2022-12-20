@@ -1,213 +1,260 @@
 package ec2
 
 import (
-	"context"
-	"strings"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
 )
 
-func TestInstanceMapping(t *testing.T) {
-	t.Parallel()
+func TestInstanceInputMapperGet(t *testing.T) {
+	input, err := InstanceInputMapperGet("foo", "bar")
 
-	t.Run("empty", func(t *testing.T) {
-		instance := types.Instance{}
-		item, err := mapInstanceToItem(instance, "foo.bar")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if item == nil {
-			t.Fatal("item is nil")
-		}
-	})
-	t.Run("with imageId", func(t *testing.T) {
-		imageId := "imageId"
-		instance := types.Instance{ImageId: &imageId}
-		item, err := mapInstanceToItem(instance, "foo.bar")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if item == nil {
-			t.Fatal("item is nil")
-		}
-		if len(item.LinkedItemRequests) != 1 {
-			t.Fatalf("unexpected LinkedItemRequests: %v", item)
-		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "image", "ec2-image", imageId, "foo.bar")
-	})
-	t.Run("with network interfaces", func(t *testing.T) {
-		ipv6 := "2600::0"
-		privateIp := "private ip"
-		subnetId := "subnetId"
-		vpcId := "vpcId"
-		instance := types.Instance{
-			NetworkInterfaces: []types.InstanceNetworkInterface{
-				{
-					Ipv6Addresses: []types.InstanceIpv6Address{{Ipv6Address: &ipv6}},
-				},
-				{
-					PrivateIpAddresses: []types.InstancePrivateIpAddress{{PrivateIpAddress: &privateIp}},
-				},
-				{
-					SubnetId: &subnetId,
-				},
-				{
-					VpcId: &vpcId,
-				},
-			},
-		}
+	if err != nil {
+		t.Error(err)
+	}
 
-		item, err := mapInstanceToItem(instance, "foo.bar")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if item == nil {
-			t.Fatal("item is nil")
-		}
-		if len(item.LinkedItemRequests) != 4 {
-			t.Fatalf("unexpected LinkedItemRequests: %v", item)
-		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "ipv6Request", "ip", ipv6, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[1], "privateIpRequest", "ip", privateIp, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[2], "subnetRequest", "ec2-subnet", subnetId, "foo.bar")
-		sources.CheckItem(t, item.LinkedItemRequests[3], "vpcRequest", "ec2-vpc", vpcId, "foo.bar")
-	})
-	t.Run("with public info", func(t *testing.T) {
-		publicDns := "publicDns"
-		publicIp := "publicIp"
-		instance := types.Instance{
-			PublicDnsName:   &publicDns,
-			PublicIpAddress: &publicIp,
-		}
+	if len(input.InstanceIds) != 1 {
+		t.Fatalf("expected 1 instance ID, got %v", len(input.InstanceIds))
+	}
 
-		item, err := mapInstanceToItem(instance, "foo.bar")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if item == nil {
-			t.Fatal("item is nil")
-		}
-		if len(item.LinkedItemRequests) != 2 {
-			t.Fatalf("unexpected LinkedItemRequests: %v", item)
-		}
-		sources.CheckItem(t, item.LinkedItemRequests[0], "publicDns", "dns", publicDns, "global")
-		sources.CheckItem(t, item.LinkedItemRequests[1], "publicIp", "ip", publicIp, "global")
-	})
-}
-
-type fakeClient func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
-
-func (m fakeClient) DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
-	return m(ctx, params, optFns...)
-}
-
-func createFakeClient(t *testing.T) fakeClient {
-	clientCalls := 0
-	return func(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
-		clientCalls += 1
-		if clientCalls > 2 {
-			t.Error("Called fake client too often (>2)")
-			return nil, nil
-		}
-		if params.NextToken == nil {
-			nextToken := "page2"
-			firstId := "first"
-			return &ec2.DescribeInstancesOutput{
-				NextToken: &nextToken,
-				Reservations: []types.Reservation{
-					{
-						Instances: []types.Instance{
-							{InstanceId: &firstId},
-						},
-					},
-				},
-			}, nil
-		} else if *params.NextToken == "page2" {
-			secondId := "second"
-			return &ec2.DescribeInstancesOutput{
-				Reservations: []types.Reservation{
-					{
-						Instances: []types.Instance{
-							{InstanceId: &secondId},
-						},
-					},
-				},
-			}, nil
-		}
-		return nil, nil
+	if input.InstanceIds[0] != "bar" {
+		t.Errorf("expected instance ID to be bar, got %v", input.InstanceIds[0])
 	}
 }
 
-func TestGet(t *testing.T) {
-	t.Parallel()
-	t.Run("empty (scope mismatch)", func(t *testing.T) {
-		src := InstanceSource{}
+func TestInstanceInputMapperList(t *testing.T) {
+	input, err := InstanceInputMapperList("foo")
 
-		items, err := src.Get(context.Background(), "foo.bar", "query")
-		if items != nil {
-			t.Fatalf("unexpected items: %v", items)
-		}
-		if err == nil {
-			t.Fatalf("expected err, got nil")
-		}
-		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
-			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
-		}
-	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(input.Filters) != 0 || len(input.InstanceIds) != 0 {
+		t.Errorf("non-empty input: %v", input)
+	}
 }
 
-func TestGetImpl(t *testing.T) {
-	t.Parallel()
-	t.Run("with client", func(t *testing.T) {
-		item, err := getImpl(context.Background(), createFakeClient(t), "foo.bar", "query")
-		if err != nil {
-			t.Fatalf("unexpected err: %v", err)
-		}
-		if item == nil {
-			t.Fatalf("item is nil")
-		}
-		if item.Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "first" {
-			t.Errorf("unexpected first item: %v", item)
-		}
-	})
-}
+func TestInstanceOutputMapper(t *testing.T) {
+	output := &ec2.DescribeInstancesOutput{
+		Reservations: []types.Reservation{
+			{
+				Instances: []types.Instance{
+					{
+						AmiLaunchIndex:  sources.PtrInt32(0),
+						PublicIpAddress: sources.PtrString("43.5.36.7"),
+						ImageId:         sources.PtrString("ami-04706e771f950937f"),
+						InstanceId:      sources.PtrString("i-04c7b2794f7bc3d6a"),
+						InstanceType:    types.InstanceTypeT2Micro,
+						KeyName:         sources.PtrString("dylan.ratcliffe"),
+						LaunchTime:      sources.PtrTime(time.Now()),
+						Monitoring: &types.Monitoring{
+							State: types.MonitoringStateDisabled,
+						},
+						Placement: &types.Placement{
+							AvailabilityZone: sources.PtrString("eu-west-2c"),
+							GroupName:        sources.PtrString(""),
+							GroupId:          sources.PtrString("groupId"),
+							Tenancy:          types.TenancyDefault,
+						},
+						PrivateDnsName:   sources.PtrString("ip-172-31-95-79.eu-west-2.compute.internal"),
+						PrivateIpAddress: sources.PtrString("172.31.95.79"),
+						ProductCodes:     []types.ProductCode{},
+						PublicDnsName:    sources.PtrString(""),
+						State: &types.InstanceState{
+							Code: sources.PtrInt32(16),
+							Name: types.InstanceStateNameRunning,
+						},
+						StateTransitionReason: sources.PtrString(""),
+						SubnetId:              sources.PtrString("subnet-0450a637af9984235"),
+						VpcId:                 sources.PtrString("vpc-0d7892e00e573e701"),
+						Architecture:          types.ArchitectureValuesX8664,
+						BlockDeviceMappings: []types.InstanceBlockDeviceMapping{
+							{
+								DeviceName: sources.PtrString("/dev/xvda"),
+								Ebs: &types.EbsInstanceBlockDevice{
+									AttachTime:          sources.PtrTime(time.Now()),
+									DeleteOnTermination: sources.PtrBool(true),
+									Status:              types.AttachmentStatusAttached,
+									VolumeId:            sources.PtrString("vol-06c7211d9e79a355e"),
+								},
+							},
+						},
+						ClientToken:  sources.PtrString("eafad400-29e0-4b5c-a0fc-ef74c77659c4"),
+						EbsOptimized: sources.PtrBool(false),
+						EnaSupport:   sources.PtrBool(true),
+						Hypervisor:   types.HypervisorTypeXen,
+						NetworkInterfaces: []types.InstanceNetworkInterface{
+							{
+								Attachment: &types.InstanceNetworkInterfaceAttachment{
+									AttachTime:          sources.PtrTime(time.Now()),
+									AttachmentId:        sources.PtrString("eni-attach-02b19215d0dd9c7be"),
+									DeleteOnTermination: sources.PtrBool(true),
+									DeviceIndex:         sources.PtrInt32(0),
+									Status:              types.AttachmentStatusAttached,
+									NetworkCardIndex:    sources.PtrInt32(0),
+								},
+								Description: sources.PtrString(""),
+								Groups: []types.GroupIdentifier{
+									{
+										GroupName: sources.PtrString("default"),
+										GroupId:   sources.PtrString("sg-094e151c9fc5da181"),
+									},
+								},
+								Ipv6Addresses:      []types.InstanceIpv6Address{},
+								MacAddress:         sources.PtrString("02:8c:61:38:6f:c2"),
+								NetworkInterfaceId: sources.PtrString("eni-09711a69e6d511358"),
+								OwnerId:            sources.PtrString("052392120703"),
+								PrivateDnsName:     sources.PtrString("ip-172-31-95-79.eu-west-2.compute.internal"),
+								PrivateIpAddress:   sources.PtrString("172.31.95.79"),
+								PrivateIpAddresses: []types.InstancePrivateIpAddress{
+									{
+										Primary:          sources.PtrBool(true),
+										PrivateDnsName:   sources.PtrString("ip-172-31-95-79.eu-west-2.compute.internal"),
+										PrivateIpAddress: sources.PtrString("172.31.95.79"),
+									},
+								},
+								SourceDestCheck: sources.PtrBool(true),
+								Status:          types.NetworkInterfaceStatusInUse,
+								SubnetId:        sources.PtrString("subnet-0450a637af9984235"),
+								VpcId:           sources.PtrString("vpc-0d7892e00e573e701"),
+								InterfaceType:   sources.PtrString("interface"),
+							},
+						},
+						RootDeviceName: sources.PtrString("/dev/xvda"),
+						RootDeviceType: types.DeviceTypeEbs,
+						SecurityGroups: []types.GroupIdentifier{
+							{
+								GroupName: sources.PtrString("default"),
+								GroupId:   sources.PtrString("sg-094e151c9fc5da181"),
+							},
+						},
+						SourceDestCheck: sources.PtrBool(true),
+						Tags: []types.Tag{
+							{
+								Key:   sources.PtrString("Name"),
+								Value: sources.PtrString("test"),
+							},
+						},
+						VirtualizationType: types.VirtualizationTypeHvm,
+						CpuOptions: &types.CpuOptions{
+							CoreCount:      sources.PtrInt32(1),
+							ThreadsPerCore: sources.PtrInt32(1),
+						},
+						CapacityReservationSpecification: &types.CapacityReservationSpecificationResponse{
+							CapacityReservationPreference: types.CapacityReservationPreferenceOpen,
+						},
+						HibernationOptions: &types.HibernationOptions{
+							Configured: sources.PtrBool(false),
+						},
+						MetadataOptions: &types.InstanceMetadataOptionsResponse{
+							State:                   types.InstanceMetadataOptionsStateApplied,
+							HttpTokens:              types.HttpTokensStateOptional,
+							HttpPutResponseHopLimit: sources.PtrInt32(1),
+							HttpEndpoint:            types.InstanceMetadataEndpointStateEnabled,
+							HttpProtocolIpv6:        types.InstanceMetadataProtocolStateDisabled,
+							InstanceMetadataTags:    types.InstanceMetadataTagsStateDisabled,
+						},
+						EnclaveOptions: &types.EnclaveOptions{
+							Enabled: sources.PtrBool(false),
+						},
+						PlatformDetails:          sources.PtrString("Linux/UNIX"),
+						UsageOperation:           sources.PtrString("RunInstances"),
+						UsageOperationUpdateTime: sources.PtrTime(time.Now()),
+						PrivateDnsNameOptions: &types.PrivateDnsNameOptionsResponse{
+							HostnameType:                    types.HostnameTypeIpName,
+							EnableResourceNameDnsARecord:    sources.PtrBool(true),
+							EnableResourceNameDnsAAAARecord: sources.PtrBool(false),
+						},
+						MaintenanceOptions: &types.InstanceMaintenanceOptions{
+							AutoRecovery: types.InstanceAutoRecoveryStateDefault,
+						},
+					},
+				},
+			},
+		},
+	}
 
-func TestList(t *testing.T) {
-	t.Parallel()
-	t.Run("empty (scope mismatch)", func(t *testing.T) {
-		src := InstanceSource{}
+	items, err := InstanceOutputMapper("foo", output)
 
-		items, err := src.List(context.Background(), "foo.bar")
-		if items != nil {
-			t.Fatalf("unexpected items: %v", items)
-		}
-		if err == nil {
-			t.Fatalf("expected err, got nil")
-		}
-		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
-			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
-		}
-	})
-}
+	if err != nil {
+		t.Fatal(err)
+	}
 
-func TestListImpl(t *testing.T) {
-	t.Parallel()
-	t.Run("with client", func(t *testing.T) {
-		items, err := findImpl(context.Background(), createFakeClient(t), "foo.bar")
-		if err != nil {
-			t.Fatalf("unexpected err: %v", err)
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
 		}
-		if len(items) != 2 {
-			t.Fatalf("unexpected items (len=%v): %v", len(items), items)
-		}
-		if items[0].Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "first" {
-			t.Errorf("unexpected first item: %v", items[0])
-		}
-		if items[1].Attributes.AttrStruct.Fields["instanceId"].GetStringValue() != "second" {
-			t.Errorf("unexpected second item: %v", items[0])
-		}
-	})
+	}
+
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %v", len(items))
+	}
+
+	item := items[0]
+
+	// It doesn't really make sense to test anything other than the linked items
+	// since the attributes are converted automatically
+	tests := sources.ItemRequestTests{
+		{
+			ExpectedType:   "ec2-image",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "ami-04706e771f950937f",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ip",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "172.31.95.79",
+			ExpectedScope:  "global",
+		},
+		{
+			ExpectedType:   "ec2-subnet",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "subnet-0450a637af9984235",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-vpc",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "vpc-0d7892e00e573e701",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ip",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "43.5.36.7",
+			ExpectedScope:  "global",
+		},
+		{
+			ExpectedType:   "ec2-security-group",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "sg-094e151c9fc5da181",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-instance-status",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "i-04c7b2794f7bc3d6a",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-volume",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "vol-06c7211d9e79a355e",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-placement-group",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "groupId",
+			ExpectedScope:  "foo",
+		},
+	}
+
+	tests.Execute(t, item)
+
 }

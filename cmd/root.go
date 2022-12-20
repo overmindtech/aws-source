@@ -20,7 +20,6 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
-	"github.com/overmindtech/aws-source/sources/securitygroup"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
@@ -163,14 +162,31 @@ Currently supported:
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
-				&ec2.InstanceSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
-				&securitygroup.SecurityGroupSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
+				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account),
+				ec2.NewInstanceSource(cfg, *callerID.Account),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
+				ec2.NewVpcSource(cfg, *callerID.Account),
+				ec2.NewVolumeSource(cfg, *callerID.Account),
+				ec2.NewImageSource(cfg, *callerID.Account),
+				ec2.NewAddressSource(cfg, *callerID.Account),
+				ec2.NewInternetGatewaySource(cfg, *callerID.Account),
+				ec2.NewKeyPairSource(cfg, *callerID.Account),
+				ec2.NewNatGatewaySource(cfg, *callerID.Account),
+				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account),
+				ec2.NewRegionSource(cfg, *callerID.Account),
+				ec2.NewSubnetSource(cfg, *callerID.Account),
+				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account),
+				ec2.NewInstanceStatusSource(cfg, *callerID.Account),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account),
+				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account),
+				ec2.NewLaunchTemplateSource(cfg, *callerID.Account),
+				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account),
+				ec2.NewNetworkAclSource(cfg, *callerID.Account),
+				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account),
+				ec2.NewPlacementGroupSource(cfg, *callerID.Account),
+				ec2.NewRouteTableSource(cfg, *callerID.Account),
+				ec2.NewReservedInstanceSource(cfg, *callerID.Account),
+				ec2.NewSnapshotSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
