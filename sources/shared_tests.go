@@ -24,6 +24,14 @@ func PtrInt64(v int64) *int64 {
 	return &v
 }
 
+func PtrFloat32(v float32) *float32 {
+	return &v
+}
+
+func PtrFloat64(v float64) *float64 {
+	return &v
+}
+
 func PtrTime(v time.Time) *time.Time {
 	return &v
 }
