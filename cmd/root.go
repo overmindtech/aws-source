@@ -186,6 +186,7 @@ Currently supported:
 				ec2.NewPlacementGroupSource(cfg, *callerID.Account),
 				ec2.NewRouteTableSource(cfg, *callerID.Account),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account),
+				ec2.NewSnapshotSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
