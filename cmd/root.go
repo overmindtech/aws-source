@@ -20,6 +20,7 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
+	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
@@ -187,6 +188,7 @@ Currently supported:
 				ec2.NewRouteTableSource(cfg, *callerID.Account),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account),
 				ec2.NewSnapshotSource(cfg, *callerID.Account),
+				s3.NewS3Source(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
