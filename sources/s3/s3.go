@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -334,11 +333,11 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		}
 	}
 
-	var a arn.ARN
+	var a *sources.ARN
 
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
-			if a, err = arn.Parse(*lambdaConfig.LambdaFunctionArn); err == nil {
+			if a, err = sources.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 					Type:   "lambda-function",
 					Method: sdp.RequestMethod_SEARCH,
@@ -351,7 +350,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
-			if a, err = arn.Parse(*q.QueueArn); err == nil {
+			if a, err = sources.ParseARN(*q.QueueArn); err == nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 					Type:   "sqs-queue",
 					Method: sdp.RequestMethod_SEARCH,
@@ -364,7 +363,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
-			if a, err = arn.Parse(*topic.TopicArn); err == nil {
+			if a, err = sources.ParseARN(*topic.TopicArn); err == nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 					Type:   "sns-topic",
 					Method: sdp.RequestMethod_SEARCH,
@@ -399,7 +398,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if bucket.InventoryConfiguration.Destination != nil {
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
-					if a, err = arn.Parse(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
+					if a, err = sources.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 							Type:   "s3-bucket",
 							Method: sdp.RequestMethod_SEARCH,
@@ -420,7 +419,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 				if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination != nil {
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
-							if a, err = arn.Parse(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
+							if a, err = sources.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
 								item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 									Type:   "s3-bucket",
 									Method: sdp.RequestMethod_SEARCH,
@@ -488,7 +487,7 @@ func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*s
 
 func searchImpl(ctx context.Context, client S3Client, scope string, query string) ([]*sdp.Item, error) {
 	// Parse the ARN
-	a, err := arn.Parse(query)
+	a, err := sources.ParseARN(query)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
@@ -503,7 +502,7 @@ func searchImpl(ctx context.Context, client S3Client, scope string, query string
 	}
 
 	// If the ARN was parsed we can just ask Get for the item
-	item, err := getImpl(ctx, client, scope, a.Resource)
+	item, err := getImpl(ctx, client, scope, a.ResourceID)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
