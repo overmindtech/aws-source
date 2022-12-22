@@ -1,1 +1,0 @@
-Refactor this to use the generic version that EC2 uses. However it's not quite *exactly* the same, so possibly wait until we have a few different examples and maybe we can make a generic-of-generics
