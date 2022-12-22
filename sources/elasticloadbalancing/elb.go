@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -55,7 +56,7 @@ func (s *ELBSource) Name() string {
 // in the format {accountID}.{region}
 func (s *ELBSource) Scopes() []string {
 	return []string{
-		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
+		sources.FormatScope(s.AccountID, s.Config.Region),
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -126,7 +127,7 @@ func (e *EC2Source[Input, Output]) Name() string {
 // in the format {accountID}.{region}
 func (e *EC2Source[Input, Output]) Scopes() []string {
 	return []string{
-		fmt.Sprintf("%v.%v", e.AccountID, e.Config.Region),
+		sources.FormatScope(e.AccountID, e.Config.Region),
 	}
 }
 
@@ -227,6 +228,39 @@ func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*s
 	}
 
 	return items, nil
+}
+
+// Search Searches for EC2 resources by ARN
+func (e *EC2Source[Input, Output]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+	if scope != e.Scopes()[0] {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, e.Scopes()[0]),
+		}
+	}
+
+	// Parse the ARN
+	a, err := sources.ParseARN(query)
+
+	if err != nil {
+		return nil, sdp.NewItemRequestError(err)
+	}
+
+	if arnScope := sources.FormatScope(a.AccountID, a.Region); arnScope != scope {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
+			Scope:       scope,
+		}
+	}
+
+	item, err := e.Get(ctx, scope, a.ResourceID)
+
+	if err != nil {
+		return nil, sdp.NewItemRequestError(err)
+	}
+
+	return []*sdp.Item{item}, nil
 }
 
 // listRegular Lists items from the API when the API is not paginated. Basically

@@ -163,6 +163,39 @@ func TestGet(t *testing.T) {
 	})
 }
 
+func TestSearch(t *testing.T) {
+	s := EC2Source[string, string]{
+		Config: aws.Config{
+			Region: "region",
+		},
+		AccountID: "account-id",
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
+			return "input", nil
+		},
+		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+			return []*sdp.Item{
+				{},
+			}, nil
+		},
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+			return "fancy", nil
+		},
+	}
+
+	items, err := s.Search(context.Background(), "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(items) != 1 {
+		t.Errorf("expected 1 item, got %v", len(items))
+	}
+}
+
 func TestNoInputMapper(t *testing.T) {
 	s := EC2Source[string, string]{
 		Config: aws.Config{
