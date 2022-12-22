@@ -1,0 +1,20 @@
+version: "3"
+services:
+  devcontainer:
+    image: "mcr.microsoft.com/devcontainers/go:0-1-bullseye"
+    volumes:
+      - ..:/workspace:cached
+      # mount the user's AWS config so that the CLI works as expected
+      - ~/.aws:/home/vscode/.aws:cached
+      # make the rest of the checkouts from the host available, so that
+      # cross-mod changes can be developed and tested inside the container
+      - ../..:/sources
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Uncomment the next line to use a non-root user for all processes.
+    user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
