@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -64,7 +65,7 @@ func (s *S3Source) Name() string {
 // in the format {accountID}.{region}
 func (s *S3Source) Scopes() []string {
 	return []string{
-		fmt.Sprintf("%v.%v", s.accountID, s.config.Region),
+		sources.FormatScope(s.accountID, s.config.Region),
 	}
 }
 
@@ -333,36 +334,44 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		}
 	}
 
+	var a arn.ARN
+
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:   "lambda-function",
-				Method: sdp.RequestMethod_SEARCH,
-				Query:  *lambdaConfig.LambdaFunctionArn,
-				Scope:  scope,
-			})
+			if a, err = arn.Parse(*lambdaConfig.LambdaFunctionArn); err == nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:   "lambda-function",
+					Method: sdp.RequestMethod_SEARCH,
+					Query:  *lambdaConfig.LambdaFunctionArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				})
+			}
 		}
 	}
 
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:   "sqs-queue",
-				Method: sdp.RequestMethod_SEARCH,
-				Query:  *q.QueueArn,
-				Scope:  scope,
-			})
+			if a, err = arn.Parse(*q.QueueArn); err == nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:   "sqs-queue",
+					Method: sdp.RequestMethod_SEARCH,
+					Query:  *q.QueueArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				})
+			}
 		}
 	}
 
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-				Type:   "sns-topic",
-				Method: sdp.RequestMethod_SEARCH,
-				Query:  *topic.TopicArn,
-				Scope:  scope,
-			})
+			if a, err = arn.Parse(*topic.TopicArn); err == nil {
+				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					Type:   "sns-topic",
+					Method: sdp.RequestMethod_SEARCH,
+					Query:  *topic.TopicArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				})
+			}
 		}
 	}
 
@@ -390,12 +399,14 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if bucket.InventoryConfiguration.Destination != nil {
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "s3-bucket",
-						Method: sdp.RequestMethod_SEARCH,
-						Query:  *bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket,
-						Scope:  scope,
-					})
+					if a, err = arn.Parse(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
+						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+							Type:   "s3-bucket",
+							Method: sdp.RequestMethod_SEARCH,
+							Query:  *bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						})
+					}
 				}
 			}
 		}
@@ -409,12 +420,14 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 				if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination != nil {
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
-							item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-								Type:   "s3-bucket",
-								Method: sdp.RequestMethod_SEARCH,
-								Query:  *bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket,
-								Scope:  scope,
-							})
+							if a, err = arn.Parse(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
+								item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+									Type:   "s3-bucket",
+									Method: sdp.RequestMethod_SEARCH,
+									Query:  *bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket,
+									Scope:  sources.FormatScope(a.AccountID, a.Region),
+								})
+							}
 						}
 					}
 				}
@@ -458,6 +471,45 @@ func listImpl(ctx context.Context, client S3Client, scope string) ([]*sdp.Item, 
 	}
 
 	return items, nil
+}
+
+// Search Searches for an S3 bucket by ARN rather than name
+func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			Scope:       scope,
+		}
+	}
+
+	return searchImpl(ctx, s.client, scope, query)
+}
+
+func searchImpl(ctx context.Context, client S3Client, scope string, query string) ([]*sdp.Item, error) {
+	// Parse the ARN
+	a, err := arn.Parse(query)
+
+	if err != nil {
+		return nil, sdp.NewItemRequestError(err)
+	}
+
+	if arnScope := sources.FormatScope(a.AccountID, a.Region); arnScope != scope {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+			ErrorString: fmt.Sprintf("ARN scope %v does not match source scope %v", arnScope, scope),
+			Scope:       scope,
+		}
+	}
+
+	// If the ARN was parsed we can just ask Get for the item
+	item, err := getImpl(ctx, client, scope, a.Resource)
+
+	if err != nil {
+		return nil, sdp.NewItemRequestError(err)
+	}
+
+	return []*sdp.Item{item}, nil
 }
 
 // Weight Returns the priority weighting of items returned by this source.

@@ -9,6 +9,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -126,7 +127,7 @@ func (e *EC2Source[Input, Output]) Name() string {
 // in the format {accountID}.{region}
 func (e *EC2Source[Input, Output]) Scopes() []string {
 	return []string{
-		fmt.Sprintf("%v.%v", e.AccountID, e.Config.Region),
+		sources.FormatScope(e.AccountID, e.Config.Region),
 	}
 }
 

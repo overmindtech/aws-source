@@ -58,7 +58,7 @@ func (s *ELBv2Source) Name() string {
 // in the format {accountID}.{region}
 func (s *ELBv2Source) Scopes() []string {
 	return []string{
-		fmt.Sprintf("%v.%v", s.AccountID, s.Config.Region),
+		sources.FormatScope(s.AccountID, s.Config.Region),
 	}
 }
 

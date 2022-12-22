@@ -11,6 +11,62 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+func TestS3SearchImpl(t *testing.T) {
+	t.Run("with a good ARN", func(t *testing.T) {
+		items, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id")
+
+		if err != nil {
+			t.Error(err)
+		}
+		if len(items) != 1 {
+			t.Errorf("expected 1 item, got %v", len(items))
+		}
+	})
+
+	t.Run("with a bad ARN", func(t *testing.T) {
+		_, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "foo")
+
+		if err == nil {
+			t.Error("expected error")
+		} else {
+			if ire, ok := err.(*sdp.ItemRequestError); ok {
+				if ire.ErrorType != sdp.ItemRequestError_OTHER {
+					t.Errorf("expected error type to be OTHER, got %v", ire.ErrorType.String())
+				}
+			} else {
+				t.Errorf("expected item request error, got %T", err)
+			}
+		}
+	})
+
+	t.Run("with an ARN in another scope", func(t *testing.T) {
+		_, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id-2:resource-type:resource-id")
+
+		if err == nil {
+			t.Error("expected error")
+		} else {
+			if ire, ok := err.(*sdp.ItemRequestError); ok {
+				if ire.ErrorType != sdp.ItemRequestError_NOSCOPE {
+					t.Errorf("expected error type to be OTHER, got %v", ire.ErrorType.String())
+				}
+			} else {
+				t.Errorf("expected item request error, got %T", err)
+			}
+		}
+	})
+}
+
+func TestS3ListImpl(t *testing.T) {
+	items, err := listImpl(context.Background(), TestS3Client{}, "foo")
+
+	if err != nil {
+		t.Error(err)
+	}
+	if len(items) != 1 {
+		t.Errorf("expected 1 item, got %v", len(items))
+	}
+}
+
 func TestS3GetImpl(t *testing.T) {
 	item, err := getImpl(context.Background(), TestS3Client{}, "foo", "bar")
 
@@ -28,20 +84,20 @@ func TestS3GetImpl(t *testing.T) {
 		{
 			ExpectedType:   "lambda-function",
 			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "arn",
-			ExpectedScope:  "foo",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedScope:  "account-id.region",
 		},
 		{
 			ExpectedType:   "sqs-queue",
 			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "arn",
-			ExpectedScope:  "foo",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedScope:  "account-id.region",
 		},
 		{
 			ExpectedType:   "sns-topic",
 			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "arn",
-			ExpectedScope:  "foo",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedScope:  "account-id.region",
 		},
 		{
 			ExpectedType:   "s3-bucket",
@@ -58,14 +114,14 @@ func TestS3GetImpl(t *testing.T) {
 		{
 			ExpectedType:   "s3-bucket",
 			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "bucket",
-			ExpectedScope:  "foo",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedScope:  "account-id.region",
 		},
 		{
 			ExpectedType:   "s3-bucket",
 			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "bucket",
-			ExpectedScope:  "foo",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedScope:  "account-id.region",
 		},
 	}
 
@@ -117,7 +173,7 @@ func (t TestS3Client) GetBucketAnalyticsConfiguration(ctx context.Context, param
 				DataExport: &types.StorageClassAnalysisDataExport{
 					Destination: &types.AnalyticsExportDestination{
 						S3BucketDestination: &types.AnalyticsS3BucketDestination{
-							Bucket:          sources.PtrString("bucket"),
+							Bucket:          sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 							Format:          types.AnalyticsS3ExportFileFormatCsv,
 							BucketAccountId: sources.PtrString("id"),
 							Prefix:          sources.PtrString("pre"),
@@ -190,7 +246,7 @@ func (t TestS3Client) GetBucketInventoryConfiguration(ctx context.Context, param
 		InventoryConfiguration: &types.InventoryConfiguration{
 			Destination: &types.InventoryDestination{
 				S3BucketDestination: &types.InventoryS3BucketDestination{
-					Bucket:    sources.PtrString("bucket"),
+					Bucket:    sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 					Format:    types.InventoryFormatCsv,
 					AccountId: sources.PtrString("id"),
 					Encryption: &types.InventoryEncryption{
@@ -285,7 +341,7 @@ func (t TestS3Client) GetBucketNotificationConfiguration(ctx context.Context, pa
 		LambdaFunctionConfigurations: []types.LambdaFunctionConfiguration{
 			{
 				Events:            []types.Event{},
-				LambdaFunctionArn: sources.PtrString("arn"),
+				LambdaFunctionArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 				Id:                sources.PtrString("id"),
 			},
 		},
@@ -293,7 +349,7 @@ func (t TestS3Client) GetBucketNotificationConfiguration(ctx context.Context, pa
 		QueueConfigurations: []types.QueueConfiguration{
 			{
 				Events:   []types.Event{},
-				QueueArn: sources.PtrString("arn"),
+				QueueArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 				Filter: &types.NotificationConfigurationFilter{
 					Key: &types.S3KeyFilter{
 						FilterRules: []types.FilterRule{
@@ -310,7 +366,7 @@ func (t TestS3Client) GetBucketNotificationConfiguration(ctx context.Context, pa
 		TopicConfigurations: []types.TopicConfiguration{
 			{
 				Events:   []types.Event{},
-				TopicArn: sources.PtrString("arn"),
+				TopicArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 				Filter: &types.NotificationConfigurationFilter{
 					Key: &types.S3KeyFilter{
 						FilterRules: []types.FilterRule{
