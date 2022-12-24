@@ -168,17 +168,17 @@ func NetworkInterfaceOutputMapper(scope string, output *ec2.DescribeNetworkInter
 	return items, nil
 }
 
-func NewNetworkInterfaceSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput] {
-	return &EC2Source[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput]{
+func NewNetworkInterfaceSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNetworkInterfacesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
 		InputMapperGet:  NetworkInterfaceInputMapperGet,
 		InputMapperList: NetworkInterfaceInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacesInput) Paginator[*ec2.DescribeNetworkInterfacesOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacesInput) sources.Paginator[*ec2.DescribeNetworkInterfacesOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkInterfacesPaginator(client, params)
 		},
 		OutputMapper: NetworkInterfaceOutputMapper,

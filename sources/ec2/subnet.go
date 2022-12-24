@@ -68,17 +68,17 @@ func SubnetOutputMapper(scope string, output *ec2.DescribeSubnetsOutput) ([]*sdp
 	return items, nil
 }
 
-func NewSubnetSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput] {
-	return &EC2Source[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput]{
+func NewSubnetSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-subnet",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSubnetsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
 			return client.DescribeSubnets(ctx, input)
 		},
 		InputMapperGet:  SubnetInputMapperGet,
 		InputMapperList: SubnetInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSubnetsInput) Paginator[*ec2.DescribeSubnetsOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSubnetsInput) sources.Paginator[*ec2.DescribeSubnetsOutput, *ec2.Options] {
 			return ec2.NewDescribeSubnetsPaginator(client, params)
 		},
 		OutputMapper: SubnetOutputMapper,

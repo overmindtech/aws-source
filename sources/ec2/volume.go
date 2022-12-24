@@ -59,17 +59,17 @@ func VolumeOutputMapper(scope string, output *ec2.DescribeVolumesOutput) ([]*sdp
 	return items, nil
 }
 
-func NewVolumeSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput] {
-	return &EC2Source[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput]{
+func NewVolumeSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-volume",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVolumesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
 			return client.DescribeVolumes(ctx, input)
 		},
 		InputMapperGet:  VolumeInputMapperGet,
 		InputMapperList: VolumeInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumesInput) Paginator[*ec2.DescribeVolumesOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumesInput) sources.Paginator[*ec2.DescribeVolumesOutput, *ec2.Options] {
 			return ec2.NewDescribeVolumesPaginator(client, params)
 		},
 		OutputMapper: VolumeOutputMapper,

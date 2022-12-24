@@ -50,12 +50,12 @@ func PlacementGroupOutputMapper(scope string, output *ec2.DescribePlacementGroup
 	return items, nil
 }
 
-func NewPlacementGroupSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput] {
-	return &EC2Source[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput]{
+func NewPlacementGroupSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-placement-group",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribePlacementGroupsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput) (*ec2.DescribePlacementGroupsOutput, error) {
 			return client.DescribePlacementGroups(ctx, input)
 		},
 		InputMapperGet:  PlacementGroupInputMapperGet,

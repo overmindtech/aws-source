@@ -59,17 +59,17 @@ func NetworkInterfacePermissionOutputMapper(scope string, output *ec2.DescribeNe
 	return items, nil
 }
 
-func NewNetworkInterfacePermissionSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput] {
-	return &EC2Source[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput]{
+func NewNetworkInterfacePermissionSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface-permission",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
 		InputMapperGet:  NetworkInterfacePermissionInputMapperGet,
 		InputMapperList: NetworkInterfacePermissionInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacePermissionsInput) Paginator[*ec2.DescribeNetworkInterfacePermissionsOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacePermissionsInput) sources.Paginator[*ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkInterfacePermissionsPaginator(client, params)
 		},
 		OutputMapper: NetworkInterfacePermissionOutputMapper,

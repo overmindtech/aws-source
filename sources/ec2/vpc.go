@@ -50,17 +50,17 @@ func VpcOutputMapper(scope string, output *ec2.DescribeVpcsOutput) ([]*sdp.Item,
 	return items, nil
 }
 
-func NewVpcSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput] {
-	return &EC2Source[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput]{
+func NewVpcSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-vpc",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
 			return client.DescribeVpcs(ctx, input)
 		},
 		InputMapperGet:  VpcInputMapperGet,
 		InputMapperList: VpcInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcsInput) Paginator[*ec2.DescribeVpcsOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcsInput) sources.Paginator[*ec2.DescribeVpcsOutput, *ec2.Options] {
 			return ec2.NewDescribeVpcsPaginator(client, params)
 		},
 		OutputMapper: VpcOutputMapper,

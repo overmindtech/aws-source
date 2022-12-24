@@ -61,12 +61,12 @@ func ImageOutputMapper(scope string, output *ec2.DescribeImagesOutput) ([]*sdp.I
 	return items, nil
 }
 
-func NewImageSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput] {
-	return &EC2Source[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput]{
+func NewImageSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-image",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeImagesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
 			return client.DescribeImages(ctx, input)
 		},
 		InputMapperGet:  ImageInputMapperGet,

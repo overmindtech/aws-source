@@ -1,41 +1,61 @@
-package ec2
+package sources
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
 const DefaultMaxResultsPerPage = 100
 
+// These `any` types exist just for documentation
+
+// ClientStructType represents the AWS API client that actions are run against. This is
+// usually a struct that comes from the `New()` or `NewFromConfig()` functions
+// in the relevant package e.g.
+// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#Client
+type ClientStructType any
+
+// InputType is the type of data that will be sent to the DesribeFunc. This is
+// typically a struct ending with the word Input such as:
+// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterInput
+type InputType any
+
+// OutputType is the type of output to expect from the DescribeFunc, this is
+// usually named the same as the input type, but with `Output` on the end e.g.
+// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterOutput
+type OutputType any
+
+// OptionsType The options struct that is passed to the client when it created,
+// and also to `optFns` when getting more pages:
+// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#ListClustersPaginator.NextPage
+type OptionsType any
+
 // Paginator Represents an AWS API Paginator:
 // https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
 // The Output param should be the type of output that this specific paginator
 // returns e.g. *ec2.DescribeInstancesOutput
-type Paginator[Output any] interface {
+type Paginator[Output OutputType, Options OptionsType] interface {
 	HasMorePages() bool
-	NextPage(context.Context, ...func(*ec2.Options)) (Output, error)
+	NextPage(context.Context, ...func(Options)) (Output, error)
 }
 
-// EC2Source This Struct allows us to create sources easily despite the
+// AWSSource This Struct allows us to create sources easily despite the
 // differences between the many EC2 APIs. Not that paginated APIs should
 // populate the `InputMapperPaginated` and `OutputMapperPaginated` fields, where
 // non-paginated APIs should use `InputMapper` and `OutputMapper`. The source
 // will return an error if you use any other combination
-type EC2Source[Input any, Output any] struct {
+type AWSSource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
 
 	// The function that should be used to describe the resources that this
 	// source is related to
-	DescribeFunc func(ctx context.Context, client *ec2.Client, input Input, optFns ...func(*ec2.Options)) (Output, error)
+	DescribeFunc func(ctx context.Context, client ClientStruct, input Input) (Output, error)
 
 	// A function that returns the input object that will be passed to
 	// DescribeFunc for a GET request
@@ -48,7 +68,7 @@ type EC2Source[Input any, Output any] struct {
 	// A function that returns a paginator for this API. If this is nil, we will
 	// assume that the API is not paginated e.g.
 	// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
-	PaginatorBuilder func(client *ec2.Client, params Input) Paginator[Output]
+	PaginatorBuilder func(client ClientStruct, params Input) Paginator[Output, Options]
 
 	// A function that returns a slice of items for a given output. If this is a
 	// GET request the EC2 source itself will handle errors if there are too
@@ -62,48 +82,30 @@ type EC2Source[Input any, Output any] struct {
 	// sources as the first element in the scope
 	AccountID string
 
-	// client The AWS client to use when making requests
-	client        *ec2.Client
-	clientCreated bool
-	clientMutex   sync.Mutex
-}
-
-func (e *EC2Source[Input, Output]) Client() *ec2.Client {
-	e.clientMutex.Lock()
-	defer e.clientMutex.Unlock()
-
-	// If the client already exists then return it
-	if e.clientCreated {
-		return e.client
-	}
-
-	// Otherwise create a new client from the config
-	e.client = ec2.NewFromConfig(e.Config)
-	e.clientCreated = true
-
-	return e.client
+	// Client The AWS client to use when making requests
+	Client ClientStruct
 }
 
 // Validate Checks that the source is correctly set up and returns an error if
 // not
-func (e *EC2Source[Input, Output]) Validate() error {
-	if e.DescribeFunc == nil {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Validate() error {
+	if s.DescribeFunc == nil {
 		return errors.New("ec2 source describe func is nil")
 	}
 
-	if e.MaxResultsPerPage == 0 {
-		e.MaxResultsPerPage = DefaultMaxResultsPerPage
+	if s.MaxResultsPerPage == 0 {
+		s.MaxResultsPerPage = DefaultMaxResultsPerPage
 	}
 
-	if e.InputMapperGet == nil {
+	if s.InputMapperGet == nil {
 		return errors.New("ec2 source get input mapper is nil")
 	}
 
-	if e.InputMapperList == nil {
+	if s.InputMapperList == nil {
 		return errors.New("ec2 source list input mapper is nil")
 	}
 
-	if e.OutputMapper == nil {
+	if s.OutputMapper == nil {
 		return errors.New("ec2 source output mapper is nil")
 	}
 
@@ -111,23 +113,23 @@ func (e *EC2Source[Input, Output]) Validate() error {
 }
 
 // Paginated returns whether or not this source is using a paginated API
-func (e *EC2Source[Input, Output]) Paginated() bool {
-	return e.PaginatorBuilder != nil
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Paginated() bool {
+	return s.PaginatorBuilder != nil
 }
 
-func (e *EC2Source[Input, Output]) Type() string {
-	return e.ItemType
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Type() string {
+	return s.ItemType
 }
 
-func (e *EC2Source[Input, Output]) Name() string {
-	return fmt.Sprintf("%v-source", e.ItemType)
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Name() string {
+	return fmt.Sprintf("%v-source", s.ItemType)
 }
 
 // List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (e *EC2Source[Input, Output]) Scopes() []string {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Scopes() []string {
 	return []string{
-		sources.FormatScope(e.AccountID, e.Config.Region),
+		FormatScope(s.AccountID, s.Config.Region),
 	}
 }
 
@@ -136,11 +138,11 @@ func (e *EC2Source[Input, Output]) Scopes() []string {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (e *EC2Source[Input, Output]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
-	if scope != e.Scopes()[0] {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, e.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -149,27 +151,27 @@ func (e *EC2Source[Input, Output]) Get(ctx context.Context, scope string, query 
 	var err error
 	var items []*sdp.Item
 
-	err = e.Validate()
+	err = s.Validate()
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
 	}
 
 	// Get the input object
-	input, err = e.InputMapperGet(scope, query)
+	input, err = s.InputMapperGet(scope, query)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
 	}
 
 	// Call the API using the object
-	output, err = e.DescribeFunc(ctx, e.Client(), input)
+	output, err = s.DescribeFunc(ctx, s.Client, input)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
 	}
 
-	items, err = e.OutputMapper(scope, output)
+	items, err = s.OutputMapper(scope, output)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
@@ -193,7 +195,7 @@ func (e *EC2Source[Input, Output]) Get(ctx context.Context, scope string, query 
 	case numItems == 0:
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOTFOUND,
-			ErrorString: fmt.Sprintf("%v %v not found", e.Type(), query),
+			ErrorString: fmt.Sprintf("%v %v not found", s.Type(), query),
 		}
 	}
 
@@ -201,15 +203,15 @@ func (e *EC2Source[Input, Output]) Get(ctx context.Context, scope string, query 
 }
 
 // List Lists all items in a given scope
-func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
-	if scope != e.Scopes()[0] {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, e.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
-	err := e.Validate()
+	err := s.Validate()
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
@@ -217,10 +219,10 @@ func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*s
 
 	var items []*sdp.Item
 
-	if e.Paginated() {
-		items, err = e.listPaginated(ctx, scope)
+	if s.Paginated() {
+		items, err = s.listPaginated(ctx, scope)
 	} else {
-		items, err = e.listRegular(ctx, scope)
+		items, err = s.listRegular(ctx, scope)
 	}
 
 	if err != nil {
@@ -231,22 +233,22 @@ func (e *EC2Source[Input, Output]) List(ctx context.Context, scope string) ([]*s
 }
 
 // Search Searches for EC2 resources by ARN
-func (e *EC2Source[Input, Output]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
-	if scope != e.Scopes()[0] {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, e.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
 	// Parse the ARN
-	a, err := sources.ParseARN(query)
+	a, err := ParseARN(query)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
 	}
 
-	if arnScope := sources.FormatScope(a.AccountID, a.Region); arnScope != scope {
+	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
@@ -254,7 +256,7 @@ func (e *EC2Source[Input, Output]) Search(ctx context.Context, scope string, que
 		}
 	}
 
-	item, err := e.Get(ctx, scope, a.ResourceID)
+	item, err := s.Get(ctx, scope, a.ResourceID)
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)
@@ -265,25 +267,25 @@ func (e *EC2Source[Input, Output]) Search(ctx context.Context, scope string, que
 
 // listRegular Lists items from the API when the API is not paginated. Basically
 // just calls the API and maps the output once
-func (e *EC2Source[Input, Output]) listRegular(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) listRegular(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	var input Input
 	var output Output
 	var err error
 	var items []*sdp.Item
 
-	input, err = e.InputMapperList(scope)
+	input, err = s.InputMapperList(scope)
 
 	if err != nil {
 		return nil, err
 	}
 
-	output, err = e.DescribeFunc(ctx, e.client, input)
+	output, err = s.DescribeFunc(ctx, s.Client, input)
 
 	if err != nil {
 		return nil, err
 	}
 
-	items, err = e.OutputMapper(scope, output)
+	items, err = s.OutputMapper(scope, output)
 
 	if err != nil {
 		return nil, err
@@ -294,24 +296,24 @@ func (e *EC2Source[Input, Output]) listRegular(ctx context.Context, scope string
 
 // listPaginated Lists all items with a paginated API. This requires that the
 // `PaginatorBuilder` be set
-func (e *EC2Source[Input, Output]) listPaginated(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) listPaginated(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	var input Input
 	var output Output
 	var err error
 	var newItems []*sdp.Item
 	items := make([]*sdp.Item, 0)
 
-	input, err = e.InputMapperList(scope)
+	input, err = s.InputMapperList(scope)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if e.PaginatorBuilder == nil {
+	if s.PaginatorBuilder == nil {
 		return nil, errors.New("paginator builder is nil, cannot use paginated API")
 	}
 
-	paginator := e.PaginatorBuilder(e.client, input)
+	paginator := s.PaginatorBuilder(s.Client, input)
 
 	for paginator.HasMorePages() {
 		output, err = paginator.NextPage(ctx)
@@ -320,7 +322,7 @@ func (e *EC2Source[Input, Output]) listPaginated(ctx context.Context, scope stri
 			return nil, err
 		}
 
-		newItems, err = e.OutputMapper(scope, output)
+		newItems, err = s.OutputMapper(scope, output)
 
 		if err != nil {
 			return nil, err
@@ -332,10 +334,10 @@ func (e *EC2Source[Input, Output]) listPaginated(ctx context.Context, scope stri
 	return items, nil
 }
 
-// Weight Returns the priority weighting of items returned by this source.
+// Weight Returns the priority weighting of items returned by this sourcs.
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (e *EC2Source[Input, Output]) Weight() int {
+func (s *AWSSource[Input, Output, ClientStruct, Options]) Weight() int {
 	return 100
 }

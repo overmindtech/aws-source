@@ -183,17 +183,17 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 	return items, nil
 }
 
-func NewInstanceSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput] {
-	return &EC2Source[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput]{
+func NewInstanceSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-instance",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 			return client.DescribeInstances(ctx, input)
 		},
 		InputMapperGet:  InstanceInputMapperGet,
 		InputMapperList: InstanceInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstancesInput) Paginator[*ec2.DescribeInstancesOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstancesInput) sources.Paginator[*ec2.DescribeInstancesOutput, *ec2.Options] {
 			return ec2.NewDescribeInstancesPaginator(client, params)
 		},
 		OutputMapper: InstanceOutputMapper,

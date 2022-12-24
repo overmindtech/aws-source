@@ -61,17 +61,17 @@ func EgressOnlyInternetGatewayOutputMapper(scope string, output *ec2.DescribeEgr
 	return items, nil
 }
 
-func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput] {
-	return &EC2Source[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput]{
+func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-EgressOnlyInternetGateway",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeEgressOnlyInternetGatewaysInput, optFns ...func(*ec2.Options)) (*ec2.DescribeEgressOnlyInternetGatewaysOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeEgressOnlyInternetGatewaysInput) (*ec2.DescribeEgressOnlyInternetGatewaysOutput, error) {
 			return client.DescribeEgressOnlyInternetGateways(ctx, input)
 		},
 		InputMapperGet:  EgressOnlyInternetGatewayInputMapperGet,
 		InputMapperList: EgressOnlyInternetGatewayInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeEgressOnlyInternetGatewaysInput) Paginator[*ec2.DescribeEgressOnlyInternetGatewaysOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeEgressOnlyInternetGatewaysInput) sources.Paginator[*ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Options] {
 			return ec2.NewDescribeEgressOnlyInternetGatewaysPaginator(client, params)
 		},
 		OutputMapper: EgressOnlyInternetGatewayOutputMapper,

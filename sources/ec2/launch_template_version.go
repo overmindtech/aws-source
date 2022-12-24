@@ -202,17 +202,17 @@ func LaunchTemplateVersionOutputMapper(scope string, output *ec2.DescribeLaunchT
 	return items, nil
 }
 
-func NewLaunchTemplateVersionSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput] {
-	return &EC2Source[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput]{
+func NewLaunchTemplateVersionSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.AWSSource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template-version",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
 		InputMapperGet:  LaunchTemplateVersionInputMapperGet,
 		InputMapperList: LaunchTemplateVersionInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplateVersionsInput) Paginator[*ec2.DescribeLaunchTemplateVersionsOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplateVersionsInput) sources.Paginator[*ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Options] {
 			return ec2.NewDescribeLaunchTemplateVersionsPaginator(client, params)
 		},
 		OutputMapper: LaunchTemplateVersionOutputMapper,
