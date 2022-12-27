@@ -61,8 +61,8 @@ func EgressOnlyInternetGatewayOutputMapper(scope string, output *ec2.DescribeEgr
 	return items, nil
 }
 
-func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
+func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-EgressOnlyInternetGateway",

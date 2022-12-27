@@ -183,8 +183,8 @@ func InstanceOutputMapper(scope string, output *ec2.DescribeInstancesOutput) ([]
 	return items, nil
 }
 
-func NewInstanceSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options]{
+func NewInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-instance",

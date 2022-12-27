@@ -70,8 +70,8 @@ func NetworkAclOutputMapper(scope string, output *ec2.DescribeNetworkAclsOutput)
 	return items, nil
 }
 
-func NewNetworkAclSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
+func NewNetworkAclSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-acl",

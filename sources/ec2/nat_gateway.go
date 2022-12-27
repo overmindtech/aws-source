@@ -97,8 +97,8 @@ func NatGatewayOutputMapper(scope string, output *ec2.DescribeNatGatewaysOutput)
 	return items, nil
 }
 
-func NewNatGatewaySource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{
+func NewNatGatewaySource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-nat-gateway",

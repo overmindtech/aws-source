@@ -59,8 +59,8 @@ func NetworkInterfacePermissionOutputMapper(scope string, output *ec2.DescribeNe
 	return items, nil
 }
 
-func NewNetworkInterfacePermissionSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
+func NewNetworkInterfacePermissionSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface-permission",

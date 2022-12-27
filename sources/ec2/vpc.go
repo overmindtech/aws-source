@@ -50,8 +50,8 @@ func VpcOutputMapper(scope string, output *ec2.DescribeVpcsOutput) ([]*sdp.Item,
 	return items, nil
 }
 
-func NewVpcSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
+func NewVpcSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-vpc",

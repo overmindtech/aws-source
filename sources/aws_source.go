@@ -44,12 +44,12 @@ type Paginator[Output OutputType, Options OptionsType] interface {
 	NextPage(context.Context, ...func(Options)) (Output, error)
 }
 
-// AWSSource This Struct allows us to create sources easily despite the
+// DescribeOnlySource This Struct allows us to create sources easily despite the
 // differences between the many EC2 APIs. Not that paginated APIs should
 // populate the `InputMapperPaginated` and `OutputMapperPaginated` fields, where
 // non-paginated APIs should use `InputMapper` and `OutputMapper`. The source
 // will return an error if you use any other combination
-type AWSSource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
+type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
 
@@ -88,7 +88,7 @@ type AWSSource[Input InputType, Output OutputType, ClientStruct ClientStructType
 
 // Validate Checks that the source is correctly set up and returns an error if
 // not
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Validate() error {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Validate() error {
 	if s.DescribeFunc == nil {
 		return errors.New("ec2 source describe func is nil")
 	}
@@ -113,21 +113,21 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) Validate() error {
 }
 
 // Paginated returns whether or not this source is using a paginated API
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Paginated() bool {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Paginated() bool {
 	return s.PaginatorBuilder != nil
 }
 
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Type() string {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Type() string {
 	return s.ItemType
 }
 
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Name() string {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
 }
 
 // List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Scopes() []string {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Scopes() []string {
 	return []string{
 		FormatScope(s.AccountID, s.Config.Region),
 	}
@@ -138,7 +138,7 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) Scopes() []string {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -203,7 +203,7 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) Get(ctx context.Contex
 }
 
 // List Lists all items in a given scope
-func (s *AWSSource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -233,7 +233,7 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) List(ctx context.Conte
 }
 
 // Search Searches for EC2 resources by ARN
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -267,7 +267,7 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) Search(ctx context.Con
 
 // listRegular Lists items from the API when the API is not paginated. Basically
 // just calls the API and maps the output once
-func (s *AWSSource[Input, Output, ClientStruct, Options]) listRegular(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) listRegular(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	var input Input
 	var output Output
 	var err error
@@ -296,7 +296,7 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) listRegular(ctx contex
 
 // listPaginated Lists all items with a paginated API. This requires that the
 // `PaginatorBuilder` be set
-func (s *AWSSource[Input, Output, ClientStruct, Options]) listPaginated(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) listPaginated(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	var input Input
 	var output Output
 	var err error
@@ -338,6 +338,6 @@ func (s *AWSSource[Input, Output, ClientStruct, Options]) listPaginated(ctx cont
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (s *AWSSource[Input, Output, ClientStruct, Options]) Weight() int {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Weight() int {
 	return 100
 }

@@ -202,8 +202,8 @@ func LaunchTemplateVersionOutputMapper(scope string, output *ec2.DescribeLaunchT
 	return items, nil
 }
 
-func NewLaunchTemplateVersionSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{
+func NewLaunchTemplateVersionSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template-version",

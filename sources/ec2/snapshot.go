@@ -68,8 +68,8 @@ func SnapshotOutputMapper(scope string, output *ec2.DescribeSnapshotsOutput) ([]
 	return items, nil
 }
 
-func NewSnapshotSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{
+func NewSnapshotSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-snapshot",

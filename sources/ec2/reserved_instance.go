@@ -57,8 +57,8 @@ func ReservedInstanceOutputMapper(scope string, output *ec2.DescribeReservedInst
 	return items, nil
 }
 
-func NewReservedInstanceSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
+func NewReservedInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-reserved-instance",

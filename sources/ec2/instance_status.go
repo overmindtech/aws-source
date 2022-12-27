@@ -57,8 +57,8 @@ func InstanceStatusOutputMapper(scope string, output *ec2.DescribeInstanceStatus
 	return items, nil
 }
 
-func NewInstanceStatusSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
+func NewInstanceStatusSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-instance-status",

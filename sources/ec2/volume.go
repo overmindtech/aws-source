@@ -59,8 +59,8 @@ func VolumeOutputMapper(scope string, output *ec2.DescribeVolumesOutput) ([]*sdp
 	return items, nil
 }
 
-func NewVolumeSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
+func NewVolumeSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-volume",

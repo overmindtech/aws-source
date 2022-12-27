@@ -11,7 +11,7 @@ import (
 )
 
 func TestType(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
@@ -22,7 +22,7 @@ func TestType(t *testing.T) {
 
 func TestName(t *testing.T) {
 	// Basically just test that it's not empty. It doesn't matter what it is
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
@@ -32,7 +32,7 @@ func TestName(t *testing.T) {
 }
 
 func TestScopes(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "outer-space",
 		},
@@ -56,7 +56,7 @@ func TestGet(t *testing.T) {
 		var outputMapperCalled bool
 		var describeFuncCalled bool
 
-		s := AWSSource[string, string, struct{}, struct{}]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -104,7 +104,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("with too many results", func(t *testing.T) {
-		s := AWSSource[string, string, struct{}, struct{}]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -135,7 +135,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("with no results", func(t *testing.T) {
-		s := AWSSource[string, string, struct{}, struct{}]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -163,7 +163,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "region",
 		},
@@ -196,7 +196,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestNoInputMapper(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -229,7 +229,7 @@ func TestNoInputMapper(t *testing.T) {
 }
 
 func TestNoOutputMapper(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -263,7 +263,7 @@ func TestNoOutputMapper(t *testing.T) {
 }
 
 func TestNoDescribeFunc(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -299,7 +299,7 @@ func TestNoDescribeFunc(t *testing.T) {
 }
 
 func TestFailingInputMapper(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -348,7 +348,7 @@ func TestFailingInputMapper(t *testing.T) {
 }
 
 func TestFailingOutputMapper(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -395,7 +395,7 @@ func TestFailingOutputMapper(t *testing.T) {
 }
 
 func TestFailingDescribeFunc(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -458,7 +458,7 @@ func (t *TestPaginator) NextPage(context.Context, ...func(struct{})) (string, er
 }
 
 func TestPaginated(t *testing.T) {
-	s := AWSSource[string, string, struct{}, struct{}]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		MaxResultsPerPage: 1,
 		Config: aws.Config{
 			Region: "eu-west-2",

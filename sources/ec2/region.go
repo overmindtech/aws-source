@@ -50,8 +50,8 @@ func RegionOutputMapper(scope string, output *ec2.DescribeRegionsOutput) ([]*sdp
 	return items, nil
 }
 
-func NewRegionSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options]{
+func NewRegionSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-region",

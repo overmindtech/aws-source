@@ -108,8 +108,8 @@ func AddressOutputMapper(scope string, output *ec2.DescribeAddressesOutput) ([]*
 }
 
 // NewAddressSource Creates a new source for aws-Address resources
-func NewAddressSource(config aws.Config, accountID string) *sources.AWSSource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
-	return &sources.AWSSource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
+func NewAddressSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-address",
