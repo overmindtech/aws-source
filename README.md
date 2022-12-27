@@ -16,6 +16,10 @@ Meaning that the type in Overmind should be:
 ec2-security-group
 ```
 
+## Rate limiting
+
+For EC2 APIs this sources uses the [same throttling methods as EC2 does](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/throttling.html), with the bucket size and refill rate set to 50% of the total. This means that the source will never use more than 50% of the available requests, including refil;ls when the bucket is empty.
+
 ## Sources
 
 ### elasticloadbalancing-loadbalancer-v2

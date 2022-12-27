@@ -61,12 +61,13 @@ func ImageOutputMapper(scope string, output *ec2.DescribeImagesOutput) ([]*sdp.I
 	return items, nil
 }
 
-func NewImageSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
+func NewImageSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-image",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeImages(ctx, input)
 		},
 		InputMapperGet:  ImageInputMapperGet,

@@ -50,12 +50,13 @@ func VpcOutputMapper(scope string, output *ec2.DescribeVpcsOutput) ([]*sdp.Item,
 	return items, nil
 }
 
-func NewVpcSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
+func NewVpcSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-vpc",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeVpcs(ctx, input)
 		},
 		InputMapperGet:  VpcInputMapperGet,

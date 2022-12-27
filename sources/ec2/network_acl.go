@@ -70,12 +70,13 @@ func NetworkAclOutputMapper(scope string, output *ec2.DescribeNetworkAclsOutput)
 	return items, nil
 }
 
-func NewNetworkAclSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkAclSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-acl",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkAclsInput) (*ec2.DescribeNetworkAclsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkAcls(ctx, input)
 		},
 		InputMapperGet:  NetworkAclInputMapperGet,

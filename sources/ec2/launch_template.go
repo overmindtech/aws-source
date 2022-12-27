@@ -50,12 +50,13 @@ func LaunchTemplateOutputMapper(scope string, output *ec2.DescribeLaunchTemplate
 	return items, nil
 }
 
-func NewLaunchTemplateSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
+func NewLaunchTemplateSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
 		InputMapperGet:  LaunchTemplateInputMapperGet,

@@ -62,12 +62,13 @@ func InternetGatewayOutputMapper(scope string, output *ec2.DescribeInternetGatew
 	return items, nil
 }
 
-func NewInternetGatewaySource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
+func NewInternetGatewaySource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-internet-gateway",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInternetGatewaysInput) (*ec2.DescribeInternetGatewaysOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeInternetGateways(ctx, input)
 		},
 		InputMapperGet:  InternetGatewayInputMapperGet,

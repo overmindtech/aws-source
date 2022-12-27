@@ -50,12 +50,13 @@ func PlacementGroupOutputMapper(scope string, output *ec2.DescribePlacementGroup
 	return items, nil
 }
 
-func NewPlacementGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
+func NewPlacementGroupSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-placement-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput) (*ec2.DescribePlacementGroupsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribePlacementGroups(ctx, input)
 		},
 		InputMapperGet:  PlacementGroupInputMapperGet,

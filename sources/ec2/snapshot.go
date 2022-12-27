@@ -68,12 +68,13 @@ func SnapshotOutputMapper(scope string, output *ec2.DescribeSnapshotsOutput) ([]
 	return items, nil
 }
 
-func NewSnapshotSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
+func NewSnapshotSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-snapshot",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeSnapshots(ctx, input)
 		},
 		InputMapperGet:  SnapshotInputMapperGet,

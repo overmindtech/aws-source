@@ -59,12 +59,13 @@ func NetworkInterfacePermissionOutputMapper(scope string, output *ec2.DescribeNe
 	return items, nil
 }
 
-func NewNetworkInterfacePermissionSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkInterfacePermissionSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface-permission",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
 		InputMapperGet:  NetworkInterfacePermissionInputMapperGet,

@@ -168,12 +168,13 @@ func NetworkInterfaceOutputMapper(scope string, output *ec2.DescribeNetworkInter
 	return items, nil
 }
 
-func NewNetworkInterfaceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkInterfaceSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
 		InputMapperGet:  NetworkInterfaceInputMapperGet,

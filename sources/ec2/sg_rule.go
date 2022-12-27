@@ -70,12 +70,13 @@ func SecurityGroupRuleOutputMapper(scope string, output *ec2.DescribeSecurityGro
 	return items, nil
 }
 
-func NewSecurityGroupRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
+func NewSecurityGroupRuleSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		AccountID: accountID,
 		ItemType:  "ec2-security-group-rule",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupRulesInput) (*ec2.DescribeSecurityGroupRulesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeSecurityGroupRules(ctx, input)
 		},
 		InputMapperGet:  SecurityGroupRuleInputMapperGet,
