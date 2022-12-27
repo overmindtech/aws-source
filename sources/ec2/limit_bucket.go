@@ -54,7 +54,7 @@ func (b *LimitBucket) Start(ctx context.Context) {
 	}(ctx, b)
 }
 
-// refill refuills the bucket the specified amount
+// refill refills the bucket the specified amount
 func (b *LimitBucket) refill() {
 	var newTokens int
 	var full bool

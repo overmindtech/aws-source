@@ -63,7 +63,7 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -90,7 +90,7 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("foo")
 			},
 		}
@@ -120,7 +120,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -152,7 +152,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return nil, errors.New("output mapper error")
 			},
-			GetFunc: func(ctx context.Context, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -184,7 +184,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("get func error")
 			},
 		}

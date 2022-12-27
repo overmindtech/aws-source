@@ -46,7 +46,7 @@ type ListGetSource[Input InputType, Output OutputType, ClientStruct ClientStruct
 	ListFuncOutputMapper func(output Output) ([]string, error)
 
 	// A function that gets the details of a given item
-	GetFunc func(ctx context.Context, scope, query string) (*sdp.Item, error)
+	GetFunc func(ctx context.Context, client ClientStruct, scope, query string) (*sdp.Item, error)
 }
 
 // Validate Checks that the source has been set up correctly
@@ -97,7 +97,7 @@ func (s *ListGetSource[Input, Output, ClientStruct, Options]) Get(ctx context.Co
 		return nil, sdp.NewItemRequestError(err)
 	}
 
-	item, err = s.GetFunc(ctx, scope, query)
+	item, err = s.GetFunc(ctx, s.Client, scope, query)
 
 	if err != nil {
 		// TODO: How can we handle NOTFOUND?
@@ -143,7 +143,7 @@ func (s *ListGetSource[Input, Output, ClientStruct, Options]) List(ctx context.C
 			wg.Add(1)
 			go func(query string) {
 				defer wg.Done()
-				item, err := s.GetFunc(ctx, scope, query)
+				item, err := s.GetFunc(ctx, s.Client, scope, query)
 
 				if err != nil {
 					log.WithFields(log.Fields{

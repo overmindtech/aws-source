@@ -36,6 +36,7 @@ func TestToAttributesCase(t *testing.T) {
 	exampleMap := make(map[string]interface{})
 
 	exampleMap["Name"] = "Dylan"
+	exampleMap["Removed"] = "goodbye"
 	exampleMap["Nested"] = map[string]string{
 		"NestedKeyName":    "Value",
 		"NestedAWSAcronym": "Wow",
@@ -44,7 +45,7 @@ func TestToAttributesCase(t *testing.T) {
 
 	i := interface{}(exampleMap)
 
-	attrs, err := ToAttributesCase(i)
+	attrs, err := ToAttributesCase(i, "removed")
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,5 +57,9 @@ func TestToAttributesCase(t *testing.T) {
 
 	if _, err := attrs.Get("nil"); err == nil {
 		t.Error("expected nil attributes to be removed")
+	}
+
+	if _, err := attrs.Get("removed"); err == nil {
+		t.Error("expected 'removed' to have been removed")
 	}
 }

@@ -53,6 +53,7 @@ func RegionOutputMapper(scope string, output *ec2.DescribeRegionsOutput) ([]*sdp
 func NewRegionSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-region",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
