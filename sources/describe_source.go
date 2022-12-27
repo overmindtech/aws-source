@@ -10,45 +10,10 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-const DefaultMaxResultsPerPage = 100
-
-// These `any` types exist just for documentation
-
-// ClientStructType represents the AWS API client that actions are run against. This is
-// usually a struct that comes from the `New()` or `NewFromConfig()` functions
-// in the relevant package e.g.
-// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#Client
-type ClientStructType any
-
-// InputType is the type of data that will be sent to the DesribeFunc. This is
-// typically a struct ending with the word Input such as:
-// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterInput
-type InputType any
-
-// OutputType is the type of output to expect from the DescribeFunc, this is
-// usually named the same as the input type, but with `Output` on the end e.g.
-// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterOutput
-type OutputType any
-
-// OptionsType The options struct that is passed to the client when it created,
-// and also to `optFns` when getting more pages:
-// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#ListClustersPaginator.NextPage
-type OptionsType any
-
-// Paginator Represents an AWS API Paginator:
-// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
-// The Output param should be the type of output that this specific paginator
-// returns e.g. *ec2.DescribeInstancesOutput
-type Paginator[Output OutputType, Options OptionsType] interface {
-	HasMorePages() bool
-	NextPage(context.Context, ...func(Options)) (Output, error)
-}
-
-// DescribeOnlySource This Struct allows us to create sources easily despite the
-// differences between the many EC2 APIs. Not that paginated APIs should
-// populate the `InputMapperPaginated` and `OutputMapperPaginated` fields, where
-// non-paginated APIs should use `InputMapper` and `OutputMapper`. The source
-// will return an error if you use any other combination
+// DescribeOnlySource Generates a source for AWS APIs that only use a `Descibe`
+// function for both List and Get operations. EC2 is a good example of this,
+// where running Describe with no params returns everything, but params can be
+// supplied to reduce the number of results.
 type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
@@ -232,7 +197,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 	return items, nil
 }
 
-// Search Searches for EC2 resources by ARN
+// Search Searches for AWS resources by ARN
 func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
