@@ -36,6 +36,20 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
+		LinkedItemRequests: []*sdp.ItemRequest{
+			{
+				Type:   "eks-addon",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *cluster.Name,
+				Scope:  scope,
+			},
+			{
+				Type:   "eks-fargate-profile",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *cluster.Name,
+				Scope:  scope,
+			},
+		},
 	}
 
 	var a *sources.ARN

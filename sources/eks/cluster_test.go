@@ -181,6 +181,18 @@ func TestClusterGetFunc(t *testing.T) {
 			ExpectedQuery:  "arn:aws:iam::801795385023:role/dylan-cluster-20221222134106992100000001",
 			ExpectedScope:  "801795385023",
 		},
+		{
+			ExpectedType:   "eks-fargate-profile",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "dylan",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "eks-addon",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "dylan",
+			ExpectedScope:  item.Scope,
+		},
 	}
 
 	tests.Execute(t, item)

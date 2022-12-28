@@ -35,7 +35,7 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	attributes.Set("uniqueName", (*out.FargateProfile.ClusterName + "/" + *out.FargateProfile.FargateProfileName))
 
 	item := sdp.Item{
-		Type:            "eks-FargateProfile",
+		Type:            "eks-fargate-profile",
 		UniqueAttribute: "uniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
