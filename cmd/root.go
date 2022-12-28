@@ -21,6 +21,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/eks"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
+	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
@@ -168,6 +169,7 @@ Currently supported:
 			rateLimit.Start(rateLimitCtx)
 
 			sources := []discovery.Source{
+				// ELB
 				&elasticloadbalancing.ELBSource{
 					Config:    cfg,
 					AccountID: *callerID.Account,
@@ -176,6 +178,8 @@ Currently supported:
 					Config:    cfg,
 					AccountID: *callerID.Account,
 				},
+
+				// EC2
 				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &rateLimit),
 				ec2.NewInstanceSource(cfg, *callerID.Account, &rateLimit),
 				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &rateLimit),
@@ -201,11 +205,18 @@ Currently supported:
 				ec2.NewRouteTableSource(cfg, *callerID.Account, &rateLimit),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &rateLimit),
 				ec2.NewSnapshotSource(cfg, *callerID.Account, &rateLimit),
+
+				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
+
+				// EKS
 				eks.NewClusterSource(cfg, *callerID.Account, region),
 				eks.NewAddonSource(cfg, *callerID.Account, region),
 				eks.NewFargateProfileSource(cfg, *callerID.Account, region),
 				eks.NewNodegroupSource(cfg, *callerID.Account, region),
+
+				// Route 53
+				route53.NewHostedZoneSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

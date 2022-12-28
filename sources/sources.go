@@ -27,6 +27,10 @@ type OutputType any
 // https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#ListClustersPaginator.NextPage
 type OptionsType any
 
+// AWSItemType A struct that represents the item in the AWS API e.g.
+// https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/route53@v1.25.2/types#HostedZone
+type AWSItemType any
+
 // Paginator Represents an AWS API Paginator:
 // https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
 // The Output param should be the type of output that this specific paginator
