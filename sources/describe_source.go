@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// DescribeOnlySource Generates a source for AWS APIs that only use a `Descibe`
+// DescribeOnlySource Generates a source for AWS APIs that only use a `Describe`
 // function for both List and Get operations. EC2 is a good example of this,
 // where running Describe with no params returns everything, but params can be
 // supplied to reduce the number of results.

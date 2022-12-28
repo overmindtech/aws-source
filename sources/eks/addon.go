@@ -44,8 +44,8 @@ func AddonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 	return &item, nil
 }
 
-func NewAddonSource(config aws.Config, accountID string, region string) *sources.ListGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
-	return &sources.ListGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
+func NewAddonSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
+	return &sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:    "eks-addon",
 		Client:      eks.NewFromConfig(config),
 		AccountID:   accountID,

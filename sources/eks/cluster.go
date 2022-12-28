@@ -150,8 +150,8 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 }
 
-func NewClusterSource(config aws.Config, accountID string, region string) *sources.ListGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
-	return &sources.ListGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
+func NewClusterSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
+	return &sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
 		ItemType:  "eks-cluster",
 		Client:    eks.NewFromConfig(config),
 		AccountID: accountID,
