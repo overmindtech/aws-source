@@ -1,0 +1,82 @@
+package eks
+
+import (
+	"context"
+	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/eks"
+	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
+)
+
+func AddonGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeAddonInput) (*sdp.Item, error) {
+	out, err := client.DescribeAddon(ctx, input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if out.Addon == nil {
+		return nil, &sdp.ItemRequestError{
+			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			ErrorString: "addon was nil",
+		}
+	}
+
+	attributes, err := sources.ToAttributesCase(out.Addon)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// The uniqueAttributeValue for this is a custom field:
+	// {clusterName}/{addonName}
+	attributes.Set("uniqueName", (*out.Addon.ClusterName + "/" + *out.Addon.AddonName))
+
+	item := sdp.Item{
+		Type:            "eks-addon",
+		UniqueAttribute: "uniqueName",
+		Attributes:      attributes,
+		Scope:           scope,
+	}
+
+	return &item, nil
+}
+
+func NewAddonSource(config aws.Config, accountID string, region string) *sources.ListGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
+	return &sources.ListGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
+		ItemType:    "eks-addon",
+		Client:      eks.NewFromConfig(config),
+		AccountID:   accountID,
+		Region:      region,
+		DisableList: true,
+		SearchInputMapper: func(scope, query string) (*eks.ListAddonsInput, error) {
+			return &eks.ListAddonsInput{
+				ClusterName: &query,
+			}, nil
+		},
+		GetInputMapper: func(scope, query string) *eks.DescribeAddonInput {
+			// The uniqueAttributeValue for this is a custom field:
+			// {clusterName}/{addonName}
+			fields := strings.Split(query, "/")
+
+			var clusterName string
+			var addonName string
+
+			if len(fields) == 2 {
+				clusterName = fields[0]
+				addonName = fields[1]
+			}
+
+			return &eks.DescribeAddonInput{
+				AddonName:   &addonName,
+				ClusterName: &clusterName,
+			}
+		},
+		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListAddonsInput) sources.Paginator[*eks.ListAddonsOutput, *eks.Options] {
+			return eks.NewListAddonsPaginator(client, input)
+		},
+		GetFunc: AddonGetFunc,
+	}
+}

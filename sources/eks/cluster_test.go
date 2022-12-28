@@ -108,7 +108,7 @@ var ClusterClient = TestClient{
 }
 
 func TestClusterGetFunc(t *testing.T) {
-	item, err := ClusterGetFunc(context.Background(), ClusterClient, "foo", "")
+	item, err := ClusterGetFunc(context.Background(), ClusterClient, "foo", &eks.DescribeClusterInput{})
 
 	if err != nil {
 		t.Error(err)

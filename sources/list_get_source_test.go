@@ -17,7 +17,7 @@ func TestMaxParallel(t *testing.T) {
 }
 
 func TestListGetSourceType(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any]{
+	lgs := ListGetSource[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
@@ -27,7 +27,7 @@ func TestListGetSourceType(t *testing.T) {
 }
 
 func TestListGetSourceName(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any]{
+	lgs := ListGetSource[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
@@ -37,7 +37,7 @@ func TestListGetSourceName(t *testing.T) {
 }
 
 func TestListGetSourceScopes(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any]{
+	lgs := ListGetSource[any, any, any, any, any, any]{
 		AccountID: "foo",
 		Region:    "bar",
 	}
@@ -49,7 +49,7 @@ func TestListGetSourceScopes(t *testing.T) {
 
 func TestListGetSourceGet(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := ListGetSource[string, string, struct{}, struct{}]{
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -63,8 +63,11 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
 			},
 		}
 
@@ -76,7 +79,7 @@ func TestListGetSourceGet(t *testing.T) {
 	})
 
 	t.Run("with an error", func(t *testing.T) {
-		lgs := ListGetSource[string, string, struct{}, struct{}]{
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -90,8 +93,11 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("foo")
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
 			},
 		}
 
@@ -105,7 +111,7 @@ func TestListGetSourceGet(t *testing.T) {
 
 func TestListGetSourceList(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := ListGetSource[string, string, struct{}, struct{}]{
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -120,8 +126,11 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
 			},
 		}
 
@@ -137,7 +146,7 @@ func TestListGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing output mapper", func(t *testing.T) {
-		lgs := ListGetSource[string, string, struct{}, struct{}]{
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -152,8 +161,11 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return nil, errors.New("output mapper error")
 			},
-			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
 			},
 		}
 
@@ -169,7 +181,7 @@ func TestListGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing GetFunc", func(t *testing.T) {
-		lgs := ListGetSource[string, string, struct{}, struct{}]{
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -184,8 +196,11 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
-			GetFunc: func(ctx context.Context, client struct{}, scope, query string) (*sdp.Item, error) {
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("get func error")
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
 			},
 		}
 
@@ -198,6 +213,101 @@ func TestListGetSourceList(t *testing.T) {
 
 		if len(items) != 0 {
 			t.Errorf("expected no items, got %v", len(items))
+		}
+	})
+}
+
+func TestListGetSourceSearch(t *testing.T) {
+	t.Run("with ARN search", func(t *testing.T) {
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+			ItemType:    "test",
+			AccountID:   "foo",
+			Region:      "bar",
+			Client:      struct{}{},
+			MaxParallel: MaxParallel(1),
+			ListInput:   "",
+			ListFuncPaginatorBuilder: func(client struct{}, input string) Paginator[string, struct{}] {
+				// Returns 3 pages
+				return &TestPaginator{}
+			},
+			ListFuncOutputMapper: func(output string) ([]string, error) {
+				// Returns 2 gets per page
+				return []string{"", ""}, nil
+			},
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
+				if input == "foo.bar.id" {
+					return &sdp.Item{}, nil
+				} else {
+					return nil, sdp.NewItemRequestError(errors.New("bad query details"))
+				}
+			},
+			GetInputMapper: func(scope, query string) string {
+				return scope + "." + query
+			},
+		}
+
+		t.Run("bad ARN", func(t *testing.T) {
+			_, err := lgs.Search(context.Background(), "foo.bar", "query")
+
+			if err == nil {
+				t.Error("expected error because the ARN was bad")
+			}
+		})
+
+		t.Run("good ARN but bad scope", func(t *testing.T) {
+			_, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:region:account:type/id")
+
+			if err == nil {
+				t.Error("expected error because the ARN had a bad scope")
+			}
+		})
+
+		t.Run("good ARN", func(t *testing.T) {
+			_, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id")
+
+			if err != nil {
+				t.Error(err)
+			}
+		})
+	})
+
+	t.Run("with custom search logic", func(t *testing.T) {
+		var searchMapperCalled bool
+
+		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+			ItemType:  "test",
+			AccountID: "foo",
+			Region:    "bar",
+			Client:    struct{}{},
+			ListInput: "",
+			ListFuncPaginatorBuilder: func(client struct{}, input string) Paginator[string, struct{}] {
+				// Returns 3 pages
+				return &TestPaginator{}
+			},
+			ListFuncOutputMapper: func(output string) ([]string, error) {
+				// Returns 2 gets per page
+				return []string{"", ""}, nil
+			},
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
+				return &sdp.Item{}, nil
+			},
+			SearchInputMapper: func(scope, query string) (string, error) {
+				searchMapperCalled = true
+				return "", nil
+			},
+			GetInputMapper: func(scope, query string) string {
+				return ""
+			},
+		}
+
+		_, err := lgs.Search(context.Background(), "foo.bar", "bar")
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if !searchMapperCalled {
+			t.Error("search mapper not called")
 		}
 	})
 }
