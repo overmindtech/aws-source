@@ -16,12 +16,12 @@ func TestKeyPairInputMapperGet(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(input.KeyPairIds) != 1 {
-		t.Fatalf("expected 1 KeyPair ID, got %v", len(input.KeyPairIds))
+	if len(input.KeyNames) != 1 {
+		t.Fatalf("expected 1 KeyPair ID, got %v", len(input.KeyNames))
 	}
 
-	if input.KeyPairIds[0] != "bar" {
-		t.Errorf("expected KeyPair ID to be bar, got %v", input.KeyPairIds[0])
+	if input.KeyNames[0] != "bar" {
+		t.Errorf("expected KeyPair ID to be bar, got %v", input.KeyNames[0])
 	}
 }
 
