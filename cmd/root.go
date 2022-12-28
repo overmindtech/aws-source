@@ -217,6 +217,7 @@ Currently supported:
 
 				// Route 53
 				route53.NewHostedZoneSource(cfg, *callerID.Account, region),
+				route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

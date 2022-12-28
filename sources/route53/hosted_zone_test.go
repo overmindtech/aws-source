@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
 )
 
 func TestHostedZoneItemMapper(t *testing.T) {
@@ -32,4 +33,15 @@ func TestHostedZoneItemMapper(t *testing.T) {
 	if err = item.Validate(); err != nil {
 		t.Error(err)
 	}
+
+	tests := sources.ItemRequestTests{
+		{
+			ExpectedType:   "route53-resource-record-set",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "/hostedzone/Z08416862SZP5DJXIDB29",
+			ExpectedScope:  "foo",
+		},
+	}
+
+	tests.Execute(t, item)
 }
