@@ -15,6 +15,8 @@ type TestClient struct {
 	DescribeFargateProfileOutput         *eks.DescribeFargateProfileOutput
 	ListIdentityProviderConfigsOutput    *eks.ListIdentityProviderConfigsOutput
 	DescribeIdentityProviderConfigOutput *eks.DescribeIdentityProviderConfigOutput
+	ListNodegroupsOutput                 *eks.ListNodegroupsOutput
+	DescribeNodegroupOutput              *eks.DescribeNodegroupOutput
 }
 
 func (t TestClient) ListClusters(context.Context, *eks.ListClustersInput, ...func(*eks.Options)) (*eks.ListClustersOutput, error) {
@@ -44,6 +46,15 @@ func (t TestClient) DescribeFargateProfile(ctx context.Context, params *eks.Desc
 func (t TestClient) ListIdentityProviderConfigs(ctx context.Context, params *eks.ListIdentityProviderConfigsInput, optFns ...func(*eks.Options)) (*eks.ListIdentityProviderConfigsOutput, error) {
 	return t.ListIdentityProviderConfigsOutput, nil
 }
+
 func (t TestClient) DescribeIdentityProviderConfig(ctx context.Context, params *eks.DescribeIdentityProviderConfigInput, optFns ...func(*eks.Options)) (*eks.DescribeIdentityProviderConfigOutput, error) {
 	return t.DescribeIdentityProviderConfigOutput, nil
+}
+
+func (t TestClient) ListNodegroups(ctx context.Context, params *eks.ListNodegroupsInput, optFns ...func(*eks.Options)) (*eks.ListNodegroupsOutput, error) {
+	return t.ListNodegroupsOutput, nil
+}
+
+func (t TestClient) DescribeNodegroup(ctx context.Context, params *eks.DescribeNodegroupInput, optFns ...func(*eks.Options)) (*eks.DescribeNodegroupOutput, error) {
+	return t.DescribeNodegroupOutput, nil
 }

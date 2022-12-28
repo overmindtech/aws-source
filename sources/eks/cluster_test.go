@@ -193,6 +193,12 @@ func TestClusterGetFunc(t *testing.T) {
 			ExpectedQuery:  "dylan",
 			ExpectedScope:  item.Scope,
 		},
+		{
+			ExpectedType:   "eks-nodegroup",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "dylan",
+			ExpectedScope:  item.Scope,
+		},
 	}
 
 	tests.Execute(t, item)

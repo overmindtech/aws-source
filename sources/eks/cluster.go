@@ -49,6 +49,12 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 				Query:  *cluster.Name,
 				Scope:  scope,
 			},
+			{
+				Type:   "eks-nodegroup",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *cluster.Name,
+				Scope:  scope,
+			},
 		},
 	}
 
