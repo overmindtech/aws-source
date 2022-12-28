@@ -7,10 +7,12 @@ import (
 )
 
 type TestClient struct {
-	ListClustersOutput    *eks.ListClustersOutput
-	DescribeClusterOutput *eks.DescribeClusterOutput
-	ListAddonsOutput      *eks.ListAddonsOutput
-	DescribeAddonOutput   *eks.DescribeAddonOutput
+	ListClustersOutput           *eks.ListClustersOutput
+	DescribeClusterOutput        *eks.DescribeClusterOutput
+	ListAddonsOutput             *eks.ListAddonsOutput
+	DescribeAddonOutput          *eks.DescribeAddonOutput
+	ListFargateProfilesOutput    *eks.ListFargateProfilesOutput
+	DescribeFargateProfileOutput *eks.DescribeFargateProfileOutput
 }
 
 func (t TestClient) ListClusters(context.Context, *eks.ListClustersInput, ...func(*eks.Options)) (*eks.ListClustersOutput, error) {
@@ -27,4 +29,11 @@ func (t TestClient) ListAddons(context.Context, *eks.ListAddonsInput, ...func(*e
 
 func (t TestClient) DescribeAddon(ctx context.Context, params *eks.DescribeAddonInput, optFns ...func(*eks.Options)) (*eks.DescribeAddonOutput, error) {
 	return t.DescribeAddonOutput, nil
+}
+
+func (t TestClient) ListFargateProfiles(ctx context.Context, params *eks.ListFargateProfilesInput, optFns ...func(*eks.Options)) (*eks.ListFargateProfilesOutput, error) {
+	return t.ListFargateProfilesOutput, nil
+}
+func (t TestClient) DescribeFargateProfile(ctx context.Context, params *eks.DescribeFargateProfileInput, optFns ...func(*eks.Options)) (*eks.DescribeFargateProfileOutput, error) {
+	return t.DescribeFargateProfileOutput, nil
 }

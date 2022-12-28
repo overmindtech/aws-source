@@ -19,6 +19,7 @@ import (
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
+	"github.com/overmindtech/aws-source/sources/eks"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
@@ -201,6 +202,9 @@ Currently supported:
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &rateLimit),
 				ec2.NewSnapshotSource(cfg, *callerID.Account, &rateLimit),
 				s3.NewS3Source(cfg, *callerID.Account),
+				eks.NewClusterSource(cfg, *callerID.Account, region),
+				eks.NewAddonSource(cfg, *callerID.Account, region),
+				eks.NewFargateProfileSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
