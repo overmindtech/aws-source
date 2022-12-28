@@ -68,17 +68,19 @@ func InstanceEventWindowOutputMapper(scope string, output *ec2.DescribeInstanceE
 	return items, nil
 }
 
-func NewInstanceEventWindowSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput] {
-	return &EC2Source[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput]{
+func NewInstanceEventWindowSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-instance-event-window",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstanceEventWindowsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput) (*ec2.DescribeInstanceEventWindowsOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
 		InputMapperGet:  InstanceEventWindowInputMapperGet,
 		InputMapperList: InstanceEventWindowInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceEventWindowsInput) Paginator[*ec2.DescribeInstanceEventWindowsOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceEventWindowsInput) sources.Paginator[*ec2.DescribeInstanceEventWindowsOutput, *ec2.Options] {
 			return ec2.NewDescribeInstanceEventWindowsPaginator(client, params)
 		},
 		OutputMapper: InstanceEventWindowOutputMapper,

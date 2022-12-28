@@ -146,17 +146,19 @@ func RouteTableOutputMapper(scope string, output *ec2.DescribeRouteTablesOutput)
 	return items, nil
 }
 
-func NewRouteTableSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput] {
-	return &EC2Source[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput]{
+func NewRouteTableSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-route-table",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeRouteTablesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeRouteTables(ctx, input)
 		},
 		InputMapperGet:  RouteTableInputMapperGet,
 		InputMapperList: RouteTableInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeRouteTablesInput) Paginator[*ec2.DescribeRouteTablesOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeRouteTablesInput) sources.Paginator[*ec2.DescribeRouteTablesOutput, *ec2.Options] {
 			return ec2.NewDescribeRouteTablesPaginator(client, params)
 		},
 		OutputMapper: RouteTableOutputMapper,

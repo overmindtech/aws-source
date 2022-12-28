@@ -65,12 +65,14 @@ func AvailabilityZoneOutputMapper(scope string, output *ec2.DescribeAvailability
 }
 
 // NewAvailabilityZoneSource Creates a new source for aws-availabilityzone resources
-func NewAvailabilityZoneSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput] {
-	return &EC2Source[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput]{
+func NewAvailabilityZoneSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-availability-zone",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAvailabilityZonesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeAvailabilityZonesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAvailabilityZonesInput) (*ec2.DescribeAvailabilityZonesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeAvailabilityZones(ctx, input)
 		},
 		InputMapperGet:  AvailabilityZoneInputMapperGet,

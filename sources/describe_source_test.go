@@ -1,4 +1,4 @@
-package ec2
+package sources
 
 import (
 	"context"
@@ -7,12 +7,11 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestType(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
@@ -23,7 +22,7 @@ func TestType(t *testing.T) {
 
 func TestName(t *testing.T) {
 	// Basically just test that it's not empty. It doesn't matter what it is
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
@@ -33,7 +32,7 @@ func TestName(t *testing.T) {
 }
 
 func TestScopes(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "outer-space",
 		},
@@ -57,7 +56,7 @@ func TestGet(t *testing.T) {
 		var outputMapperCalled bool
 		var describeFuncCalled bool
 
-		s := EC2Source[string, string]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -75,7 +74,7 @@ func TestGet(t *testing.T) {
 					{},
 				}, nil
 			},
-			DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 				describeFuncCalled = true
 				return "", nil
 			},
@@ -105,7 +104,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("with too many results", func(t *testing.T) {
-		s := EC2Source[string, string]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -123,7 +122,7 @@ func TestGet(t *testing.T) {
 					{},
 				}, nil
 			},
-			DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 				return "", nil
 			},
 		}
@@ -136,7 +135,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("with no results", func(t *testing.T) {
-		s := EC2Source[string, string]{
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{
 				Region: "eu-west-2",
 			},
@@ -150,7 +149,7 @@ func TestGet(t *testing.T) {
 			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
 				return []*sdp.Item{}, nil
 			},
-			DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 				return "", nil
 			},
 		}
@@ -164,7 +163,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "region",
 		},
@@ -180,7 +179,7 @@ func TestSearch(t *testing.T) {
 				{},
 			}, nil
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "fancy", nil
 		},
 	}
@@ -197,7 +196,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestNoInputMapper(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -207,7 +206,7 @@ func TestNoInputMapper(t *testing.T) {
 				{},
 			}, nil
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
 		},
 	}
@@ -230,7 +229,7 @@ func TestNoInputMapper(t *testing.T) {
 }
 
 func TestNoOutputMapper(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -241,7 +240,7 @@ func TestNoOutputMapper(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
 		},
 	}
@@ -264,7 +263,7 @@ func TestNoOutputMapper(t *testing.T) {
 }
 
 func TestNoDescribeFunc(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -300,7 +299,7 @@ func TestNoDescribeFunc(t *testing.T) {
 }
 
 func TestFailingInputMapper(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -316,7 +315,7 @@ func TestFailingInputMapper(t *testing.T) {
 				{},
 			}, nil
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
 		},
 	}
@@ -349,7 +348,7 @@ func TestFailingInputMapper(t *testing.T) {
 }
 
 func TestFailingOutputMapper(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -363,7 +362,7 @@ func TestFailingOutputMapper(t *testing.T) {
 		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
 			return nil, errors.New("foobar")
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
 		},
 	}
@@ -396,7 +395,7 @@ func TestFailingOutputMapper(t *testing.T) {
 }
 
 func TestFailingDescribeFunc(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
@@ -412,7 +411,7 @@ func TestFailingDescribeFunc(t *testing.T) {
 				{},
 			}, nil
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", errors.New("foobar")
 		},
 	}
@@ -452,14 +451,14 @@ func (t *TestPaginator) HasMorePages() bool {
 	return t.page < 3
 }
 
-func (t *TestPaginator) NextPage(context.Context, ...func(*ec2.Options)) (string, error) {
+func (t *TestPaginator) NextPage(context.Context, ...func(struct{})) (string, error) {
 	t.page++
 
 	return "", nil
 }
 
 func TestPaginated(t *testing.T) {
-	s := EC2Source[string, string]{
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		MaxResultsPerPage: 1,
 		Config: aws.Config{
 			Region: "eu-west-2",
@@ -476,10 +475,10 @@ func TestPaginated(t *testing.T) {
 				{},
 			}, nil
 		},
-		PaginatorBuilder: func(client *ec2.Client, params string) Paginator[string] {
+		PaginatorBuilder: func(client struct{}, params string) Paginator[string, struct{}] {
 			return &TestPaginator{}
 		},
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input string, optFns ...func(*ec2.Options)) (string, error) {
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
 		},
 	}

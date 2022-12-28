@@ -50,17 +50,19 @@ func LaunchTemplateOutputMapper(scope string, output *ec2.DescribeLaunchTemplate
 	return items, nil
 }
 
-func NewLaunchTemplateSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput] {
-	return &EC2Source[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput]{
+func NewLaunchTemplateSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeLaunchTemplatesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
 		InputMapperGet:  LaunchTemplateInputMapperGet,
 		InputMapperList: LaunchTemplateInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplatesInput) Paginator[*ec2.DescribeLaunchTemplatesOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplatesInput) sources.Paginator[*ec2.DescribeLaunchTemplatesOutput, *ec2.Options] {
 			return ec2.NewDescribeLaunchTemplatesPaginator(client, params)
 		},
 		OutputMapper: LaunchTemplateOutputMapper,

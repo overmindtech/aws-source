@@ -57,17 +57,19 @@ func InstanceStatusOutputMapper(scope string, output *ec2.DescribeInstanceStatus
 	return items, nil
 }
 
-func NewInstanceStatusSource(config aws.Config, accountID string) *EC2Source[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput] {
-	return &EC2Source[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput]{
+func NewInstanceStatusSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
+	return &sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
+		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "ec2-instance-status",
-		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstanceStatusOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput) (*ec2.DescribeInstanceStatusOutput, error) {
+			<-limit.C // Wait for late limiting
 			return client.DescribeInstanceStatus(ctx, input)
 		},
 		InputMapperGet:  InstanceStatusInputMapperGet,
 		InputMapperList: InstanceStatusInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceStatusInput) Paginator[*ec2.DescribeInstanceStatusOutput] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceStatusInput) sources.Paginator[*ec2.DescribeInstanceStatusOutput, *ec2.Options] {
 			return ec2.NewDescribeInstanceStatusPaginator(client, params)
 		},
 		OutputMapper: InstanceStatusOutputMapper,

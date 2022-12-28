@@ -138,24 +138,6 @@ func (s *S3Source) Get(ctx context.Context, scope string, query string) (*sdp.It
 
 func getImpl(ctx context.Context, client S3Client, scope string, query string) (*sdp.Item, error) {
 	var location *s3.GetBucketLocationOutput
-	var acl *s3.GetBucketAclOutput
-	var analyticsConfiguration *s3.GetBucketAnalyticsConfigurationOutput
-	var cors *s3.GetBucketCorsOutput
-	var encryption *s3.GetBucketEncryptionOutput
-	var intelligentTieringConfiguration *s3.GetBucketIntelligentTieringConfigurationOutput
-	var inventoryConfiguration *s3.GetBucketInventoryConfigurationOutput
-	var lifecycleConfiguration *s3.GetBucketLifecycleConfigurationOutput
-	var logging *s3.GetBucketLoggingOutput
-	var metricsConfiguration *s3.GetBucketMetricsConfigurationOutput
-	var notificationConfiguration *s3.GetBucketNotificationConfigurationOutput
-	var ownershipControls *s3.GetBucketOwnershipControlsOutput
-	var policy *s3.GetBucketPolicyOutput
-	var policyStatus *s3.GetBucketPolicyStatusOutput
-	var replication *s3.GetBucketReplicationOutput
-	var requestPayment *s3.GetBucketRequestPaymentOutput
-	var tagging *s3.GetBucketTaggingOutput
-	var versioning *s3.GetBucketVersioningOutput
-	var website *s3.GetBucketWebsiteOutput
 	var wg sync.WaitGroup
 	var err error
 
@@ -174,6 +156,14 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		}
 	}
 
+	bucket := Bucket{
+		// TODO: Where do we get this from??
+		Bucket: types.Bucket{
+			Name: bucketName,
+		},
+		GetBucketLocationOutput: *location,
+	}
+
 	// We want to execute all of these requests in parallel so we're not
 	// crippled by latency. This API is really stupid but there's not much I can
 	// do about it
@@ -181,121 +171,132 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		acl, _ = client.GetBucketAcl(ctx, &s3.GetBucketAclInput{Bucket: bucketName})
+		if acl, err := client.GetBucketAcl(ctx, &s3.GetBucketAclInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketAclOutput = *acl
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		analyticsConfiguration, _ = client.GetBucketAnalyticsConfiguration(ctx, &s3.GetBucketAnalyticsConfigurationInput{Bucket: bucketName})
+		if analyticsConfiguration, err := client.GetBucketAnalyticsConfiguration(ctx, &s3.GetBucketAnalyticsConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketAnalyticsConfigurationOutput = *analyticsConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		cors, _ = client.GetBucketCors(ctx, &s3.GetBucketCorsInput{Bucket: bucketName})
+		if cors, err := client.GetBucketCors(ctx, &s3.GetBucketCorsInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketCorsOutput = *cors
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		encryption, _ = client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{Bucket: bucketName})
+		if encryption, err := client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketEncryptionOutput = *encryption
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		intelligentTieringConfiguration, _ = client.GetBucketIntelligentTieringConfiguration(ctx, &s3.GetBucketIntelligentTieringConfigurationInput{Bucket: bucketName})
+		if intelligentTieringConfiguration, err := client.GetBucketIntelligentTieringConfiguration(ctx, &s3.GetBucketIntelligentTieringConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketIntelligentTieringConfigurationOutput = *intelligentTieringConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		inventoryConfiguration, _ = client.GetBucketInventoryConfiguration(ctx, &s3.GetBucketInventoryConfigurationInput{Bucket: bucketName})
+		if inventoryConfiguration, err := client.GetBucketInventoryConfiguration(ctx, &s3.GetBucketInventoryConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketInventoryConfigurationOutput = *inventoryConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		lifecycleConfiguration, _ = client.GetBucketLifecycleConfiguration(ctx, &s3.GetBucketLifecycleConfigurationInput{Bucket: bucketName})
+		if lifecycleConfiguration, err := client.GetBucketLifecycleConfiguration(ctx, &s3.GetBucketLifecycleConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketLifecycleConfigurationOutput = *lifecycleConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		logging, _ = client.GetBucketLogging(ctx, &s3.GetBucketLoggingInput{Bucket: bucketName})
+		if logging, err := client.GetBucketLogging(ctx, &s3.GetBucketLoggingInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketLoggingOutput = *logging
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		metricsConfiguration, _ = client.GetBucketMetricsConfiguration(ctx, &s3.GetBucketMetricsConfigurationInput{Bucket: bucketName})
+		if metricsConfiguration, err := client.GetBucketMetricsConfiguration(ctx, &s3.GetBucketMetricsConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketMetricsConfigurationOutput = *metricsConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		notificationConfiguration, _ = client.GetBucketNotificationConfiguration(ctx, &s3.GetBucketNotificationConfigurationInput{Bucket: bucketName})
+		if notificationConfiguration, err := client.GetBucketNotificationConfiguration(ctx, &s3.GetBucketNotificationConfigurationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketNotificationConfigurationOutput = *notificationConfiguration
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		ownershipControls, _ = client.GetBucketOwnershipControls(ctx, &s3.GetBucketOwnershipControlsInput{Bucket: bucketName})
+		if ownershipControls, err := client.GetBucketOwnershipControls(ctx, &s3.GetBucketOwnershipControlsInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketOwnershipControlsOutput = *ownershipControls
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		policy, _ = client.GetBucketPolicy(ctx, &s3.GetBucketPolicyInput{Bucket: bucketName})
+		if policy, err := client.GetBucketPolicy(ctx, &s3.GetBucketPolicyInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketPolicyOutput = *policy
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		policyStatus, _ = client.GetBucketPolicyStatus(ctx, &s3.GetBucketPolicyStatusInput{Bucket: bucketName})
+		if policyStatus, err := client.GetBucketPolicyStatus(ctx, &s3.GetBucketPolicyStatusInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketPolicyStatusOutput = *policyStatus
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		replication, _ = client.GetBucketReplication(ctx, &s3.GetBucketReplicationInput{Bucket: bucketName})
+		if replication, err := client.GetBucketReplication(ctx, &s3.GetBucketReplicationInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketReplicationOutput = *replication
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		requestPayment, _ = client.GetBucketRequestPayment(ctx, &s3.GetBucketRequestPaymentInput{Bucket: bucketName})
+		if requestPayment, err := client.GetBucketRequestPayment(ctx, &s3.GetBucketRequestPaymentInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketRequestPaymentOutput = *requestPayment
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		tagging, _ = client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucketName})
+		if tagging, err := client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketTaggingOutput = *tagging
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		versioning, _ = client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{Bucket: bucketName})
+		if versioning, err := client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketVersioningOutput = *versioning
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		website, _ = client.GetBucketWebsite(ctx, &s3.GetBucketWebsiteInput{Bucket: bucketName})
+		if website, err := client.GetBucketWebsite(ctx, &s3.GetBucketWebsiteInput{Bucket: bucketName}); err == nil {
+			bucket.GetBucketWebsiteOutput = *website
+		}
 	}()
 
 	// Wait for all requests to complete
 	wg.Wait()
-
-	bucket := Bucket{
-		// TODO: Where do we get this from??
-		Bucket: types.Bucket{},
-
-		GetBucketAclOutput:                             *acl,
-		GetBucketAnalyticsConfigurationOutput:          *analyticsConfiguration,
-		GetBucketCorsOutput:                            *cors,
-		GetBucketEncryptionOutput:                      *encryption,
-		GetBucketIntelligentTieringConfigurationOutput: *intelligentTieringConfiguration,
-		GetBucketInventoryConfigurationOutput:          *inventoryConfiguration,
-		GetBucketLifecycleConfigurationOutput:          *lifecycleConfiguration,
-		GetBucketLocationOutput:                        *location,
-		GetBucketLoggingOutput:                         *logging,
-		GetBucketMetricsConfigurationOutput:            *metricsConfiguration,
-		GetBucketNotificationConfigurationOutput:       *notificationConfiguration,
-		GetBucketOwnershipControlsOutput:               *ownershipControls,
-		GetBucketPolicyOutput:                          *policy,
-		GetBucketPolicyStatusOutput:                    *policyStatus,
-		GetBucketReplicationOutput:                     *replication,
-		GetBucketRequestPaymentOutput:                  *requestPayment,
-		GetBucketTaggingOutput:                         *tagging,
-		GetBucketVersioningOutput:                      *versioning,
-		GetBucketWebsiteOutput:                         *website,
-	}
 
 	attributes, err := sources.ToAttributesCase(bucket)
 

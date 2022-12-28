@@ -78,8 +78,8 @@ func TestGetv2(t *testing.T) {
 		if err == nil {
 			t.Fatalf("expected err, got nil")
 		}
-		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
-			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
+		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope") {
+			t.Errorf("expected 'requested scope foo.bar does not match source scope', got '%v'", err.Error())
 		}
 	})
 }
@@ -223,8 +223,8 @@ func TestListV2(t *testing.T) {
 		if err == nil {
 			t.Fatalf("expected err, got nil")
 		}
-		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope .") {
-			t.Errorf("expected 'requested scope foo.bar does not match source scope .', got '%v'", err.Error())
+		if !strings.HasPrefix(err.Error(), "requested scope foo.bar does not match source scope") {
+			t.Errorf("expected 'requested scope foo.bar does not match source scope', got '%v'", err.Error())
 		}
 	})
 }
