@@ -11,7 +11,7 @@ import (
 
 func KeyPairInputMapperGet(scope string, query string) (*ec2.DescribeKeyPairsInput, error) {
 	return &ec2.DescribeKeyPairsInput{
-		KeyPairIds: []string{
+		KeyNames: []string{
 			query,
 		},
 	}, nil
@@ -39,7 +39,7 @@ func KeyPairOutputMapper(scope string, output *ec2.DescribeKeyPairsOutput) ([]*s
 
 		item := sdp.Item{
 			Type:            "ec2-key-pair",
-			UniqueAttribute: "keyPairId",
+			UniqueAttribute: "keyName",
 			Scope:           scope,
 			Attributes:      attrs,
 		}

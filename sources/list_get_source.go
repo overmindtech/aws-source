@@ -58,8 +58,9 @@ type ListGetSource[ListInput InputType, ListOutput OutputType, GetInput InputTyp
 	ListFuncPaginatorBuilder func(client ClientStruct, input ListInput) Paginator[ListOutput, Options]
 
 	// A function that accepts the output of a ListFunc and maps this to a slice
-	// of inputs to pass to the GetFunc
-	ListFuncOutputMapper func(output ListOutput) ([]GetInput, error)
+	// of inputs to pass to the GetFunc. The input used for the ListFunc is also
+	// included in case it is required
+	ListFuncOutputMapper func(output ListOutput, input ListInput) ([]GetInput, error)
 }
 
 // Validate Checks that the source has been set up correctly
@@ -216,7 +217,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 			return nil, err
 		}
 
-		newGetInputs, err = s.ListFuncOutputMapper(output)
+		newGetInputs, err = s.ListFuncOutputMapper(output, input)
 
 		if err != nil {
 			return nil, err

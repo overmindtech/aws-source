@@ -32,7 +32,7 @@ func TestKeyPairInputMapperList(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(input.Filters) != 0 || len(input.KeyPairIds) != 0 {
+	if len(input.Filters) != 0 || len(input.KeyNames) != 0 {
 		t.Errorf("non-empty input: %v", input)
 	}
 }

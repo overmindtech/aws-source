@@ -130,6 +130,18 @@ func NewNodegroupSource(config aws.Config, accountID string, region string) *sou
 		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListNodegroupsInput) sources.Paginator[*eks.ListNodegroupsOutput, *eks.Options] {
 			return eks.NewListNodegroupsPaginator(client, input)
 		},
+		ListFuncOutputMapper: func(output *eks.ListNodegroupsOutput, input *eks.ListNodegroupsInput) ([]*eks.DescribeNodegroupInput, error) {
+			inputs := make([]*eks.DescribeNodegroupInput, len(output.Nodegroups))
+
+			for i, group := range output.Nodegroups {
+				inputs[i] = &eks.DescribeNodegroupInput{
+					ClusterName:   input.ClusterName,
+					NodegroupName: &group,
+				}
+			}
+
+			return inputs, nil
+		},
 		GetFunc: NodegroupGetFunc,
 	}
 }

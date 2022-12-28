@@ -205,6 +205,7 @@ Currently supported:
 				eks.NewClusterSource(cfg, *callerID.Account, region),
 				eks.NewAddonSource(cfg, *callerID.Account, region),
 				eks.NewFargateProfileSource(cfg, *callerID.Account, region),
+				eks.NewNodegroupSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

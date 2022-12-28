@@ -59,7 +59,7 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
@@ -89,7 +89,7 @@ func TestListGetSourceGet(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
@@ -122,7 +122,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
@@ -157,7 +157,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return nil, errors.New("output mapper error")
 			},
@@ -192,7 +192,7 @@ func TestListGetSourceList(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
@@ -230,7 +230,7 @@ func TestListGetSourceSearch(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},
@@ -284,7 +284,7 @@ func TestListGetSourceSearch(t *testing.T) {
 				// Returns 3 pages
 				return &TestPaginator{}
 			},
-			ListFuncOutputMapper: func(output string) ([]string, error) {
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
 				// Returns 2 gets per page
 				return []string{"", ""}, nil
 			},

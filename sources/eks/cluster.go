@@ -165,7 +165,7 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListClustersInput) sources.Paginator[*eks.ListClustersOutput, *eks.Options] {
 			return eks.NewListClustersPaginator(client, input)
 		},
-		ListFuncOutputMapper: func(output *eks.ListClustersOutput) ([]*eks.DescribeClusterInput, error) {
+		ListFuncOutputMapper: func(output *eks.ListClustersOutput, _ *eks.ListClustersInput) ([]*eks.DescribeClusterInput, error) {
 			inputs := make([]*eks.DescribeClusterInput, len(output.Clusters))
 
 			for i, clusterName := range output.Clusters {

@@ -77,6 +77,18 @@ func NewAddonSource(config aws.Config, accountID string, region string) *sources
 		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListAddonsInput) sources.Paginator[*eks.ListAddonsOutput, *eks.Options] {
 			return eks.NewListAddonsPaginator(client, input)
 		},
+		ListFuncOutputMapper: func(output *eks.ListAddonsOutput, input *eks.ListAddonsInput) ([]*eks.DescribeAddonInput, error) {
+			inputs := make([]*eks.DescribeAddonInput, len(output.Addons))
+
+			for i, addon := range output.Addons {
+				inputs[i] = &eks.DescribeAddonInput{
+					AddonName:   &addon,
+					ClusterName: input.ClusterName,
+				}
+			}
+
+			return inputs, nil
+		},
 		GetFunc: AddonGetFunc,
 	}
 }

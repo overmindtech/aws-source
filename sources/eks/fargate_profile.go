@@ -88,6 +88,18 @@ func NewFargateProfileSource(config aws.Config, accountID string, region string)
 		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListFargateProfilesInput) sources.Paginator[*eks.ListFargateProfilesOutput, *eks.Options] {
 			return eks.NewListFargateProfilesPaginator(client, input)
 		},
+		ListFuncOutputMapper: func(output *eks.ListFargateProfilesOutput, input *eks.ListFargateProfilesInput) ([]*eks.DescribeFargateProfileInput, error) {
+			inputs := make([]*eks.DescribeFargateProfileInput, len(output.FargateProfileNames))
+
+			for i, name := range output.FargateProfileNames {
+				inputs[i] = &eks.DescribeFargateProfileInput{
+					ClusterName:        input.ClusterName,
+					FargateProfileName: &name,
+				}
+			}
+
+			return inputs, nil
+		},
 		GetFunc: FargateProfileGetFunc,
 	}
 }
