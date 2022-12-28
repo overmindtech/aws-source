@@ -16,8 +16,8 @@ func TestMaxParallel(t *testing.T) {
 	}
 }
 
-func TestListGetSourceType(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any, any, any]{
+func TestAlwaysGetSourceType(t *testing.T) {
+	lgs := AlwaysGetSource[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
@@ -26,8 +26,8 @@ func TestListGetSourceType(t *testing.T) {
 	}
 }
 
-func TestListGetSourceName(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any, any, any]{
+func TestAlwaysGetSourceName(t *testing.T) {
+	lgs := AlwaysGetSource[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
@@ -36,8 +36,8 @@ func TestListGetSourceName(t *testing.T) {
 	}
 }
 
-func TestListGetSourceScopes(t *testing.T) {
-	lgs := ListGetSource[any, any, any, any, any, any]{
+func TestAlwaysGetSourceScopes(t *testing.T) {
+	lgs := AlwaysGetSource[any, any, any, any, any, any]{
 		AccountID: "foo",
 		Region:    "bar",
 	}
@@ -47,9 +47,9 @@ func TestListGetSourceScopes(t *testing.T) {
 	}
 }
 
-func TestListGetSourceGet(t *testing.T) {
+func TestAlwaysGetSourceGet(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -79,7 +79,7 @@ func TestListGetSourceGet(t *testing.T) {
 	})
 
 	t.Run("with an error", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -109,9 +109,9 @@ func TestListGetSourceGet(t *testing.T) {
 	})
 }
 
-func TestListGetSourceList(t *testing.T) {
+func TestAlwaysGetSourceList(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -146,7 +146,7 @@ func TestListGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing output mapper", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -181,7 +181,7 @@ func TestListGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing GetFunc", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -217,9 +217,9 @@ func TestListGetSourceList(t *testing.T) {
 	})
 }
 
-func TestListGetSourceSearch(t *testing.T) {
+func TestAlwaysGetSourceSearch(t *testing.T) {
 	t.Run("with ARN search", func(t *testing.T) {
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -274,7 +274,7 @@ func TestListGetSourceSearch(t *testing.T) {
 	t.Run("with custom search logic", func(t *testing.T) {
 		var searchMapperCalled bool
 
-		lgs := ListGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",

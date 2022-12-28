@@ -55,8 +55,8 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	return &item, nil
 }
 
-func NewFargateProfileSource(config aws.Config, accountID string, region string) *sources.ListGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
-	return &sources.ListGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
+func NewFargateProfileSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
+	return &sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
 		ItemType:    "eks-fargate-profile",
 		Client:      eks.NewFromConfig(config),
 		AccountID:   accountID,

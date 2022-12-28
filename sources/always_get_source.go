@@ -22,13 +22,13 @@ func (m MaxParallel) Value() int {
 	return int(m)
 }
 
-// ListGetSource This source is designed for AWS APIs that have separate List
+// AlwaysGetSource This source is designed for AWS APIs that have separate List
 // and Get functions. It also assumes that the results of the list function
 // cannot be converted directly into items as they do not contain enough
-// information, and therefore they need to be passed to the Get function before
-// returning. An example is the `ListClusters` API in EKS which returns a list
-// of cluster names.
-type ListGetSource[ListInput InputType, ListOutput OutputType, GetInput InputType, GetOutput OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
+// information, and therefore they always need to be passed to the Get function
+// before returning. An example is the `ListClusters` API in EKS which returns a
+// list of cluster names.
+type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputType, GetOutput OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	ItemType    string       // The type of items to return
 	Client      ClientStruct // The AWS API client
 	AccountID   string       // The AWS account ID
@@ -64,7 +64,7 @@ type ListGetSource[ListInput InputType, ListOutput OutputType, GetInput InputTyp
 }
 
 // Validate Checks that the source has been set up correctly
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Validate() error {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Validate() error {
 	if s.ListFuncPaginatorBuilder == nil {
 		return errors.New("ListFuncPaginatorBuilder is nil")
 	}
@@ -84,23 +84,23 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 	return nil
 }
 
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Type() string {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Type() string {
 	return s.ItemType
 }
 
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Name() string {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
 }
 
 // List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Scopes() []string {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Scopes() []string {
 	return []string{
 		FormatScope(s.AccountID, s.Region),
 	}
 }
 
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -129,7 +129,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 
 // List Lists all available items. This is done by running the ListFunc, then
 // passing these results to GetFunc in order to get the details
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -147,7 +147,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 }
 
 // listInternal Accepts a ListInput and runs the List logic against it
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) listInternal(ctx context.Context, scope string, input ListInput) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) listInternal(ctx context.Context, scope string, input ListInput) ([]*sdp.Item, error) {
 	var output ListOutput
 	var err error
 	items := make([]*sdp.Item, 0)
@@ -239,7 +239,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 }
 
 // Search Searches for AWS resources by ARN
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.ItemRequestError{
 			ErrorType:   sdp.ItemRequestError_NOSCOPE,
@@ -256,7 +256,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 
 // SearchCustom Searches using custom mapping logic. The SearchInputMapper is
 // used to create an input for ListFunc, at which point the usual logic is used
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	input, err := s.SearchInputMapper(scope, query)
 
 	if err != nil {
@@ -266,7 +266,7 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 	return s.listInternal(ctx, scope, input)
 }
 
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -295,6 +295,6 @@ func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct,
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (s *ListGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Weight() int {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Weight() int {
 	return 100
 }
