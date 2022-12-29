@@ -50,25 +50,22 @@ func UserGetFunc(ctx context.Context, client IAMClient, scope, query string) (*U
 // Gets all of the groups that a user is in
 func GetUserGroups(ctx context.Context, client IAMClient, userName *string) ([]types.Group, error) {
 	var out *iam.ListGroupsForUserOutput
-	var marker *string
 	var err error
-	truncated := true
 	groups := make([]types.Group, 0)
 
-	for truncated {
-		out, err = client.ListGroupsForUser(ctx, &iam.ListGroupsForUserInput{
-			UserName: userName,
-			Marker:   marker,
-		})
+	paginator := iam.NewListGroupsForUserPaginator(client, &iam.ListGroupsForUserInput{
+		UserName: userName,
+	})
 
-		if err == nil {
-			marker = out.Marker
-			truncated = out.IsTruncated
+	for paginator.HasMorePages() {
+		out, err = paginator.NextPage(ctx)
 
-			groups = append(groups, out.Groups...)
-		} else {
+		if err != nil {
 			return nil, err
+
 		}
+
+		groups = append(groups, out.Groups...)
 	}
 
 	return groups, nil
@@ -77,21 +74,17 @@ func GetUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 func UserListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
 	var out *iam.ListUsersOutput
 	var err error
-	var marker *string
-	isTruncated := true
 	users := make([]types.User, 0)
 
-	for isTruncated {
-		out, err = client.ListUsers(ctx, &iam.ListUsersInput{
-			Marker: marker,
-		})
+	paginator := iam.NewListUsersPaginator(client, &iam.ListUsersInput{})
+
+	for paginator.HasMorePages() {
+		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
 			return nil, err
 		}
 
-		isTruncated = out.IsTruncated
-		marker = out.Marker
 		users = append(users, out.Users...)
 	}
 
