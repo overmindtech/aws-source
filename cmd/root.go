@@ -223,6 +223,8 @@ Currently supported:
 				// IAM
 				iam.NewGroupSource(cfg, *callerID.Account, region),
 				iam.NewUserSource(cfg, *callerID.Account, region),
+				iam.NewRoleSource(cfg, *callerID.Account, region),
+				iam.NewPolicySource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
