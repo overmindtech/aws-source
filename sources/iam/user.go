@@ -16,12 +16,6 @@ type UserDetails struct {
 	UserGroups []types.Group
 }
 
-type IAMClient interface {
-	ListGroupsForUser(ctx context.Context, params *iam.ListGroupsForUserInput, optFns ...func(*iam.Options)) (*iam.ListGroupsForUserOutput, error)
-	GetUser(ctx context.Context, params *iam.GetUserInput, optFns ...func(*iam.Options)) (*iam.GetUserOutput, error)
-	ListUsers(ctx context.Context, params *iam.ListUsersInput, optFns ...func(*iam.Options)) (*iam.ListUsersOutput, error)
-}
-
 func UserGetFunc(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 	out, err := client.GetUser(ctx, &iam.GetUserInput{
 		UserName: &query,

@@ -13,9 +13,6 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// TestIAMClient Test client that returns three pages
-type TestIAMClient struct{}
-
 func (t *TestIAMClient) ListGroupsForUser(ctx context.Context, params *iam.ListGroupsForUserInput, optFns ...func(*iam.Options)) (*iam.ListGroupsForUserOutput, error) {
 	isTruncated := true
 	marker := params.Marker
