@@ -21,6 +21,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/eks"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
+	"github.com/overmindtech/aws-source/sources/iam"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
@@ -218,6 +219,12 @@ Currently supported:
 				// Route 53
 				route53.NewHostedZoneSource(cfg, *callerID.Account, region),
 				route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
+
+				// IAM
+				iam.NewGroupSource(cfg, *callerID.Account, region),
+				iam.NewUserSource(cfg, *callerID.Account, region),
+				iam.NewRoleSource(cfg, *callerID.Account, region),
+				iam.NewPolicySource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
