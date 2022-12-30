@@ -23,6 +23,7 @@ type ARN struct {
 	Region     string
 	AccountID  string
 	ResourceID string
+	Service    string
 }
 
 // ParseARN Parses an ARN and tries to determine the resource ID from it. The
@@ -43,5 +44,6 @@ func ParseARN(arnString string) (*ARN, error) {
 		Region:     a.Region,
 		AccountID:  a.AccountID,
 		ResourceID: fields[len(fields)-1],
+		Service:    a.Service,
 	}, nil
 }
