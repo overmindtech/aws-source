@@ -337,6 +337,9 @@ func init() {
 			log.SetLevel(lvl)
 		} else {
 			log.SetLevel(log.InfoLevel)
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Error("Could not parse log level")
 		}
 
 		// Bind flags that haven't been set to the values from viper of we have them
