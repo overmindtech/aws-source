@@ -1,14 +1,13 @@
 version: "3"
 services:
   devcontainer:
-    image: "mcr.microsoft.com/devcontainers/go:0-1-bullseye"
+    image: "mcr.microsoft.com/devcontainers/go:1"
     volumes:
-      - ..:/workspace:cached
       # mount the user's AWS config so that the CLI works as expected
       - ~/.aws:/home/vscode/.aws:cached
       # make the rest of the checkouts from the host available, so that
       # cross-mod changes can be developed and tested inside the container
-      - ../..:/sources
+      - ../..:/workspace
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
