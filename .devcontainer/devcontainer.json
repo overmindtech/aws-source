@@ -4,7 +4,7 @@
 	"name": "aws-source",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "devcontainer",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/workspace/aws-source",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -18,23 +18,31 @@
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
+				"github.vscode-pull-request-github",
 				"golang.go",
+				"gruntfuggly.todo-tree",
 				"streetsidesoftware.code-spell-checker"
 			]
 		}
-	},
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers/features/aws-cli:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "go mod vendor",
+	"postCreateCommand": ["./.devcontainer/setup.sh"],
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"features": {
+		"ghcr.io/devcontainers/features/aws-cli:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/mpriscella/features/kind:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:1": {},
+		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
+	},
+
+	// Set up environment variables in the remote container.
+	"remoteEnv": {
+	}
 }
