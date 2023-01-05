@@ -49,7 +49,7 @@ func LayerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, er
 		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 			Type:   "lambda-layer-version",
 			Method: sdp.RequestMethod_GET,
-			Query:  fmt.Sprintf("%v/%v", *awsItem.LayerName, awsItem.LatestMatchingVersion.Version),
+			Query:  fmt.Sprintf("%v:%v", *awsItem.LayerName, awsItem.LatestMatchingVersion.Version),
 			Scope:  scope,
 		})
 	}
