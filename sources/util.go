@@ -22,6 +22,7 @@ func FormatScope(accountID, region string) string {
 type ARN struct {
 	Region     string
 	AccountID  string
+	Resource   string
 	ResourceID string
 	Service    string
 }
@@ -43,6 +44,7 @@ func ParseARN(arnString string) (*ARN, error) {
 	return &ARN{
 		Region:     a.Region,
 		AccountID:  a.AccountID,
+		Resource:   a.Resource,
 		ResourceID: fields[len(fields)-1],
 		Service:    a.Service,
 	}, nil

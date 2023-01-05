@@ -8,6 +8,8 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+// GetListSource A source for AWS APIs where the Get and List functions both
+// return the full item, such as many of the IAM APIs
 type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
 	ItemType  string       // The type of items that will be returned
 	Client    ClientStruct // The AWS API client

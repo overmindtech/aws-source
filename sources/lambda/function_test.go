@@ -67,10 +67,10 @@ var testFuncConfig = &types.FunctionConfiguration{
 	LastUpdateStatusReasonCode: types.LastUpdateStatusReasonCodeDisabledKMSKey,
 	Layers: []types.Layer{
 		{
-			Arn:                      sources.PtrString("arn:aws:service:region:account:type/id"), // link
+			Arn:                      sources.PtrString("arn:aws:service:region:account:layer:name:version"), // link
 			CodeSize:                 128,
-			SigningJobArn:            sources.PtrString("arn:aws:service:region:account:type/id"), // No idea what this links to
-			SigningProfileVersionArn: sources.PtrString("arn:aws:service:region:account:type/id"), // No idea what this links to
+			SigningJobArn:            sources.PtrString("arn:aws:service:region:account:type/id"), // link
+			SigningProfileVersionArn: sources.PtrString("arn:aws:service:region:account:type/id"), // link
 		},
 	},
 	MasterArn:                sources.PtrString("arn:aws:service:region:account:type/id"), // link
@@ -218,9 +218,9 @@ func TestFunctionGetFunc(t *testing.T) {
 			ExpectedScope:  "account.region",
 		},
 		{
-			ExpectedType:   "lambda-layer",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
-			ExpectedQuery:  "arn:aws:service:region:account:type/id",
+			ExpectedType:   "lambda-layer-version",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "name:version",
 			ExpectedScope:  "account.region",
 		},
 		{

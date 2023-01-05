@@ -3,6 +3,7 @@ package lambda
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
@@ -178,10 +179,12 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		for _, layer := range function.Configuration.Layers {
 			if layer.Arn != nil {
 				if a, err = sources.ParseARN(*layer.Arn); err == nil {
+					// Strip the leading "layer:"
+					name := strings.TrimPrefix(a.Resource, "layer:")
 					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "lambda-layer",
-						Method: sdp.RequestMethod_SEARCH,
-						Query:  *layer.Arn,
+						Type:   "lambda-layer-version",
+						Method: sdp.RequestMethod_GET,
+						Query:  name,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
 				}

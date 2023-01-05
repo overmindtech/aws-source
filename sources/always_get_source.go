@@ -45,7 +45,7 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 	// The input to the ListFunc. This is static
 	ListInput ListInput
 
-	// A function that maps from the GDP get inputs to the relevant input for
+	// A function that maps from the SDP get inputs to the relevant input for
 	// the GetFunc
 	GetInputMapper func(scope, query string) GetInput
 
