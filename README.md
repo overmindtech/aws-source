@@ -4,7 +4,7 @@ This source integrates with AWS, allowing Overmind to pull data about many types
 
 ## Naming Conventions
 
-Types are named to match the `describe-*` command within the AWS CLI, with the service that they are part of as a prefix. For example to get the details if a security group you would run:
+Types are named to match the `describe-*`, `get-*` or `list-*` command within the AWS CLI, with the service that they are part of as a prefix. For example to get the details if a security group you would run:
 
 ```
 aws ec2 describe-security-groups
