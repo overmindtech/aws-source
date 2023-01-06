@@ -11,8 +11,8 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// IncludeFields Fields that we want included by default
-var IncludeFields = []types.ClusterField{
+// ClusterIncludeFields Fields that we want included by default
+var ClusterIncludeFields = []types.ClusterField{
 	types.ClusterFieldAttachments,
 	types.ClusterFieldConfigurations,
 	types.ClusterFieldSettings,
@@ -103,7 +103,7 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 				Clusters: []string{
 					query,
 				},
-				Include: IncludeFields,
+				Include: ClusterIncludeFields,
 			}
 		},
 		ListInput: &ecs.ListClustersInput{},
@@ -127,7 +127,7 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 					Clusters: []string{
 						a.ResourceID, // This will be the name of the cluster
 					},
-					Include: IncludeFields,
+					Include: ClusterIncludeFields,
 				})
 			}
 
