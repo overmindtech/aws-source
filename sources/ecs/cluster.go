@@ -44,6 +44,15 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		UniqueAttribute: "clusterName",
 		Scope:           scope,
 		Attributes:      attributes,
+		LinkedItemRequests: []*sdp.ItemRequest{
+			{
+				// Search for all container instances on this cluster
+				Type:   "ecs-container-instance",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *cluster.ClusterName,
+				Scope:  scope,
+			},
+		},
 	}
 
 	if cluster.Configuration != nil {

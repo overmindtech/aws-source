@@ -126,6 +126,12 @@ func TestClusterGetFunc(t *testing.T) {
 			ExpectedQuery:  "test",
 			ExpectedScope:  "foo",
 		},
+		{
+			ExpectedType:   "ecs-container-instance",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
 	}
 
 	tests.Execute(t, item)
