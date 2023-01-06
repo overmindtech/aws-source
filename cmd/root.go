@@ -19,6 +19,7 @@ import (
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/ec2"
+	"github.com/overmindtech/aws-source/sources/ecs"
 	"github.com/overmindtech/aws-source/sources/eks"
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/aws-source/sources/iam"
@@ -231,6 +232,9 @@ Currently supported:
 				lambda.NewFunctionSource(cfg, *callerID.Account, region),
 				lambda.NewLayerSource(cfg, *callerID.Account, region),
 				lambda.NewLayerVersionSource(cfg, *callerID.Account, region),
+
+				// ECS
+				ecs.NewClusterSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
