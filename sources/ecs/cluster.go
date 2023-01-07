@@ -52,6 +52,12 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				Query:  *cluster.ClusterName,
 				Scope:  scope,
 			},
+			{
+				Type:   "ecs-service",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *cluster.ClusterName,
+				Scope:  scope,
+			},
 		},
 	}
 

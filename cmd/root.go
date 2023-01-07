@@ -237,6 +237,7 @@ Currently supported:
 				ecs.NewClusterSource(cfg, *callerID.Account, region),
 				ecs.NewCapacityProviderSource(cfg, *callerID.Account),
 				ecs.NewContainerInstanceSource(cfg, *callerID.Account, region),
+				ecs.NewServiceSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

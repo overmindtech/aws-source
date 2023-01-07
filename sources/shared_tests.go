@@ -230,7 +230,7 @@ func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
 		}
 
 		if !found {
-			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\n", len(item.LinkedItemRequests), test.ExpectedType, test.ExpectedQuery)
+			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\nScope: %v", len(item.LinkedItemRequests), test.ExpectedType, test.ExpectedQuery, test.ExpectedScope)
 		}
 	}
 }
