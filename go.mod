@@ -14,7 +14,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/iam v1.19.0
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.26.2
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.25.2
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.6
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
