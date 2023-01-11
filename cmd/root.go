@@ -18,6 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
+	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
 	"github.com/overmindtech/aws-source/sources/eks"
@@ -240,6 +241,9 @@ Currently supported:
 				ecs.NewServiceSource(cfg, *callerID.Account, region),
 				ecs.NewTaskDefinitionSource(cfg, *callerID.Account, region),
 				ecs.NewTaskSource(cfg, *callerID.Account, region),
+
+				// DynamoDB
+				dynamodb.NewTableSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
