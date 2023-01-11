@@ -239,6 +239,7 @@ Currently supported:
 				ecs.NewContainerInstanceSource(cfg, *callerID.Account, region),
 				ecs.NewServiceSource(cfg, *callerID.Account, region),
 				ecs.NewTaskDefinitionSource(cfg, *callerID.Account, region),
+				ecs.NewTaskSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
