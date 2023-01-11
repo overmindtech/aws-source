@@ -17,11 +17,45 @@ func TestParseARN(t *testing.T) {
 		}
 
 		if a.Region != "region" {
-			t.Errorf("expected account ID to be region, got %v", a.Region)
+			t.Errorf("expected region to be region, got %v", a.Region)
 		}
 
 		if a.ResourceID != "resource-id" {
-			t.Errorf("expected account ID to be resource-id, got %v", a.ResourceID)
+			t.Errorf("expected resource ID to be resource-id, got %v", a.ResourceID)
+		}
+
+		if a.Service != "service" {
+			t.Errorf("expected service to be service, got %v", a.Service)
+		}
+	})
+
+	t.Run("arn:aws:ecs:eu-west-1:052392120703:task-definition/ecs-template-ecs-demo-app:1", func(t *testing.T) {
+		arn := "arn:aws:ecs:eu-west-1:052392120703:task-definition/ecs-template-ecs-demo-app:1"
+
+		a, err := ParseARN(arn)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if a.AccountID != "052392120703" {
+			t.Errorf("expected account ID to be 052392120703, got %v", a.AccountID)
+		}
+
+		if a.Region != "eu-west-1" {
+			t.Errorf("expected region to be eu-west-1, got %v", a.Region)
+		}
+
+		if a.Service != "ecs" {
+			t.Errorf("expected service to be ecs, got %v", a.Service)
+		}
+
+		if a.Resource != "task-definition/ecs-template-ecs-demo-app:1" {
+			t.Errorf("expected resource ID to be task-definition/ecs-template-ecs-demo-app:1, got %v", a.ResourceID)
+		}
+
+		if a.ResourceID != "ecs-template-ecs-demo-app:1" {
+			t.Errorf("expected ResourceID to be ecs-template-ecs-demo-app:1, got %v", a.ResourceID)
 		}
 	})
 

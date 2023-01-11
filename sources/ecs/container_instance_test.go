@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
 )
 
 func (t *TestClient) DescribeContainerInstances(ctx context.Context, params *ecs.DescribeContainerInstancesInput, optFns ...func(*ecs.Options)) (*ecs.DescribeContainerInstancesOutput, error) {
@@ -324,5 +325,24 @@ func (t *TestClient) ListContainerInstances(context.Context, *ecs.ListContainerI
 }
 
 func TestContainerInstanceGetFunc(t *testing.T) {
+	item, err := ContainerInstanceGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeContainerInstancesInput{})
 
+	if err != nil {
+		t.Error(err)
+	}
+
+	if err = item.Validate(); err != nil {
+		t.Error(err)
+	}
+
+	tests := sources.ItemRequestTests{
+		{
+			ExpectedType:   "ec2-instance",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "i-0e778f25705bc0c84",
+			ExpectedScope:  "foo",
+		},
+	}
+
+	tests.Execute(t, item)
 }
