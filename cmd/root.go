@@ -244,6 +244,7 @@ Currently supported:
 
 				// DynamoDB
 				dynamodb.NewTableSource(cfg, *callerID.Account, region),
+				dynamodb.NewBackupSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
