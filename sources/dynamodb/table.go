@@ -104,5 +104,29 @@ func NewTableSource(config aws.Config, accountID string, region string) *sources
 		AccountID: accountID,
 		Region:    region,
 		GetFunc:   TableGetFunc,
+		ListInput: &dynamodb.ListTablesInput{},
+		GetInputMapper: func(scope, query string) *dynamodb.DescribeTableInput {
+			return &dynamodb.DescribeTableInput{
+				TableName: &query,
+			}
+		},
+		ListFuncPaginatorBuilder: func(client Client, input *dynamodb.ListTablesInput) sources.Paginator[*dynamodb.ListTablesOutput, *dynamodb.Options] {
+			return dynamodb.NewListTablesPaginator(client, input)
+		},
+		ListFuncOutputMapper: func(output *dynamodb.ListTablesOutput, input *dynamodb.ListTablesInput) ([]*dynamodb.DescribeTableInput, error) {
+			if output == nil {
+				return nil, errors.New("cannot map nil output")
+			}
+
+			inputs := make([]*dynamodb.DescribeTableInput, 0)
+
+			for _, name := range output.TableNames {
+				inputs = append(inputs, &dynamodb.DescribeTableInput{
+					TableName: sources.PtrString(name),
+				})
+			}
+
+			return inputs, nil
+		},
 	}
 }
