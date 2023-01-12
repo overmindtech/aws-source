@@ -25,6 +25,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
 	"github.com/overmindtech/aws-source/sources/iam"
 	"github.com/overmindtech/aws-source/sources/lambda"
+	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
@@ -245,6 +246,9 @@ Currently supported:
 				// DynamoDB
 				dynamodb.NewTableSource(cfg, *callerID.Account, region),
 				dynamodb.NewBackupSource(cfg, *callerID.Account, region),
+
+				// RDS
+				rds.NewDBInstanceSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
