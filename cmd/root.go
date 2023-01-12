@@ -32,6 +32,7 @@ import (
 	"github.com/overmindtech/discovery"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -356,6 +357,8 @@ func init() {
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
+	// tracing
+	rootCmd.PersistentFlags().String("honeycomb-api-key", "", "If specified, configures opentelemetry libraries to submit traces to honeycomb")
 
 	// Bind these to viper
 	viper.BindPFlags(rootCmd.PersistentFlags())
@@ -378,6 +381,22 @@ func init() {
 				viper.BindPFlag(f.Name, f)
 			}
 		})
+
+		honeycomb_api_key := viper.GetString("honeycomb-api-key")
+		tracingOpts := make([]otlptracehttp.Option, 0)
+		if honeycomb_api_key != "" {
+			tracingOpts = []otlptracehttp.Option{
+				otlptracehttp.WithEndpoint("api.honeycomb.io"),
+				otlptracehttp.WithHeaders(map[string]string{"x-honeycomb-team": honeycomb_api_key}),
+			}
+		}
+		if err := initTracing(tracingOpts...); err != nil {
+			log.Fatal(err)
+		}
+	}
+	// shut down tracing at the end of the process
+	rootCmd.PersistentPostRun = func(cmd *cobra.Command, args []string) {
+		shutdownTracing()
 	}
 }
 
