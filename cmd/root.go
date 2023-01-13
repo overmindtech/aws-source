@@ -250,6 +250,7 @@ Currently supported:
 				// RDS
 				rds.NewDBInstanceSource(cfg, *callerID.Account),
 				rds.NewDBClusterSource(cfg, *callerID.Account),
+				rds.NewDBParameterGroupSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
