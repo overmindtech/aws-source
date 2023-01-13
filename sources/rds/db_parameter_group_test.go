@@ -3,34 +3,68 @@ package rds
 import (
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 	"github.com/overmindtech/aws-source/sources"
 )
 
 func TestDBParameterGroupOutputMapper(t *testing.T) {
-	output := rds.DescribeDBParameterGroupsOutput{
-		DBParameterGroups: []types.DBParameterGroup{
+	group := ParameterGroup{
+		DBParameterGroup: types.DBParameterGroup{
+			DBParameterGroupName:   sources.PtrString("default.aurora-mysql5.7"),
+			DBParameterGroupFamily: sources.PtrString("aurora-mysql5.7"),
+			Description:            sources.PtrString("Default parameter group for aurora-mysql5.7"),
+			DBParameterGroupArn:    sources.PtrString("arn:aws:rds:eu-west-1:052392120703:pg:default.aurora-mysql5.7"),
+		},
+		Parameters: []types.Parameter{
 			{
-				DBParameterGroupName:   sources.PtrString("default.aurora-mysql5.7"),
-				DBParameterGroupFamily: sources.PtrString("aurora-mysql5.7"),
-				Description:            sources.PtrString("Default parameter group for aurora-mysql5.7"),
-				DBParameterGroupArn:    sources.PtrString("arn:aws:rds:eu-west-1:052392120703:pg:default.aurora-mysql5.7"),
+				ParameterName:  sources.PtrString("activate_all_roles_on_login"),
+				ParameterValue: sources.PtrString("0"),
+				Description:    sources.PtrString("Automatically set all granted roles as active after the user has authenticated successfully."),
+				Source:         sources.PtrString("engine-default"),
+				ApplyType:      sources.PtrString("dynamic"),
+				DataType:       sources.PtrString("boolean"),
+				AllowedValues:  sources.PtrString("0,1"),
+				IsModifiable:   true,
+				ApplyMethod:    types.ApplyMethodPendingReboot,
+			},
+			{
+				ParameterName: sources.PtrString("allow-suspicious-udfs"),
+				Description:   sources.PtrString("Controls whether user-defined functions that have only an xxx symbol for the main function can be loaded"),
+				Source:        sources.PtrString("engine-default"),
+				ApplyType:     sources.PtrString("static"),
+				DataType:      sources.PtrString("boolean"),
+				AllowedValues: sources.PtrString("0,1"),
+				IsModifiable:  false,
+				ApplyMethod:   types.ApplyMethodPendingReboot,
+			},
+			{
+				ParameterName: sources.PtrString("aurora_parallel_query"),
+				Description:   sources.PtrString("This parameter can be used to enable and disable Aurora Parallel Query."),
+				Source:        sources.PtrString("engine-default"),
+				ApplyType:     sources.PtrString("dynamic"),
+				DataType:      sources.PtrString("boolean"),
+				AllowedValues: sources.PtrString("0,1"),
+				IsModifiable:  true,
+				ApplyMethod:   types.ApplyMethodPendingReboot,
+			},
+			{
+				ParameterName: sources.PtrString("autocommit"),
+				Description:   sources.PtrString("Sets the autocommit mode"),
+				Source:        sources.PtrString("engine-default"),
+				ApplyType:     sources.PtrString("dynamic"),
+				DataType:      sources.PtrString("boolean"),
+				AllowedValues: sources.PtrString("0,1"),
+				IsModifiable:  true,
+				ApplyMethod:   types.ApplyMethodPendingReboot,
 			},
 		},
 	}
 
-	items, err := DBParameterGroupOutputMapper("foo", &output)
+	item, err := DBParameterGroupItemMapper("foo", &group)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if len(items) != 1 {
-		t.Fatalf("got %v items, expected 1", len(items))
-	}
-
-	item := items[0]
 
 	if err = item.Validate(); err != nil {
 		t.Error(err)
