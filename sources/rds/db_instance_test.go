@@ -30,7 +30,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 				BackupRetentionPeriod: 1,
 				DBSecurityGroups: []types.DBSecurityGroupMembership{
 					{
-						DBSecurityGroupName: sources.PtrString("name"), // link
+						DBSecurityGroupName: sources.PtrString("name"), // This is EC2Classic only so we're skipping this
 					},
 				},
 				VpcSecurityGroups: []types.VpcSecurityGroupMembership{
@@ -201,12 +201,6 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "route53-hosted-zone",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "Z1TTGA775OQIYO",
-			ExpectedScope:  "foo",
-		},
-		{
-			ExpectedType:   "rds-db-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
-			ExpectedQuery:  "name",
 			ExpectedScope:  "foo",
 		},
 		{

@@ -68,17 +68,6 @@ func DBInstanceOutputMapper(scope string, output *rds.DescribeDBInstancesOutput)
 			}
 		}
 
-		for _, dbSg := range instance.DBSecurityGroups {
-			if dbSg.DBSecurityGroupName != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-					Type:   "rds-db-security-group",
-					Method: sdp.RequestMethod_GET,
-					Query:  *dbSg.DBSecurityGroupName,
-					Scope:  scope,
-				})
-			}
-		}
-
 		for _, sg := range instance.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
 				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
