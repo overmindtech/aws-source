@@ -253,6 +253,7 @@ Currently supported:
 				rds.NewDBParameterGroupSource(cfg, *callerID.Account, region),
 				rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
 				rds.NewDBSubnetGroupSource(cfg, *callerID.Account),
+				rds.NewOptionGroupSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
