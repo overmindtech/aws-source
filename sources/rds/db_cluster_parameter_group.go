@@ -36,7 +36,7 @@ func DBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 
 func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options] {
 	return &sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options]{
-		ItemType:  "rds-db-parameter-group",
+		ItemType:  "rds-db-cluster-parameter-group",
 		Client:    rds.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
