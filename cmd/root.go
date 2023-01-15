@@ -44,10 +44,6 @@ var rootCmd = &cobra.Command{
 	Use:   "aws-source",
 	Short: "Remote primary source for AWS",
 	Long: `This sources looks for AWS resources in your account.
-
-Currently supported:
-  * ELB
-  * EC2: instances, security groups
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Get srcman supplied config
@@ -72,6 +68,7 @@ Currently supported:
 		accessKeyID := viper.GetString("aws-access-key-id")
 		secretAccessKey := viper.GetString("aws-secret-access-key")
 		autoConfig := viper.GetBool("auto-config")
+		healthCheckPort := viper.GetInt("health-check-port")
 
 		var natsNKeySeedLog, secretAccessKeyLog string
 		var tokenClient connect.TokenClient
@@ -94,6 +91,7 @@ Currently supported:
 			"aws-access-key-id":     accessKeyID,
 			"aws-secret-access-key": secretAccessKeyLog,
 			"auto-config":           autoConfig,
+			"health-check-port":     healthCheckPort,
 		}).Info("Got config")
 
 		// Validate the auth params and create a token client if we are using
@@ -260,15 +258,16 @@ Currently supported:
 		}
 
 		// Start HTTP server for status
-		healthCheckPort := 8080
 		healthCheckPath := "/healthz"
 
 		http.HandleFunc(healthCheckPath, func(rw http.ResponseWriter, r *http.Request) {
-			if e.IsNATSConnected() {
-				fmt.Fprint(rw, "ok")
-			} else {
+			// Check that NATS is connected
+			if !e.IsNATSConnected() {
 				http.Error(rw, "NATS not connected", http.StatusInternalServerError)
+				return
 			}
+
+			fmt.Fprint(rw, "ok")
 		})
 
 		log.WithFields(log.Fields{
@@ -277,7 +276,7 @@ Currently supported:
 		}).Debug("Starting healthcheck server")
 
 		go func() {
-			log.Fatal(http.ListenAndServe(":8080", nil))
+			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", healthCheckPort), nil))
 		}()
 
 		if err != nil {
@@ -356,6 +355,7 @@ func init() {
 	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
+	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
 
 	// Bind these to viper
 	viper.BindPFlags(rootCmd.PersistentFlags())
