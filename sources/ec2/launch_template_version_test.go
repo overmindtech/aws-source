@@ -38,8 +38,8 @@ func TestLaunchTemplateVersionInputMapperList(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(input.Versions) != 0 {
-		t.Errorf("non-empty input: %v", input)
+	if len(input.Versions) != 2 {
+		t.Errorf("expected 2 inputs, got %v: %v", len(input.Versions), input)
 	}
 }
 
