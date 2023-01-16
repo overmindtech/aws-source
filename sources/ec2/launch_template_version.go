@@ -29,7 +29,12 @@ func LaunchTemplateVersionInputMapperGet(scope string, query string) (*ec2.Descr
 }
 
 func LaunchTemplateVersionInputMapperList(scope string) (*ec2.DescribeLaunchTemplateVersionsInput, error) {
-	return &ec2.DescribeLaunchTemplateVersionsInput{}, nil
+	return &ec2.DescribeLaunchTemplateVersionsInput{
+		Versions: []string{
+			"$Latest",
+			"$Default",
+		},
+	}, nil
 }
 
 func LaunchTemplateVersionOutputMapper(scope string, output *ec2.DescribeLaunchTemplateVersionsOutput) ([]*sdp.Item, error) {
@@ -51,7 +56,7 @@ func LaunchTemplateVersionOutputMapper(scope string, output *ec2.DescribeLaunchT
 		if ltv.LaunchTemplateId != nil && ltv.VersionNumber != nil {
 			// Create a custom UAV here since there is no one unique attribute.
 			// The new UAV will be {templateId}.{version}
-			attrs.Set("versionIdCombo", fmt.Sprintf("%v.%v", ltv.LaunchTemplateId, ltv.VersionNumber))
+			attrs.Set("versionIdCombo", fmt.Sprintf("%v.%v", *ltv.LaunchTemplateId, *ltv.VersionNumber))
 		} else {
 			return nil, errors.New("ec2-launch-template-version must have LaunchTemplateId and VersionNumber populated")
 		}

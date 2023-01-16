@@ -1,7 +1,9 @@
 package ec2
 
 import (
+	"context"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -95,4 +97,27 @@ func TestAvailabilityZoneOutputMapper(t *testing.T) {
 	if secondItem.UniqueAttributeValue() != *output.AvailabilityZones[1].ZoneName {
 		t.Errorf("expected second item name to be %v, got %v", *output.AvailabilityZones[1].ZoneName, secondItem.UniqueAttributeValue())
 	}
+}
+
+func TestNewAvailabilityZoneSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	rateLimit := LimitBucket{
+		MaxCapacity: 50,
+		RefillRate:  10,
+	}
+
+	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
+	defer rateLimitCancel()
+
+	rateLimit.Start(rateLimitCtx)
+
+	source := NewAvailabilityZoneSource(config, account, &rateLimit)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

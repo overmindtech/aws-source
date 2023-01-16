@@ -108,6 +108,8 @@ type E2ETest struct {
 // The purpose of these tests is mostly to give an entrypoint for debugging in a
 // real environment
 func (e E2ETest) Run(t *testing.T) {
+	t.Parallel()
+
 	// Determine the scope so that we can use this for all queries
 	scopes := e.Source.Scopes()
 	if len(scopes) != 1 {
