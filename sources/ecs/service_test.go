@@ -308,3 +308,17 @@ func TestServiceGetFunc(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewServiceSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewServiceSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:            source,
+		Timeout:           10 * time.Second,
+		SkipNotFoundCheck: true,
+	}
+
+	test.Run(t)
+}

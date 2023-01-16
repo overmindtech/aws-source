@@ -123,3 +123,17 @@ func TestNodegroupGetFunc(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewNodegroupSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewNodegroupSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:            source,
+		Timeout:           10 * time.Second,
+		SkipNotFoundCheck: true,
+	}
+
+	test.Run(t)
+}

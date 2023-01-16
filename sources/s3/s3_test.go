@@ -488,3 +488,16 @@ func (t TestS3Client) GetBucketWebsite(ctx context.Context, params *s3.GetBucket
 		},
 	}, nil
 }
+
+func TestNewS3Source(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	source := NewS3Source(config, account)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
+}

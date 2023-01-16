@@ -183,3 +183,17 @@ func TestPolicyItemMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewPolicySource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewPolicySource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+		SkipGet: true,
+	}
+
+	test.Run(t)
+}

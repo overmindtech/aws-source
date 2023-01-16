@@ -20,8 +20,8 @@ func TestParseARN(t *testing.T) {
 			t.Errorf("expected region to be region, got %v", a.Region)
 		}
 
-		if a.ResourceID != "resource-id" {
-			t.Errorf("expected resource ID to be resource-id, got %v", a.ResourceID)
+		if a.ResourceID() != "resource-id" {
+			t.Errorf("expected resource ID to be resource-id, got %v", a.ResourceID())
 		}
 
 		if a.Service != "service" {
@@ -51,11 +51,11 @@ func TestParseARN(t *testing.T) {
 		}
 
 		if a.Resource != "task-definition/ecs-template-ecs-demo-app:1" {
-			t.Errorf("expected resource ID to be task-definition/ecs-template-ecs-demo-app:1, got %v", a.ResourceID)
+			t.Errorf("expected resource ID to be task-definition/ecs-template-ecs-demo-app:1, got %v", a.ResourceID())
 		}
 
-		if a.ResourceID != "ecs-template-ecs-demo-app:1" {
-			t.Errorf("expected ResourceID to be ecs-template-ecs-demo-app:1, got %v", a.ResourceID)
+		if a.ResourceID() != "ecs-template-ecs-demo-app:1" {
+			t.Errorf("expected ResourceID to be ecs-template-ecs-demo-app:1, got %v", a.ResourceID())
 		}
 	})
 
@@ -76,8 +76,8 @@ func TestParseARN(t *testing.T) {
 			t.Errorf("expected account ID to be us-east-1, got %v", a.Region)
 		}
 
-		if a.ResourceID != "i-054dsfg34gdsfg38" {
-			t.Errorf("expected account ID to be i-054dsfg34gdsfg38, got %v", a.ResourceID)
+		if a.ResourceID() != "i-054dsfg34gdsfg38" {
+			t.Errorf("expected account ID to be i-054dsfg34gdsfg38, got %v", a.ResourceID())
 		}
 	})
 }

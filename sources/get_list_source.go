@@ -81,13 +81,13 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	item, err := s.ItemMapper(scope, awsItem)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return item, nil
@@ -110,7 +110,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 	awsItems, err := s.ListFunc(ctx, s.Client, scope)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	items := make([]*sdp.Item, 0)
@@ -151,7 +151,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 	a, err := ParseARN(query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
@@ -162,10 +162,10 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID)
+	item, err := s.Get(ctx, scope, a.ResourceID())
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return []*sdp.Item{item}, nil
@@ -175,7 +175,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 	awsItems, err := s.SearchFunc(ctx, s.Client, scope, query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	items := make([]*sdp.Item, 0)

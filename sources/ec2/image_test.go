@@ -1,7 +1,9 @@
 package ec2
 
 import (
+	"context"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -95,4 +97,27 @@ func TestImageOutputMapper(t *testing.T) {
 	if item.UniqueAttributeValue() != *output.Images[0].ImageId {
 		t.Errorf("Expected item unique attribute value to be %v, got %v", *output.Images[0].ImageId, item.UniqueAttributeValue())
 	}
+}
+
+func TestNewImageSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	rateLimit := LimitBucket{
+		MaxCapacity: 50,
+		RefillRate:  10,
+	}
+
+	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
+	defer rateLimitCancel()
+
+	rateLimit.Start(rateLimitCtx)
+
+	source := NewImageSource(config, account, &rateLimit)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

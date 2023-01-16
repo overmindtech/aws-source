@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -37,8 +38,8 @@ func TestLaunchTemplateVersionInputMapperList(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(input.Versions) != 0 {
-		t.Errorf("non-empty input: %v", input)
+	if len(input.Versions) != 2 {
+		t.Errorf("expected 2 inputs, got %v: %v", len(input.Versions), input)
 	}
 }
 
@@ -205,4 +206,28 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 
+}
+
+func TestNewLaunchTemplateVersionSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	rateLimit := LimitBucket{
+		MaxCapacity: 50,
+		RefillRate:  10,
+	}
+
+	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
+	defer rateLimitCancel()
+
+	rateLimit.Start(rateLimitCtx)
+
+	source := NewLaunchTemplateVersionSource(config, account, &rateLimit)
+
+	test := sources.E2ETest{
+		Source:            source,
+		Timeout:           10 * time.Second,
+		SkipNotFoundCheck: true,
+	}
+
+	test.Run(t)
 }

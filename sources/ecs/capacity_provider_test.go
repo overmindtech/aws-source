@@ -3,6 +3,7 @@ package ecs
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
@@ -134,4 +135,17 @@ func TestCapacityProviderSource(t *testing.T) {
 	if len(items) != 3 {
 		t.Errorf("expected 3 items, got %v", len(items))
 	}
+}
+
+func TestNewCapacityProviderSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	source := NewCapacityProviderSource(config, account)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

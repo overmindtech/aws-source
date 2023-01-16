@@ -3,6 +3,7 @@ package ecs
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
@@ -141,4 +142,17 @@ func TestClusterGetFunc(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestNewClusterSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewClusterSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

@@ -148,12 +148,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	})
 
 	if err != nil {
-		// TODO: Handle 404 with NOTFOUND error
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_OTHER,
-			ErrorString: err.Error(),
-			Scope:       scope,
-		}
+		return nil, sources.WrapAWSError(err)
 	}
 
 	bucket := Bucket{
@@ -312,6 +307,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		Type:            "s3-bucket",
 		UniqueAttribute: "name",
 		Attributes:      attributes,
+		Scope:           scope,
 	}
 
 	if bucket.RedirectAllRequestsTo != nil {
@@ -503,7 +499,7 @@ func searchImpl(ctx context.Context, client S3Client, scope string, query string
 	}
 
 	// If the ARN was parsed we can just ask Get for the item
-	item, err := getImpl(ctx, client, scope, a.ResourceID)
+	item, err := getImpl(ctx, client, scope, a.ResourceID())
 
 	if err != nil {
 		return nil, sdp.NewItemRequestError(err)

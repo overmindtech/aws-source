@@ -66,7 +66,7 @@ func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string, lim
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),
 		AccountID: accountID,
-		ItemType:  "ec2-EgressOnlyInternetGateway",
+		ItemType:  "ec2-egress-only-internet-gateway",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeEgressOnlyInternetGatewaysInput) (*ec2.DescribeEgressOnlyInternetGatewaysOutput, error) {
 			<-limit.C // Wait for late limiting
 			return client.DescribeEgressOnlyInternetGateways(ctx, input)

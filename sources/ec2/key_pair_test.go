@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -68,4 +69,27 @@ func TestKeyPairOutputMapper(t *testing.T) {
 		t.Fatalf("expected 1 item, got %v", len(items))
 	}
 
+}
+
+func TestNewKeyPairSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	rateLimit := LimitBucket{
+		MaxCapacity: 50,
+		RefillRate:  10,
+	}
+
+	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
+	defer rateLimitCancel()
+
+	rateLimit.Start(rateLimitCtx)
+
+	source := NewKeyPairSource(config, account, &rateLimit)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

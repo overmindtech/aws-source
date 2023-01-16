@@ -1,7 +1,9 @@
 package ec2
 
 import (
+	"context"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -115,4 +117,27 @@ func TestAddressOutputMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestNewAddressSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	rateLimit := LimitBucket{
+		MaxCapacity: 50,
+		RefillRate:  10,
+	}
+
+	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
+	defer rateLimitCancel()
+
+	rateLimit.Start(rateLimitCtx)
+
+	source := NewAddressSource(config, account, &rateLimit)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

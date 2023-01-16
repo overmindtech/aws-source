@@ -42,7 +42,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		return nil, errors.New("task definition family was nil")
 	}
 
-	attributes.Set("revisionName", fmt.Sprintf("%v:%v", td.Family, td.Revision))
+	attributes.Set("revisionName", fmt.Sprintf("%v:%v", *td.Family, td.Revision))
 
 	item := sdp.Item{
 		Type:            "ecs-task-definition",
@@ -154,7 +154,7 @@ func NewTaskDefinitionSource(config aws.Config, accountID string, region string)
 			for _, arn := range output.TaskDefinitionArns {
 				if a, err := sources.ParseARN(arn); err == nil {
 					getInputs = append(getInputs, &ecs.DescribeTaskDefinitionInput{
-						TaskDefinition: &a.ResourceID,
+						TaskDefinition: sources.PtrString(a.ResourceID()),
 					})
 				}
 			}

@@ -118,7 +118,8 @@ func NewContainerInstanceSource(config aws.Config, accountID string, region stri
 				Include: ContainerInstanceIncludeFields,
 			}
 		},
-		ListInput: &ecs.ListContainerInstancesInput{},
+		ListInput:   &ecs.ListContainerInstancesInput{},
+		DisableList: true, // Tou can't list without a cluster
 		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListContainerInstancesInput) sources.Paginator[*ecs.ListContainerInstancesOutput, *ecs.Options] {
 			return ecs.NewListContainerInstancesPaginator(client, input)
 		},
