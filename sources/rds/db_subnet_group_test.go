@@ -2,6 +2,7 @@ package rds
 
 import (
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
@@ -81,4 +82,17 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestNewDBSubnetGroupSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	source := NewDBSubnetGroupSource(config, account)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

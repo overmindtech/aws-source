@@ -2,6 +2,7 @@ package lambda
 
 import (
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -48,4 +49,18 @@ func TestLayerItemMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestNewLayerSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewLayerSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+		SkipGet: true,
+	}
+
+	test.Run(t)
 }

@@ -257,3 +257,16 @@ func TestDBClusterOutputMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewDBClusterSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	source := NewDBClusterSource(config, account)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
+}

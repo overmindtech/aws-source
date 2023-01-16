@@ -330,3 +330,16 @@ func TestGetEventLinkedItem(t *testing.T) {
 		})
 	}
 }
+
+func TestNewFunctionSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewFunctionSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
+}

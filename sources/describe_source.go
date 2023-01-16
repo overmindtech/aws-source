@@ -119,27 +119,27 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 	err = s.Validate()
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	// Get the input object
 	input, err = s.InputMapperGet(scope, query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	// Call the API using the object
 	output, err = s.DescribeFunc(ctx, s.Client, input)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	items, err = s.OutputMapper(scope, output)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	numItems := len(items)
@@ -179,7 +179,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 	err := s.Validate()
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	var items []*sdp.Item
@@ -191,7 +191,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 	}
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return items, nil
@@ -210,7 +210,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 	a, err := ParseARN(query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
@@ -221,10 +221,10 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID)
+	item, err := s.Get(ctx, scope, a.ResourceID())
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return []*sdp.Item{item}, nil

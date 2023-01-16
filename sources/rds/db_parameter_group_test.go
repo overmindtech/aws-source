@@ -2,6 +2,7 @@ package rds
 
 import (
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -69,4 +70,17 @@ func TestDBParameterGroupOutputMapper(t *testing.T) {
 	if err = item.Validate(); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestNewDBParameterGroupSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewDBParameterGroupSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

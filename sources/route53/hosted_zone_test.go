@@ -2,6 +2,7 @@ package route53
 
 import (
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -44,4 +45,17 @@ func TestHostedZoneItemMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestNewHostedZoneSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewHostedZoneSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
 }

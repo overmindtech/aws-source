@@ -27,6 +27,21 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		return nil, err
 	}
 
+	if len(out.Failures) != 0 {
+		failure := out.Failures[0]
+
+		if failure.Reason != nil && failure.Arn != nil {
+			if *failure.Reason == "MISSING" {
+				return nil, &sdp.ItemRequestError{
+					ErrorType:   sdp.ItemRequestError_NOTFOUND,
+					ErrorString: fmt.Sprintf("cluster with ARN %v not found", *failure.Arn),
+				}
+			}
+		}
+
+		return nil, fmt.Errorf("cluster get failure: %v", failure)
+	}
+
 	if len(out.Clusters) != 1 {
 		return nil, fmt.Errorf("got %v clusters, expected 1", len(out.Clusters))
 	}
@@ -146,7 +161,7 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 
 				inputs = append(inputs, &ecs.DescribeClustersInput{
 					Clusters: []string{
-						a.ResourceID, // This will be the name of the cluster
+						a.ResourceID(), // This will be the name of the cluster
 					},
 					Include: ClusterIncludeFields,
 				})

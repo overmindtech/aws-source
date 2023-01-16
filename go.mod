@@ -19,6 +19,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.25.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.0
+	github.com/aws/smithy-go v1.13.5
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
@@ -47,7 +48,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.21 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.12.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.0 // indirect
-	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/bits-and-blooms/bitset v1.4.0 // indirect
 	github.com/blevesearch/bleve/v2 v2.3.6 // indirect
 	github.com/blevesearch/bleve_index_api v1.0.5 // indirect

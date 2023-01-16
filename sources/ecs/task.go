@@ -89,7 +89,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 				Type:   "ecs-container-instance",
 				Method: sdp.RequestMethod_GET,
-				Query:  a.ResourceID,
+				Query:  a.ResourceID(),
 				Scope:  scope,
 			})
 		}
@@ -154,7 +154,7 @@ func TasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 	for _, taskArn := range output.TaskArns {
 		if a, err := sources.ParseARN(taskArn); err == nil {
 			// split the cluster name out
-			sections := strings.Split(a.ResourceID, "/")
+			sections := strings.Split(a.ResourceID(), "/")
 
 			if len(sections) != 2 {
 				continue

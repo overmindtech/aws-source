@@ -112,7 +112,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	var item *sdp.Item
 
 	if err = s.Validate(); err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	input := s.GetInputMapper(scope, query)
@@ -121,7 +121,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	if err != nil {
 		// TODO: How can we handle NOTFOUND?
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return item, nil
@@ -156,7 +156,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	doneChan := make(chan struct{})
 
 	if err = s.Validate(); err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	// Create a channel of permissions to allow only a certain number of Get requests to tun in parallel
@@ -260,7 +260,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	input, err := s.SearchInputMapper(scope, query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return s.listInternal(ctx, scope, input)
@@ -271,7 +271,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	a, err := ParseARN(query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
@@ -282,10 +282,10 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID)
+	item, err := s.Get(ctx, scope, a.ResourceID())
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, WrapAWSError(err)
 	}
 
 	return []*sdp.Item{item}, nil

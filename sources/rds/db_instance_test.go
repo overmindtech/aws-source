@@ -321,3 +321,16 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewDBInstanceSource(t *testing.T) {
+	config, account, _ := sources.GetAutoConfig(t)
+
+	source := NewDBInstanceSource(config, account)
+
+	test := sources.E2ETest{
+		Source:  source,
+		Timeout: 10 * time.Second,
+	}
+
+	test.Run(t)
+}

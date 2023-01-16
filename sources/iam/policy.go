@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -20,8 +21,19 @@ type PolicyDetails struct {
 }
 
 func PolicyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
+	// Construct the ARN from the name etc.
+	a := sources.ARN{
+		ARN: arn.ARN{
+			Partition: "aws",
+			Service:   "iam",
+			Region:    "", // IAM doesn't have a region
+			AccountID: scope,
+			Resource:  "policy" + query, // The query should policyFullName which is (path + name)
+		},
+	}
+
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
-		PolicyArn: &query,
+		PolicyArn: sources.PtrString(a.String()),
 	})
 
 	if err != nil {
@@ -117,9 +129,19 @@ func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 		return nil, err
 	}
 
+	if awsItem.Policy.Path == nil || awsItem.Policy.PolicyName == nil {
+		return nil, errors.New("policy Path and PolicyName must be populated")
+	}
+
+	// Create a new attribute which is a combination of `path` and `policyName`,
+	// this can then be constructed into an ARN when a user calls GET
+	attributes.Set("policyFullName", *awsItem.Policy.Path+*awsItem.Policy.PolicyName)
+
+	// Some IAM policies are lgobal
+
 	item := sdp.Item{
 		Type:            "iam-policy",
-		UniqueAttribute: "policyName",
+		UniqueAttribute: "policyFullName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}
@@ -154,12 +176,18 @@ func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	return &item, nil
 }
 
-func NewPolicySource(config aws.Config, accountID string, region string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
+// NewPolicySource Note that this policy source only support polices that are
+// user-created due to the fact that the AWS-created ones are basically "global"
+// in scope. In order to get this to work I'd have to change the way the source
+// is implemented so that it was mart enough to handle different scopes. This
+// has been added to the backlog:
+// https://github.com/overmindtech/aws-source/issues/68
+func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:   "iam-policy",
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
-		Region:     region,
+		Region:     "", // IAM policies aren't tied to a region
 		GetFunc:    PolicyGetFunc,
 		ListFunc:   PolicyListFunc,
 		ItemMapper: PolicyItemMapper,

@@ -58,3 +58,17 @@ func TestFargateProfileGetFunc(t *testing.T) {
 
 	tests.Execute(t, item)
 }
+
+func TestNewFargateProfileSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+
+	source := NewFargateProfileSource(config, account, region)
+
+	test := sources.E2ETest{
+		Source:            source,
+		Timeout:           10 * time.Second,
+		SkipNotFoundCheck: true,
+	}
+
+	test.Run(t)
+}
