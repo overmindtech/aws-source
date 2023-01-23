@@ -29,7 +29,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.14.0
+	github.com/spf13/viper v1.15.0
 	go.opentelemetry.io/contrib/detectors/aws/ec2 v1.12.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.2
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.11.2
@@ -93,7 +93,6 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/api-client v0.5.0 // indirect
 	github.com/overmindtech/sdpcache v0.4.0 // indirect
-	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
