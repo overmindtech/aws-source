@@ -361,9 +361,12 @@ All configuration options can be provided via the command line or as environment
 | `NATS_NKEY_SEED` | `--nats-nkey-seed` | ✅ | The NKey seed which corresponds to the NATS JWT e.g. `SUAFK6QUC{...}` |
 | `MAX_PARALLEL`| `--max-parallel` | ✅ | Max number of requests to run in parallel |
 | `AUTO_CONFIG` | `--auto-config` | | Use the local AWS config, the same as the AWS CLI could use. This can be set up with `aws configure` |
-| `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
 | `AWS_REGIONS` | `--aws-region` | | Comma-separated list of AWS regions that this source should operate in |
+| `AWS_ACCESS_STRATEGY` | `--aws-access-strategy` | | The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id'. Default: 'access-key'. |
+| `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
 | `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` | | The secret access key to use for auth |
+| `AWS_EXTERNAL_ID` | `--aws-external-id` | | The external ID to use when assuming the customer's role |
+| `AWS_ROLE_ARN` | `--aws-role-arn` | | The role to assume in the customer's account |
 
 ### `srcman` config
 
@@ -408,7 +411,7 @@ The naming convention for types is as follows:
 
 `{api}-{described_thing}-{version (optional)}`
 
-**API:** The name of the api as it appears when making requests e.g. if you make requests to `https://ec2.amazonaws.com/?Action=CreateRouteTable` then the API name would be `ec2`. 
+**API:** The name of the api as it appears when making requests e.g. if you make requests to `https://ec2.amazonaws.com/?Action=CreateRouteTable` then the API name would be `ec2`.
 
 **Described Thing:** What is being described as derived from the name of the API action. For example if the action was `DescribeInstances` then the described thing would be `instance`. Note that plurals should be converted so singular.
 
