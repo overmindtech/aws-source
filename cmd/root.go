@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
@@ -30,12 +31,11 @@ import (
 	"github.com/overmindtech/aws-source/sources/s3"
 	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 )
 
 var cfgFile string
@@ -66,8 +66,11 @@ var rootCmd = &cobra.Command{
 		var regions []string
 		viper.UnmarshalKey("aws-regions", &regions)
 
+		strategy := viper.GetString("aws-access-strategy")
 		accessKeyID := viper.GetString("aws-access-key-id")
 		secretAccessKey := viper.GetString("aws-secret-access-key")
+		externalID := viper.GetString("aws-external-id")
+		roleARN := viper.GetString("aws-role-arn")
 		autoConfig := viper.GetBool("auto-config")
 		healthCheckPort := viper.GetInt("health-check-port")
 
@@ -89,8 +92,11 @@ var rootCmd = &cobra.Command{
 			"nats-nkey-seed":        natsNKeySeedLog,
 			"max-parallel":          maxParallel,
 			"aws-regions":           regions,
+			"aws-access-strategy":   strategy,
 			"aws-access-key-id":     accessKeyID,
 			"aws-secret-access-key": secretAccessKeyLog,
+			"aws-external-id":       externalID,
+			"aws-role-arn":          roleARN,
 			"auto-config":           autoConfig,
 			"health-check-port":     healthCheckPort,
 		}).Info("Got config")
@@ -132,7 +138,7 @@ var rootCmd = &cobra.Command{
 			// Load config and create client which will be re-used for all connections
 			configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-			cfg, err := getAWSConfig(region, accessKeyID, secretAccessKey, autoConfig)
+			cfg, err := getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, roleARN, autoConfig)
 
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -352,11 +358,15 @@ func init() {
 	rootCmd.PersistentFlags().Int("max-parallel", (runtime.NumCPU() * 10), "Max number of requests to run in parallel")
 
 	// Custom flags for this source
-	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
+	rootCmd.PersistentFlags().String("aws-access-strategy", "access-key", "The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id'. Default: 'access-key'.")
 	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
+	rootCmd.PersistentFlags().String("aws-external-id", "", "The external ID to use when assuming the customer's role")
+	rootCmd.PersistentFlags().String("aws-role-arn", "", "The role to assume in the customer's account")
+	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
+
 	// tracing
 	rootCmd.PersistentFlags().String("honeycomb-api-key", "", "If specified, configures opentelemetry libraries to submit traces to honeycomb")
 
@@ -415,7 +425,7 @@ func initConfig() {
 	}
 }
 
-func getAWSConfig(region string, accessKeyID string, secretAccessKey string, autoConfig bool) (aws.Config, error) {
+func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, roleARN string, autoConfig bool) (aws.Config, error) {
 	if autoConfig {
 		return config.LoadDefaultConfig(context.Background())
 	}
@@ -423,19 +433,63 @@ func getAWSConfig(region string, accessKeyID string, secretAccessKey string, aut
 	if region == "" {
 		return aws.Config{}, errors.New("aws-region cannot be blank")
 	}
-	if accessKeyID == "" {
-		return aws.Config{}, errors.New("aws-access-key-id cannot be blank")
+
+	if strategy == "access-key" {
+		if accessKeyID == "" {
+			return aws.Config{}, errors.New("with access-key strategy, aws-access-key-id cannot be blank")
+		}
+		if secretAccessKey == "" {
+			return aws.Config{}, errors.New("with access-key strategy, aws-secret-access-key cannot be blank")
+		}
+		if externalID != "" {
+			return aws.Config{}, errors.New("with access-key strategy, aws-external-id must be blank")
+		}
+		if roleARN != "" {
+			return aws.Config{}, errors.New("with access-key strategy, aws-role-arn must be blank")
+		}
+
+		config := getStaticAWSConfig(region, accessKeyID, secretAccessKey)
+		return config, nil
+	} else if strategy == "external-id" {
+		if accessKeyID != "" {
+			return aws.Config{}, errors.New("with external-id strategy, aws-access-key-id must be blank")
+		}
+		if secretAccessKey != "" {
+			return aws.Config{}, errors.New("with external-id strategy, aws-secret-access-key must be blank")
+		}
+		if externalID == "" {
+			return aws.Config{}, errors.New("with external-id strategy, aws-external-id cannot be blank")
+		}
+		if roleARN == "" {
+			return aws.Config{}, errors.New("with external-id strategy, aws-role-arn cannot be blank")
+		}
+
+		return getAssumedRoleAWSConfig(region, externalID, roleARN)
+	} else {
+		return aws.Config{}, errors.New("invalid aws-access-strategy")
 	}
-	if secretAccessKey == "" {
-		return aws.Config{}, errors.New("aws-secret-access-key cannot be blank")
+}
+
+func getAssumedRoleAWSConfig(region, externalID, roleARN string) (aws.Config, error) {
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
 	}
 
-	config := aws.Config{
+	creds := stscreds.NewAssumeRoleProvider(sts.NewFromConfig(cfg), roleARN, func(o *stscreds.AssumeRoleOptions) {
+		o.ExternalID = &externalID
+	})
+
+	cfg.Credentials = aws.NewCredentialsCache(creds)
+
+	return cfg, nil
+}
+
+func getStaticAWSConfig(region string, accessKeyID string, secretAccessKey string) aws.Config {
+	return aws.Config{
 		Region:      region,
 		Credentials: credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, ""),
 	}
-
-	return config, nil
 }
 
 // createTokenClient Creates a basic token client that will authenticate to NATS
