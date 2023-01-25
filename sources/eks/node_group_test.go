@@ -119,6 +119,12 @@ func TestNodegroupGetFunc(t *testing.T) {
 			ExpectedQuery:  "sg2",
 			ExpectedScope:  item.Scope,
 		},
+		{
+			ExpectedType:   "ec2-launch-template",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "lt-097e994ce7e14fcdc",
+			ExpectedScope:  item.Scope,
+		},
 	}
 
 	tests.Execute(t, item)

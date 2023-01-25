@@ -94,6 +94,17 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 	}
 
+	if ng.LaunchTemplate != nil {
+		if ng.LaunchTemplate.Id != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:   "ec2-launch-template",
+				Method: sdp.RequestMethod_GET,
+				Query:  *ng.LaunchTemplate.Id,
+				Scope:  scope,
+			})
+		}
+	}
+
 	return &item, nil
 }
 
