@@ -475,12 +475,12 @@ func getAssumedRoleAWSConfig(region, externalID, roleARN string) (aws.Config, er
 	if err != nil {
 		return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
 	}
+	cfg.Region = region
 
 	creds := stscreds.NewAssumeRoleProvider(sts.NewFromConfig(cfg), roleARN, func(o *stscreds.AssumeRoleOptions) {
 		o.ExternalID = &externalID
 	})
 
-	cfg.Region = region
 	cfg.Credentials = aws.NewCredentialsCache(creds)
 
 	return cfg, nil
