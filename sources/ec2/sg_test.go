@@ -54,7 +54,7 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 						UserIdGroupPairs: []types.UserIdGroupPair{
 							{
 								GroupId: sources.PtrString("sg-094e151c9fc5da181"),
-								UserId:  sources.PtrString("052392120703"),
+								UserId:  sources.PtrString("052392120704"),
 							},
 						},
 					},
@@ -79,7 +79,7 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SecurityGroupOutputMapper("foo", output)
+	items, err := SecurityGroupOutputMapper("052392120703.eu-west-2", output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -99,6 +99,12 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-security-group",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "sg-094e151c9fc5da181",
+			ExpectedScope:  "052392120704.eu-west-2",
 		},
 	}
 

@@ -27,6 +27,17 @@ func FormatScope(accountID, region string) string {
 	return fmt.Sprintf("%v.%v", accountID, region)
 }
 
+// ParseScope Parses a scope and returns the account id and region
+func ParseScope(scope string) (string, string, error) {
+	sections := strings.Split(scope, ".")
+
+	if len(sections) != 2 {
+		return "", "", fmt.Errorf("could not split scope '%v' into 2 sections", scope)
+	}
+
+	return sections[0], sections[1], nil
+}
+
 // A parsed representation of the parts of the ARN that Overmind needs to care
 // about
 //
