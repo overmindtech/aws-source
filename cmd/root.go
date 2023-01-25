@@ -480,6 +480,7 @@ func getAssumedRoleAWSConfig(region, externalID, roleARN string) (aws.Config, er
 		o.ExternalID = &externalID
 	})
 
+	cfg.Region = region
 	cfg.Credentials = aws.NewCredentialsCache(creds)
 
 	return cfg, nil
