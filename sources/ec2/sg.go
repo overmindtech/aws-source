@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -54,6 +55,9 @@ func SecurityGroupOutputMapper(scope string, output *ec2.DescribeSecurityGroupsO
 			})
 		}
 
+		item.LinkedItemRequests = append(item.LinkedItemRequests, extractLinkedSecurityGroups(securityGroup.IpPermissions, scope)...)
+		item.LinkedItemRequests = append(item.LinkedItemRequests, extractLinkedSecurityGroups(securityGroup.IpPermissionsEgress, scope)...)
+
 		items = append(items, &item)
 	}
 
@@ -77,4 +81,37 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBuc
 		},
 		OutputMapper: SecurityGroupOutputMapper,
 	}
+}
+
+// extractLinkedSecurityGroups Extracts related security groups from IP
+// permissions
+func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string) []*sdp.ItemRequest {
+	currentAccount, region, err := sources.ParseScope(scope)
+	requests := make([]*sdp.ItemRequest, 0)
+	var relatedAccount string
+
+	if err != nil {
+		return requests
+	}
+
+	for _, permission := range permissions {
+		for _, idGroup := range permission.UserIdGroupPairs {
+			if idGroup.UserId != nil {
+				relatedAccount = *idGroup.UserId
+			} else {
+				relatedAccount = currentAccount
+			}
+
+			if idGroup.GroupId != nil {
+				requests = append(requests, &sdp.ItemRequest{
+					Type:   "ec2-security-group",
+					Method: sdp.RequestMethod_GET,
+					Query:  *idGroup.GroupId,
+					Scope:  sources.FormatScope(relatedAccount, region),
+				})
+			}
+		}
+	}
+
+	return requests
 }
