@@ -471,17 +471,17 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 }
 
 func getAssumedRoleAWSConfig(region, externalID, roleARN string) (aws.Config, error) {
-	cfg, err := config.LoadDefaultConfig(context.Background())
+	cfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(region),
+		config.WithAssumeRoleCredentialOptions(
+			func(aro *stscreds.AssumeRoleOptions) {
+				aro.RoleARN = roleARN
+				aro.ExternalID = &externalID
+			},
+		))
 	if err != nil {
 		return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
 	}
-	cfg.Region = region
-
-	creds := stscreds.NewAssumeRoleProvider(sts.NewFromConfig(cfg), roleARN, func(o *stscreds.AssumeRoleOptions) {
-		o.ExternalID = &externalID
-	})
-
-	cfg.Credentials = aws.NewCredentialsCache(creds)
 
 	return cfg, nil
 }
