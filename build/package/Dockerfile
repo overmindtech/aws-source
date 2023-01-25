@@ -1,5 +1,9 @@
 # Build the source binary
 FROM golang:1.19 as builder
+ARG TARGETOS
+ARG TARGETARCH
+
+ENV CGO_ENABLED=0
 
 WORKDIR /workspace
 
