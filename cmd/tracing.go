@@ -52,7 +52,7 @@ func tracingResource() *resource.Resource {
 		),
 	)
 	if err != nil {
-		log.Fatalf("resource.New: %v", err)
+		log.Errorf("resource.New: %v", err)
 		return nil
 	}
 	return res
@@ -79,7 +79,7 @@ func initTracing(opts ...otlptracehttp.Option) error {
 			TracesSampleRate: 1.0,
 		})
 		if err != nil {
-			log.Fatalf("sentry.Init: %s", err)
+			log.Errorf("sentry.Init: %s", err)
 		}
 		// setup recovery for an unexpected panic in this function
 		defer sentry.Flush(2 * time.Second)
