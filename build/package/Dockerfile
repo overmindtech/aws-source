@@ -1,5 +1,5 @@
 # Build the source binary
-FROM golang:1.19 as builder
+FROM golang:1.19-alpine3.17 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -22,11 +22,9 @@ COPY sources/ sources/
 RUN --mount=type=cache,target=/root/.cache/go-build \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o source main.go
 
-# Use distroless as minimal base image to package the source binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM alpine:3.17
 WORKDIR /
 COPY --from=builder /workspace/source .
-USER 65532:65532
+USER 65534:65534
 
 ENTRYPOINT ["/source"]
