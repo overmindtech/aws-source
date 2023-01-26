@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/getsentry/sentry-go"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -165,6 +166,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if acl, err := client.GetBucketAcl(ctx, &s3.GetBucketAclInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketAclOutput = *acl
@@ -172,6 +174,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if analyticsConfiguration, err := client.GetBucketAnalyticsConfiguration(ctx, &s3.GetBucketAnalyticsConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketAnalyticsConfigurationOutput = *analyticsConfiguration
@@ -179,6 +182,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if cors, err := client.GetBucketCors(ctx, &s3.GetBucketCorsInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketCorsOutput = *cors
@@ -186,6 +190,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if encryption, err := client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketEncryptionOutput = *encryption
@@ -193,6 +198,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if intelligentTieringConfiguration, err := client.GetBucketIntelligentTieringConfiguration(ctx, &s3.GetBucketIntelligentTieringConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketIntelligentTieringConfigurationOutput = *intelligentTieringConfiguration
@@ -200,6 +206,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if inventoryConfiguration, err := client.GetBucketInventoryConfiguration(ctx, &s3.GetBucketInventoryConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketInventoryConfigurationOutput = *inventoryConfiguration
@@ -207,6 +214,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if lifecycleConfiguration, err := client.GetBucketLifecycleConfiguration(ctx, &s3.GetBucketLifecycleConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketLifecycleConfigurationOutput = *lifecycleConfiguration
@@ -214,6 +222,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if logging, err := client.GetBucketLogging(ctx, &s3.GetBucketLoggingInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketLoggingOutput = *logging
@@ -221,6 +230,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if metricsConfiguration, err := client.GetBucketMetricsConfiguration(ctx, &s3.GetBucketMetricsConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketMetricsConfigurationOutput = *metricsConfiguration
@@ -228,6 +238,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if notificationConfiguration, err := client.GetBucketNotificationConfiguration(ctx, &s3.GetBucketNotificationConfigurationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketNotificationConfigurationOutput = *notificationConfiguration
@@ -235,6 +246,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if ownershipControls, err := client.GetBucketOwnershipControls(ctx, &s3.GetBucketOwnershipControlsInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketOwnershipControlsOutput = *ownershipControls
@@ -242,6 +254,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if policy, err := client.GetBucketPolicy(ctx, &s3.GetBucketPolicyInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketPolicyOutput = *policy
@@ -249,6 +262,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if policyStatus, err := client.GetBucketPolicyStatus(ctx, &s3.GetBucketPolicyStatusInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketPolicyStatusOutput = *policyStatus
@@ -256,6 +270,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if replication, err := client.GetBucketReplication(ctx, &s3.GetBucketReplicationInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketReplicationOutput = *replication
@@ -263,6 +278,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if requestPayment, err := client.GetBucketRequestPayment(ctx, &s3.GetBucketRequestPaymentInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketRequestPaymentOutput = *requestPayment
@@ -270,6 +286,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if tagging, err := client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketTaggingOutput = *tagging
@@ -277,6 +294,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if versioning, err := client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketVersioningOutput = *versioning
@@ -284,6 +302,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}()
 	wg.Add(1)
 	go func() {
+		defer sentry.Recover()
 		defer wg.Done()
 		if website, err := client.GetBucketWebsite(ctx, &s3.GetBucketWebsiteInput{Bucket: bucketName}); err == nil {
 			bucket.GetBucketWebsiteOutput = *website

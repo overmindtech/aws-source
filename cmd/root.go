@@ -294,6 +294,8 @@ var rootCmd = &cobra.Command{
 		}).Debug("Starting healthcheck server")
 
 		go func() {
+			defer sentry.Recover()
+
 			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", healthCheckPort), nil))
 		}()
 
