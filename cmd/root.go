@@ -17,6 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/getsentry/sentry-go"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
@@ -47,6 +48,16 @@ var rootCmd = &cobra.Command{
 	Long: `This sources looks for AWS resources in your account.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		defer func() {
+			err := recover()
+
+			if err != nil {
+				sentry.CurrentHub().Recover(err)
+				defer sentry.Flush(time.Second * 5)
+				panic(err)
+			}
+		}()
+
 		// Get srcman supplied config
 		natsServers := viper.GetStringSlice("nats-servers")
 		natsNamePrefix := viper.GetString("nats-name-prefix")
@@ -369,6 +380,8 @@ func init() {
 
 	// tracing
 	rootCmd.PersistentFlags().String("honeycomb-api-key", "", "If specified, configures opentelemetry libraries to submit traces to honeycomb")
+	rootCmd.PersistentFlags().String("sentry-dsn", "", "If specified, configures sentry libraries to capture errors")
+	rootCmd.PersistentFlags().String("run-mode", "release", "Set the run mode for this service, 'release', 'debug' or 'test'. Defaults to 'release'.")
 
 	// Bind these to viper
 	viper.BindPFlags(rootCmd.PersistentFlags())

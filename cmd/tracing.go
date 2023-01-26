@@ -3,8 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"go.opentelemetry.io/contrib/detectors/aws/ec2"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -58,6 +61,32 @@ func tracingResource() *resource.Resource {
 var tp *sdktrace.TracerProvider
 
 func initTracing(opts ...otlptracehttp.Option) error {
+	if sentry_dsn := viper.GetString("sentry-dsn"); sentry_dsn != "" {
+		var environment string
+		if viper.GetString("run-mode") == "release" {
+			environment = "prod"
+		} else {
+			environment = "dev"
+		}
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:              sentry_dsn,
+			AttachStacktrace: true,
+			EnableTracing:    false,
+			Environment:      environment,
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+		// setup recovery for an unexpected panic in this function
+		defer sentry.Flush(2 * time.Second)
+		defer sentry.Recover()
+		log.Info("sentry configured")
+	}
+
 	// for stdout debugging of traces
 	// stdoutExp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	// if err != nil {
@@ -84,6 +113,9 @@ func initTracing(opts ...otlptracehttp.Option) error {
 }
 
 func shutdownTracing() {
+	// Flush buffered events before the program terminates.
+	defer sentry.Flush(2 * time.Second)
+
 	if err := tp.Shutdown(context.Background()); err != nil {
 		log.Printf("Error shutting down tracer provider: %v", err)
 	}
