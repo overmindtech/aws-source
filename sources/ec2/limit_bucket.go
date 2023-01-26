@@ -3,6 +3,8 @@ package ec2
 import (
 	"context"
 	"time"
+
+	"github.com/getsentry/sentry-go"
 )
 
 // DefaultRefillDuration How often LimitBuckets are refilled by default
@@ -39,6 +41,8 @@ func (b *LimitBucket) Start(ctx context.Context) {
 	b.C = tokenChan
 
 	go func(ctx context.Context, bucket *LimitBucket) {
+		defer sentry.Recover()
+
 		ticker := time.NewTicker(bucket.RefillDuration)
 		defer ticker.Stop()
 

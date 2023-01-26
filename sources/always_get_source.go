@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -167,11 +168,13 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	// Create a process to take queries and run them using Get
 	go func() {
+		defer sentry.Recover()
 		var wg sync.WaitGroup
 		for i := range getInputs {
 			<-permissions
 			wg.Add(1)
 			go func(input GetInput) {
+				defer sentry.Recover()
 				defer wg.Done()
 				item, err := s.GetFunc(ctx, s.Client, scope, input)
 
@@ -199,6 +202,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	// Create a process to collect items
 	go func() {
+		defer sentry.Recover()
 		for item := range itemsChan {
 			items = append(items, item)
 		}
