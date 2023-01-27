@@ -495,6 +495,9 @@ func getAssumedRoleAWSConfig(region, externalID, targetRoleARN string) (aws.Conf
 			stscredsv2.NewAssumeRoleProvider(
 				stsclient,
 				targetRoleARN,
+				func(aro *stscredsv2.AssumeRoleOptions) {
+					aro.ExternalID = &externalID
+				},
 			)),
 		),
 	)
