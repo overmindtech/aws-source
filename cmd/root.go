@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	stscredsv2 "github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/getsentry/sentry-go"
 	"github.com/nats-io/jwt/v2"
@@ -85,31 +85,25 @@ var rootCmd = &cobra.Command{
 		autoConfig := viper.GetBool("auto-config")
 		healthCheckPort := viper.GetInt("health-check-port")
 
-		var natsNKeySeedLog, secretAccessKeyLog string
+		var natsNKeySeedLog string
 		var tokenClient connect.TokenClient
 
 		if natsNKeySeed != "" {
 			natsNKeySeedLog = "[REDACTED]"
 		}
 
-		if secretAccessKey != "" {
-			secretAccessKeyLog = "[REDACTED]"
-		}
-
 		log.WithFields(log.Fields{
-			"nats-servers":          natsServers,
-			"nats-name-prefix":      natsNamePrefix,
-			"nats-jwt":              natsJWT,
-			"nats-nkey-seed":        natsNKeySeedLog,
-			"max-parallel":          maxParallel,
-			"aws-regions":           regions,
-			"aws-access-strategy":   strategy,
-			"aws-access-key-id":     accessKeyID,
-			"aws-secret-access-key": secretAccessKeyLog,
-			"aws-external-id":       externalID,
-			"aws-target-role-arn":   targetRoleARN,
-			"auto-config":           autoConfig,
-			"health-check-port":     healthCheckPort,
+			"nats-servers":        natsServers,
+			"nats-name-prefix":    natsNamePrefix,
+			"nats-jwt":            natsJWT,
+			"nats-nkey-seed":      natsNKeySeedLog,
+			"max-parallel":        maxParallel,
+			"aws-regions":         regions,
+			"aws-access-strategy": strategy,
+			"aws-external-id":     externalID,
+			"aws-target-role-arn": targetRoleARN,
+			"auto-config":         autoConfig,
+			"health-check-port":   healthCheckPort,
 		}).Info("Got config")
 
 		// Validate the auth params and create a token client if we are using
@@ -485,19 +479,28 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 	}
 }
 
-func getAssumedRoleAWSConfig(region, externalID, roleARN string) (aws.Config, error) {
-	cfg, err := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion(region),
-		config.WithAssumeRoleCredentialOptions(
-			func(aro *stscreds.AssumeRoleOptions) {
-				aro.RoleARN = roleARN
-				aro.ExternalID = &externalID
-			},
-		))
+func getAssumedRoleAWSConfig(region, externalID, targetRoleARN string) (aws.Config, error) {
+	ctx := context.Background()
+
+	assumecnf, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
 	}
 
+	stsclient := sts.NewFromConfig(assumecnf)
+	cfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithRegion(region),
+		config.WithCredentialsProvider(aws.NewCredentialsCache(
+			stscredsv2.NewAssumeRoleProvider(
+				stsclient,
+				targetRoleARN,
+			)),
+		),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("could not assume the target role: %v", err)
+	}
 	return cfg, nil
 }
 
