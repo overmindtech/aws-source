@@ -81,7 +81,7 @@ var rootCmd = &cobra.Command{
 		accessKeyID := viper.GetString("aws-access-key-id")
 		secretAccessKey := viper.GetString("aws-secret-access-key")
 		externalID := viper.GetString("aws-external-id")
-		roleARN := viper.GetString("aws-role-arn")
+		targetRoleARN := viper.GetString("aws-target-role-arn")
 		autoConfig := viper.GetBool("auto-config")
 		healthCheckPort := viper.GetInt("health-check-port")
 
@@ -107,7 +107,7 @@ var rootCmd = &cobra.Command{
 			"aws-access-key-id":     accessKeyID,
 			"aws-secret-access-key": secretAccessKeyLog,
 			"aws-external-id":       externalID,
-			"aws-role-arn":          roleARN,
+			"aws-target-role-arn":   targetRoleARN,
 			"auto-config":           autoConfig,
 			"health-check-port":     healthCheckPort,
 		}).Info("Got config")
@@ -149,7 +149,7 @@ var rootCmd = &cobra.Command{
 			// Load config and create client which will be re-used for all connections
 			configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-			cfg, err := getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, roleARN, autoConfig)
+			cfg, err := getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, targetRoleARN, autoConfig)
 
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -375,7 +375,7 @@ func init() {
 	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
 	rootCmd.PersistentFlags().String("aws-external-id", "", "The external ID to use when assuming the customer's role")
-	rootCmd.PersistentFlags().String("aws-role-arn", "", "The role to assume in the customer's account")
+	rootCmd.PersistentFlags().String("aws-target-role-arn", "", "The role to assume in the customer's account")
 	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
@@ -460,7 +460,7 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 			return aws.Config{}, errors.New("with access-key strategy, aws-external-id must be blank")
 		}
 		if roleARN != "" {
-			return aws.Config{}, errors.New("with access-key strategy, aws-role-arn must be blank")
+			return aws.Config{}, errors.New("with access-key strategy, aws-target-role-arn must be blank")
 		}
 
 		config := getStaticAWSConfig(region, accessKeyID, secretAccessKey)
@@ -476,7 +476,7 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 			return aws.Config{}, errors.New("with external-id strategy, aws-external-id cannot be blank")
 		}
 		if roleARN == "" {
-			return aws.Config{}, errors.New("with external-id strategy, aws-role-arn cannot be blank")
+			return aws.Config{}, errors.New("with external-id strategy, aws-target-role-arn cannot be blank")
 		}
 
 		return getAssumedRoleAWSConfig(region, externalID, roleARN)

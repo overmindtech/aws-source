@@ -366,7 +366,7 @@ All configuration options can be provided via the command line or as environment
 | `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
 | `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` | | The secret access key to use for auth |
 | `AWS_EXTERNAL_ID` | `--aws-external-id` | | The external ID to use when assuming the customer's role |
-| `AWS_ROLE_ARN` | `--aws-role-arn` | | The role to assume in the customer's account |
+| `AWS_TARGET_ROLE_ARN` | `--aws-target-role-arn` | | The role to assume in the customer's account |
 
 ### `srcman` config
 
