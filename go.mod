@@ -26,7 +26,7 @@ require (
 	github.com/nats-io/nkeys v0.3.0
 	github.com/overmindtech/connect v0.6.1
 	github.com/overmindtech/discovery v0.17.0
-	github.com/overmindtech/sdp-go v0.15.1
+	github.com/overmindtech/sdp-go v0.15.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
@@ -118,4 +118,9 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+replace (
+	github.com/overmindtech/sdp-go => github.com/overmindtech/sdp-go v0.15.2
+	github.com/overmindtech/sdp-go v0.15.1 => github.com/overmindtech/sdp-go v0.15.2
 )
