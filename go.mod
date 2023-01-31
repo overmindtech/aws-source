@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.10
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.10
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.18.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.81.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.83.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.23.1
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.1
@@ -24,8 +24,8 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
-	github.com/overmindtech/connect v0.6.1
-	github.com/overmindtech/discovery v0.17.0
+	github.com/overmindtech/connect v0.7.2
+	github.com/overmindtech/discovery v0.17.1
 	github.com/overmindtech/sdp-go v0.15.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
@@ -40,7 +40,7 @@ require (
 // Transitive dependencies
 require (
 	github.com/RoaringBitmap/roaring v1.2.3 // indirect
-	github.com/aws/aws-sdk-go v1.44.189 // indirect
+	github.com/aws/aws-sdk-go v1.44.191 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.21 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.27 // indirect
@@ -99,7 +99,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	go.etcd.io/bbolt v1.3.6 // indirect
+	go.etcd.io/bbolt v1.3.7 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.38.0 // indirect
 	go.opentelemetry.io/otel v1.12.0
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.12.0 // indirect
