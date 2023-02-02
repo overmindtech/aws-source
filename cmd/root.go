@@ -20,6 +20,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
+	"github.com/overmindtech/aws-source/sources/autoscaling"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
@@ -173,7 +174,15 @@ var rootCmd = &cobra.Command{
 
 			// Create an EC2 rate limit which limits the source to 50% of the
 			// overall rate limit
-			rateLimit := ec2.LimitBucket{
+			ec2RateLimit := ec2.LimitBucket{
+				MaxCapacity: 50,
+				RefillRate:  10,
+			}
+
+			// Apparently Autoscaling has a separate bucket to EC2 but I'm going
+			// to assume the values are the same, the documentation for rate
+			// limiting for everything other than EC2 is very poor
+			autoScalingRateLimit := ec2.LimitBucket{
 				MaxCapacity: 50,
 				RefillRate:  10,
 			}
@@ -181,7 +190,8 @@ var rootCmd = &cobra.Command{
 			rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
 			defer rateLimitCancel()
 
-			rateLimit.Start(rateLimitCtx)
+			ec2RateLimit.Start(rateLimitCtx)
+			autoScalingRateLimit.Start(rateLimitCtx)
 
 			sources := []discovery.Source{
 				// ELB
@@ -195,31 +205,31 @@ var rootCmd = &cobra.Command{
 				},
 
 				// EC2
-				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewInstanceSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewVpcSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewVolumeSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewImageSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewAddressSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewInternetGatewaySource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewKeyPairSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewNatGatewaySource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewRegionSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewSubnetSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewInstanceStatusSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewLaunchTemplateSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewNetworkAclSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewPlacementGroupSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewRouteTableSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &rateLimit),
-				ec2.NewSnapshotSource(cfg, *callerID.Account, &rateLimit),
+				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVpcSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVolumeSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewImageSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewAddressSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewKeyPairSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNatGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewRegionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSubnetSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceStatusSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewLaunchTemplateSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkAclSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewPlacementGroupSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
@@ -264,6 +274,9 @@ var rootCmd = &cobra.Command{
 				rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
 				rds.NewDBSubnetGroupSource(cfg, *callerID.Account),
 				rds.NewOptionGroupSource(cfg, *callerID.Account),
+
+				// Autoscaling
+				autoscaling.NewAutoScalingGroupSource(cfg, *callerID.Account, &autoScalingRateLimit),
 			}
 
 			e.AddSources(sources...)
