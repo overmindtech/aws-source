@@ -36,7 +36,7 @@ func AutoScalingGroupOutputMapper(scope string, output *autoscaling.DescribeAuto
 				if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification != nil {
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
 						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:   "ecs-launch-template",
+							Type:   "ec2-launch-template",
 							Method: sdp.RequestMethod_GET,
 							Query:  *asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId,
 							Scope:  scope,
@@ -68,6 +68,17 @@ func AutoScalingGroupOutputMapper(scope string, output *autoscaling.DescribeAuto
 					Query:  *instance.InstanceId,
 					Scope:  scope,
 				})
+			}
+
+			if instance.LaunchTemplate != nil {
+				if instance.LaunchTemplate.LaunchTemplateId != nil {
+					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						Type:   "ec2-launch-template",
+						Method: sdp.RequestMethod_GET,
+						Query:  *instance.LaunchTemplate.LaunchTemplateId,
+						Scope:  scope,
+					})
+				}
 			}
 		}
 

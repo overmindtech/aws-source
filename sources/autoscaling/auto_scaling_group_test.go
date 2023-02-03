@@ -62,7 +62,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 						LifecycleState:   types.LifecycleStateInService,
 						HealthStatus:     sources.PtrString("Healthy"),
 						LaunchTemplate: &types.LaunchTemplateSpecification{
-							LaunchTemplateId:   sources.PtrString("lt-0174ff2b8909d0c75"), // Do not link, we'll do it below
+							LaunchTemplateId:   sources.PtrString("lt-0174ff2b8909d0c75"), // Link
 							LaunchTemplateName: sources.PtrString("eks-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
 							Version:            sources.PtrString("1"),
 						},
@@ -171,7 +171,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 	// since the attributes are converted automatically
 	tests := sources.ItemRequestTests{
 		{
-			ExpectedType:   "ecs-launch-template",
+			ExpectedType:   "ec2-launch-template",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "lt-0174ff2b8909d0c75",
 			ExpectedScope:  "foo",
@@ -210,6 +210,12 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-placement-group",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "placementGroup",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-launch-template",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "lt-0174ff2b8909d0c75",
 			ExpectedScope:  "foo",
 		},
 	}
