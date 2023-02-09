@@ -25,9 +25,9 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
-	github.com/overmindtech/connect v0.8.1
-	github.com/overmindtech/discovery v0.17.1
-	github.com/overmindtech/sdp-go v0.15.3
+	github.com/overmindtech/connect v0.8.2
+	github.com/overmindtech/discovery v0.17.2
+	github.com/overmindtech/sdp-go v0.15.5
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
@@ -86,6 +86,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
