@@ -54,6 +54,12 @@ func TestFargateProfileGetFunc(t *testing.T) {
 			ExpectedQuery:  "arn:partition:service::account-id:resource-type/resource-id",
 			ExpectedScope:  "account-id",
 		},
+		{
+			ExpectedType:   "ec2-subnet",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "subnet",
+			ExpectedScope:  "foo",
+		},
 	}
 
 	tests.Execute(t, item)

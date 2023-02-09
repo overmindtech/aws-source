@@ -52,6 +52,15 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 		}
 	}
 
+	for _, subnet := range out.FargateProfile.Subnets {
+		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			Type:   "ec2-subnet",
+			Method: sdp.RequestMethod_GET,
+			Query:  subnet,
+			Scope:  scope,
+		})
+	}
+
 	return &item, nil
 }
 
