@@ -140,8 +140,6 @@ var rootCmd = &cobra.Command{
 		for _, region := range regions {
 			region = strings.Trim(region, " ")
 
-			// TODO: Create a way to load config for auth that will work within srcman ⚠️
-			// Load config and create client which will be re-used for all connections
 			configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
 
 			cfg, err := getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, targetRoleARN, autoConfig)
@@ -150,8 +148,6 @@ var rootCmd = &cobra.Command{
 				log.WithFields(log.Fields{
 					"error": err,
 				}).Fatal("Error loading config")
-
-				os.Exit(1)
 			}
 
 			// Work out what account we're using. This will be used in item scopes
@@ -165,8 +161,6 @@ var rootCmd = &cobra.Command{
 				log.WithFields(log.Fields{
 					"error": err,
 				}).Fatal("Error retrieving account information")
-
-				os.Exit(1)
 			}
 
 			// Cancel config load context and release resources
@@ -310,8 +304,6 @@ var rootCmd = &cobra.Command{
 			log.WithFields(log.Fields{
 				"error": err,
 			}).Error("Could not start HTTP server for /healthz health checks")
-
-			os.Exit(1)
 		}
 
 		err = e.Start()
@@ -320,8 +312,6 @@ var rootCmd = &cobra.Command{
 			log.WithFields(log.Fields{
 				"error": err,
 			}).Error("Could not start engine")
-
-			os.Exit(1)
 		}
 
 		sigs := make(chan os.Signal, 1)
@@ -405,6 +395,8 @@ func init() {
 				"error": err,
 			}).Error("Could not parse log level")
 		}
+
+		log.AddHook(TerminationLogHook{})
 
 		// Bind flags that haven't been set to the values from viper of we have them
 		cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) {
@@ -550,4 +542,23 @@ func createTokenClient(natsJWT string, natsNKeySeed string) (connect.TokenClient
 	}
 
 	return connect.NewBasicTokenClient(natsJWT, kp), nil
+}
+
+// TerminationLogHook A hook that logs fatal errors to the termination log
+type TerminationLogHook struct{}
+
+func (t TerminationLogHook) Levels() []log.Level {
+	return []log.Level{log.FatalLevel}
+}
+
+func (t TerminationLogHook) Fire(e *log.Entry) error {
+	tLog, err := os.OpenFile("/dev/termination-log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = tLog.WriteString(e.Message + "\n")
+
+	return err
 }
