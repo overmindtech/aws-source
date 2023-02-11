@@ -558,7 +558,13 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 		return err
 	}
 
-	_, err = tLog.WriteString(e.Message + "\n")
+	message, err := e.String()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = tLog.WriteString(message + "\n")
 
 	return err
 }
