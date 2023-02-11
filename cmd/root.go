@@ -558,13 +558,15 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 		return err
 	}
 
-	message, err := e.String()
+	var message string
 
-	if err != nil {
-		return err
+	message = e.Message
+
+	for k, v := range e.Data {
+		message = fmt.Sprintf("%v %v=%v", message, k, v)
 	}
 
-	_, err = tLog.WriteString(message + "\n")
+	_, err = tLog.WriteString(message)
 
 	return err
 }
