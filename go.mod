@@ -25,7 +25,7 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
-	github.com/overmindtech/connect v0.8.2
+	github.com/overmindtech/connect v0.8.3
 	github.com/overmindtech/discovery v0.17.2
 	github.com/overmindtech/sdp-go v0.15.5
 	github.com/sirupsen/logrus v1.9.0
