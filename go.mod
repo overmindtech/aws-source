@@ -7,9 +7,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.18.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.12
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.26.2
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.18.2
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.84.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.85.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.23.2
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.2
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.2
@@ -41,7 +41,7 @@ require (
 // Transitive dependencies
 require (
 	github.com/RoaringBitmap/roaring v1.2.3 // indirect
-	github.com/aws/aws-sdk-go v1.44.197 // indirect
+	github.com/aws/aws-sdk-go v1.44.199 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.22 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.28 // indirect
@@ -114,7 +114,7 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
+	google.golang.org/genproto v0.0.0-20230209215440-0dfe4f8abfcc // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
