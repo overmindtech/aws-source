@@ -27,7 +27,7 @@ require (
 	github.com/nats-io/nkeys v0.3.0
 	github.com/overmindtech/connect v0.8.3
 	github.com/overmindtech/discovery v0.17.2
-	github.com/overmindtech/sdp-go v0.15.5
+	github.com/overmindtech/sdp-go v0.16.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
