@@ -26,7 +26,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
 	github.com/overmindtech/connect v0.8.3
-	github.com/overmindtech/discovery v0.17.2
+	github.com/overmindtech/discovery v0.17.3
 	github.com/overmindtech/sdp-go v0.16.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
@@ -95,7 +95,7 @@ require (
 	github.com/nats-io/nats.go v1.23.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/api-client v0.11.1 // indirect
-	github.com/overmindtech/sdpcache v0.4.1 // indirect
+	github.com/overmindtech/sdpcache v1.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
@@ -121,3 +121,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require github.com/google/btree v1.1.2 // indirect
