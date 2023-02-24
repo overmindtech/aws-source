@@ -5,29 +5,29 @@ go 1.19
 // Direct dependencies
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.5
-	github.com/aws/aws-sdk-go-v2/config v1.18.14
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.14
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.1
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.18.4
+	github.com/aws/aws-sdk-go-v2/config v1.18.15
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.15
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.2
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.18.5
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.86.1
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.23.4
-	github.com/aws/aws-sdk-go-v2/service/eks v1.27.4
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.3
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.4
-	github.com/aws/aws-sdk-go-v2/service/iam v1.19.3
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.29.3
-	github.com/aws/aws-sdk-go-v2/service/rds v1.40.4
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.2
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.4
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.24.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.27.5
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.4
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.5
+	github.com/aws/aws-sdk-go-v2/service/iam v1.19.4
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.29.4
+	github.com/aws/aws-sdk-go-v2/service/rds v1.40.5
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.5
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.5
 	github.com/aws/smithy-go v1.13.5
 	github.com/getsentry/sentry-go v0.18.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nkeys v0.3.0
 	github.com/overmindtech/connect v0.8.3
-	github.com/overmindtech/discovery v0.17.3
-	github.com/overmindtech/sdp-go v0.16.0
+	github.com/overmindtech/discovery v0.17.4
+	github.com/overmindtech/sdp-go v0.16.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
@@ -41,7 +41,7 @@ require (
 // Transitive dependencies
 require (
 	github.com/RoaringBitmap/roaring v1.2.3 // indirect
-	github.com/aws/aws-sdk-go v1.44.206 // indirect
+	github.com/aws/aws-sdk-go v1.44.208 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.29 // indirect
@@ -53,8 +53,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.23 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.23 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.23 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.12.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.4 // indirect
 	github.com/bits-and-blooms/bitset v1.5.0 // indirect
 	github.com/blevesearch/bleve/v2 v2.3.6 // indirect
 	github.com/blevesearch/bleve_index_api v1.0.5 // indirect
@@ -78,10 +78,12 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
+	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/btree v1.1.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -97,7 +99,8 @@ require (
 	github.com/overmindtech/api-client v0.12.0 // indirect
 	github.com/overmindtech/sdpcache v1.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/spf13/afero v1.9.3 // indirect
+	github.com/sourcegraph/conc v0.2.1-0.20230221121046-14c5081d40d6 // indirect
+	github.com/spf13/afero v1.9.4 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
@@ -108,18 +111,18 @@ require (
 	go.opentelemetry.io/otel/metric v0.36.0 // indirect
 	go.opentelemetry.io/otel/trace v1.13.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230221151758-ace64dc21148 // indirect
+	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923 // indirect
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/google/btree v1.1.2 // indirect
