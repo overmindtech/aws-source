@@ -80,6 +80,11 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBuc
 			return ec2.NewDescribeSecurityGroupsPaginator(client, params)
 		},
 		OutputMapper: SecurityGroupOutputMapper,
+		InputMapperSearch: func(ctx context.Context, client *ec2.Client, scope, query string) (*ec2.DescribeSecurityGroupsInput, error) {
+			return &ec2.DescribeSecurityGroupsInput{
+				GroupNames: []string{query},
+			}, nil
+		},
 	}
 }
 
