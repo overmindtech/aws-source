@@ -64,7 +64,7 @@ func TestSnapshotOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SnapshotOutputMapper("foo", output)
+	items, err := SnapshotOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -54,7 +54,7 @@ func TestEgressOnlyInternetGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := EgressOnlyInternetGatewayOutputMapper("foo", output)
+	items, err := EgressOnlyInternetGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

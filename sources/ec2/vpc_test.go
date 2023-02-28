@@ -80,7 +80,7 @@ func TestVpcOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := VpcOutputMapper("foo", output)
+	items, err := VpcOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

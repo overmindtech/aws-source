@@ -25,7 +25,8 @@ import (
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
 	"github.com/overmindtech/aws-source/sources/eks"
-	"github.com/overmindtech/aws-source/sources/elasticloadbalancing"
+	"github.com/overmindtech/aws-source/sources/elb"
+	"github.com/overmindtech/aws-source/sources/elbv2"
 	"github.com/overmindtech/aws-source/sources/iam"
 	"github.com/overmindtech/aws-source/sources/lambda"
 	"github.com/overmindtech/aws-source/sources/rds"
@@ -192,16 +193,6 @@ var rootCmd = &cobra.Command{
 			autoScalingRateLimit.Start(rateLimitCtx)
 
 			sources := []discovery.Source{
-				// ELB
-				&elasticloadbalancing.ELBSource{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
-				&elasticloadbalancing.ELBv2Source{
-					Config:    cfg,
-					AccountID: *callerID.Account,
-				},
-
 				// EC2
 				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
@@ -275,6 +266,17 @@ var rootCmd = &cobra.Command{
 
 				// Autoscaling
 				autoscaling.NewAutoScalingGroupSource(cfg, *callerID.Account, &autoScalingRateLimit),
+
+				// ELB
+				elb.NewInstanceHealthSource(cfg, *callerID.Account),
+				elb.NewLoadBalancerSource(cfg, *callerID.Account),
+
+				// ELBv2
+				elbv2.NewLoadBalancerSource(cfg, *callerID.Account),
+				elbv2.NewListenerSource(cfg, *callerID.Account),
+				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
+				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
+				elbv2.NewRuleSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)

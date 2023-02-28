@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBSubnetGroupOutputMapper(scope string, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
+func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, sg := range output.DBSubnetGroups {

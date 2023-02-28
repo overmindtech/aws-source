@@ -64,7 +64,7 @@ func TestRegionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := RegionOutputMapper("foo", output)
+	items, err := RegionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

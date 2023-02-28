@@ -109,7 +109,7 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := LaunchTemplateVersionOutputMapper("foo", output)
+	items, err := LaunchTemplateVersionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

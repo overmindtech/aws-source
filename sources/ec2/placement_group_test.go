@@ -54,7 +54,7 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := PlacementGroupOutputMapper("foo", output)
+	items, err := PlacementGroupOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

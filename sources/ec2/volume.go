@@ -21,7 +21,7 @@ func VolumeInputMapperList(scope string) (*ec2.DescribeVolumesInput, error) {
 	return &ec2.DescribeVolumesInput{}, nil
 }
 
-func VolumeOutputMapper(scope string, output *ec2.DescribeVolumesOutput) ([]*sdp.Item, error) {
+func VolumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.DescribeVolumesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, volume := range output.Volumes {

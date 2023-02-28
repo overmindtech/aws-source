@@ -21,7 +21,7 @@ func InstanceEventWindowInputMapperList(scope string) (*ec2.DescribeInstanceEven
 	return &ec2.DescribeInstanceEventWindowsInput{}, nil
 }
 
-func InstanceEventWindowOutputMapper(scope string, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
+func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventWindowsInput, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {

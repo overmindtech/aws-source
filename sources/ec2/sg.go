@@ -22,7 +22,7 @@ func SecurityGroupInputMapperList(scope string) (*ec2.DescribeSecurityGroupsInpu
 	return &ec2.DescribeSecurityGroupsInput{}, nil
 }
 
-func SecurityGroupOutputMapper(scope string, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
+func SecurityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, securityGroup := range output.SecurityGroups {
@@ -80,6 +80,11 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBuc
 			return ec2.NewDescribeSecurityGroupsPaginator(client, params)
 		},
 		OutputMapper: SecurityGroupOutputMapper,
+		InputMapperSearch: func(ctx context.Context, client *ec2.Client, scope, query string) (*ec2.DescribeSecurityGroupsInput, error) {
+			return &ec2.DescribeSecurityGroupsInput{
+				GroupNames: []string{query},
+			}, nil
+		},
 	}
 }
 

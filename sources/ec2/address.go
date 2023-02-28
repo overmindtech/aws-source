@@ -25,7 +25,7 @@ func AddressInputMapperList(scope string) (*ec2.DescribeAddressesInput, error) {
 }
 
 // AddressOutputMapper Maps API output to items
-func AddressOutputMapper(scope string, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
+func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("empty output")
 	}

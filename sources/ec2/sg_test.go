@@ -79,7 +79,7 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SecurityGroupOutputMapper("052392120703.eu-west-2", output)
+	items, err := SecurityGroupOutputMapper("052392120703.eu-west-2", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

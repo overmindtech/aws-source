@@ -57,7 +57,7 @@ func TestAddressOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AddressOutputMapper("foo", &output)
+	items, err := AddressOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

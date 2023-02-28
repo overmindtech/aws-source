@@ -69,7 +69,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := ReservedInstanceOutputMapper("foo", output)
+	items, err := ReservedInstanceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

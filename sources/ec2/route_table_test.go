@@ -90,7 +90,7 @@ func TestRouteTableOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := RouteTableOutputMapper("foo", output)
+	items, err := RouteTableOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

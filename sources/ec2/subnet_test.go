@@ -78,7 +78,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SubnetOutputMapper("foo", output)
+	items, err := SubnetOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

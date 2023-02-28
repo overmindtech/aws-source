@@ -30,15 +30,20 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// DescribeFunc for a LIST request
 	InputMapperList func(scope string) (Input, error)
 
+	// A function that maps a search query to the required input. If this is
+	// unset then a search request will default to searching by ARN
+	InputMapperSearch func(ctx context.Context, client ClientStruct, scope string, query string) (Input, error)
+
 	// A function that returns a paginator for this API. If this is nil, we will
 	// assume that the API is not paginated e.g.
 	// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
 	PaginatorBuilder func(client ClientStruct, params Input) Paginator[Output, Options]
 
-	// A function that returns a slice of items for a given output. If this is a
-	// GET request the EC2 source itself will handle errors if there are too
-	// many items returned, so no need to worry about handling that
-	OutputMapper func(scope string, output Output) ([]*sdp.Item, error)
+	// A function that returns a slice of items for a given output. The scope
+	// and input are passed in on order to assist in creating the items if
+	// needed, but primarily this function should iterate over the output and
+	// create new items for each result
+	OutputMapper func(scope string, input Input, output Output) ([]*sdp.Item, error)
 
 	// Config AWS Config including region and credentials
 	Config aws.Config
@@ -136,7 +141,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 		return nil, WrapAWSError(err)
 	}
 
-	items, err = s.OutputMapper(scope, output)
+	items, err = s.OutputMapper(scope, input, output)
 
 	if err != nil {
 		return nil, WrapAWSError(err)
@@ -184,11 +189,13 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 
 	var items []*sdp.Item
 
-	if s.Paginated() {
-		items, err = s.listPaginated(ctx, scope)
-	} else {
-		items, err = s.listRegular(ctx, scope)
+	input, err := s.InputMapperList(scope)
+
+	if err != nil {
+		return nil, WrapAWSError(err)
 	}
+
+	items, err = s.describe(ctx, input, scope)
 
 	if err != nil {
 		return nil, WrapAWSError(err)
@@ -206,6 +213,14 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 		}
 	}
 
+	if s.InputMapperSearch == nil {
+		return s.searchARN(ctx, scope, query)
+	} else {
+		return s.searchCustom(ctx, scope, query)
+	}
+}
+
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -230,76 +245,68 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 	return []*sdp.Item{item}, nil
 }
 
-// listRegular Lists items from the API when the API is not paginated. Basically
-// just calls the API and maps the output once
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) listRegular(ctx context.Context, scope string) ([]*sdp.Item, error) {
-	var input Input
-	var output Output
-	var err error
-	var items []*sdp.Item
-
-	input, err = s.InputMapperList(scope)
+// searchCustom Runs custom search logic using the `InputMapperSearch` function
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+	input, err := s.InputMapperSearch(ctx, s.Client, scope, query)
 
 	if err != nil {
-		return nil, err
+		return nil, WrapAWSError(err)
 	}
 
-	output, err = s.DescribeFunc(ctx, s.Client, input)
+	items, err := s.describe(ctx, input, scope)
 
 	if err != nil {
-		return nil, err
-	}
-
-	items, err = s.OutputMapper(scope, output)
-
-	if err != nil {
-		return nil, err
+		return nil, WrapAWSError(err)
 	}
 
 	return items, nil
 }
 
-// listPaginated Lists all items with a paginated API. This requires that the
-// `PaginatorBuilder` be set
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) listPaginated(ctx context.Context, scope string) ([]*sdp.Item, error) {
-	var input Input
+// describe Runs describe on the given input, intelligently choosing whether to
+// run the paginated or unpaginated query
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx context.Context, input Input, scope string) ([]*sdp.Item, error) {
 	var output Output
 	var err error
 	var newItems []*sdp.Item
+
 	items := make([]*sdp.Item, 0)
 
-	input, err = s.InputMapperList(scope)
+	if s.Paginated() {
+		paginator := s.PaginatorBuilder(s.Client, input)
 
-	if err != nil {
-		return nil, err
-	}
+		for paginator.HasMorePages() {
+			output, err = paginator.NextPage(ctx)
 
-	if s.PaginatorBuilder == nil {
-		return nil, errors.New("paginator builder is nil, cannot use paginated API")
-	}
+			if err != nil {
+				return nil, err
+			}
 
-	paginator := s.PaginatorBuilder(s.Client, input)
+			newItems, err = s.OutputMapper(scope, input, output)
 
-	for paginator.HasMorePages() {
-		output, err = paginator.NextPage(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			items = append(items, newItems...)
+		}
+	} else {
+		output, err = s.DescribeFunc(ctx, s.Client, input)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newItems, err = s.OutputMapper(scope, output)
+		items, err = s.OutputMapper(scope, input, output)
 
 		if err != nil {
 			return nil, err
 		}
-
-		items = append(items, newItems...)
 	}
 
 	return items, nil
 }
 
-// Weight Returns the priority weighting of items returned by this sourcs.
+// Weight Returns the priority weighting of items returned by this source.
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.

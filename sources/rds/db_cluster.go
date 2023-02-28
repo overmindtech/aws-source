@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBClusterOutputMapper(scope string, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
+func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, cluster := range output.DBClusters {

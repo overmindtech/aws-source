@@ -76,7 +76,7 @@ func TestImageOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := ImageOutputMapper("foo", &output)
+	items, err := ImageOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

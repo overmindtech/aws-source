@@ -21,7 +21,7 @@ func NetworkInterfaceInputMapperList(scope string) (*ec2.DescribeNetworkInterfac
 	return &ec2.DescribeNetworkInterfacesInput{}, nil
 }
 
-func NetworkInterfaceOutputMapper(scope string, output *ec2.DescribeNetworkInterfacesOutput) ([]*sdp.Item, error) {
+func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacesInput, output *ec2.DescribeNetworkInterfacesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.NetworkInterfaces {

@@ -168,7 +168,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := DBInstanceOutputMapper("foo", output)
+	items, err := DBInstanceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

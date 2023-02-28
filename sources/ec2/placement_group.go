@@ -21,7 +21,7 @@ func PlacementGroupInputMapperList(scope string) (*ec2.DescribePlacementGroupsIn
 	return &ec2.DescribePlacementGroupsInput{}, nil
 }
 
-func PlacementGroupOutputMapper(scope string, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
+func PlacementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInput, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.PlacementGroups {

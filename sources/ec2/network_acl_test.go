@@ -85,7 +85,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkAclOutputMapper("foo", output)
+	items, err := NetworkAclOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

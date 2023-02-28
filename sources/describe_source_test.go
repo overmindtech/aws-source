@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/sdp-go"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestType(t *testing.T) {
@@ -68,7 +69,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 				outputMapperCalled = true
 				return []*sdp.Item{
 					{},
@@ -115,7 +116,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 				return []*sdp.Item{
 					{},
 					{},
@@ -146,7 +147,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 				return []*sdp.Item{}, nil
 			},
 			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
@@ -162,7 +163,7 @@ func TestGet(t *testing.T) {
 	})
 }
 
-func TestSearch(t *testing.T) {
+func TestSearchARN(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "region",
@@ -174,7 +175,7 @@ func TestSearch(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -195,13 +196,63 @@ func TestSearch(t *testing.T) {
 	}
 }
 
+func TestSearchCustom(t *testing.T) {
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
+		Config: aws.Config{
+			Region: "region",
+		},
+		AccountID: "account-id",
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
+			return "input", nil
+		},
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+			return []*sdp.Item{
+				{
+					Type:            "test-item",
+					UniqueAttribute: "name",
+					Attributes: &sdp.ItemAttributes{
+						AttrStruct: &structpb.Struct{
+							Fields: map[string]*structpb.Value{
+								"name": structpb.NewStringValue(output),
+							},
+						},
+					},
+				},
+			}, nil
+		},
+		InputMapperSearch: func(ctx context.Context, client struct{}, scope, query string) (string, error) {
+			return "custom", nil
+		},
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
+			return input, nil
+		},
+	}
+
+	items, err := s.Search(context.Background(), "account-id.region", "foo")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(items) != 1 {
+		t.Errorf("expected 1 item, got %v", len(items))
+	}
+
+	if items[0].UniqueAttributeValue() != "custom" {
+		t.Errorf("expected item to be 'custom', got %v", items[0].UniqueAttributeValue())
+	}
+}
+
 func TestNoInputMapper(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		Config: aws.Config{
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -274,7 +325,7 @@ func TestNoDescribeFunc(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -310,7 +361,7 @@ func TestFailingInputMapper(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", errors.New("foobar")
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -359,7 +410,7 @@ func TestFailingOutputMapper(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return nil, errors.New("foobar")
 		},
 		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
@@ -406,7 +457,7 @@ func TestFailingDescribeFunc(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -470,7 +521,7 @@ func TestPaginated(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil

@@ -21,7 +21,7 @@ func RouteTableInputMapperList(scope string) (*ec2.DescribeRouteTablesInput, err
 	return &ec2.DescribeRouteTablesInput{}, nil
 }
 
-func RouteTableOutputMapper(scope string, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
+func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, rt := range output.RouteTables {

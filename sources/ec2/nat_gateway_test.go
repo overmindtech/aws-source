@@ -91,7 +91,7 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NatGatewayOutputMapper("foo", output)
+	items, err := NatGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)
