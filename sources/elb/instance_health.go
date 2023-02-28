@@ -97,7 +97,10 @@ func NewInstanceHealthSource(config aws.Config, accountID string) *sources.Descr
 			}, nil
 		},
 		InputMapperList: func(scope string) (*elb.DescribeInstanceHealthInput, error) {
-			return nil, fmt.Errorf("list of not supported elb-instance-health, use search")
+			return nil, &sdp.ItemRequestError{
+				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+				ErrorString: "list not supported for elb-instance-health, use search",
+			}
 		},
 		OutputMapper: InstanceHealthOutputMapper,
 	}
