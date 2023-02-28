@@ -26,6 +26,15 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 			Scope:           scope,
 		}
 
+		if tg.TargetGroupArn != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:   "elbv2-target-health",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *tg.TargetGroupArn,
+				Scope:  scope,
+			})
+		}
+
 		if tg.VpcId != nil {
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 				Type:   "ec2-vpc",
