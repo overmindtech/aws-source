@@ -274,6 +274,7 @@ var rootCmd = &cobra.Command{
 				// ELBv2
 				elbv2.NewLoadBalancerSource(cfg, *callerID.Account),
 				elbv2.NewListenerSource(cfg, *callerID.Account),
+				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
