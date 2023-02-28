@@ -71,7 +71,7 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceStatusOutputMapper("foo", output)
+	items, err := InstanceStatusOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

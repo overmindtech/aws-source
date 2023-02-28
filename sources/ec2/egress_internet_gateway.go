@@ -21,7 +21,7 @@ func EgressOnlyInternetGatewayInputMapperList(scope string) (*ec2.DescribeEgress
 	return &ec2.DescribeEgressOnlyInternetGatewaysInput{}, nil
 }
 
-func EgressOnlyInternetGatewayOutputMapper(scope string, output *ec2.DescribeEgressOnlyInternetGatewaysOutput) ([]*sdp.Item, error) {
+func EgressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOnlyInternetGatewaysInput, output *ec2.DescribeEgressOnlyInternetGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.EgressOnlyInternetGateways {

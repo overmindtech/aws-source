@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func OptionGroupOutputMapper(scope string, output *rds.DescribeOptionGroupsOutput) ([]*sdp.Item, error) {
+func OptionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, output *rds.DescribeOptionGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, group := range output.OptionGroupsList {

@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TargetGroupOutputMapper(scope string, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
+func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, tg := range output.TargetGroups {

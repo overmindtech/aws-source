@@ -15,7 +15,7 @@ var CapacityProviderIncludeFields = []types.CapacityProviderField{
 	types.CapacityProviderFieldTags,
 }
 
-func CapacityProviderOutputMapper(scope string, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
+func CapacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	var attributes *sdp.ItemAttributes

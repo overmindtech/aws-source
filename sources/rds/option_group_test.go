@@ -23,7 +23,7 @@ func TestOptionGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := OptionGroupOutputMapper("foo", &output)
+	items, err := OptionGroupOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

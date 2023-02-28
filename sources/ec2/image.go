@@ -32,7 +32,7 @@ func ImageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
 	}, nil
 }
 
-func ImageOutputMapper(scope string, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
+func ImageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, Image := range output.Images {

@@ -71,7 +71,7 @@ func TestAvailabilityZoneOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AvailabilityZoneOutputMapper("foo", &output)
+	items, err := AvailabilityZoneOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

@@ -21,7 +21,7 @@ func NetworkInterfacePermissionInputMapperList(scope string) (*ec2.DescribeNetwo
 	return &ec2.DescribeNetworkInterfacePermissionsInput{}, nil
 }
 
-func NetworkInterfacePermissionOutputMapper(scope string, output *ec2.DescribeNetworkInterfacePermissionsOutput) ([]*sdp.Item, error) {
+func NetworkInterfacePermissionOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacePermissionsInput, output *ec2.DescribeNetworkInterfacePermissionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.NetworkInterfacePermissions {

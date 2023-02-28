@@ -54,7 +54,7 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkInterfacePermissionOutputMapper("foo", output)
+	items, err := NetworkInterfacePermissionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBInstanceOutputMapper(scope string, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
+func DBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instance := range output.DBInstances {

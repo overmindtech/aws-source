@@ -68,7 +68,7 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceEventWindowOutputMapper("foo", output)
+	items, err := InstanceEventWindowOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -53,7 +53,7 @@ func TestKeyPairOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := KeyPairOutputMapper("foo", output)
+	items, err := KeyPairOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -75,7 +75,7 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SecurityGroupRuleOutputMapper("foo", output)
+	items, err := SecurityGroupRuleOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

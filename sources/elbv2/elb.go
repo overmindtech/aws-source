@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LoadBalancerOutputMapper(scope string, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
+func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, lb := range output.LoadBalancers {

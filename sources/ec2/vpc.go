@@ -21,7 +21,7 @@ func VpcInputMapperList(scope string) (*ec2.DescribeVpcsInput, error) {
 	return &ec2.DescribeVpcsInput{}, nil
 }
 
-func VpcOutputMapper(scope string, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
+func VpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, vpc := range output.Vpcs {

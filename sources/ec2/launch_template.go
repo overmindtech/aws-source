@@ -21,7 +21,7 @@ func LaunchTemplateInputMapperList(scope string) (*ec2.DescribeLaunchTemplatesIn
 	return &ec2.DescribeLaunchTemplatesInput{}, nil
 }
 
-func LaunchTemplateOutputMapper(scope string, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
+func LaunchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInput, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, LaunchTemplate := range output.LaunchTemplates {

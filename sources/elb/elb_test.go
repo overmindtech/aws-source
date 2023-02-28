@@ -104,7 +104,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := LoadBalancerOutputMapper("foo", output)
+	items, err := LoadBalancerOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Error(err)

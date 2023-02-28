@@ -61,7 +61,7 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InternetGatewayOutputMapper("foo", output)
+	items, err := InternetGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

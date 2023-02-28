@@ -27,7 +27,7 @@ func SnapshotInputMapperList(scope string) (*ec2.DescribeSnapshotsInput, error) 
 	}, nil
 }
 
-func SnapshotOutputMapper(scope string, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
+func SnapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, snapshot := range output.Snapshots {

@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func AutoScalingGroupOutputMapper(scope string, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
+func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScalingGroupsInput, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	var item sdp.Item

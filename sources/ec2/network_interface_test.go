@@ -104,7 +104,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkInterfaceOutputMapper("foo", output)
+	items, err := NetworkInterfaceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

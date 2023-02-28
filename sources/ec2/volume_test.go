@@ -67,7 +67,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := VolumeOutputMapper("foo", output)
+	items, err := VolumeOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

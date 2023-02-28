@@ -21,7 +21,7 @@ func NatGatewayInputMapperList(scope string) (*ec2.DescribeNatGatewaysInput, err
 	return &ec2.DescribeNatGatewaysInput{}, nil
 }
 
-func NatGatewayOutputMapper(scope string, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
+func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.NatGateways {

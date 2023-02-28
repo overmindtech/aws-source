@@ -179,7 +179,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceOutputMapper("foo", output)
+	items, err := InstanceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

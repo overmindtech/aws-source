@@ -21,7 +21,7 @@ func SubnetInputMapperList(scope string) (*ec2.DescribeSubnetsInput, error) {
 	return &ec2.DescribeSubnetsInput{}, nil
 }
 
-func SubnetOutputMapper(scope string, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
+func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, subnet := range output.Subnets {
