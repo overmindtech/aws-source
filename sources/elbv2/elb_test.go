@@ -72,6 +72,18 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 	// since the attributes are converted automatically
 	tests := sources.ItemRequestTests{
 		{
+			ExpectedType:   "elbv2-target-group",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:loadbalancer/app/ingress/1bf10920c5bd199d",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "elbv2-listener",
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:loadbalancer/app/ingress/1bf10920c5bd199d",
+			ExpectedScope:  "foo",
+		},
+		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "ingress-1285969159.eu-west-2.elb.amazonaws.com",

@@ -27,6 +27,22 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 			Scope:           scope,
 		}
 
+		if lb.LoadBalancerArn != nil {
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:   "elbv2-target-group",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *lb.LoadBalancerArn,
+				Scope:  scope,
+			})
+
+			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				Type:   "elbv2-listener",
+				Method: sdp.RequestMethod_SEARCH,
+				Query:  *lb.LoadBalancerArn,
+				Scope:  scope,
+			})
+		}
+
 		if lb.DNSName != nil {
 			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
 				Type:   "dns",

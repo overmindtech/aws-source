@@ -78,6 +78,12 @@ func NewTargetGroupSource(config aws.Config, accountID string) *sources.Describe
 		InputMapperList: func(scope string) (*elbv2.DescribeTargetGroupsInput, error) {
 			return &elbv2.DescribeTargetGroupsInput{}, nil
 		},
+		InputMapperSearch: func(ctx context.Context, client *elbv2.Client, scope, query string) (*elbv2.DescribeTargetGroupsInput, error) {
+			// Search by load balancer
+			return &elbv2.DescribeTargetGroupsInput{
+				LoadBalancerArn: &query,
+			}, nil
+		},
 		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeTargetGroupsInput) sources.Paginator[*elbv2.DescribeTargetGroupsOutput, *elbv2.Options] {
 			return elbv2.NewDescribeTargetGroupsPaginator(client, params)
 		},

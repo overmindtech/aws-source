@@ -105,6 +105,12 @@ func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnl
 				ErrorString: "list not supported for elbv2-listener, use search",
 			}
 		},
+		InputMapperSearch: func(ctx context.Context, client *elbv2.Client, scope, query string) (*elbv2.DescribeListenersInput, error) {
+			// Search by LB ARN
+			return &elbv2.DescribeListenersInput{
+				LoadBalancerArn: &query,
+			}, nil
+		},
 		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeListenersInput) sources.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeListenersPaginator(client, params)
 		},
