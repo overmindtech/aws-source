@@ -39,10 +39,11 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
 	PaginatorBuilder func(client ClientStruct, params Input) Paginator[Output, Options]
 
-	// A function that returns a slice of items for a given output. If this is a
-	// GET request the EC2 source itself will handle errors if there are too
-	// many items returned, so no need to worry about handling that
-	OutputMapper func(scope string, output Output) ([]*sdp.Item, error)
+	// A function that returns a slice of items for a given output. The scope
+	// and input are passed in on order to assist in creating the items if
+	// needed, but primarily this function should iterate over the output and
+	// create new items for each result
+	OutputMapper func(scope string, input Input, output Output) ([]*sdp.Item, error)
 
 	// Config AWS Config including region and credentials
 	Config aws.Config
@@ -140,7 +141,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 		return nil, WrapAWSError(err)
 	}
 
-	items, err = s.OutputMapper(scope, output)
+	items, err = s.OutputMapper(scope, input, output)
 
 	if err != nil {
 		return nil, WrapAWSError(err)
@@ -280,7 +281,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 				return nil, err
 			}
 
-			newItems, err = s.OutputMapper(scope, output)
+			newItems, err = s.OutputMapper(scope, input, output)
 
 			if err != nil {
 				return nil, err
@@ -295,7 +296,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 			return nil, err
 		}
 
-		items, err = s.OutputMapper(scope, output)
+		items, err = s.OutputMapper(scope, input, output)
 
 		if err != nil {
 			return nil, err
