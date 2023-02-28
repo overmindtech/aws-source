@@ -5,7 +5,6 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	"net/url"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
@@ -73,111 +72,11 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 			}
 		}
 
+		var requests []*sdp.ItemRequest
+
 		for _, action := range listener.DefaultActions {
-			if action.AuthenticateCognitoConfig != nil {
-				if action.AuthenticateCognitoConfig.UserPoolArn != nil {
-					if a, err := sources.ParseARN(*action.AuthenticateCognitoConfig.UserPoolArn); err == nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:   "cognito-idp-user-pool",
-							Method: sdp.RequestMethod_SEARCH,
-							Query:  *action.AuthenticateCognitoConfig.UserPoolArn,
-							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						})
-					}
-				}
-			}
-
-			if action.AuthenticateOidcConfig != nil {
-				if action.AuthenticateOidcConfig.AuthorizationEndpoint != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "http",
-						Method: sdp.RequestMethod_GET,
-						Query:  *action.AuthenticateOidcConfig.AuthorizationEndpoint,
-						Scope:  "global",
-					})
-				}
-
-				if action.AuthenticateOidcConfig.TokenEndpoint != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "http",
-						Method: sdp.RequestMethod_GET,
-						Query:  *action.AuthenticateOidcConfig.TokenEndpoint,
-						Scope:  "global",
-					})
-				}
-
-				if action.AuthenticateOidcConfig.UserInfoEndpoint != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-						Type:   "http",
-						Method: sdp.RequestMethod_GET,
-						Query:  *action.AuthenticateOidcConfig.UserInfoEndpoint,
-						Scope:  "global",
-					})
-				}
-
-				if action.ForwardConfig != nil {
-					for _, tg := range action.ForwardConfig.TargetGroups {
-						if tg.TargetGroupArn != nil {
-							if a, err := sources.ParseARN(*tg.TargetGroupArn); err == nil {
-								item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-									Type:   "elbv2-target-group",
-									Method: sdp.RequestMethod_SEARCH,
-									Query:  *tg.TargetGroupArn,
-									Scope:  sources.FormatScope(a.AccountID, a.Region),
-								})
-							}
-						}
-					}
-				}
-
-				if action.RedirectConfig != nil {
-					u := url.URL{}
-
-					if action.RedirectConfig.Path != nil {
-						u.Path = *action.RedirectConfig.Path
-					}
-
-					if action.RedirectConfig.Port != nil {
-						u.Port()
-					}
-
-					if action.RedirectConfig.Host != nil {
-						u.Host = *action.RedirectConfig.Host
-
-						if action.RedirectConfig.Port != nil {
-							u.Host = u.Host + fmt.Sprintf(":%v", *action.RedirectConfig.Port)
-						}
-					}
-
-					if action.RedirectConfig.Protocol != nil {
-						u.Scheme = *action.RedirectConfig.Protocol
-					}
-
-					if action.RedirectConfig.Query != nil {
-						u.RawQuery = *action.RedirectConfig.Query
-					}
-
-					if u.Scheme == "http" || u.Scheme == "https" {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:   "http",
-							Method: sdp.RequestMethod_GET,
-							Query:  u.String(),
-							Scope:  "global",
-						})
-					}
-				}
-
-				if action.TargetGroupArn != nil {
-					if a, err := sources.ParseARN(*action.TargetGroupArn); err == nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
-							Type:   "elbv2-target-group",
-							Method: sdp.RequestMethod_SEARCH,
-							Query:  *action.TargetGroupArn,
-							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						})
-					}
-				}
-			}
+			requests = ActionToRequests(action)
+			item.LinkedItemRequests = append(item.LinkedItemRequests, requests...)
 		}
 
 		items = append(items, &item)

@@ -276,6 +276,7 @@ var rootCmd = &cobra.Command{
 				elbv2.NewListenerSource(cfg, *callerID.Account),
 				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
+				elbv2.NewRuleSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
