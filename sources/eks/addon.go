@@ -18,8 +18,8 @@ func AddonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 	}
 
 	if out.Addon == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "addon was nil",
 		}
 	}

@@ -29,7 +29,7 @@ func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 		var a *sources.ARN
 
 		if sg.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *sg.VpcId,
@@ -39,7 +39,7 @@ func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.RequestMethod_GET,
 					Query:  *subnet.SubnetIdentifier,
@@ -49,7 +49,7 @@ func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 			if subnet.SubnetAvailabilityZone != nil {
 				if subnet.SubnetAvailabilityZone.Name != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.RequestMethod_GET,
 						Query:  *subnet.SubnetAvailabilityZone.Name,
@@ -61,7 +61,7 @@ func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 			if subnet.SubnetOutpost != nil {
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = sources.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "outposts-outpost",
 							Method: sdp.RequestMethod_SEARCH,
 							Query:  *subnet.SubnetOutpost.Arn,

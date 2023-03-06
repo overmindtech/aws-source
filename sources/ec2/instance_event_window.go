@@ -28,8 +28,8 @@ func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 		attrs, err := sources.ToAttributesCase(ew)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -44,7 +44,7 @@ func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 
 		if at := ew.AssociationTarget; at != nil {
 			for _, id := range at.DedicatedHostIds {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-host",
 					Method: sdp.RequestMethod_GET,
 					Query:  id,
@@ -53,7 +53,7 @@ func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 			}
 
 			for _, id := range at.InstanceIds {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.RequestMethod_GET,
 					Query:  id,

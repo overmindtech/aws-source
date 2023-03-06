@@ -62,7 +62,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		if attachment.Type != nil {
 			if *attachment.Type == "ElasticNetworkInterface" {
 				if attachment.Id != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-network-interface",
 						Method: sdp.RequestMethod_GET,
 						Query:  *attachment.Id,
@@ -75,7 +75,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.ClusterArn != nil {
 		if a, err = sources.ParseARN(*task.ClusterArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *task.ClusterArn,
@@ -86,7 +86,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.ContainerInstanceArn != nil {
 		if a, err = sources.ParseARN(*task.ContainerInstanceArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-container-instance",
 				Method: sdp.RequestMethod_GET,
 				Query:  a.ResourceID(),
@@ -98,7 +98,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	for _, container := range task.Containers {
 		for _, ni := range container.NetworkInterfaces {
 			if ni.Ipv6Address != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *ni.Ipv6Address,
@@ -107,7 +107,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			}
 
 			if ni.PrivateIpv4Address != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *ni.PrivateIpv4Address,
@@ -119,7 +119,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.TaskDefinitionArn != nil {
 		if a, err = sources.ParseARN(*task.TaskDefinitionArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *task.TaskDefinitionArn,

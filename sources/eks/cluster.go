@@ -17,8 +17,8 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	}
 
 	if output.Cluster == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "cluster response was nil",
 		}
 	}
@@ -36,7 +36,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
-		LinkedItemRequests: []*sdp.ItemRequest{
+		LinkedItemQueries: []*sdp.Query{
 			{
 				Type:   "eks-addon",
 				Method: sdp.RequestMethod_SEARCH,
@@ -63,7 +63,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	if cluster.ConnectorConfig != nil {
 		if cluster.ConnectorConfig.RoleArn != nil {
 			if a, err = sources.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *cluster.ConnectorConfig.RoleArn,
@@ -77,7 +77,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if conf.Provider != nil {
 			if conf.Provider.KeyArn != nil {
 				if a, err = sources.ParseARN(*conf.Provider.KeyArn); err == nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kms-key",
 						Method: sdp.RequestMethod_SEARCH,
 						Query:  *conf.Provider.KeyArn,
@@ -89,7 +89,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	}
 
 	if cluster.Endpoint != nil {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "http",
 			Method: sdp.RequestMethod_GET,
 			Query:  *cluster.Endpoint,
@@ -99,7 +99,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.ResourcesVpcConfig != nil {
 		if cluster.ResourcesVpcConfig.ClusterSecurityGroupId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.RequestMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.ClusterSecurityGroupId,
@@ -108,7 +108,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SecurityGroupIds {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.RequestMethod_GET,
 				Query:  id,
@@ -117,7 +117,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SubnetIds {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.RequestMethod_GET,
 				Query:  id,
@@ -126,7 +126,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		if cluster.ResourcesVpcConfig.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.VpcId,
@@ -137,7 +137,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.RoleArn != nil {
 		if a, err = sources.ParseARN(*cluster.RoleArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *cluster.RoleArn,

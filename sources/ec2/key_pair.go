@@ -30,8 +30,8 @@ func KeyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2
 		attrs, err = sources.ToAttributesCase(gw)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}

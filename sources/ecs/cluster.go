@@ -32,8 +32,8 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 		if failure.Reason != nil && failure.Arn != nil {
 			if *failure.Reason == "MISSING" {
-				return nil, &sdp.ItemRequestError{
-					ErrorType:   sdp.ItemRequestError_NOTFOUND,
+				return nil, &sdp.QueryError{
+					ErrorType:   sdp.QueryError_NOTFOUND,
 					ErrorString: fmt.Sprintf("cluster with ARN %v not found", *failure.Arn),
 				}
 			}
@@ -59,7 +59,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		UniqueAttribute: "clusterName",
 		Scope:           scope,
 		Attributes:      attributes,
-		LinkedItemRequests: []*sdp.ItemRequest{
+		LinkedItemQueries: []*sdp.Query{
 			{
 				// Search for all container instances on this cluster
 				Type:   "ecs-container-instance",
@@ -85,7 +85,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	if cluster.Configuration != nil {
 		if cluster.Configuration.ExecuteCommandConfiguration != nil {
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.RequestMethod_GET,
 					Query:  *cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId,
@@ -95,7 +95,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 			if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration != nil {
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "logs-log-group",
 						Method: sdp.RequestMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName,
@@ -104,7 +104,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				}
 
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "s3-bucket",
 						Method: sdp.RequestMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
@@ -116,7 +116,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	}
 
 	for _, provider := range cluster.CapacityProviders {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ecs-capacity-provider",
 			Method: sdp.RequestMethod_GET,
 			Query:  provider,

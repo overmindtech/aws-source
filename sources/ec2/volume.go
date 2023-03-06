@@ -30,8 +30,8 @@ func VolumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 		attrs, err = sources.ToAttributesCase(volume)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -45,7 +45,7 @@ func VolumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 		}
 
 		for _, attachment := range volume.Attachments {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.RequestMethod_GET,
 				Query:  *attachment.InstanceId,

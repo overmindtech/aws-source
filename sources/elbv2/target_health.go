@@ -123,14 +123,14 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 		if err == nil {
 			switch a.Service {
 			case "lambda":
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *desc.Target.Id,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
 			case "elasticloadbalancing":
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *desc.Target.Id,
@@ -142,7 +142,7 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			// for IP first
 			if net.ParseIP(*desc.Target.Id) != nil {
 				// This means it's an IP
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *desc.Target.Id,
@@ -150,7 +150,7 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 				})
 			} else {
 				// If all else fails it must be an instance ID
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.RequestMethod_GET,
 					Query:  *desc.Target.Id,
@@ -193,8 +193,8 @@ func NewTargetHealthSource(config aws.Config, accountID string) *sources.Describ
 			}, nil
 		},
 		InputMapperList: func(scope string) (*elbv2.DescribeTargetHealthInput, error) {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: "list not supported for elbv2-target-health, use search",
 			}
 		},

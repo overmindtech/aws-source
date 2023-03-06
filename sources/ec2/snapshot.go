@@ -36,8 +36,8 @@ func SnapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 		attrs, err = sources.ToAttributesCase(snapshot)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -53,7 +53,7 @@ func SnapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 		if snapshot.VolumeId != nil {
 			// Ignore the arbitrary ID that is used by Amazon
 			if *snapshot.VolumeId != "vol-ffffffff" {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-volume",
 					Method: sdp.RequestMethod_GET,
 					Query:  *snapshot.VolumeId,

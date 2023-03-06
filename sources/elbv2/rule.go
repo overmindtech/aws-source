@@ -26,11 +26,11 @@ func RuleOutputMapper(scope string, _ *elbv2.DescribeRulesInput, output *elbv2.D
 			Scope:           scope,
 		}
 
-		var requests []*sdp.ItemRequest
+		var requests []*sdp.Query
 
 		for _, action := range rule.Actions {
 			requests = ActionToRequests(action)
-			item.LinkedItemRequests = append(item.LinkedItemRequests, requests...)
+			item.LinkedItemQueries = append(item.LinkedItemQueries, requests...)
 		}
 
 		items = append(items, &item)
@@ -54,8 +54,8 @@ func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySou
 			}, nil
 		},
 		InputMapperList: func(scope string) (*elbv2.DescribeRulesInput, error) {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: "list not supported for elbv2-rule, use search",
 			}
 		},

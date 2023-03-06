@@ -18,8 +18,8 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	}
 
 	if out.FargateProfile == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "fargate profile was nil",
 		}
 	}
@@ -43,7 +43,7 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 
 	if out.FargateProfile.PodExecutionRoleArn != nil {
 		if a, err := sources.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *out.FargateProfile.PodExecutionRoleArn,
@@ -53,7 +53,7 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	}
 
 	for _, subnet := range out.FargateProfile.Subnets {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-subnet",
 			Method: sdp.RequestMethod_GET,
 			Query:  subnet,

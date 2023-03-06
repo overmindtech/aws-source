@@ -30,8 +30,8 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 		attrs, err = sources.ToAttributesCase(rt)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -46,7 +46,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 
 		for _, assoc := range rt.Associations {
 			if assoc.SubnetId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.RequestMethod_GET,
 					Query:  *assoc.SubnetId,
@@ -55,7 +55,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 			}
 
 			if assoc.GatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-internet-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *assoc.GatewayId,
@@ -66,7 +66,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 
 		for _, route := range rt.Routes {
 			if route.CarrierGatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-carrier-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.CarrierGatewayId,
@@ -74,7 +74,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.EgressOnlyInternetGatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-egress-only-internet-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.EgressOnlyInternetGatewayId,
@@ -82,7 +82,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.InstanceId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.InstanceId,
@@ -90,7 +90,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.LocalGatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-local-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.LocalGatewayId,
@@ -98,7 +98,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.NatGatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-nat-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.NatGatewayId,
@@ -106,7 +106,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.NetworkInterfaceId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-network-interface",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.NetworkInterfaceId,
@@ -114,7 +114,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.TransitGatewayId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-transit-gateway",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.TransitGatewayId,
@@ -122,7 +122,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 				})
 			}
 			if route.VpcPeeringConnectionId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc-peering-connection",
 					Method: sdp.RequestMethod_GET,
 					Query:  *route.VpcPeeringConnectionId,
@@ -132,7 +132,7 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 		}
 
 		if rt.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *rt.VpcId,

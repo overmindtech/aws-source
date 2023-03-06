@@ -30,8 +30,8 @@ func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		attrs, err = sources.ToAttributesCase(subnet)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -45,7 +45,7 @@ func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		}
 
 		if subnet.AvailabilityZone != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.RequestMethod_GET,
 				Query:  *subnet.AvailabilityZone,
@@ -54,7 +54,7 @@ func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		}
 
 		if subnet.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *subnet.VpcId,

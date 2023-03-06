@@ -67,11 +67,11 @@ func TestActionToRequests(t *testing.T) {
 	}
 
 	item := sdp.Item{
-		Type:               "test",
-		UniqueAttribute:    "foo",
-		Attributes:         &sdp.ItemAttributes{},
-		Scope:              "foo",
-		LinkedItemRequests: ActionToRequests(action),
+		Type:              "test",
+		UniqueAttribute:   "foo",
+		Attributes:        &sdp.ItemAttributes{},
+		Scope:             "foo",
+		LinkedItemQueries: ActionToRequests(action),
 	}
 
 	tests := sources.ItemRequestTests{

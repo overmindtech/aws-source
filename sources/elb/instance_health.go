@@ -56,7 +56,7 @@ func InstanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput
 		}
 
 		if is.InstanceId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.RequestMethod_GET,
 				Query:  *is.InstanceId,
@@ -97,8 +97,8 @@ func NewInstanceHealthSource(config aws.Config, accountID string) *sources.Descr
 			}, nil
 		},
 		InputMapperList: func(scope string) (*elb.DescribeInstanceHealthInput, error) {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: "list not supported for elb-instance-health, use search",
 			}
 		},

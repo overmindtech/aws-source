@@ -147,7 +147,7 @@ func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	}
 
 	for _, group := range awsItem.PolicyGroups {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-group",
 			Query:  *group.GroupName,
 			Method: sdp.RequestMethod_GET,
@@ -156,7 +156,7 @@ func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	}
 
 	for _, user := range awsItem.PolicyUsers {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-user",
 			Method: sdp.RequestMethod_GET,
 			Query:  *user.UserName,
@@ -165,7 +165,7 @@ func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	}
 
 	for _, role := range awsItem.PolicyRoles {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-role",
 			Method: sdp.RequestMethod_GET,
 			Query:  *role.RoleName,

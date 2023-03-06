@@ -50,7 +50,7 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 
 		if listener.LoadBalancerArn != nil {
 			if a, err := sources.ParseARN(*listener.LoadBalancerArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *listener.LoadBalancerArn,
@@ -62,7 +62,7 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 		for _, cert := range listener.Certificates {
 			if cert.CertificateArn != nil {
 				if a, err := sources.ParseARN(*cert.CertificateArn); err == nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "acm-certificate",
 						Method: sdp.RequestMethod_SEARCH,
 						Query:  *cert.CertificateArn,
@@ -72,11 +72,11 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 			}
 		}
 
-		var requests []*sdp.ItemRequest
+		var requests []*sdp.Query
 
 		for _, action := range listener.DefaultActions {
 			requests = ActionToRequests(action)
-			item.LinkedItemRequests = append(item.LinkedItemRequests, requests...)
+			item.LinkedItemQueries = append(item.LinkedItemQueries, requests...)
 		}
 
 		items = append(items, &item)
@@ -100,8 +100,8 @@ func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnl
 			}, nil
 		},
 		InputMapperList: func(scope string) (*elbv2.DescribeListenersInput, error) {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: "list not supported for elbv2-listener, use search",
 			}
 		},

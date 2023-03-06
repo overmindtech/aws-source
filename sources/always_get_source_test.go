@@ -238,7 +238,7 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 				if input == "foo.bar.id" {
 					return &sdp.Item{}, nil
 				} else {
-					return nil, sdp.NewItemRequestError(errors.New("bad query details"))
+					return nil, sdp.NewQueryError(errors.New("bad query details"))
 				}
 			},
 			GetInputMapper: func(scope, query string) string {

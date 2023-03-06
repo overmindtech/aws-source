@@ -18,15 +18,15 @@ func BackupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 	}
 
 	if out.BackupDescription == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "backup description was nil",
 		}
 	}
 
 	if out.BackupDescription.BackupDetails == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "backup details were nil",
 		}
 	}
@@ -48,7 +48,7 @@ func BackupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 
 	if out.BackupDescription.SourceTableDetails != nil {
 		if out.BackupDescription.SourceTableDetails.TableName != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dynamodb-table",
 				Method: sdp.RequestMethod_GET,
 				Query:  *out.BackupDescription.SourceTableDetails.TableName,

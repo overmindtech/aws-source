@@ -18,8 +18,8 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	}
 
 	if out.Nodegroup == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "Nodegroup was nil",
 		}
 	}
@@ -45,7 +45,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-key-pair",
 				Method: sdp.RequestMethod_GET,
 				Query:  *ng.RemoteAccess.Ec2SshKey,
@@ -54,7 +54,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.RequestMethod_GET,
 				Query:  sg,
@@ -64,7 +64,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	}
 
 	for _, subnet := range ng.Subnets {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-subnet",
 			Method: sdp.RequestMethod_GET,
 			Query:  subnet,
@@ -75,7 +75,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	if ng.Resources != nil {
 		for _, g := range ng.Resources.AutoScalingGroups {
 			if g.Name != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "autoscaling-auto-scaling-group",
 					Method: sdp.RequestMethod_GET,
 					Query:  *g.Name,
@@ -85,7 +85,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.RequestMethod_GET,
 				Query:  *ng.Resources.RemoteAccessSecurityGroup,
@@ -96,7 +96,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.LaunchTemplate != nil {
 		if ng.LaunchTemplate.Id != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-launch-template",
 				Method: sdp.RequestMethod_GET,
 				Query:  *ng.LaunchTemplate.Id,

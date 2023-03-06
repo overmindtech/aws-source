@@ -27,7 +27,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		}
 
 		if tg.TargetGroupArn != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "elbv2-target-health",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *tg.TargetGroupArn,
@@ -36,7 +36,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		}
 
 		if tg.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *tg.VpcId,
@@ -46,7 +46,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 
 		for _, lbArn := range tg.LoadBalancerArns {
 			if a, err := sources.ParseARN(lbArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  lbArn,

@@ -30,8 +30,8 @@ func LaunchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInpu
 		attrs, err = sources.ToAttributesCase(LaunchTemplate)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}

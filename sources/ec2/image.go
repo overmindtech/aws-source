@@ -41,8 +41,8 @@ func ImageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.Des
 		attrs, err = sources.ToAttributesCase(Image)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}

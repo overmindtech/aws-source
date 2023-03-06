@@ -103,8 +103,8 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -132,8 +132,8 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 // passing these results to GetFunc in order to get the details
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -245,8 +245,8 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 // Search Searches for AWS resources by ARN
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -279,8 +279,8 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
 			Scope:       scope,
 		}

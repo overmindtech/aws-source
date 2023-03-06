@@ -222,7 +222,7 @@ func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
 	for _, test := range i {
 		var found bool
 
-		for _, lir := range item.LinkedItemRequests {
+		for _, lir := range item.LinkedItemQueries {
 			if lirMatches(test, lir) {
 				found = true
 				break
@@ -230,12 +230,12 @@ func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
 		}
 
 		if !found {
-			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\nScope: %v", len(item.LinkedItemRequests), test.ExpectedType, test.ExpectedQuery, test.ExpectedScope)
+			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\nScope: %v", len(item.LinkedItemQueries), test.ExpectedType, test.ExpectedQuery, test.ExpectedScope)
 		}
 	}
 }
 
-func lirMatches(test ItemRequestTest, req *sdp.ItemRequest) bool {
+func lirMatches(test ItemRequestTest, req *sdp.Query) bool {
 	return (test.ExpectedMethod == req.Method &&
 		test.ExpectedQuery == req.Query &&
 		test.ExpectedScope == req.Scope &&
@@ -243,7 +243,7 @@ func lirMatches(test ItemRequestTest, req *sdp.ItemRequest) bool {
 }
 
 // CheckItemRequest Checks that an item request matches the expected params
-func CheckItemRequest(t *testing.T, item *sdp.ItemRequest, itemName string, expectedType string, expectedQuery string, expectedScope string) {
+func CheckItemRequest(t *testing.T, item *sdp.Query, itemName string, expectedType string, expectedQuery string, expectedScope string) {
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}
