@@ -50,7 +50,7 @@ func HostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
-		LinkedItemRequests: []*sdp.ItemRequest{
+		LinkedItemQueries: []*sdp.Query{
 			{
 				Type:   "route53-resource-record-set",
 				Method: sdp.RequestMethod_SEARCH,

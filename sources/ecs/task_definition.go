@@ -52,14 +52,14 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	}
 
 	var a *sources.ARN
-	var link *sdp.ItemRequest
+	var link *sdp.Query
 
 	for _, cd := range td.ContainerDefinitions {
 		for _, secret := range cd.Secrets {
 			link = getSecretLinkedItem(secret)
 
 			if link != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, link)
+				item.LinkedItemQueries = append(item.LinkedItemQueries, link)
 			}
 		}
 
@@ -68,7 +68,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 				link = getSecretLinkedItem(secret)
 
 				if link != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, link)
+					item.LinkedItemQueries = append(item.LinkedItemQueries, link)
 				}
 			}
 		}
@@ -76,7 +76,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.ExecutionRoleArn != nil {
 		if a, err = sources.ParseARN(*td.ExecutionRoleArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *td.ExecutionRoleArn,
@@ -87,7 +87,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.TaskRoleArn != nil {
 		if a, err = sources.ParseARN(*td.TaskRoleArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *td.TaskRoleArn,
@@ -101,7 +101,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 // getSecretLinkedItem Converts a `types.Secret` to the linked item that the
 // secret is related to, if relevant
-func getSecretLinkedItem(secret types.Secret) *sdp.ItemRequest {
+func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 	if secret.ValueFrom != nil {
 		if a, err := sources.ParseARN(*secret.ValueFrom); err == nil {
 			// The secret can refer to either something from secrets
@@ -110,14 +110,14 @@ func getSecretLinkedItem(secret types.Secret) *sdp.ItemRequest {
 
 			switch a.Service {
 			case "secretsmanager":
-				return &sdp.ItemRequest{
+				return &sdp.Query{
 					Type:   "secretsmanager-secret",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *secret.ValueFrom,
 					Scope:  secretScope,
 				}
 			case "ssm":
-				return &sdp.ItemRequest{
+				return &sdp.Query{
 					Type:   "ssm-parameter",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *secret.ValueFrom,

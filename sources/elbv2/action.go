@@ -9,13 +9,13 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ActionToRequests(action types.Action) []*sdp.ItemRequest {
-	requests := make([]*sdp.ItemRequest, 0)
+func ActionToRequests(action types.Action) []*sdp.Query {
+	requests := make([]*sdp.Query, 0)
 
 	if action.AuthenticateCognitoConfig != nil {
 		if action.AuthenticateCognitoConfig.UserPoolArn != nil {
 			if a, err := sources.ParseARN(*action.AuthenticateCognitoConfig.UserPoolArn); err == nil {
-				requests = append(requests, &sdp.ItemRequest{
+				requests = append(requests, &sdp.Query{
 					Type:   "cognito-idp-user-pool",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *action.AuthenticateCognitoConfig.UserPoolArn,
@@ -27,7 +27,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 
 	if action.AuthenticateOidcConfig != nil {
 		if action.AuthenticateOidcConfig.AuthorizationEndpoint != nil {
-			requests = append(requests, &sdp.ItemRequest{
+			requests = append(requests, &sdp.Query{
 				Type:   "http",
 				Method: sdp.RequestMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.AuthorizationEndpoint,
@@ -36,7 +36,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 		}
 
 		if action.AuthenticateOidcConfig.TokenEndpoint != nil {
-			requests = append(requests, &sdp.ItemRequest{
+			requests = append(requests, &sdp.Query{
 				Type:   "http",
 				Method: sdp.RequestMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.TokenEndpoint,
@@ -45,7 +45,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 		}
 
 		if action.AuthenticateOidcConfig.UserInfoEndpoint != nil {
-			requests = append(requests, &sdp.ItemRequest{
+			requests = append(requests, &sdp.Query{
 				Type:   "http",
 				Method: sdp.RequestMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.UserInfoEndpoint,
@@ -57,7 +57,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 			for _, tg := range action.ForwardConfig.TargetGroups {
 				if tg.TargetGroupArn != nil {
 					if a, err := sources.ParseARN(*tg.TargetGroupArn); err == nil {
-						requests = append(requests, &sdp.ItemRequest{
+						requests = append(requests, &sdp.Query{
 							Type:   "elbv2-target-group",
 							Method: sdp.RequestMethod_SEARCH,
 							Query:  *tg.TargetGroupArn,
@@ -96,7 +96,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 			}
 
 			if u.Scheme == "http" || u.Scheme == "https" {
-				requests = append(requests, &sdp.ItemRequest{
+				requests = append(requests, &sdp.Query{
 					Type:   "http",
 					Method: sdp.RequestMethod_GET,
 					Query:  u.String(),
@@ -107,7 +107,7 @@ func ActionToRequests(action types.Action) []*sdp.ItemRequest {
 
 		if action.TargetGroupArn != nil {
 			if a, err := sources.ParseARN(*action.TargetGroupArn); err == nil {
-				requests = append(requests, &sdp.ItemRequest{
+				requests = append(requests, &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *action.TargetGroupArn,

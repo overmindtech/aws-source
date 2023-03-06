@@ -28,8 +28,8 @@ func ReservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstances
 		attrs, err := sources.ToAttributesCase(reservation)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -43,7 +43,7 @@ func ReservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstances
 		}
 
 		if reservation.AvailabilityZone != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.RequestMethod_GET,
 				Query:  *reservation.AvailabilityZone,

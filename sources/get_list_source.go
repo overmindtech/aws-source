@@ -72,8 +72,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Scopes() []string {
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -97,8 +97,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 // passing these results to GetFunc in order to get the details
 func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -133,8 +133,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 // Search Searches for AWS resources by ARN
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 		}
 	}
@@ -155,8 +155,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
 			Scope:       scope,
 		}

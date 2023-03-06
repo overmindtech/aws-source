@@ -30,8 +30,8 @@ func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 		attrs, err = sources.ToAttributesCase(securityGroupRule)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -45,7 +45,7 @@ func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 		}
 
 		if securityGroupRule.GroupId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.RequestMethod_GET,
 				Query:  *securityGroupRule.GroupId,
@@ -55,7 +55,7 @@ func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 
 		if rg := securityGroupRule.ReferencedGroupInfo; rg != nil {
 			if rg.GroupId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.RequestMethod_GET,
 					Query:  *rg.GroupId,

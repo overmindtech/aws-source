@@ -30,8 +30,8 @@ func VpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.Describ
 		attrs, err = sources.ToAttributesCase(vpc)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}

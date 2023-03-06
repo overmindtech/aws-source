@@ -85,14 +85,14 @@ func WrapAWSError(err error) error {
 		// If the input is bad or the thing wasn't found then it's definitely
 		// not there
 		if responseErr.HTTPStatusCode() == 400 || responseErr.HTTPStatusCode() == 404 {
-			return &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_NOTFOUND,
+			return &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: err.Error(),
 			}
 		}
 	}
 
-	return sdp.NewItemRequestError(err)
+	return sdp.NewQueryError(err)
 }
 
 // E2ETest A struct that runs end to end tests on a fully configured source.
@@ -228,12 +228,12 @@ func (e E2ETest) Run(t *testing.T) {
 
 			if !e.SkipNotFoundCheck {
 				// Make sure the error is an SDP error
-				if sdpErr, ok := err.(*sdp.ItemRequestError); ok {
-					if sdpErr.ErrorType != sdp.ItemRequestError_NOTFOUND {
+				if sdpErr, ok := err.(*sdp.QueryError); ok {
+					if sdpErr.ErrorType != sdp.QueryError_NOTFOUND {
 						t.Errorf("expected error to be NOTFOUND, got %v\nError: %v", sdpErr.ErrorType.String(), sdpErr.ErrorString)
 					}
 				} else {
-					t.Errorf("Error (%T) was not (*sdp.ItemRequestError)", err)
+					t.Errorf("Error (%T) was not (*sdp.QueryError)", err)
 				}
 			}
 		})

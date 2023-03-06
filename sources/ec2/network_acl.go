@@ -30,8 +30,8 @@ func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		attrs, err = sources.ToAttributesCase(networkAcl)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -46,7 +46,7 @@ func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.RequestMethod_GET,
 					Query:  *assoc.SubnetId,
@@ -56,7 +56,7 @@ func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		}
 
 		if networkAcl.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *networkAcl.VpcId,

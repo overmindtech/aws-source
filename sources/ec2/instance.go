@@ -29,8 +29,8 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			attrs, err := sources.ToAttributesCase(instance)
 
 			if err != nil {
-				return nil, &sdp.ItemRequestError{
-					ErrorType:   sdp.ItemRequestError_OTHER,
+				return nil, &sdp.QueryError{
+					ErrorType:   sdp.QueryError_OTHER,
 					ErrorString: err.Error(),
 					Scope:       scope,
 				}
@@ -41,7 +41,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				UniqueAttribute: "instanceId",
 				Scope:           scope,
 				Attributes:      attrs,
-				LinkedItemRequests: []*sdp.ItemRequest{
+				LinkedItemQueries: []*sdp.Query{
 					{
 						// Always get the status
 						Type:   "ec2-instance-status",
@@ -53,7 +53,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.ImageId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-image",
 					Method: sdp.RequestMethod_GET,
 					Query:  *instance.ImageId,
@@ -62,7 +62,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.KeyName != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-key-pair",
 					Method: sdp.RequestMethod_GET,
 					Query:  *instance.KeyName,
@@ -72,7 +72,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 			if instance.Placement != nil {
 				if instance.Placement.AvailabilityZone != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.RequestMethod_GET,
 						Query:  *instance.Placement.AvailabilityZone,
@@ -81,7 +81,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				}
 
 				if instance.Placement.GroupId != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-placement-group",
 						Method: sdp.RequestMethod_GET,
 						Query:  *instance.Placement.GroupId,
@@ -94,7 +94,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				// IPs
 				for _, ip := range nic.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
 							Method: sdp.RequestMethod_GET,
 							Query:  *ip.Ipv6Address,
@@ -105,7 +105,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				for _, ip := range nic.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
 							Method: sdp.RequestMethod_GET,
 							Query:  *ip.PrivateIpAddress,
@@ -116,7 +116,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				// Subnet
 				if nic.SubnetId != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.RequestMethod_GET,
 						Query:  *nic.SubnetId,
@@ -126,7 +126,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				// VPC
 				if nic.VpcId != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-vpc",
 						Method: sdp.RequestMethod_GET,
 						Query:  *nic.VpcId,
@@ -136,7 +136,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
 					Method: sdp.RequestMethod_GET,
 					Query:  *instance.PublicDnsName,
@@ -145,7 +145,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.PublicIpAddress != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *instance.PublicIpAddress,
@@ -156,7 +156,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			// Security groups
 			for _, group := range instance.SecurityGroups {
 				if group.GroupId != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-security-group",
 						Method: sdp.RequestMethod_GET,
 						Query:  *group.GroupId,
@@ -167,7 +167,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 			for _, mapping := range instance.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.VolumeId != nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-volume",
 						Method: sdp.RequestMethod_GET,
 						Query:  *mapping.Ebs.VolumeId,

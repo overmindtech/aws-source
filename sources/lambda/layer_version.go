@@ -35,8 +35,8 @@ func LayerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInpu
 
 func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string, input *lambda.GetLayerVersionInput) (*sdp.Item, error) {
 	if input == nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOTFOUND,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: "nil input provided to query",
 		}
 	}
@@ -71,7 +71,7 @@ func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 	if out.Content != nil {
 		if out.Content.SigningJobArn != nil {
 			if a, err = sources.ParseARN(*out.Content.SigningJobArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-job",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *out.Content.SigningJobArn,
@@ -82,7 +82,7 @@ func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 		if out.Content.SigningProfileVersionArn != nil {
 			if a, err = sources.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-profile",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *out.Content.SigningProfileVersionArn,

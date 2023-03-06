@@ -66,7 +66,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	if service.ClusterArn != nil {
 		if a, err = sources.ParseARN(*service.ClusterArn); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *service.ClusterArn,
@@ -78,7 +78,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, lb := range service.LoadBalancers {
 		if lb.TargetGroupArn != nil {
 			if a, err = sources.ParseARN(*lb.TargetGroupArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *lb.TargetGroupArn,
@@ -91,7 +91,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, sr := range service.ServiceRegistries {
 		if sr.RegistryArn != nil {
 			if a, err = sources.ParseARN(*sr.RegistryArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "servicediscovery-service",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *sr.RegistryArn,
@@ -103,7 +103,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	if service.TaskDefinition != nil {
 		if a, err = sources.ParseARN(*service.TaskDefinition); err == nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
 				Method: sdp.RequestMethod_SEARCH,
 				Query:  *service.TaskDefinition,
@@ -115,7 +115,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, deployment := range service.Deployments {
 		if deployment.TaskDefinition != nil {
 			if a, err = sources.ParseARN(*deployment.TaskDefinition); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-task-definition",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *deployment.TaskDefinition,
@@ -126,7 +126,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 		for _, strategy := range deployment.CapacityProviderStrategy {
 			if strategy.CapacityProvider != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-capacity-provider",
 					Method: sdp.RequestMethod_GET,
 					Query:  *strategy.CapacityProvider,
@@ -138,7 +138,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if deployment.NetworkConfiguration != nil {
 			if deployment.NetworkConfiguration.AwsvpcConfiguration != nil {
 				for _, subnet := range deployment.NetworkConfiguration.AwsvpcConfiguration.Subnets {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.RequestMethod_GET,
 						Query:  subnet,
@@ -147,7 +147,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				}
 
 				for _, sg := range deployment.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ecs-security-group",
 						Method: sdp.RequestMethod_GET,
 						Query:  sg,
@@ -161,7 +161,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			for _, svc := range deployment.ServiceConnectConfiguration.Services {
 				for _, alias := range svc.ClientAliases {
 					if alias.DnsName != nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "dns",
 							Method: sdp.RequestMethod_GET,
 							Query:  *alias.DnsName,
@@ -175,7 +175,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		for _, cr := range deployment.ServiceConnectResources {
 			if cr.DiscoveryArn != nil {
 				if a, err = sources.ParseARN(*cr.DiscoveryArn); err == nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "servicediscovery-service",
 						Method: sdp.RequestMethod_SEARCH,
 						Query:  *cr.DiscoveryArn,
@@ -189,7 +189,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	if service.NetworkConfiguration != nil {
 		if service.NetworkConfiguration.AwsvpcConfiguration != nil {
 			for _, subnet := range service.NetworkConfiguration.AwsvpcConfiguration.Subnets {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.RequestMethod_GET,
 					Query:  subnet,
@@ -198,7 +198,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			}
 
 			for _, sg := range service.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-security-group",
 					Method: sdp.RequestMethod_GET,
 					Query:  sg,
@@ -209,7 +209,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	}
 
 	for _, id := range taskSetIds {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ecs-task-set",
 			Method: sdp.RequestMethod_GET,
 			Query:  id,

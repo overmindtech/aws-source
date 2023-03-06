@@ -30,8 +30,8 @@ func InternetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysIn
 		attrs, err = sources.ToAttributesCase(gw)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -47,7 +47,7 @@ func InternetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysIn
 		// VPCs
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc",
 					Method: sdp.RequestMethod_GET,
 					Query:  *attachment.VpcId,

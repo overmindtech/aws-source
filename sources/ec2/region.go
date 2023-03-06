@@ -30,8 +30,8 @@ func RegionOutputMapper(scope string, _ *ec2.DescribeRegionsInput, output *ec2.D
 		attrs, err = sources.ToAttributesCase(ni)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}

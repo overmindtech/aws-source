@@ -28,8 +28,8 @@ func InstanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 		attrs, err := sources.ToAttributesCase(instanceStatus)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -43,7 +43,7 @@ func InstanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 		}
 
 		if instanceStatus.AvailabilityZone != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.RequestMethod_GET,
 				Query:  *instanceStatus.AvailabilityZone,

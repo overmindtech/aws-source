@@ -46,7 +46,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 			UniqueAttribute: "publicIp",
 			Scope:           scope,
 			Attributes:      attrs,
-			LinkedItemRequests: []*sdp.ItemRequest{
+			LinkedItemQueries: []*sdp.Query{
 				{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
@@ -57,7 +57,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.InstanceId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.RequestMethod_GET,
 				Query:  *address.InstanceId,
@@ -66,7 +66,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.CarrierIp != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.RequestMethod_GET,
 				Query:  *address.CarrierIp,
@@ -75,7 +75,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.CustomerOwnedIp != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.RequestMethod_GET,
 				Query:  *address.CustomerOwnedIp,
@@ -84,7 +84,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.NetworkInterfaceId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-network-interface",
 				Method: sdp.RequestMethod_GET,
 				Query:  *address.NetworkInterfaceId,
@@ -93,7 +93,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.PrivateIpAddress != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.RequestMethod_GET,
 				Query:  *address.PrivateIpAddress,

@@ -29,8 +29,8 @@ func TestS3SearchImpl(t *testing.T) {
 		if err == nil {
 			t.Error("expected error")
 		} else {
-			if ire, ok := err.(*sdp.ItemRequestError); ok {
-				if ire.ErrorType != sdp.ItemRequestError_OTHER {
+			if ire, ok := err.(*sdp.QueryError); ok {
+				if ire.ErrorType != sdp.QueryError_OTHER {
 					t.Errorf("expected error type to be OTHER, got %v", ire.ErrorType.String())
 				}
 			} else {
@@ -45,8 +45,8 @@ func TestS3SearchImpl(t *testing.T) {
 		if err == nil {
 			t.Error("expected error")
 		} else {
-			if ire, ok := err.(*sdp.ItemRequestError); ok {
-				if ire.ErrorType != sdp.ItemRequestError_NOSCOPE {
+			if ire, ok := err.(*sdp.QueryError); ok {
+				if ire.ErrorType != sdp.QueryError_NOSCOPE {
 					t.Errorf("expected error type to be OTHER, got %v", ire.ErrorType.String())
 				}
 			} else {

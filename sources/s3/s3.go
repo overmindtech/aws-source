@@ -127,8 +127,8 @@ type Bucket struct {
 // long-running actions
 func (s *S3Source) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
@@ -315,8 +315,8 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	attributes, err := sources.ToAttributesCase(bucket)
 
 	if err != nil {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_OTHER,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_OTHER,
 			ErrorString: err.Error(),
 			Scope:       scope,
 		}
@@ -340,7 +340,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 				url = "https://" + *bucket.RedirectAllRequestsTo.HostName
 			}
 
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
 				Method: sdp.RequestMethod_GET,
 				Query:  url,
@@ -354,7 +354,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
 			if a, err = sources.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *lambdaConfig.LambdaFunctionArn,
@@ -367,7 +367,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
 			if a, err = sources.ParseARN(*q.QueueArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sqs-queue",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *q.QueueArn,
@@ -380,7 +380,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
 			if a, err = sources.ParseARN(*topic.TopicArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sns-topic",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *topic.TopicArn,
@@ -392,7 +392,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 	if bucket.LoggingEnabled != nil {
 		if bucket.LoggingEnabled.TargetBucket != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "s3-bucket",
 				Method: sdp.RequestMethod_GET,
 				Query:  *bucket.LoggingEnabled.TargetBucket,
@@ -402,7 +402,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}
 
 	if bucket.LocationConstraint != "" {
-		item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-region",
 			Method: sdp.RequestMethod_GET,
 			Query:  string(bucket.LocationConstraint),
@@ -415,7 +415,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
 					if a, err = sources.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
-						item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "s3-bucket",
 							Method: sdp.RequestMethod_SEARCH,
 							Query:  *bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket,
@@ -436,7 +436,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
 							if a, err = sources.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
-								item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 									Type:   "s3-bucket",
 									Method: sdp.RequestMethod_SEARCH,
 									Query:  *bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket,
@@ -456,8 +456,8 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 // List Lists all items in a given scope
 func (s *S3Source) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
@@ -472,7 +472,7 @@ func listImpl(ctx context.Context, client S3Client, scope string) ([]*sdp.Item, 
 	buckets, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, sdp.NewQueryError(err)
 	}
 
 	for _, bucket := range buckets.Buckets {
@@ -491,8 +491,8 @@ func listImpl(ctx context.Context, client S3Client, scope string) ([]*sdp.Item, 
 // Search Searches for an S3 bucket by ARN rather than name
 func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
@@ -506,12 +506,12 @@ func searchImpl(ctx context.Context, client S3Client, scope string, query string
 	a, err := sources.ParseARN(query)
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, sdp.NewQueryError(err)
 	}
 
 	if arnScope := sources.FormatScope(a.AccountID, a.Region); arnScope != scope {
-		return nil, &sdp.ItemRequestError{
-			ErrorType:   sdp.ItemRequestError_NOSCOPE,
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match source scope %v", arnScope, scope),
 			Scope:       scope,
 		}
@@ -521,7 +521,7 @@ func searchImpl(ctx context.Context, client S3Client, scope string, query string
 	item, err := getImpl(ctx, client, scope, a.ResourceID())
 
 	if err != nil {
-		return nil, sdp.NewItemRequestError(err)
+		return nil, sdp.NewQueryError(err)
 	}
 
 	return []*sdp.Item{item}, nil

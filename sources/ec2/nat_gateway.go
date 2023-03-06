@@ -30,8 +30,8 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		attrs, err = sources.ToAttributesCase(ng)
 
 		if err != nil {
-			return nil, &sdp.ItemRequestError{
-				ErrorType:   sdp.ItemRequestError_OTHER,
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
@@ -46,7 +46,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 
 		for _, address := range ng.NatGatewayAddresses {
 			if address.NetworkInterfaceId != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-network-interface",
 					Method: sdp.RequestMethod_GET,
 					Query:  *address.NetworkInterfaceId,
@@ -55,7 +55,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			}
 
 			if address.PrivateIp != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *address.PrivateIp,
@@ -64,7 +64,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			}
 
 			if address.PublicIp != nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.RequestMethod_GET,
 					Query:  *address.PublicIp,
@@ -74,7 +74,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		}
 
 		if ng.SubnetId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.RequestMethod_GET,
 				Query:  *ng.SubnetId,
@@ -83,7 +83,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		}
 
 		if ng.VpcId != nil {
-			item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.RequestMethod_GET,
 				Query:  *ng.VpcId,

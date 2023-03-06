@@ -46,7 +46,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		for _, dest := range streamsOut.KinesisDataStreamDestinations {
 			if dest.StreamArn != nil {
 				if a, err = sources.ParseARN(*dest.StreamArn); err == nil {
-					item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kinesis-stream",
 						Method: sdp.RequestMethod_SEARCH,
 						Query:  *dest.StreamArn,
@@ -60,7 +60,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	if table.RestoreSummary != nil {
 		if table.RestoreSummary.SourceBackupArn != nil {
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceBackupArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "backup-recovery-point",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *table.RestoreSummary.SourceBackupArn,
@@ -71,7 +71,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 		if table.RestoreSummary.SourceTableArn != nil {
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceTableArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dynamodb-table",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *table.RestoreSummary.SourceTableArn,
@@ -84,7 +84,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	if table.SSEDescription != nil {
 		if table.SSEDescription.KMSMasterKeyArn != nil {
 			if a, err = sources.ParseARN(*table.SSEDescription.KMSMasterKeyArn); err == nil {
-				item.LinkedItemRequests = append(item.LinkedItemRequests, &sdp.ItemRequest{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.RequestMethod_SEARCH,
 					Query:  *table.SSEDescription.KMSMasterKeyArn,
