@@ -64,7 +64,7 @@ func TestRouteTableOutputMapper(t *testing.T) {
 				Routes: []types.Route{
 					{
 						DestinationCidrBlock: sources.PtrString("172.31.0.0/16"),
-						GatewayId:            sources.PtrString("local"),
+						GatewayId:            sources.PtrString("igw-12345"),
 						Origin:               types.RouteOriginCreateRouteTable,
 						State:                types.RouteStateActive,
 					},
@@ -175,6 +175,18 @@ func TestRouteTableOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.RequestMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-vpc-endpoint",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "vpce-09fcbac4dcf142db3",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-internet-gateway",
+			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedQuery:  "igw-12345",
 			ExpectedScope:  "foo",
 		},
 	}

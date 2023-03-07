@@ -2,6 +2,7 @@ package ec2
 
 import (
 	"context"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -65,6 +66,24 @@ func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 		}
 
 		for _, route := range rt.Routes {
+			if route.GatewayId != nil {
+				if strings.HasPrefix(*route.GatewayId, "igw") {
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						Type:   "ec2-internet-gateway",
+						Method: sdp.RequestMethod_GET,
+						Query:  *route.GatewayId,
+						Scope:  scope,
+					})
+				}
+				if strings.HasPrefix(*route.GatewayId, "vpce") {
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						Type:   "ec2-vpc-endpoint",
+						Method: sdp.RequestMethod_GET,
+						Query:  *route.GatewayId,
+						Scope:  scope,
+					})
+				}
+			}
 			if route.CarrierGatewayId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-carrier-gateway",
