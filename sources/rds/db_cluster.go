@@ -42,7 +42,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if endpoint != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.RequestMethod_SEARCH,
 					Query:  *endpoint,
 					Scope:  "global",
 				})
@@ -123,7 +123,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		for _, endpoint := range cluster.CustomEndpoints {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.RequestMethod_SEARCH,
 				Query:  endpoint,
 				Scope:  "global",
 			})

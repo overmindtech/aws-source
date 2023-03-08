@@ -138,7 +138,7 @@ func InstanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.RequestMethod_SEARCH,
 					Query:  *instance.PublicDnsName,
 					Scope:  "global",
 				})

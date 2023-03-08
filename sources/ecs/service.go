@@ -163,7 +163,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 					if alias.DnsName != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "dns",
-							Method: sdp.RequestMethod_GET,
+							Method: sdp.RequestMethod_SEARCH,
 							Query:  *alias.DnsName,
 							Scope:  "global",
 						})

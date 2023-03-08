@@ -289,7 +289,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "foo.bar.com",
 			ExpectedScope:  "global",
 		},

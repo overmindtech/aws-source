@@ -127,13 +127,13 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com",
 			ExpectedScope:  "global",
 		},

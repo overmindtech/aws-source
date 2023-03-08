@@ -153,7 +153,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "database-2.cluster-ro-camcztjohmlj.eu-west-2.rds.amazonaws.com",
 			ExpectedScope:  "global",
 		},
@@ -165,7 +165,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "database-2.cluster-camcztjohmlj.eu-west-2.rds.amazonaws.com",
 			ExpectedScope:  "global",
 		},
@@ -213,7 +213,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "endpoint1",
 			ExpectedScope:  "global",
 		},

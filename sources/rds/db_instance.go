@@ -43,7 +43,7 @@ func DBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, outpu
 			if instance.Endpoint.Address != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.RequestMethod_SEARCH,
 					Query:  *instance.Endpoint.Address,
 					Scope:  "global",
 				})
@@ -225,7 +225,7 @@ func DBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, outpu
 			if instance.ListenerEndpoint.Address != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.RequestMethod_SEARCH,
 					Query:  *instance.ListenerEndpoint.Address,
 					Scope:  "global",
 				})

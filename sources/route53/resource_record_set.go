@@ -53,7 +53,7 @@ func ResourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 		if awsItem.AliasTarget.DNSName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.RequestMethod_SEARCH,
 				Query:  *awsItem.AliasTarget.DNSName,
 				Scope:  "global",
 			})

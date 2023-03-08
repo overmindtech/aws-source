@@ -29,7 +29,7 @@ func LoadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		if desc.DNSName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.RequestMethod_SEARCH,
 				Query:  *desc.DNSName,
 				Scope:  "global",
 			})
@@ -38,7 +38,7 @@ func LoadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		if desc.CanonicalHostedZoneName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.RequestMethod_SEARCH,
 				Query:  *desc.CanonicalHostedZoneName,
 				Scope:  "global",
 			})
