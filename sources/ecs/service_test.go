@@ -276,7 +276,7 @@ func TestServiceGetFunc(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "www.foo.com",
 			ExpectedScope:  "global",
 		},

@@ -85,7 +85,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "ingress-1285969159.eu-west-2.elb.amazonaws.com",
 			ExpectedScope:  "global",
 		},

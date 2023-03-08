@@ -151,7 +151,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "ip-172-31-35-98.eu-west-2.compute.internal",
 			ExpectedScope:  "global",
 		},
@@ -175,7 +175,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.RequestMethod_SEARCH,
 			ExpectedQuery:  "ec2-18-170-133-9.eu-west-2.compute.amazonaws.com",
 			ExpectedScope:  "global",
 		},

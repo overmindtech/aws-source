@@ -46,7 +46,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.DNSName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.RequestMethod_SEARCH,
 				Query:  *lb.DNSName,
 				Scope:  "global",
 			})

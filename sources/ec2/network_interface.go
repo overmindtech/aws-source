@@ -91,7 +91,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				if assoc.PublicDnsName != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "dns",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.RequestMethod_SEARCH,
 						Query:  *assoc.PublicDnsName,
 						Scope:  "global",
 					})
@@ -128,7 +128,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if ip.PrivateDnsName != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.RequestMethod_SEARCH,
 					Query:  *ip.PrivateDnsName,
 					Scope:  "global",
 				})
