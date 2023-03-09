@@ -270,8 +270,8 @@ github.com/overmindtech/connect v0.8.4 h1:j5Jc93YOJk6jPPi4HjDWa/1fTXNHCWj2OSF9+R
 github.com/overmindtech/connect v0.8.4/go.mod h1:+qergsLMbV4AOlgQinl6pgoCbb2e+dl9AIB3nciSBYE=
 github.com/overmindtech/discovery v0.18.1 h1:BEabgXPoSgCxLkpgL0LDUSHg8xyMIb4YXR4klNh1xY4=
 github.com/overmindtech/discovery v0.18.1/go.mod h1:t8QJp+rt9QdV22Wlt8lht21jLZoZWXBB8k470c+GY10=
-github.com/overmindtech/sdp-go v0.18.1 h1:7ORD9jHHUxmzw1l7kb3do0WhhUDUzl1Em9MsUmhizC8=
-github.com/overmindtech/sdp-go v0.18.1/go.mod h1:mzgfx8+4pVFa8yGyPEJNuu6qK/ZNXEL8g23NUo77wL4=
+github.com/overmindtech/sdp-go v0.18.2 h1:bc2WjQBW1DerWOhMSHIptwKAEnxN9zfi39JI/mxfo0w=
+github.com/overmindtech/sdp-go v0.18.2/go.mod h1:mzgfx8+4pVFa8yGyPEJNuu6qK/ZNXEL8g23NUo77wL4=
 github.com/overmindtech/sdpcache v1.2.2 h1:JlefKjdXPdCEABX81xMeamQqarFysA7EfPHLOOtoPYM=
 github.com/overmindtech/sdpcache v1.2.2/go.mod h1:hb3gKok8wLtsCWKp1WnZDEMgwo0/zPe9BVeNfdOln8o=
 github.com/pelletier/go-toml/v2 v2.0.7 h1:muncTPStnKRos5dpVKULv2FVd4bMOhNePj9CjgDb8Us=
