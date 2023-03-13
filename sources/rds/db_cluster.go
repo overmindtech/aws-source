@@ -32,7 +32,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.DBSubnetGroup != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "rds-db-subnet-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.DBSubnetGroup,
 				Scope:  scope,
 			})
@@ -42,7 +42,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if endpoint != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *endpoint,
 					Scope:  "global",
 				})
@@ -50,7 +50,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 				if cluster.Port != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "networksocket",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  fmt.Sprintf("%v:%v", *endpoint, *cluster.Port),
 						Scope:  "global",
 					})
@@ -62,7 +62,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if a, err = sources.ParseARN(replica); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-cluster",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  replica,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -73,7 +73,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if member.DBInstanceIdentifier != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-instance",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *member.DBInstanceIdentifier,
 					Scope:  scope,
 				})
@@ -84,7 +84,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if sg.VpcSecurityGroupId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *sg.VpcSecurityGroupId,
 					Scope:  scope,
 				})
@@ -94,7 +94,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.HostedZoneId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "route53-hosted-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.HostedZoneId,
 				Scope:  scope,
 			})
@@ -104,7 +104,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if a, err = sources.ParseARN(*cluster.KmsKeyId); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.KmsKeyId,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -114,7 +114,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.ActivityStreamKinesisStreamName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "kinesis-stream",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ActivityStreamKinesisStreamName,
 				Scope:  scope,
 			})
@@ -123,7 +123,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		for _, endpoint := range cluster.CustomEndpoints {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  endpoint,
 				Scope:  "global",
 			})
@@ -133,7 +133,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if optionGroup.DBClusterOptionGroupName != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-option-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *optionGroup.DBClusterOptionGroupName,
 					Scope:  scope,
 				})
@@ -145,7 +145,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.KmsKeyId); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kms-key",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cluster.MasterUserSecret.KmsKeyId,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -156,7 +156,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.SecretArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "secretsmanager-secret",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cluster.MasterUserSecret.SecretArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -168,7 +168,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if a, err = sources.ParseARN(*cluster.MonitoringRoleArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.MonitoringRoleArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -180,7 +180,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if a, err = sources.ParseARN(*cluster.PerformanceInsightsKMSKeyId); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.PerformanceInsightsKMSKeyId,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -191,7 +191,7 @@ func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if a, err = sources.ParseARN(*cluster.ReplicationSourceIdentifier); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-cluster",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ReplicationSourceIdentifier,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})

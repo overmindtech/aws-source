@@ -52,7 +52,7 @@ func AvailabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZones
 		if az.RegionName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-region",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *az.RegionName,
 				Scope:  scope,
 			})

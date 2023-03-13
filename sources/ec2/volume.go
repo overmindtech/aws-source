@@ -47,7 +47,7 @@ func VolumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 		for _, attachment := range volume.Attachments {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *attachment.InstanceId,
 				Scope:  scope,
 			})

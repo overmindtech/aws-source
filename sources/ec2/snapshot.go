@@ -55,7 +55,7 @@ func SnapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 			if *snapshot.VolumeId != "vol-ffffffff" {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-volume",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *snapshot.VolumeId,
 					Scope:  scope,
 				})

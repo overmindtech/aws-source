@@ -104,7 +104,7 @@ func RoleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	for _, policy := range awsItem.Policies {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-role-policy",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  policy,
 			Scope:  scope,
 		})

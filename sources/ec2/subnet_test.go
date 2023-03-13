@@ -101,13 +101,13 @@ func TestSubnetOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eu-west-2c",
 			ExpectedScope:  "foo",
 		},

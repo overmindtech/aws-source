@@ -47,7 +47,7 @@ func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		if subnet.AvailabilityZone != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *subnet.AvailabilityZone,
 				Scope:  scope,
 			})
@@ -56,7 +56,7 @@ func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		if subnet.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *subnet.VpcId,
 				Scope:  scope,
 			})

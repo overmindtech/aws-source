@@ -114,31 +114,31 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-network-interface",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eni-0b4652e6f2aa36d78",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "172.31.35.98",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "18.170.133.9",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ec2-subnet",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet-0d8ae4b4e07647efa",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  "foo",
 		},

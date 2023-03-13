@@ -45,7 +45,7 @@ func InstanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 		if instanceStatus.AvailabilityZone != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *instanceStatus.AvailabilityZone,
 				Scope:  scope,
 			})

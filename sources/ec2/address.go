@@ -49,7 +49,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 			LinkedItemQueries: []*sdp.Query{
 				{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *address.PublicIp,
 					Scope:  "global",
 				},
@@ -59,7 +59,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		if address.InstanceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *address.InstanceId,
 				Scope:  scope,
 			})
@@ -68,7 +68,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		if address.CarrierIp != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *address.CarrierIp,
 				Scope:  "global",
 			})
@@ -77,7 +77,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		if address.CustomerOwnedIp != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *address.CustomerOwnedIp,
 				Scope:  "global",
 			})
@@ -86,7 +86,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		if address.NetworkInterfaceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-network-interface",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *address.NetworkInterfaceId,
 				Scope:  scope,
 			})
@@ -95,7 +95,7 @@ func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		if address.PrivateIpAddress != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *address.PrivateIpAddress,
 				Scope:  "global",
 			})

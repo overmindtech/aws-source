@@ -46,7 +46,7 @@ func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 			for _, id := range at.DedicatedHostIds {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-host",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
 				})
@@ -55,7 +55,7 @@ func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 			for _, id := range at.InstanceIds {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
 				})

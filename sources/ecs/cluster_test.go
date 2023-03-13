@@ -105,37 +105,37 @@ func TestClusterGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "kms-key",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "id",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "logs-log-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "cloud-watch-name",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "s3-bucket",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "s3-name",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ecs-capacity-provider",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ecs-container-instance",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ecs-service",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
 			ExpectedScope:  "foo",
 		},

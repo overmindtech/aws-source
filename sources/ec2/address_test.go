@@ -80,37 +80,37 @@ func TestAddressOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].PublicIp,
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ec2-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].InstanceId,
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].CarrierIp,
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].CustomerOwnedIp,
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ec2-network-interface",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].NetworkInterfaceId,
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  *output.Addresses[0].PrivateIpAddress,
 			ExpectedScope:  "global",
 		},

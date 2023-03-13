@@ -29,7 +29,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		if tg.TargetGroupArn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "elbv2-target-health",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *tg.TargetGroupArn,
 				Scope:  scope,
 			})
@@ -38,7 +38,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		if tg.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *tg.VpcId,
 				Scope:  scope,
 			})
@@ -48,7 +48,7 @@ func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 			if a, err := sources.ParseARN(lbArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  lbArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})

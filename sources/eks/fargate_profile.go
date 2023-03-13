@@ -45,7 +45,7 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 		if a, err := sources.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *out.FargateProfile.PodExecutionRoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -55,7 +55,7 @@ func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	for _, subnet := range out.FargateProfile.Subnets {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-subnet",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  subnet,
 			Scope:  scope,
 		})

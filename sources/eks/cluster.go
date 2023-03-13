@@ -39,19 +39,19 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		LinkedItemQueries: []*sdp.Query{
 			{
 				Type:   "eks-addon",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.Name,
 				Scope:  scope,
 			},
 			{
 				Type:   "eks-fargate-profile",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.Name,
 				Scope:  scope,
 			},
 			{
 				Type:   "eks-nodegroup",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.Name,
 				Scope:  scope,
 			},
@@ -65,7 +65,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 			if a, err = sources.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ConnectorConfig.RoleArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -79,7 +79,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 				if a, err = sources.ParseARN(*conf.Provider.KeyArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kms-key",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *conf.Provider.KeyArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -91,7 +91,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	if cluster.Endpoint != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "http",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  *cluster.Endpoint,
 			Scope:  "global",
 		})
@@ -101,7 +101,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if cluster.ResourcesVpcConfig.ClusterSecurityGroupId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.ClusterSecurityGroupId,
 				Scope:  scope,
 			})
@@ -110,7 +110,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		for _, id := range cluster.ResourcesVpcConfig.SecurityGroupIds {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  id,
 				Scope:  scope,
 			})
@@ -119,7 +119,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		for _, id := range cluster.ResourcesVpcConfig.SubnetIds {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  id,
 				Scope:  scope,
 			})
@@ -128,7 +128,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if cluster.ResourcesVpcConfig.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.VpcId,
 				Scope:  scope,
 			})
@@ -139,7 +139,7 @@ func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if a, err = sources.ParseARN(*cluster.RoleArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.RoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})

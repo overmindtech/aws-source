@@ -90,7 +90,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "10.0.6.64",
 			ExpectedScope:  "global",
 		},
@@ -103,7 +103,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 	tests = sources.ItemRequestTests{
 		{
 			ExpectedType:   "elbv2-load-balancer",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:loadbalancer/app/ingress/1bf10920c5bd199d",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},
@@ -116,7 +116,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 	tests = sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-foo",
 			ExpectedScope:  "foo",
 		},
@@ -129,7 +129,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 	tests = sources.ItemRequestTests{
 		{
 			ExpectedType:   "lambda-function",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:lambda:eu-west-2:944651592624:function/foobar",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},

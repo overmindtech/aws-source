@@ -98,13 +98,13 @@ func TestLayerVersionGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "signer-signing-job",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
 		},
 		{
 			ExpectedType:   "signer-signing-profile",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
 		},

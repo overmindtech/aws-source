@@ -90,7 +90,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-0667d3ca802741e30",
 			ExpectedScope:  item.Scope,
 		},

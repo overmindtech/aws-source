@@ -48,7 +48,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 				if a, err = sources.ParseARN(*dest.StreamArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kinesis-stream",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *dest.StreamArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -62,7 +62,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceBackupArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "backup-recovery-point",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *table.RestoreSummary.SourceBackupArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -73,7 +73,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceTableArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dynamodb-table",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *table.RestoreSummary.SourceTableArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -86,7 +86,7 @@ func TableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 			if a, err = sources.ParseARN(*table.SSEDescription.KMSMasterKeyArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *table.SSEDescription.KMSMasterKeyArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})

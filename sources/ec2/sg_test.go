@@ -96,13 +96,13 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "ec2-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg-094e151c9fc5da181",
 			ExpectedScope:  "052392120704.eu-west-2",
 		},

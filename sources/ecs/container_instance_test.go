@@ -338,7 +338,7 @@ func TestContainerInstanceGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-0e778f25705bc0c84",
 			ExpectedScope:  "foo",
 		},

@@ -68,7 +68,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if a, err = sources.ParseARN(*service.ClusterArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *service.ClusterArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -80,7 +80,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if a, err = sources.ParseARN(*lb.TargetGroupArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-target-group",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *lb.TargetGroupArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -93,7 +93,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if a, err = sources.ParseARN(*sr.RegistryArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "servicediscovery-service",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *sr.RegistryArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -105,7 +105,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if a, err = sources.ParseARN(*service.TaskDefinition); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *service.TaskDefinition,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -117,7 +117,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if a, err = sources.ParseARN(*deployment.TaskDefinition); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-task-definition",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *deployment.TaskDefinition,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -128,7 +128,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if strategy.CapacityProvider != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-capacity-provider",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *strategy.CapacityProvider,
 					Scope:  scope,
 				})
@@ -140,7 +140,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				for _, subnet := range deployment.NetworkConfiguration.AwsvpcConfiguration.Subnets {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  subnet,
 						Scope:  scope,
 					})
@@ -149,7 +149,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				for _, sg := range deployment.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ecs-security-group",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  sg,
 						Scope:  scope,
 					})
@@ -163,7 +163,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 					if alias.DnsName != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "dns",
-							Method: sdp.RequestMethod_SEARCH,
+							Method: sdp.QueryMethod_SEARCH,
 							Query:  *alias.DnsName,
 							Scope:  "global",
 						})
@@ -177,7 +177,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				if a, err = sources.ParseARN(*cr.DiscoveryArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "servicediscovery-service",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cr.DiscoveryArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -191,7 +191,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			for _, subnet := range service.NetworkConfiguration.AwsvpcConfiguration.Subnets {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  subnet,
 					Scope:  scope,
 				})
@@ -200,7 +200,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			for _, sg := range service.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  sg,
 					Scope:  scope,
 				})
@@ -211,7 +211,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, id := range taskSetIds {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ecs-task-set",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  id,
 			Scope:  scope,
 		})

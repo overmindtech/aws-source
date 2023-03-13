@@ -177,25 +177,25 @@ func TestTableGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "kinesis-stream",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:kinesis:eu-west-1:052392120703:stream/test",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},
 		{
 			ExpectedType:   "backup-recovery-point",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:backup:eu-west-1:052392120703:recovery-point:89d0f956-d3a6-42fd-abbd-7d397766bc7e",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},
 		{
 			ExpectedType:   "dynamodb-table",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},
 		{
 			ExpectedType:   "kms-key",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
 		},

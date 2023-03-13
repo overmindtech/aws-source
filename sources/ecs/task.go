@@ -64,7 +64,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 				if attachment.Id != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-network-interface",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *attachment.Id,
 						Scope:  scope,
 					})
@@ -77,7 +77,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		if a, err = sources.ParseARN(*task.ClusterArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *task.ClusterArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -88,7 +88,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		if a, err = sources.ParseARN(*task.ContainerInstanceArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-container-instance",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  a.ResourceID(),
 				Scope:  scope,
 			})
@@ -100,7 +100,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			if ni.Ipv6Address != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *ni.Ipv6Address,
 					Scope:  "global",
 				})
@@ -109,7 +109,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			if ni.PrivateIpv4Address != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *ni.PrivateIpv4Address,
 					Scope:  "global",
 				})
@@ -121,7 +121,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		if a, err = sources.ParseARN(*task.TaskDefinitionArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *task.TaskDefinitionArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})

@@ -92,13 +92,13 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg-0814766e46f201c22",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ec2-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg-09371b4a54fe7ab38",
 			ExpectedScope:  "foo",
 		},

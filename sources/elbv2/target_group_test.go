@@ -63,13 +63,13 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0c72199250cd479ea",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "elbv2-load-balancer",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:loadbalancer/app/ingress/1bf10920c5bd199d",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},

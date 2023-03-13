@@ -215,25 +215,25 @@ func TestTaskDefinitionGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "secretsmanager-secret",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c",
 			ExpectedScope:  "123456789012.us-west-2",
 		},
 		{
 			ExpectedType:   "ssm-parameter",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:ssm:us-east-2:123456789012:parameter/prod-123",
 			ExpectedScope:  "123456789012.us-east-2",
 		},
 		{
 			ExpectedType:   "iam-role",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:iam:us-east-2:123456789012:role/foo",
 			ExpectedScope:  "123456789012.us-east-2",
 		},
 		{
 			ExpectedType:   "iam-role",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:iam:us-east-2:123456789012:role/bar",
 			ExpectedScope:  "123456789012.us-east-2",
 		},

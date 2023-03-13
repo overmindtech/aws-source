@@ -58,7 +58,7 @@ func InstanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput
 		if is.InstanceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *is.InstanceId,
 				Scope:  scope,
 			})

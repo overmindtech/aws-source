@@ -45,7 +45,7 @@ func TestInstanceHealthOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-0337802d908b4a81e",
 			ExpectedScope:  "foo",
 		},

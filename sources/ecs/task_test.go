@@ -191,37 +191,37 @@ func TestTaskGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-network-interface",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "id",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ecs-cluster",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:ecs:eu-west-1:052392120703:cluster/test-ECSCluster-Bt4SqcM3CURk",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},
 		{
 			ExpectedType:   "ecs-container-instance",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-ECSCluster-Bt4SqcM3CURk/4b5c1d7dbb6746b38ada1b97b1866f6a",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "2001:db8:3333:4444:5555:6666:7777:8888",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ip",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "10.0.0.1",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ecs-task-definition",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:ecs:eu-west-1:052392120703:task-definition/test-ecs-demo-app:1",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},

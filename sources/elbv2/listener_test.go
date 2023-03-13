@@ -57,13 +57,13 @@ func TestListenerOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "elbv2-load-balancer",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:loadbalancer/app/ingress/1bf10920c5bd199d",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},
 		{
 			ExpectedType:   "acm-certificate",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:acm:eu-west-2:944651592624:certificate/acd84d34-fb78-4411-bd8a-43684a3477c5",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},

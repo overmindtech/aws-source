@@ -47,7 +47,7 @@ func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 		if securityGroupRule.GroupId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *securityGroupRule.GroupId,
 				Scope:  scope,
 			})
@@ -57,7 +57,7 @@ func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 			if rg.GroupId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *rg.GroupId,
 					Scope:  scope,
 				})

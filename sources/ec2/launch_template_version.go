@@ -74,7 +74,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 					if ip.Ipv6Address != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
-							Method: sdp.RequestMethod_GET,
+							Method: sdp.QueryMethod_GET,
 							Query:  *ip.Ipv6Address,
 							Scope:  "global",
 						})
@@ -84,7 +84,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if ni.NetworkInterfaceId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-network-interface",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *ni.NetworkInterfaceId,
 						Scope:  scope,
 					})
@@ -94,7 +94,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 					if ip.PrivateIpAddress != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
-							Method: sdp.RequestMethod_GET,
+							Method: sdp.QueryMethod_GET,
 							Query:  *ip.PrivateIpAddress,
 							Scope:  "global",
 						})
@@ -104,7 +104,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if ni.SubnetId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *ni.SubnetId,
 						Scope:  scope,
 					})
@@ -113,7 +113,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				for _, group := range ni.Groups {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-security-group",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  group,
 						Scope:  scope,
 					})
@@ -123,7 +123,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 			if lt.ImageId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-image",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *lt.ImageId,
 					Scope:  scope,
 				})
@@ -132,7 +132,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 			if lt.KeyName != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-key-pair",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *lt.KeyName,
 					Scope:  scope,
 				})
@@ -142,7 +142,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if mapping.Ebs != nil && mapping.Ebs.SnapshotId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-snapshot",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *mapping.Ebs.SnapshotId,
 						Scope:  scope,
 					})
@@ -154,7 +154,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 					if target.CapacityReservationId != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ec2-capacity-reservation",
-							Method: sdp.RequestMethod_GET,
+							Method: sdp.QueryMethod_GET,
 							Query:  *target.CapacityReservationId,
 							Scope:  scope,
 						})
@@ -166,7 +166,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if lt.Placement.AvailabilityZone != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-availability-zone",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.AvailabilityZone,
 						Scope:  scope,
 					})
@@ -175,7 +175,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if lt.Placement.GroupId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-placement-group",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.GroupId,
 						Scope:  scope,
 					})
@@ -184,7 +184,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if lt.Placement.HostId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-host",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.HostId,
 						Scope:  scope,
 					})
@@ -194,7 +194,7 @@ func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 			for _, id := range lt.SecurityGroupIds {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
 				})

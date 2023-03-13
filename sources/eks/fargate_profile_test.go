@@ -50,13 +50,13 @@ func TestFargateProfileGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "iam-role",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:partition:service::account-id:resource-type/resource-id",
 			ExpectedScope:  "account-id",
 		},
 		{
 			ExpectedType:   "ec2-subnet",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet",
 			ExpectedScope:  "foo",
 		},

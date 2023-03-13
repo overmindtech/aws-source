@@ -84,7 +84,7 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  item.Scope,
 		},

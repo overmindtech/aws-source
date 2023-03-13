@@ -52,7 +52,7 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 			if a, err := sources.ParseARN(*listener.LoadBalancerArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *listener.LoadBalancerArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -64,7 +64,7 @@ func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 				if a, err := sources.ParseARN(*cert.CertificateArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "acm-certificate",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cert.CertificateArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})

@@ -105,7 +105,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Code.Location != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.Location,
 				Scope:  "global",
 			})
@@ -114,7 +114,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Code.ImageUri != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.ImageUri,
 				Scope:  "global",
 			})
@@ -123,7 +123,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Code.ResolvedImageUri != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.ResolvedImageUri,
 				Scope:  "global",
 			})
@@ -137,7 +137,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if a, err = sources.ParseARN(*function.Configuration.Role); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.Role,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -157,7 +157,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 				if a, err = sources.ParseARN(*fsConfig.Arn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "efs-access-point",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *fsConfig.Arn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -169,7 +169,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if a, err = sources.ParseARN(*function.Configuration.KMSKeyArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.KMSKeyArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -183,7 +183,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 					name := strings.TrimPrefix(a.Resource, "layer:")
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "lambda-layer-version",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  name,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -194,7 +194,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 				if a, err = sources.ParseARN(*layer.SigningJobArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "signer-signing-job",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *layer.SigningJobArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -205,7 +205,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 				if a, err = sources.ParseARN(*layer.SigningProfileVersionArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "signer-signing-profile",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *layer.SigningProfileVersionArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})
@@ -217,7 +217,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if a, err = sources.ParseARN(*function.Configuration.MasterArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.MasterArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -228,7 +228,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if a, err = sources.ParseARN(*function.Configuration.SigningJobArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-job",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.SigningJobArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -239,7 +239,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if a, err = sources.ParseARN(*function.Configuration.SigningProfileVersionArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-profile",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.SigningProfileVersionArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -250,7 +250,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			for _, id := range function.Configuration.VpcConfig.SecurityGroupIds {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
 				})
@@ -259,7 +259,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			for _, id := range function.Configuration.VpcConfig.SubnetIds {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
 				})
@@ -268,7 +268,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if function.Configuration.VpcConfig.VpcId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *function.Configuration.VpcConfig.VpcId,
 					Scope:  scope,
 				})
@@ -280,7 +280,7 @@ func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if config.FunctionUrl != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *config.FunctionUrl,
 				Scope:  "global",
 			})
@@ -330,28 +330,28 @@ func GetEventLinkedItem(destinationARN string) (*sdp.Query, error) {
 		// In this case it's an SNS topic
 		return &sdp.Query{
 			Type:   "sns-topic",
-			Method: sdp.RequestMethod_SEARCH,
+			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
 		}, nil
 	case "sqs":
 		return &sdp.Query{
 			Type:   "sqs-queue",
-			Method: sdp.RequestMethod_SEARCH,
+			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
 		}, nil
 	case "lambda":
 		return &sdp.Query{
 			Type:   "lambda-function",
-			Method: sdp.RequestMethod_SEARCH,
+			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
 		}, nil
 	case "events":
 		return &sdp.Query{
 			Type:   "events-event-bus",
-			Method: sdp.RequestMethod_SEARCH,
+			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
 		}, nil

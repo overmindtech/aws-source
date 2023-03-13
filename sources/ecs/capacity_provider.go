@@ -41,7 +41,7 @@ func CapacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProviders
 				if a, err := sources.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "autoscaling-auto-scaling-group",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *provider.AutoScalingGroupProvider.AutoScalingGroupArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
 					})

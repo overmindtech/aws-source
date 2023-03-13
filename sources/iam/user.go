@@ -118,7 +118,7 @@ func UserItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	for _, group := range awsItem.UserGroups {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-group",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  *group.GroupName,
 			Scope:  scope,
 		})

@@ -91,37 +91,37 @@ func TestNodegroupGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-key-pair",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "key",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "ec2-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg1",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "ec2-subnet",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet0d1fabfe6794b5543",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "autoscaling-auto-scaling-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eks-default-2022122213523169820000001f-98c29d0d-b22a-aaa3-445e-ebf71d43f67c",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "ec2-security-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg2",
 			ExpectedScope:  item.Scope,
 		},
 		{
 			ExpectedType:   "ec2-launch-template",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "lt-097e994ce7e14fcdc",
 			ExpectedScope:  item.Scope,
 		},

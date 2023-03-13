@@ -48,7 +48,7 @@ func EgressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOn
 			if attachment.VpcId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *attachment.VpcId,
 					Scope:  scope,
 				})

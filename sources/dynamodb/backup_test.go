@@ -101,7 +101,7 @@ func TestBackupGetFunc(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "dynamodb-table",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test2",
 			ExpectedScope:  "foo",
 		},
