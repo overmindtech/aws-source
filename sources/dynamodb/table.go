@@ -118,11 +118,11 @@ func NewTableSource(config aws.Config, accountID string, region string) *sources
 				return nil, errors.New("cannot map nil output")
 			}
 
-			inputs := make([]*dynamodb.DescribeTableInput, 0)
+			inputs := make([]*dynamodb.DescribeTableInput, len(output.TableNames))
 
-			for _, name := range output.TableNames {
+			for i := range output.TableNames {
 				inputs = append(inputs, &dynamodb.DescribeTableInput{
-					TableName: sources.PtrString(name),
+					TableName: &output.TableNames[i],
 				})
 			}
 

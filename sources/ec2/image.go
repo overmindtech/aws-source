@@ -35,10 +35,10 @@ func ImageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
 func ImageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
-	for _, Image := range output.Images {
+	for _, image := range output.Images {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(Image)
+		attrs, err = sources.ToAttributesCase(image)
 
 		if err != nil {
 			return nil, &sdp.QueryError{

@@ -379,9 +379,9 @@ func NewFunctionSource(config aws.Config, accountID string, region string) *sour
 		ListFuncOutputMapper: func(output *lambda.ListFunctionsOutput, input *lambda.ListFunctionsInput) ([]*lambda.GetFunctionInput, error) {
 			inputs := make([]*lambda.GetFunctionInput, len(output.Functions))
 
-			for i, f := range output.Functions {
+			for i := range output.Functions {
 				inputs[i] = &lambda.GetFunctionInput{
-					FunctionName: f.FunctionName,
+					FunctionName: output.Functions[i].FunctionName,
 				}
 			}
 

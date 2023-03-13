@@ -144,10 +144,10 @@ func NewNodegroupSource(config aws.Config, accountID string, region string) *sou
 		ListFuncOutputMapper: func(output *eks.ListNodegroupsOutput, input *eks.ListNodegroupsInput) ([]*eks.DescribeNodegroupInput, error) {
 			inputs := make([]*eks.DescribeNodegroupInput, len(output.Nodegroups))
 
-			for i, group := range output.Nodegroups {
+			for i := range output.Nodegroups {
 				inputs[i] = &eks.DescribeNodegroupInput{
 					ClusterName:   input.ClusterName,
-					NodegroupName: &group,
+					NodegroupName: &output.Nodegroups[i],
 				}
 			}
 

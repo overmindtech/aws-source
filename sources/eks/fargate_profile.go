@@ -100,10 +100,10 @@ func NewFargateProfileSource(config aws.Config, accountID string, region string)
 		ListFuncOutputMapper: func(output *eks.ListFargateProfilesOutput, input *eks.ListFargateProfilesInput) ([]*eks.DescribeFargateProfileInput, error) {
 			inputs := make([]*eks.DescribeFargateProfileInput, len(output.FargateProfileNames))
 
-			for i, name := range output.FargateProfileNames {
+			for i := range output.FargateProfileNames {
 				inputs[i] = &eks.DescribeFargateProfileInput{
 					ClusterName:        input.ClusterName,
-					FargateProfileName: &name,
+					FargateProfileName: &output.FargateProfileNames[i],
 				}
 			}
 
