@@ -168,9 +168,9 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 		ListFuncOutputMapper: func(output *eks.ListClustersOutput, _ *eks.ListClustersInput) ([]*eks.DescribeClusterInput, error) {
 			inputs := make([]*eks.DescribeClusterInput, len(output.Clusters))
 
-			for i, clusterName := range output.Clusters {
+			for i := range output.Clusters {
 				inputs[i] = &eks.DescribeClusterInput{
-					Name: &clusterName,
+					Name: &output.Clusters[i],
 				}
 			}
 

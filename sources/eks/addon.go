@@ -80,9 +80,9 @@ func NewAddonSource(config aws.Config, accountID string, region string) *sources
 		ListFuncOutputMapper: func(output *eks.ListAddonsOutput, input *eks.ListAddonsInput) ([]*eks.DescribeAddonInput, error) {
 			inputs := make([]*eks.DescribeAddonInput, len(output.Addons))
 
-			for i, addon := range output.Addons {
+			for i := range output.Addons {
 				inputs[i] = &eks.DescribeAddonInput{
-					AddonName:   &addon,
+					AddonName:   &output.Addons[i],
 					ClusterName: input.ClusterName,
 				}
 			}
