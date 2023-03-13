@@ -81,7 +81,7 @@ func TestSnapshotOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-volume",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "volumeId",
 			ExpectedScope:  item.Scope,
 		},

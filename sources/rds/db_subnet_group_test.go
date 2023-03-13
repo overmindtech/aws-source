@@ -57,25 +57,25 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-vpc",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ec2-subnet",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet-0450a637af9984235",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eu-west-2c",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "outposts-outpost",
-			ExpectedMethod: sdp.RequestMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
 		},

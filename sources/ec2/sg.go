@@ -49,7 +49,7 @@ func SecurityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 		if securityGroup.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *securityGroup.VpcId,
 				Scope:  scope,
 			})
@@ -110,7 +110,7 @@ func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string)
 			if idGroup.GroupId != nil {
 				requests = append(requests, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *idGroup.GroupId,
 					Scope:  sources.FormatScope(relatedAccount, region),
 				})

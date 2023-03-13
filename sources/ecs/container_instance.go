@@ -54,7 +54,7 @@ func ContainerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	if containerInstance.Ec2InstanceId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-instance",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  *containerInstance.Ec2InstanceId,
 			Scope:  scope,
 		})

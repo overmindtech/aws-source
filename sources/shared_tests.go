@@ -211,7 +211,7 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 
 type ItemRequestTest struct {
 	ExpectedType   string
-	ExpectedMethod sdp.RequestMethod
+	ExpectedMethod sdp.QueryMethod
 	ExpectedQuery  string
 	ExpectedScope  string
 }
@@ -247,8 +247,8 @@ func CheckItemRequest(t *testing.T, item *sdp.Query, itemName string, expectedTy
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}
-	if item.Method != sdp.RequestMethod_GET {
-		t.Errorf("%s.Method '%v' != '%v'", itemName, item.Method, sdp.RequestMethod_GET)
+	if item.Method != sdp.QueryMethod_GET {
+		t.Errorf("%s.Method '%v' != '%v'", itemName, item.Method, sdp.QueryMethod_GET)
 	}
 	if item.Query != expectedQuery {
 		t.Errorf("%s.Query '%v' != '%v'", itemName, item.Query, expectedQuery)

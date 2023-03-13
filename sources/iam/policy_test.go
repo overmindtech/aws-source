@@ -163,19 +163,19 @@ func TestPolicyItemMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "iam-group",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "groupName",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "iam-user",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "userName",
 			ExpectedScope:  "foo",
 		},
 		{
 			ExpectedType:   "iam-role",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "roleName",
 			ExpectedScope:  "foo",
 		},

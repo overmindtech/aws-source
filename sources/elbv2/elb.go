@@ -30,14 +30,14 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.LoadBalancerArn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "elbv2-target-group",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *lb.LoadBalancerArn,
 				Scope:  scope,
 			})
 
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "elbv2-listener",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *lb.LoadBalancerArn,
 				Scope:  scope,
 			})
@@ -46,7 +46,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.DNSName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *lb.DNSName,
 				Scope:  "global",
 			})
@@ -55,7 +55,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.CanonicalHostedZoneId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "route53-hosted-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *lb.CanonicalHostedZoneId,
 				Scope:  scope,
 			})
@@ -64,7 +64,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *lb.VpcId,
 				Scope:  scope,
 			})
@@ -74,7 +74,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 			if az.ZoneName != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-availability-zone",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *az.ZoneName,
 					Scope:  scope,
 				})
@@ -83,7 +83,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 			if az.SubnetId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *az.SubnetId,
 					Scope:  scope,
 				})
@@ -93,7 +93,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 				if address.AllocationId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-address",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *address.AllocationId,
 						Scope:  scope,
 					})
@@ -102,7 +102,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 				if address.IPv6Address != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *address.IPv6Address,
 						Scope:  "global",
 					})
@@ -111,7 +111,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 				if address.IpAddress != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *address.IpAddress,
 						Scope:  "global",
 					})
@@ -120,7 +120,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 				if address.PrivateIPv4Address != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *address.PrivateIPv4Address,
 						Scope:  "global",
 					})
@@ -131,7 +131,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		for _, sg := range lb.SecurityGroups {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  sg,
 				Scope:  scope,
 			})
@@ -140,7 +140,7 @@ func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 		if lb.CustomerOwnedIpv4Pool != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-coip-pool",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *lb.CustomerOwnedIpv4Pool,
 				Scope:  scope,
 			})

@@ -45,7 +45,7 @@ func ReservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstances
 		if reservation.AvailabilityZone != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *reservation.AvailabilityZone,
 				Scope:  scope,
 			})

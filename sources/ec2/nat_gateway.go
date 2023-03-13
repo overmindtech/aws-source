@@ -48,7 +48,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			if address.NetworkInterfaceId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-network-interface",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *address.NetworkInterfaceId,
 					Scope:  scope,
 				})
@@ -57,7 +57,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			if address.PrivateIp != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *address.PrivateIp,
 					Scope:  "global",
 				})
@@ -66,7 +66,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			if address.PublicIp != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *address.PublicIp,
 					Scope:  "global",
 				})
@@ -76,7 +76,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		if ng.SubnetId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ng.SubnetId,
 				Scope:  scope,
 			})
@@ -85,7 +85,7 @@ func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		if ng.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ng.VpcId,
 				Scope:  scope,
 			})

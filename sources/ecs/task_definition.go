@@ -78,7 +78,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		if a, err = sources.ParseARN(*td.ExecutionRoleArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *td.ExecutionRoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -89,7 +89,7 @@ func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		if a, err = sources.ParseARN(*td.TaskRoleArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *td.TaskRoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
 			})
@@ -112,14 +112,14 @@ func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 			case "secretsmanager":
 				return &sdp.Query{
 					Type:   "secretsmanager-secret",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *secret.ValueFrom,
 					Scope:  secretScope,
 				}
 			case "ssm":
 				return &sdp.Query{
 					Type:   "ssm-parameter",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *secret.ValueFrom,
 					Scope:  secretScope,
 				}

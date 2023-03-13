@@ -73,7 +73,7 @@ func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 			if a, err = sources.ParseARN(*out.Content.SigningJobArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-job",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *out.Content.SigningJobArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -84,7 +84,7 @@ func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 			if a, err = sources.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "signer-signing-profile",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *out.Content.SigningProfileVersionArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})

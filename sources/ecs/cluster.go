@@ -63,19 +63,19 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			{
 				// Search for all container instances on this cluster
 				Type:   "ecs-container-instance",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.ClusterName,
 				Scope:  scope,
 			},
 			{
 				Type:   "ecs-service",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.ClusterName,
 				Scope:  scope,
 			},
 			{
 				Type:   "ecs-task",
-				Method: sdp.RequestMethod_SEARCH,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.ClusterName,
 				Scope:  scope,
 			},
@@ -87,7 +87,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId,
 					Scope:  scope,
 				})
@@ -97,7 +97,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "logs-log-group",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName,
 						Scope:  scope,
 					})
@@ -106,7 +106,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "s3-bucket",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
 						Scope:  scope,
 					})
@@ -118,7 +118,7 @@ func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, provider := range cluster.CapacityProviders {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ecs-capacity-provider",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  provider,
 			Scope:  scope,
 		})

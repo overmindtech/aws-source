@@ -48,7 +48,7 @@ func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 			if assoc.SubnetId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *assoc.SubnetId,
 					Scope:  scope,
 				})
@@ -58,7 +58,7 @@ func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		if networkAcl.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *networkAcl.VpcId,
 				Scope:  scope,
 			})

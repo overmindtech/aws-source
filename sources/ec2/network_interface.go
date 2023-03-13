@@ -48,7 +48,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if ni.Attachment.InstanceId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *ni.Attachment.InstanceId,
 					Scope:  scope,
 				})
@@ -58,7 +58,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		if ni.AvailabilityZone != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ni.AvailabilityZone,
 				Scope:  scope,
 			})
@@ -68,7 +68,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if sg.GroupId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *sg.GroupId,
 					Scope:  scope,
 				})
@@ -79,7 +79,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if ip.Ipv6Address != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *ip.Ipv6Address,
 					Scope:  "global",
 				})
@@ -91,7 +91,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				if assoc.PublicDnsName != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "dns",
-						Method: sdp.RequestMethod_SEARCH,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *assoc.PublicDnsName,
 						Scope:  "global",
 					})
@@ -100,7 +100,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				if assoc.PublicIp != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.PublicIp,
 						Scope:  "global",
 					})
@@ -109,7 +109,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				if assoc.CarrierIp != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.CarrierIp,
 						Scope:  "global",
 					})
@@ -118,7 +118,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				if assoc.CustomerOwnedIp != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.CustomerOwnedIp,
 						Scope:  "global",
 					})
@@ -128,7 +128,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if ip.PrivateDnsName != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *ip.PrivateDnsName,
 					Scope:  "global",
 				})
@@ -137,7 +137,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if ip.PrivateIpAddress != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *ip.PrivateIpAddress,
 					Scope:  "global",
 				})
@@ -147,7 +147,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		if ni.SubnetId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ni.SubnetId,
 				Scope:  scope,
 			})
@@ -156,7 +156,7 @@ func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		if ni.VpcId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ni.VpcId,
 				Scope:  scope,
 			})

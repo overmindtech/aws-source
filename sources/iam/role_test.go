@@ -116,7 +116,7 @@ func TestRoleItemMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "iam-role-policy",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "one",
 			ExpectedScope:  "foo",
 		},

@@ -92,7 +92,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "az",
 			ExpectedScope:  item.Scope,
 		},

@@ -47,7 +47,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		if ng.RemoteAccess.Ec2SshKey != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-key-pair",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ng.RemoteAccess.Ec2SshKey,
 				Scope:  scope,
 			})
@@ -56,7 +56,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  sg,
 				Scope:  scope,
 			})
@@ -66,7 +66,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	for _, subnet := range ng.Subnets {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-subnet",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  subnet,
 			Scope:  scope,
 		})
@@ -77,7 +77,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 			if g.Name != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "autoscaling-auto-scaling-group",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *g.Name,
 					Scope:  scope,
 				})
@@ -87,7 +87,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ng.Resources.RemoteAccessSecurityGroup,
 				Scope:  scope,
 			})
@@ -98,7 +98,7 @@ func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		if ng.LaunchTemplate.Id != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-launch-template",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *ng.LaunchTemplate.Id,
 				Scope:  scope,
 			})

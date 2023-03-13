@@ -94,7 +94,7 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eu-west-2c",
 			ExpectedScope:  item.Scope,
 		},

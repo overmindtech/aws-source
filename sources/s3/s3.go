@@ -342,7 +342,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  url,
 				Scope:  "global",
 			})
@@ -356,7 +356,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			if a, err = sources.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *lambdaConfig.LambdaFunctionArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -369,7 +369,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			if a, err = sources.ParseARN(*q.QueueArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sqs-queue",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *q.QueueArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -382,7 +382,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			if a, err = sources.ParseARN(*topic.TopicArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sns-topic",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *topic.TopicArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -394,7 +394,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if bucket.LoggingEnabled.TargetBucket != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "s3-bucket",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *bucket.LoggingEnabled.TargetBucket,
 				Scope:  scope,
 			})
@@ -404,7 +404,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	if bucket.LocationConstraint != "" {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-region",
-			Method: sdp.RequestMethod_GET,
+			Method: sdp.QueryMethod_GET,
 			Query:  string(bucket.LocationConstraint),
 			Scope:  scope,
 		})
@@ -417,7 +417,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 					if a, err = sources.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "s3-bucket",
-							Method: sdp.RequestMethod_SEARCH,
+							Method: sdp.QueryMethod_SEARCH,
 							Query:  *bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket,
 							Scope:  sources.FormatScope(a.AccountID, a.Region),
 						})
@@ -438,7 +438,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 							if a, err = sources.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
 								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 									Type:   "s3-bucket",
-									Method: sdp.RequestMethod_SEARCH,
+									Method: sdp.QueryMethod_SEARCH,
 									Query:  *bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket,
 									Scope:  sources.FormatScope(a.AccountID, a.Region),
 								})

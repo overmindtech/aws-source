@@ -125,14 +125,14 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			case "lambda":
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *desc.Target.Id,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
 			case "elasticloadbalancing":
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *desc.Target.Id,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -144,7 +144,7 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 				// This means it's an IP
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *desc.Target.Id,
 					Scope:  "global",
 				})
@@ -152,7 +152,7 @@ func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 				// If all else fails it must be an instance ID
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *desc.Target.Id,
 					Scope:  scope,
 				})

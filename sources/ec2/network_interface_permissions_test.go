@@ -77,7 +77,7 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "ec2-network-interface",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eni-07f8f3d404036c833",
 			ExpectedScope:  "foo",
 		},

@@ -37,7 +37,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ec2-launch-template",
-							Method: sdp.RequestMethod_GET,
+							Method: sdp.QueryMethod_GET,
 							Query:  *asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId,
 							Scope:  scope,
 						})
@@ -53,7 +53,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			if a, err = sources.ParseARN(tgARN); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-target-group",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  tgARN,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -64,7 +64,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			if instance.InstanceId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *instance.InstanceId,
 					Scope:  scope,
 				})
@@ -74,7 +74,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 				if instance.LaunchTemplate.LaunchTemplateId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-launch-template",
-						Method: sdp.RequestMethod_GET,
+						Method: sdp.QueryMethod_GET,
 						Query:  *instance.LaunchTemplate.LaunchTemplateId,
 						Scope:  scope,
 					})
@@ -86,7 +86,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			if a, err = sources.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
-					Method: sdp.RequestMethod_SEARCH,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *asg.ServiceLinkedRoleARN,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
@@ -96,7 +96,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		if asg.LaunchConfigurationName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "autoscaling-launch-configuration",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *asg.LaunchConfigurationName,
 				Scope:  scope,
 			})
@@ -106,7 +106,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			if asg.LaunchTemplate.LaunchTemplateId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-launch-template",
-					Method: sdp.RequestMethod_GET,
+					Method: sdp.QueryMethod_GET,
 					Query:  *asg.LaunchTemplate.LaunchTemplateId,
 					Scope:  scope,
 				})
@@ -116,7 +116,7 @@ func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		if asg.PlacementGroup != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-placement-group",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *asg.PlacementGroup,
 				Scope:  scope,
 			})

@@ -42,7 +42,7 @@ func TestLayerItemMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "lambda-layer-version",
-			ExpectedMethod: sdp.RequestMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "name:10",
 			ExpectedScope:  "foo",
 		},

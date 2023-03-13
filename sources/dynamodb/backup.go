@@ -50,7 +50,7 @@ func BackupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 		if out.BackupDescription.SourceTableDetails.TableName != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dynamodb-table",
-				Method: sdp.RequestMethod_GET,
+				Method: sdp.QueryMethod_GET,
 				Query:  *out.BackupDescription.SourceTableDetails.TableName,
 				Scope:  scope,
 			})
