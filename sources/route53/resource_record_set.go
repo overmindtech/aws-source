@@ -72,5 +72,6 @@ func NewResourceRecordSetSource(config aws.Config, accountID string, region stri
 		Region:      region,
 		GetFunc:     ResourceRecordSetGetFunc,
 		ItemMapper:  ResourceRecordSetItemMapper,
+		SearchFunc:  ResourceRecordSetSearchFunc,
 	}
 }
