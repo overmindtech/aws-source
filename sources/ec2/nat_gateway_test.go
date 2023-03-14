@@ -12,7 +12,7 @@ import (
 )
 
 func TestNatGatewayInputMapperGet(t *testing.T) {
-	input, err := NatGatewayInputMapperGet("foo", "bar")
+	input, err := natGatewayInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestNatGatewayInputMapperGet(t *testing.T) {
 }
 
 func TestNatGatewayInputMapperList(t *testing.T) {
-	input, err := NatGatewayInputMapperList("foo")
+	input, err := natGatewayInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -91,7 +91,7 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NatGatewayOutputMapper("foo", nil, output)
+	items, err := natGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

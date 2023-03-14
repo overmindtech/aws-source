@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func SecurityGroupRuleInputMapperGet(scope string, query string) (*ec2.DescribeSecurityGroupRulesInput, error) {
+func securityGroupRuleInputMapperGet(scope string, query string) (*ec2.DescribeSecurityGroupRulesInput, error) {
 	return &ec2.DescribeSecurityGroupRulesInput{
 		SecurityGroupRuleIds: []string{
 			query,
@@ -17,11 +17,11 @@ func SecurityGroupRuleInputMapperGet(scope string, query string) (*ec2.DescribeS
 	}, nil
 }
 
-func SecurityGroupRuleInputMapperList(scope string) (*ec2.DescribeSecurityGroupRulesInput, error) {
+func securityGroupRuleInputMapperList(scope string) (*ec2.DescribeSecurityGroupRulesInput, error) {
 	return &ec2.DescribeSecurityGroupRulesInput{}, nil
 }
 
-func SecurityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRulesInput, output *ec2.DescribeSecurityGroupRulesOutput) ([]*sdp.Item, error) {
+func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRulesInput, output *ec2.DescribeSecurityGroupRulesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, securityGroupRule := range output.SecurityGroupRules {
@@ -80,11 +80,11 @@ func NewSecurityGroupRuleSource(config aws.Config, accountID string, limit *Limi
 			<-limit.C // Wait for late limiting
 			return client.DescribeSecurityGroupRules(ctx, input)
 		},
-		InputMapperGet:  SecurityGroupRuleInputMapperGet,
-		InputMapperList: SecurityGroupRuleInputMapperList,
+		InputMapperGet:  securityGroupRuleInputMapperGet,
+		InputMapperList: securityGroupRuleInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSecurityGroupRulesInput) sources.Paginator[*ec2.DescribeSecurityGroupRulesOutput, *ec2.Options] {
 			return ec2.NewDescribeSecurityGroupRulesPaginator(client, params)
 		},
-		OutputMapper: SecurityGroupRuleOutputMapper,
+		OutputMapper: securityGroupRuleOutputMapper,
 	}
 }

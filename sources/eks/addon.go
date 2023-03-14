@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func AddonGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeAddonInput) (*sdp.Item, error) {
+func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeAddonInput) (*sdp.Item, error) {
 	out, err := client.DescribeAddon(ctx, input)
 
 	if err != nil {
@@ -89,6 +89,6 @@ func NewAddonSource(config aws.Config, accountID string, region string) *sources
 
 			return inputs, nil
 		},
-		GetFunc: AddonGetFunc,
+		GetFunc: addonGetFunc,
 	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func TestLaunchTemplateInputMapperGet(t *testing.T) {
-	input, err := LaunchTemplateInputMapperGet("foo", "bar")
+	input, err := launchTemplateInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestLaunchTemplateInputMapperGet(t *testing.T) {
 }
 
 func TestLaunchTemplateInputMapperList(t *testing.T) {
-	input, err := LaunchTemplateInputMapperList("foo")
+	input, err := launchTemplateInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -53,7 +53,7 @@ func TestLaunchTemplateOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := LaunchTemplateOutputMapper("foo", nil, output)
+	items, err := launchTemplateOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

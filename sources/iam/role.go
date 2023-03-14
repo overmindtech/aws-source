@@ -16,7 +16,7 @@ type RoleDetails struct {
 	Policies []string
 }
 
-func RoleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
+func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
 	out, err := client.GetRole(ctx, &iam.GetRoleInput{
 		RoleName: &query,
 	})
@@ -58,7 +58,7 @@ func getRolePolicies(ctx context.Context, client IAMClient, roleName string) ([]
 	return policies, nil
 }
 
-func RoleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
+func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
 
@@ -87,7 +87,7 @@ func RoleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 	return roles, nil
 }
 
-func RoleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
+func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem.Role)
 
 	if err != nil {
@@ -119,8 +119,8 @@ func NewRoleSource(config aws.Config, accountID string, region string) *sources.
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
 		Region:     region,
-		GetFunc:    RoleGetFunc,
-		ListFunc:   RoleListFunc,
-		ItemMapper: RoleItemMapper,
+		GetFunc:    roleGetFunc,
+		ListFunc:   roleListFunc,
+		ItemMapper: roleItemMapper,
 	}
 }

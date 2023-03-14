@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func NetworkInterfacePermissionInputMapperGet(scope string, query string) (*ec2.DescribeNetworkInterfacePermissionsInput, error) {
+func networkInterfacePermissionInputMapperGet(scope string, query string) (*ec2.DescribeNetworkInterfacePermissionsInput, error) {
 	return &ec2.DescribeNetworkInterfacePermissionsInput{
 		NetworkInterfacePermissionIds: []string{
 			query,
@@ -17,11 +17,11 @@ func NetworkInterfacePermissionInputMapperGet(scope string, query string) (*ec2.
 	}, nil
 }
 
-func NetworkInterfacePermissionInputMapperList(scope string) (*ec2.DescribeNetworkInterfacePermissionsInput, error) {
+func networkInterfacePermissionInputMapperList(scope string) (*ec2.DescribeNetworkInterfacePermissionsInput, error) {
 	return &ec2.DescribeNetworkInterfacePermissionsInput{}, nil
 }
 
-func NetworkInterfacePermissionOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacePermissionsInput, output *ec2.DescribeNetworkInterfacePermissionsOutput) ([]*sdp.Item, error) {
+func networkInterfacePermissionOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacePermissionsInput, output *ec2.DescribeNetworkInterfacePermissionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.NetworkInterfacePermissions {
@@ -69,11 +69,11 @@ func NewNetworkInterfacePermissionSource(config aws.Config, accountID string, li
 			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
-		InputMapperGet:  NetworkInterfacePermissionInputMapperGet,
-		InputMapperList: NetworkInterfacePermissionInputMapperList,
+		InputMapperGet:  networkInterfacePermissionInputMapperGet,
+		InputMapperList: networkInterfacePermissionInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacePermissionsInput) sources.Paginator[*ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkInterfacePermissionsPaginator(client, params)
 		},
-		OutputMapper: NetworkInterfacePermissionOutputMapper,
+		OutputMapper: networkInterfacePermissionOutputMapper,
 	}
 }

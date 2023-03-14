@@ -83,7 +83,7 @@ func (t *TestIAMClient) ListPolicies(context.Context, *iam.ListPoliciesInput, ..
 }
 
 func TestPolicyGetFunc(t *testing.T) {
-	policy, err := PolicyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
+	policy, err := policyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -107,7 +107,7 @@ func TestPolicyGetFunc(t *testing.T) {
 }
 
 func TestPolicyListFunc(t *testing.T) {
-	policies, err := PolicyListFunc(context.Background(), &TestIAMClient{}, "foo")
+	policies, err := policyListFunc(context.Background(), &TestIAMClient{}, "foo")
 
 	if err != nil {
 		t.Error(err)
@@ -119,7 +119,7 @@ func TestPolicyListFunc(t *testing.T) {
 }
 
 func TestPolicyItemMapper(t *testing.T) {
-	item, err := PolicyItemMapper("foo", &PolicyDetails{
+	item, err := policyItemMapper("foo", &PolicyDetails{
 		Policy: &types.Policy{
 			PolicyName:                    sources.PtrString("AWSControlTowerAdminPolicy"),
 			PolicyId:                      sources.PtrString("ANPA3VLV2U2745H37HTHN"),

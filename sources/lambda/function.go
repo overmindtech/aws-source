@@ -22,7 +22,7 @@ type FunctionDetails struct {
 }
 
 // FunctionGetFunc Gets the details of a specific lambda function
-func FunctionGetFunc(ctx context.Context, client LambdaClient, scope string, input *lambda.GetFunctionInput) (*sdp.Item, error) {
+func functionGetFunc(ctx context.Context, client LambdaClient, scope string, input *lambda.GetFunctionInput) (*sdp.Item, error) {
 	out, err := client.GetFunction(ctx, input)
 
 	if err != nil {
@@ -367,7 +367,7 @@ func NewFunctionSource(config aws.Config, accountID string, region string) *sour
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &lambda.ListFunctionsInput{},
-		GetFunc:   FunctionGetFunc,
+		GetFunc:   functionGetFunc,
 		GetInputMapper: func(scope, query string) *lambda.GetFunctionInput {
 			return &lambda.GetFunctionInput{
 				FunctionName: &query,

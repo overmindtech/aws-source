@@ -22,7 +22,7 @@ func TestInstanceHealthOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceHealthOutputMapper("foo", nil, &output)
+	items, err := instanceHealthOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

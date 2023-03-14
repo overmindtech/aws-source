@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TableGetFunc(ctx context.Context, client Client, scope string, input *dynamodb.DescribeTableInput) (*sdp.Item, error) {
+func tableGetFunc(ctx context.Context, client Client, scope string, input *dynamodb.DescribeTableInput) (*sdp.Item, error) {
 	out, err := client.DescribeTable(ctx, input)
 
 	if err != nil {
@@ -103,7 +103,7 @@ func NewTableSource(config aws.Config, accountID string, region string) *sources
 		Client:    dynamodb.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc:   TableGetFunc,
+		GetFunc:   tableGetFunc,
 		ListInput: &dynamodb.ListTablesInput{},
 		GetInputMapper: func(scope, query string) *dynamodb.DescribeTableInput {
 			return &dynamodb.DescribeTableInput{

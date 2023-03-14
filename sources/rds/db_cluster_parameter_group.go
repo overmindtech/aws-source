@@ -17,7 +17,7 @@ type ClusterParameterGroup struct {
 	Parameters []types.Parameter
 }
 
-func DBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGroup) (*sdp.Item, error) {
+func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGroup) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -92,6 +92,6 @@ func NewDBClusterParameterGroupSource(config aws.Config, accountID string, regio
 
 			return groups, nil
 		},
-		ItemMapper: DBClusterParameterGroupItemMapper,
+		ItemMapper: dBClusterParameterGroupItemMapper,
 	}
 }

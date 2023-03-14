@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func InternetGatewayInputMapperGet(scope string, query string) (*ec2.DescribeInternetGatewaysInput, error) {
+func internetGatewayInputMapperGet(scope string, query string) (*ec2.DescribeInternetGatewaysInput, error) {
 	return &ec2.DescribeInternetGatewaysInput{
 		InternetGatewayIds: []string{
 			query,
@@ -17,11 +17,11 @@ func InternetGatewayInputMapperGet(scope string, query string) (*ec2.DescribeInt
 	}, nil
 }
 
-func InternetGatewayInputMapperList(scope string) (*ec2.DescribeInternetGatewaysInput, error) {
+func internetGatewayInputMapperList(scope string) (*ec2.DescribeInternetGatewaysInput, error) {
 	return &ec2.DescribeInternetGatewaysInput{}, nil
 }
 
-func InternetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysInput, output *ec2.DescribeInternetGatewaysOutput) ([]*sdp.Item, error) {
+func internetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysInput, output *ec2.DescribeInternetGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.InternetGateways {
@@ -72,11 +72,11 @@ func NewInternetGatewaySource(config aws.Config, accountID string, limit *LimitB
 			<-limit.C // Wait for late limiting
 			return client.DescribeInternetGateways(ctx, input)
 		},
-		InputMapperGet:  InternetGatewayInputMapperGet,
-		InputMapperList: InternetGatewayInputMapperList,
+		InputMapperGet:  internetGatewayInputMapperGet,
+		InputMapperList: internetGatewayInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInternetGatewaysInput) sources.Paginator[*ec2.DescribeInternetGatewaysOutput, *ec2.Options] {
 			return ec2.NewDescribeInternetGatewaysPaginator(client, params)
 		},
-		OutputMapper: InternetGatewayOutputMapper,
+		OutputMapper: internetGatewayOutputMapper,
 	}
 }

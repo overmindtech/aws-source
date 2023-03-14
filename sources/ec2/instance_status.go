@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func InstanceStatusInputMapperGet(scope, query string) (*ec2.DescribeInstanceStatusInput, error) {
+func instanceStatusInputMapperGet(scope, query string) (*ec2.DescribeInstanceStatusInput, error) {
 	return &ec2.DescribeInstanceStatusInput{
 		InstanceIds: []string{
 			query,
@@ -17,11 +17,11 @@ func InstanceStatusInputMapperGet(scope, query string) (*ec2.DescribeInstanceSta
 	}, nil
 }
 
-func InstanceStatusInputMapperList(scope string) (*ec2.DescribeInstanceStatusInput, error) {
+func instanceStatusInputMapperList(scope string) (*ec2.DescribeInstanceStatusInput, error) {
 	return &ec2.DescribeInstanceStatusInput{}, nil
 }
 
-func InstanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput, output *ec2.DescribeInstanceStatusOutput) ([]*sdp.Item, error) {
+func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput, output *ec2.DescribeInstanceStatusOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instanceStatus := range output.InstanceStatuses {
@@ -67,11 +67,11 @@ func NewInstanceStatusSource(config aws.Config, accountID string, limit *LimitBu
 			<-limit.C // Wait for late limiting
 			return client.DescribeInstanceStatus(ctx, input)
 		},
-		InputMapperGet:  InstanceStatusInputMapperGet,
-		InputMapperList: InstanceStatusInputMapperList,
+		InputMapperGet:  instanceStatusInputMapperGet,
+		InputMapperList: instanceStatusInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceStatusInput) sources.Paginator[*ec2.DescribeInstanceStatusOutput, *ec2.Options] {
 			return ec2.NewDescribeInstanceStatusPaginator(client, params)
 		},
-		OutputMapper: InstanceStatusOutputMapper,
+		OutputMapper: instanceStatusOutputMapper,
 	}
 }

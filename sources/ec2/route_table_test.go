@@ -12,7 +12,7 @@ import (
 )
 
 func TestRouteTableInputMapperGet(t *testing.T) {
-	input, err := RouteTableInputMapperGet("foo", "bar")
+	input, err := routeTableInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestRouteTableInputMapperGet(t *testing.T) {
 }
 
 func TestRouteTableInputMapperList(t *testing.T) {
-	input, err := RouteTableInputMapperList("foo")
+	input, err := routeTableInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -90,7 +90,7 @@ func TestRouteTableOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := RouteTableOutputMapper("foo", nil, output)
+	items, err := routeTableOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

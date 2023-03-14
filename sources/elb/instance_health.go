@@ -38,7 +38,7 @@ func ParseInstanceName(name string) (InstanceHealthName, error) {
 	}, nil
 }
 
-func InstanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput, output *elb.DescribeInstanceHealthOutput) ([]*sdp.Item, error) {
+func instanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput, output *elb.DescribeInstanceHealthOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, is := range output.InstanceStates {
@@ -102,6 +102,6 @@ func NewInstanceHealthSource(config aws.Config, accountID string) *sources.Descr
 				ErrorString: "list not supported for elb-instance-health, use search",
 			}
 		},
-		OutputMapper: InstanceHealthOutputMapper,
+		OutputMapper: instanceHealthOutputMapper,
 	}
 }

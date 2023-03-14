@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func SecurityGroupInputMapperGet(scope string, query string) (*ec2.DescribeSecurityGroupsInput, error) {
+func securityGroupInputMapperGet(scope string, query string) (*ec2.DescribeSecurityGroupsInput, error) {
 	return &ec2.DescribeSecurityGroupsInput{
 		GroupIds: []string{
 			query,
@@ -18,11 +18,11 @@ func SecurityGroupInputMapperGet(scope string, query string) (*ec2.DescribeSecur
 	}, nil
 }
 
-func SecurityGroupInputMapperList(scope string) (*ec2.DescribeSecurityGroupsInput, error) {
+func securityGroupInputMapperList(scope string) (*ec2.DescribeSecurityGroupsInput, error) {
 	return &ec2.DescribeSecurityGroupsInput{}, nil
 }
 
-func SecurityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
+func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, securityGroup := range output.SecurityGroups {
@@ -74,12 +74,12 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBuc
 			<-limit.C // Wait for late limiting
 			return client.DescribeSecurityGroups(ctx, input)
 		},
-		InputMapperGet:  SecurityGroupInputMapperGet,
-		InputMapperList: SecurityGroupInputMapperList,
+		InputMapperGet:  securityGroupInputMapperGet,
+		InputMapperList: securityGroupInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSecurityGroupsInput) sources.Paginator[*ec2.DescribeSecurityGroupsOutput, *ec2.Options] {
 			return ec2.NewDescribeSecurityGroupsPaginator(client, params)
 		},
-		OutputMapper: SecurityGroupOutputMapper,
+		OutputMapper: securityGroupOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client *ec2.Client, scope, query string) (*ec2.DescribeSecurityGroupsInput, error) {
 			return &ec2.DescribeSecurityGroupsInput{
 				GroupNames: []string{query},

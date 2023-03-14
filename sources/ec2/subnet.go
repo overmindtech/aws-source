@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func SubnetInputMapperGet(scope string, query string) (*ec2.DescribeSubnetsInput, error) {
+func subnetInputMapperGet(scope string, query string) (*ec2.DescribeSubnetsInput, error) {
 	return &ec2.DescribeSubnetsInput{
 		SubnetIds: []string{
 			query,
@@ -17,11 +17,11 @@ func SubnetInputMapperGet(scope string, query string) (*ec2.DescribeSubnetsInput
 	}, nil
 }
 
-func SubnetInputMapperList(scope string) (*ec2.DescribeSubnetsInput, error) {
+func subnetInputMapperList(scope string) (*ec2.DescribeSubnetsInput, error) {
 	return &ec2.DescribeSubnetsInput{}, nil
 }
 
-func SubnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
+func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, subnet := range output.Subnets {
@@ -78,11 +78,11 @@ func NewSubnetSource(config aws.Config, accountID string, limit *LimitBucket) *s
 			<-limit.C // Wait for late limiting
 			return client.DescribeSubnets(ctx, input)
 		},
-		InputMapperGet:  SubnetInputMapperGet,
-		InputMapperList: SubnetInputMapperList,
+		InputMapperGet:  subnetInputMapperGet,
+		InputMapperList: subnetInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSubnetsInput) sources.Paginator[*ec2.DescribeSubnetsOutput, *ec2.Options] {
 			return ec2.NewDescribeSubnetsPaginator(client, params)
 		},
-		OutputMapper: SubnetOutputMapper,
+		OutputMapper: subnetOutputMapper,
 	}
 }

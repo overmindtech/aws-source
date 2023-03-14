@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func HostedZoneGetFunc(ctx context.Context, client *route53.Client, scope, query string) (*types.HostedZone, error) {
+func hostedZoneGetFunc(ctx context.Context, client *route53.Client, scope, query string) (*types.HostedZone, error) {
 	out, err := client.GetHostedZone(ctx, &route53.GetHostedZoneInput{
 		Id: &query,
 	})
@@ -22,7 +22,7 @@ func HostedZoneGetFunc(ctx context.Context, client *route53.Client, scope, query
 	return out.HostedZone, nil
 }
 
-func HostedZoneListFunc(ctx context.Context, client *route53.Client, scope string) ([]*types.HostedZone, error) {
+func hostedZoneListFunc(ctx context.Context, client *route53.Client, scope string) ([]*types.HostedZone, error) {
 	out, err := client.ListHostedZones(ctx, &route53.ListHostedZonesInput{})
 
 	if err != nil {
@@ -38,7 +38,7 @@ func HostedZoneListFunc(ctx context.Context, client *route53.Client, scope strin
 	return zones, nil
 }
 
-func HostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
+func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -69,8 +69,8 @@ func NewHostedZoneSource(config aws.Config, accountID string, region string) *so
 		Client:     route53.NewFromConfig(config),
 		AccountID:  accountID,
 		Region:     region,
-		GetFunc:    HostedZoneGetFunc,
-		ListFunc:   HostedZoneListFunc,
-		ItemMapper: HostedZoneItemMapper,
+		GetFunc:    hostedZoneGetFunc,
+		ListFunc:   hostedZoneListFunc,
+		ItemMapper: hostedZoneItemMapper,
 	}
 }

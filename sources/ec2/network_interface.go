@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func NetworkInterfaceInputMapperGet(scope string, query string) (*ec2.DescribeNetworkInterfacesInput, error) {
+func networkInterfaceInputMapperGet(scope string, query string) (*ec2.DescribeNetworkInterfacesInput, error) {
 	return &ec2.DescribeNetworkInterfacesInput{
 		NetworkInterfaceIds: []string{
 			query,
@@ -17,11 +17,11 @@ func NetworkInterfaceInputMapperGet(scope string, query string) (*ec2.DescribeNe
 	}, nil
 }
 
-func NetworkInterfaceInputMapperList(scope string) (*ec2.DescribeNetworkInterfacesInput, error) {
+func networkInterfaceInputMapperList(scope string) (*ec2.DescribeNetworkInterfacesInput, error) {
 	return &ec2.DescribeNetworkInterfacesInput{}, nil
 }
 
-func NetworkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacesInput, output *ec2.DescribeNetworkInterfacesOutput) ([]*sdp.Item, error) {
+func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfacesInput, output *ec2.DescribeNetworkInterfacesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.NetworkInterfaces {
@@ -178,11 +178,11 @@ func NewNetworkInterfaceSource(config aws.Config, accountID string, limit *Limit
 			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
-		InputMapperGet:  NetworkInterfaceInputMapperGet,
-		InputMapperList: NetworkInterfaceInputMapperList,
+		InputMapperGet:  networkInterfaceInputMapperGet,
+		InputMapperList: networkInterfaceInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacesInput) sources.Paginator[*ec2.DescribeNetworkInterfacesOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkInterfacesPaginator(client, params)
 		},
-		OutputMapper: NetworkInterfaceOutputMapper,
+		OutputMapper: networkInterfaceOutputMapper,
 	}
 }

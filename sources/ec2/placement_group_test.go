@@ -11,7 +11,7 @@ import (
 )
 
 func TestPlacementGroupInputMapperGet(t *testing.T) {
-	input, err := PlacementGroupInputMapperGet("foo", "bar")
+	input, err := placementGroupInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestPlacementGroupInputMapperGet(t *testing.T) {
 }
 
 func TestPlacementGroupInputMapperList(t *testing.T) {
-	input, err := PlacementGroupInputMapperList("foo")
+	input, err := placementGroupInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -54,7 +54,7 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := PlacementGroupOutputMapper("foo", nil, output)
+	items, err := placementGroupOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

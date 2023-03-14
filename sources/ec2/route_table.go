@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func RouteTableInputMapperGet(scope string, query string) (*ec2.DescribeRouteTablesInput, error) {
+func routeTableInputMapperGet(scope string, query string) (*ec2.DescribeRouteTablesInput, error) {
 	return &ec2.DescribeRouteTablesInput{
 		RouteTableIds: []string{
 			query,
@@ -18,11 +18,11 @@ func RouteTableInputMapperGet(scope string, query string) (*ec2.DescribeRouteTab
 	}, nil
 }
 
-func RouteTableInputMapperList(scope string) (*ec2.DescribeRouteTablesInput, error) {
+func routeTableInputMapperList(scope string) (*ec2.DescribeRouteTablesInput, error) {
 	return &ec2.DescribeRouteTablesInput{}, nil
 }
 
-func RouteTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
+func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, rt := range output.RouteTables {
@@ -175,11 +175,11 @@ func NewRouteTableSource(config aws.Config, accountID string, limit *LimitBucket
 			<-limit.C // Wait for late limiting
 			return client.DescribeRouteTables(ctx, input)
 		},
-		InputMapperGet:  RouteTableInputMapperGet,
-		InputMapperList: RouteTableInputMapperList,
+		InputMapperGet:  routeTableInputMapperGet,
+		InputMapperList: routeTableInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeRouteTablesInput) sources.Paginator[*ec2.DescribeRouteTablesOutput, *ec2.Options] {
 			return ec2.NewDescribeRouteTablesPaginator(client, params)
 		},
-		OutputMapper: RouteTableOutputMapper,
+		OutputMapper: routeTableOutputMapper,
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LaunchTemplateVersionInputMapperGet(scope string, query string) (*ec2.DescribeLaunchTemplateVersionsInput, error) {
+func launchTemplateVersionInputMapperGet(scope string, query string) (*ec2.DescribeLaunchTemplateVersionsInput, error) {
 	// We are expecting the query to be {id}.{version}
 	sections := strings.Split(query, ".")
 
@@ -28,7 +28,7 @@ func LaunchTemplateVersionInputMapperGet(scope string, query string) (*ec2.Descr
 	}, nil
 }
 
-func LaunchTemplateVersionInputMapperList(scope string) (*ec2.DescribeLaunchTemplateVersionsInput, error) {
+func launchTemplateVersionInputMapperList(scope string) (*ec2.DescribeLaunchTemplateVersionsInput, error) {
 	return &ec2.DescribeLaunchTemplateVersionsInput{
 		Versions: []string{
 			"$Latest",
@@ -37,7 +37,7 @@ func LaunchTemplateVersionInputMapperList(scope string) (*ec2.DescribeLaunchTemp
 	}, nil
 }
 
-func LaunchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTemplateVersionsInput, output *ec2.DescribeLaunchTemplateVersionsOutput) ([]*sdp.Item, error) {
+func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTemplateVersionsInput, output *ec2.DescribeLaunchTemplateVersionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ltv := range output.LaunchTemplateVersions {
@@ -217,11 +217,11 @@ func NewLaunchTemplateVersionSource(config aws.Config, accountID string, limit *
 			<-limit.C // Wait for late limiting
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
-		InputMapperGet:  LaunchTemplateVersionInputMapperGet,
-		InputMapperList: LaunchTemplateVersionInputMapperList,
+		InputMapperGet:  launchTemplateVersionInputMapperGet,
+		InputMapperList: launchTemplateVersionInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplateVersionsInput) sources.Paginator[*ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Options] {
 			return ec2.NewDescribeLaunchTemplateVersionsPaginator(client, params)
 		},
-		OutputMapper: LaunchTemplateVersionOutputMapper,
+		OutputMapper: launchTemplateVersionOutputMapper,
 	}
 }

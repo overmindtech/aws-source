@@ -20,7 +20,7 @@ var ClusterIncludeFields = []types.ClusterField{
 	types.ClusterFieldTags,
 }
 
-func ClusterGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeClustersInput) (*sdp.Item, error) {
+func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeClustersInput) (*sdp.Item, error) {
 	out, err := client.DescribeClusters(ctx, input)
 
 	if err != nil {
@@ -133,7 +133,7 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 		Client:    ecs.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc:   ClusterGetFunc,
+		GetFunc:   clusterGetFunc,
 		GetInputMapper: func(scope, query string) *ecs.DescribeClustersInput {
 			return &ecs.DescribeClustersInput{
 				Clusters: []string{

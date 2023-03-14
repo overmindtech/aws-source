@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
+func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, cluster := range output.DBClusters {
@@ -224,6 +224,6 @@ func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOn
 		InputMapperList: func(scope string) (*rds.DescribeDBClustersInput, error) {
 			return &rds.DescribeDBClustersInput{}, nil
 		},
-		OutputMapper: DBClusterOutputMapper,
+		OutputMapper: dBClusterOutputMapper,
 	}
 }

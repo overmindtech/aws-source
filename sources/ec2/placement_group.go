@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func PlacementGroupInputMapperGet(scope string, query string) (*ec2.DescribePlacementGroupsInput, error) {
+func placementGroupInputMapperGet(scope string, query string) (*ec2.DescribePlacementGroupsInput, error) {
 	return &ec2.DescribePlacementGroupsInput{
 		GroupIds: []string{
 			query,
@@ -17,11 +17,11 @@ func PlacementGroupInputMapperGet(scope string, query string) (*ec2.DescribePlac
 	}, nil
 }
 
-func PlacementGroupInputMapperList(scope string) (*ec2.DescribePlacementGroupsInput, error) {
+func placementGroupInputMapperList(scope string) (*ec2.DescribePlacementGroupsInput, error) {
 	return &ec2.DescribePlacementGroupsInput{}, nil
 }
 
-func PlacementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInput, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
+func placementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInput, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.PlacementGroups {
@@ -60,8 +60,8 @@ func NewPlacementGroupSource(config aws.Config, accountID string, limit *LimitBu
 			<-limit.C // Wait for late limiting
 			return client.DescribePlacementGroups(ctx, input)
 		},
-		InputMapperGet:  PlacementGroupInputMapperGet,
-		InputMapperList: PlacementGroupInputMapperList,
-		OutputMapper:    PlacementGroupOutputMapper,
+		InputMapperGet:  placementGroupInputMapperGet,
+		InputMapperList: placementGroupInputMapperList,
+		OutputMapper:    placementGroupOutputMapper,
 	}
 }

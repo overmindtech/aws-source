@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
+func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, sg := range output.DBSubnetGroups {
@@ -98,6 +98,6 @@ func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.Descri
 		InputMapperList: func(scope string) (*rds.DescribeDBSubnetGroupsInput, error) {
 			return &rds.DescribeDBSubnetGroupsInput{}, nil
 		},
-		OutputMapper: DBSubnetGroupOutputMapper,
+		OutputMapper: dBSubnetGroupOutputMapper,
 	}
 }

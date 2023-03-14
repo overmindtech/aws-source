@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func EgressOnlyInternetGatewayInputMapperGet(scope string, query string) (*ec2.DescribeEgressOnlyInternetGatewaysInput, error) {
+func egressOnlyInternetGatewayInputMapperGet(scope string, query string) (*ec2.DescribeEgressOnlyInternetGatewaysInput, error) {
 	return &ec2.DescribeEgressOnlyInternetGatewaysInput{
 		EgressOnlyInternetGatewayIds: []string{
 			query,
@@ -17,11 +17,11 @@ func EgressOnlyInternetGatewayInputMapperGet(scope string, query string) (*ec2.D
 	}, nil
 }
 
-func EgressOnlyInternetGatewayInputMapperList(scope string) (*ec2.DescribeEgressOnlyInternetGatewaysInput, error) {
+func egressOnlyInternetGatewayInputMapperList(scope string) (*ec2.DescribeEgressOnlyInternetGatewaysInput, error) {
 	return &ec2.DescribeEgressOnlyInternetGatewaysInput{}, nil
 }
 
-func EgressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOnlyInternetGatewaysInput, output *ec2.DescribeEgressOnlyInternetGatewaysOutput) ([]*sdp.Item, error) {
+func egressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOnlyInternetGatewaysInput, output *ec2.DescribeEgressOnlyInternetGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.EgressOnlyInternetGateways {
@@ -71,11 +71,11 @@ func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string, lim
 			<-limit.C // Wait for late limiting
 			return client.DescribeEgressOnlyInternetGateways(ctx, input)
 		},
-		InputMapperGet:  EgressOnlyInternetGatewayInputMapperGet,
-		InputMapperList: EgressOnlyInternetGatewayInputMapperList,
+		InputMapperGet:  egressOnlyInternetGatewayInputMapperGet,
+		InputMapperList: egressOnlyInternetGatewayInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeEgressOnlyInternetGatewaysInput) sources.Paginator[*ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Options] {
 			return ec2.NewDescribeEgressOnlyInternetGatewaysPaginator(client, params)
 		},
-		OutputMapper: EgressOnlyInternetGatewayOutputMapper,
+		OutputMapper: egressOnlyInternetGatewayOutputMapper,
 	}
 }

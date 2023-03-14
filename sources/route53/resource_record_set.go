@@ -11,13 +11,13 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ResourceRecordSetGetFunc(ctx context.Context, client *route53.Client, scope, query string) (*types.ResourceRecordSet, error) {
+func resourceRecordSetGetFunc(ctx context.Context, client *route53.Client, scope, query string) (*types.ResourceRecordSet, error) {
 	return nil, errors.New("get is not supported for route53-resource-record-set. Use search")
 }
 
 // ResourceRecordSetSearchFunc Search func that accepts a hosted zone ID as a
 // query
-func ResourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, scope, query string) ([]*types.ResourceRecordSet, error) {
+func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, scope, query string) ([]*types.ResourceRecordSet, error) {
 	out, err := client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{
 		HostedZoneId: &query,
 	})
@@ -35,7 +35,7 @@ func ResourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 	return zones, nil
 }
 
-func ResourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
+func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -70,8 +70,8 @@ func NewResourceRecordSetSource(config aws.Config, accountID string, region stri
 		DisableList: true,
 		AccountID:   accountID,
 		Region:      region,
-		GetFunc:     ResourceRecordSetGetFunc,
-		ItemMapper:  ResourceRecordSetItemMapper,
-		SearchFunc:  ResourceRecordSetSearchFunc,
+		GetFunc:     resourceRecordSetGetFunc,
+		ItemMapper:  resourceRecordSetItemMapper,
+		SearchFunc:  resourceRecordSetSearchFunc,
 	}
 }

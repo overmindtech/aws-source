@@ -17,7 +17,7 @@ func TestGroupItemMapper(t *testing.T) {
 		CreateDate: sources.PtrTime(time.Now()),
 	}
 
-	item, err := GroupItemMapper("foo", &zone)
+	item, err := groupItemMapper("foo", &zone)
 
 	if err != nil {
 		t.Error(err)

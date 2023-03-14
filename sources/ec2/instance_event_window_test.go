@@ -12,7 +12,7 @@ import (
 )
 
 func TestInstanceEventWindowInputMapperGet(t *testing.T) {
-	input, err := InstanceEventWindowInputMapperGet("foo", "bar")
+	input, err := instanceEventWindowInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestInstanceEventWindowInputMapperGet(t *testing.T) {
 }
 
 func TestInstanceEventWindowInputMapperList(t *testing.T) {
-	input, err := InstanceEventWindowInputMapperList("foo")
+	input, err := instanceEventWindowInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -68,7 +68,7 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceEventWindowOutputMapper("foo", nil, output)
+	items, err := instanceEventWindowOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

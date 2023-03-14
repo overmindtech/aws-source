@@ -15,7 +15,7 @@ var CapacityProviderIncludeFields = []types.CapacityProviderField{
 	types.CapacityProviderFieldTags,
 }
 
-func CapacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
+func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	var attributes *sdp.ItemAttributes
@@ -80,7 +80,7 @@ func NewCapacityProviderSource(config aws.Config, accountID string) *sources.Des
 		PaginatorBuilder: func(client ECSClient, params *ecs.DescribeCapacityProvidersInput) sources.Paginator[*ecs.DescribeCapacityProvidersOutput, *ecs.Options] {
 			return NewDescribeCapacityProvidersPaginator(client, params)
 		},
-		OutputMapper: CapacityProviderOutputMapper,
+		OutputMapper: capacityProviderOutputMapper,
 	}
 }
 

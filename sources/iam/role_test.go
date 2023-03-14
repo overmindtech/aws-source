@@ -51,7 +51,7 @@ func (t *TestIAMClient) ListRoles(context.Context, *iam.ListRolesInput, ...func(
 }
 
 func TestRoleGetFunc(t *testing.T) {
-	role, err := RoleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
+	role, err := roleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -67,7 +67,7 @@ func TestRoleGetFunc(t *testing.T) {
 }
 
 func TestRoleListFunc(t *testing.T) {
-	roles, err := RoleListFunc(context.Background(), &TestIAMClient{}, "foo")
+	roles, err := roleListFunc(context.Background(), &TestIAMClient{}, "foo")
 
 	if err != nil {
 		t.Error(err)
@@ -103,7 +103,7 @@ func TestRoleItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := RoleItemMapper("foo", &role)
+	item, err := roleItemMapper("foo", &role)
 
 	if err != nil {
 		t.Error(err)

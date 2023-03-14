@@ -11,7 +11,7 @@ import (
 )
 
 func TestKeyPairInputMapperGet(t *testing.T) {
-	input, err := KeyPairInputMapperGet("foo", "bar")
+	input, err := keyPairInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestKeyPairInputMapperGet(t *testing.T) {
 }
 
 func TestKeyPairInputMapperList(t *testing.T) {
-	input, err := KeyPairInputMapperList("foo")
+	input, err := keyPairInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -53,7 +53,7 @@ func TestKeyPairOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := KeyPairOutputMapper("foo", nil, output)
+	items, err := keyPairOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

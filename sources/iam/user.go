@@ -16,7 +16,7 @@ type UserDetails struct {
 	UserGroups []types.Group
 }
 
-func UserGetFunc(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
+func userGetFunc(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 	out, err := client.GetUser(ctx, &iam.GetUserInput{
 		UserName: &query,
 	})
@@ -65,7 +65,7 @@ func GetUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 	return groups, nil
 }
 
-func UserListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
+func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
 	var out *iam.ListUsersOutput
 	var err error
 	users := make([]types.User, 0)
@@ -101,7 +101,7 @@ func UserListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserD
 	return userDetails, nil
 }
 
-func UserItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
+func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem.User)
 
 	if err != nil {
@@ -133,8 +133,8 @@ func NewUserSource(config aws.Config, accountID string, region string) *sources.
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
 		Region:     region,
-		GetFunc:    UserGetFunc,
-		ListFunc:   UserListFunc,
-		ItemMapper: UserItemMapper,
+		GetFunc:    userGetFunc,
+		ListFunc:   userListFunc,
+		ItemMapper: userItemMapper,
 	}
 }

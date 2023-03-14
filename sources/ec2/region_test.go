@@ -11,7 +11,7 @@ import (
 )
 
 func TestRegionInputMapperGet(t *testing.T) {
-	input, err := RegionInputMapperGet("foo", "bar")
+	input, err := regionInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestRegionInputMapperGet(t *testing.T) {
 }
 
 func TestRegionInputMapperList(t *testing.T) {
-	input, err := RegionInputMapperList("foo")
+	input, err := regionInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -64,7 +64,7 @@ func TestRegionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := RegionOutputMapper("foo", nil, output)
+	items, err := regionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

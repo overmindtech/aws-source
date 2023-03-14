@@ -11,7 +11,7 @@ import (
 )
 
 func TestVpcInputMapperGet(t *testing.T) {
-	input, err := VpcInputMapperGet("foo", "bar")
+	input, err := vpcInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -27,7 +27,7 @@ func TestVpcInputMapperGet(t *testing.T) {
 }
 
 func TestVpcInputMapperList(t *testing.T) {
-	input, err := VpcInputMapperList("foo")
+	input, err := vpcInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -80,7 +80,7 @@ func TestVpcOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := VpcOutputMapper("foo", nil, output)
+	items, err := vpcOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

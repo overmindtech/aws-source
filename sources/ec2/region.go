@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func RegionInputMapperGet(scope string, query string) (*ec2.DescribeRegionsInput, error) {
+func regionInputMapperGet(scope string, query string) (*ec2.DescribeRegionsInput, error) {
 	return &ec2.DescribeRegionsInput{
 		RegionNames: []string{
 			query,
@@ -17,11 +17,11 @@ func RegionInputMapperGet(scope string, query string) (*ec2.DescribeRegionsInput
 	}, nil
 }
 
-func RegionInputMapperList(scope string) (*ec2.DescribeRegionsInput, error) {
+func regionInputMapperList(scope string) (*ec2.DescribeRegionsInput, error) {
 	return &ec2.DescribeRegionsInput{}, nil
 }
 
-func RegionOutputMapper(scope string, _ *ec2.DescribeRegionsInput, output *ec2.DescribeRegionsOutput) ([]*sdp.Item, error) {
+func regionOutputMapper(scope string, _ *ec2.DescribeRegionsInput, output *ec2.DescribeRegionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.Regions {
@@ -60,8 +60,8 @@ func NewRegionSource(config aws.Config, accountID string, limit *LimitBucket) *s
 			<-limit.C // Wait for late limiting
 			return client.DescribeRegions(ctx, input)
 		},
-		InputMapperGet:  RegionInputMapperGet,
-		InputMapperList: RegionInputMapperList,
-		OutputMapper:    RegionOutputMapper,
+		InputMapperGet:  regionInputMapperGet,
+		InputMapperList: regionInputMapperList,
+		OutputMapper:    regionOutputMapper,
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func InstanceEventWindowInputMapperGet(scope, query string) (*ec2.DescribeInstanceEventWindowsInput, error) {
+func instanceEventWindowInputMapperGet(scope, query string) (*ec2.DescribeInstanceEventWindowsInput, error) {
 	return &ec2.DescribeInstanceEventWindowsInput{
 		InstanceEventWindowIds: []string{
 			query,
@@ -17,11 +17,11 @@ func InstanceEventWindowInputMapperGet(scope, query string) (*ec2.DescribeInstan
 	}, nil
 }
 
-func InstanceEventWindowInputMapperList(scope string) (*ec2.DescribeInstanceEventWindowsInput, error) {
+func instanceEventWindowInputMapperList(scope string) (*ec2.DescribeInstanceEventWindowsInput, error) {
 	return &ec2.DescribeInstanceEventWindowsInput{}, nil
 }
 
-func InstanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventWindowsInput, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
+func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventWindowsInput, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {
@@ -78,11 +78,11 @@ func NewInstanceEventWindowSource(config aws.Config, accountID string, limit *Li
 			<-limit.C // Wait for late limiting
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
-		InputMapperGet:  InstanceEventWindowInputMapperGet,
-		InputMapperList: InstanceEventWindowInputMapperList,
+		InputMapperGet:  instanceEventWindowInputMapperGet,
+		InputMapperList: instanceEventWindowInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceEventWindowsInput) sources.Paginator[*ec2.DescribeInstanceEventWindowsOutput, *ec2.Options] {
 			return ec2.NewDescribeInstanceEventWindowsPaginator(client, params)
 		},
-		OutputMapper: InstanceEventWindowOutputMapper,
+		OutputMapper: instanceEventWindowOutputMapper,
 	}
 }

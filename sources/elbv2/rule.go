@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func RuleOutputMapper(scope string, _ *elbv2.DescribeRulesInput, output *elbv2.DescribeRulesOutput) ([]*sdp.Item, error) {
+func ruleOutputMapper(scope string, _ *elbv2.DescribeRulesInput, output *elbv2.DescribeRulesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, rule := range output.Rules {
@@ -65,6 +65,6 @@ func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySou
 				ListenerArn: &query,
 			}, nil
 		},
-		OutputMapper: RuleOutputMapper,
+		OutputMapper: ruleOutputMapper,
 	}
 }

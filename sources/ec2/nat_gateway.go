@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func NatGatewayInputMapperGet(scope string, query string) (*ec2.DescribeNatGatewaysInput, error) {
+func natGatewayInputMapperGet(scope string, query string) (*ec2.DescribeNatGatewaysInput, error) {
 	return &ec2.DescribeNatGatewaysInput{
 		NatGatewayIds: []string{
 			query,
@@ -17,11 +17,11 @@ func NatGatewayInputMapperGet(scope string, query string) (*ec2.DescribeNatGatew
 	}, nil
 }
 
-func NatGatewayInputMapperList(scope string) (*ec2.DescribeNatGatewaysInput, error) {
+func natGatewayInputMapperList(scope string) (*ec2.DescribeNatGatewaysInput, error) {
 	return &ec2.DescribeNatGatewaysInput{}, nil
 }
 
-func NatGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
+func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.NatGateways {
@@ -107,11 +107,11 @@ func NewNatGatewaySource(config aws.Config, accountID string, limit *LimitBucket
 			<-limit.C // Wait for late limiting
 			return client.DescribeNatGateways(ctx, input)
 		},
-		InputMapperGet:  NatGatewayInputMapperGet,
-		InputMapperList: NatGatewayInputMapperList,
+		InputMapperGet:  natGatewayInputMapperGet,
+		InputMapperList: natGatewayInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNatGatewaysInput) sources.Paginator[*ec2.DescribeNatGatewaysOutput, *ec2.Options] {
 			return ec2.NewDescribeNatGatewaysPaginator(client, params)
 		},
-		OutputMapper: NatGatewayOutputMapper,
+		OutputMapper: natGatewayOutputMapper,
 	}
 }

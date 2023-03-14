@@ -38,7 +38,7 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := DBSubnetGroupOutputMapper("foo", nil, &output)
+	items, err := dBSubnetGroupOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

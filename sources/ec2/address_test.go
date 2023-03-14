@@ -12,7 +12,7 @@ import (
 )
 
 func TestAddressInputMapperGet(t *testing.T) {
-	input, err := AddressInputMapperGet("foo", "az-name")
+	input, err := addressInputMapperGet("foo", "az-name")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestAddressInputMapperGet(t *testing.T) {
 }
 
 func TestAddressInputMapperList(t *testing.T) {
-	input, err := AddressInputMapperList("foo")
+	input, err := addressInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -57,7 +57,7 @@ func TestAddressOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AddressOutputMapper("foo", nil, &output)
+	items, err := addressOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

@@ -68,7 +68,7 @@ func (t *TestClient) DescribeCapacityProviders(ctx context.Context, params *ecs.
 }
 
 func TestCapacityProviderOutputMapper(t *testing.T) {
-	items, err := CapacityProviderOutputMapper(
+	items, err := capacityProviderOutputMapper(
 		"foo",
 		nil,
 		&ecs.DescribeCapacityProvidersOutput{

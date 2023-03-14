@@ -200,7 +200,7 @@ func (t *TestClient) ListTaskDefinitions(context.Context, *ecs.ListTaskDefinitio
 }
 
 func TestTaskDefinitionGetFunc(t *testing.T) {
-	item, err := TaskDefinitionGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeTaskDefinitionInput{
+	item, err := taskDefinitionGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: sources.PtrString("ecs-template-ecs-demo-app:1"),
 	})
 

@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func NetworkAclInputMapperGet(scope string, query string) (*ec2.DescribeNetworkAclsInput, error) {
+func networkAclInputMapperGet(scope string, query string) (*ec2.DescribeNetworkAclsInput, error) {
 	return &ec2.DescribeNetworkAclsInput{
 		NetworkAclIds: []string{
 			query,
@@ -17,11 +17,11 @@ func NetworkAclInputMapperGet(scope string, query string) (*ec2.DescribeNetworkA
 	}, nil
 }
 
-func NetworkAclInputMapperList(scope string) (*ec2.DescribeNetworkAclsInput, error) {
+func networkAclInputMapperList(scope string) (*ec2.DescribeNetworkAclsInput, error) {
 	return &ec2.DescribeNetworkAclsInput{}, nil
 }
 
-func NetworkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, output *ec2.DescribeNetworkAclsOutput) ([]*sdp.Item, error) {
+func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, output *ec2.DescribeNetworkAclsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, networkAcl := range output.NetworkAcls {
@@ -80,11 +80,11 @@ func NewNetworkAclSource(config aws.Config, accountID string, limit *LimitBucket
 			<-limit.C // Wait for late limiting
 			return client.DescribeNetworkAcls(ctx, input)
 		},
-		InputMapperGet:  NetworkAclInputMapperGet,
-		InputMapperList: NetworkAclInputMapperList,
+		InputMapperGet:  networkAclInputMapperGet,
+		InputMapperList: networkAclInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkAclsInput) sources.Paginator[*ec2.DescribeNetworkAclsOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkAclsPaginator(client, params)
 		},
-		OutputMapper: NetworkAclOutputMapper,
+		OutputMapper: networkAclOutputMapper,
 	}
 }

@@ -18,7 +18,7 @@ var ContainerInstanceIncludeFields = []types.ContainerInstanceField{
 	types.ContainerInstanceFieldContainerInstanceHealth,
 }
 
-func ContainerInstanceGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeContainerInstancesInput) (*sdp.Item, error) {
+func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeContainerInstancesInput) (*sdp.Item, error) {
 	out, err := client.DescribeContainerInstances(ctx, input)
 
 	if err != nil {
@@ -63,7 +63,7 @@ func ContainerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	return &item, nil
 }
 
-func ContainerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOutput, input *ecs.ListContainerInstancesInput) ([]*ecs.DescribeContainerInstancesInput, error) {
+func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOutput, input *ecs.ListContainerInstancesInput) ([]*ecs.DescribeContainerInstancesInput, error) {
 	inputs := make([]*ecs.DescribeContainerInstancesInput, 0)
 
 	var a *sources.ARN
@@ -100,7 +100,7 @@ func NewContainerInstanceSource(config aws.Config, accountID string, region stri
 		Client:    ecs.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc:   ContainerInstanceGetFunc,
+		GetFunc:   containerInstanceGetFunc,
 		GetInputMapper: func(scope, query string) *ecs.DescribeContainerInstancesInput {
 			// We are using a custom id of {clusterName}/{id} e.g.
 			// ecs-template-ECSCluster-8nS0WOLbs3nZ/50e9bf71ed57450ca56293cc5a042886
@@ -129,6 +129,6 @@ func NewContainerInstanceSource(config aws.Config, accountID string, region stri
 				Cluster: sources.PtrString(query),
 			}, nil
 		},
-		ListFuncOutputMapper: ContainerInstanceListFuncOutputMapper,
+		ListFuncOutputMapper: containerInstanceListFuncOutputMapper,
 	}
 }

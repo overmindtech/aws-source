@@ -11,7 +11,7 @@ import (
 )
 
 // AddressInputMapperGet Maps source calls to the correct input for the AZ API
-func AddressInputMapperGet(scope, query string) (*ec2.DescribeAddressesInput, error) {
+func addressInputMapperGet(scope, query string) (*ec2.DescribeAddressesInput, error) {
 	return &ec2.DescribeAddressesInput{
 		PublicIps: []string{
 			query,
@@ -20,12 +20,12 @@ func AddressInputMapperGet(scope, query string) (*ec2.DescribeAddressesInput, er
 }
 
 // AddressInputMapperList Maps source calls to the correct input for the AZ API
-func AddressInputMapperList(scope string) (*ec2.DescribeAddressesInput, error) {
+func addressInputMapperList(scope string) (*ec2.DescribeAddressesInput, error) {
 	return &ec2.DescribeAddressesInput{}, nil
 }
 
 // AddressOutputMapper Maps API output to items
-func AddressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
+func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("empty output")
 	}
@@ -118,8 +118,8 @@ func NewAddressSource(config aws.Config, accountID string, limit *LimitBucket) *
 			<-limit.C // Wait for late limiting
 			return client.DescribeAddresses(ctx, input)
 		},
-		InputMapperGet:  AddressInputMapperGet,
-		InputMapperList: AddressInputMapperList,
-		OutputMapper:    AddressOutputMapper,
+		InputMapperGet:  addressInputMapperGet,
+		InputMapperList: addressInputMapperList,
+		OutputMapper:    addressOutputMapper,
 	}
 }

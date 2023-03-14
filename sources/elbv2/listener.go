@@ -13,7 +13,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ListenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
+func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, listener := range output.Listeners {
@@ -114,6 +114,6 @@ func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnl
 		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeListenersInput) sources.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeListenersPaginator(client, params)
 		},
-		OutputMapper: ListenerOutputMapper,
+		OutputMapper: listenerOutputMapper,
 	}
 }

@@ -67,7 +67,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := TargetHealthOutputMapper("foo", &elbv2.DescribeTargetHealthInput{
+	items, err := targetHealthOutputMapper("foo", &elbv2.DescribeTargetHealthInput{
 		TargetGroupArn: sources.PtrString("arn:aws:elasticloadbalancing:eu-west-2:944651592624:targetgroup/k8s-default-apiserve-d87e8f7010/559d207158e41222"),
 	}, &output)
 

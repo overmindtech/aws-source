@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LaunchTemplateInputMapperGet(scope string, query string) (*ec2.DescribeLaunchTemplatesInput, error) {
+func launchTemplateInputMapperGet(scope string, query string) (*ec2.DescribeLaunchTemplatesInput, error) {
 	return &ec2.DescribeLaunchTemplatesInput{
 		LaunchTemplateIds: []string{
 			query,
@@ -17,11 +17,11 @@ func LaunchTemplateInputMapperGet(scope string, query string) (*ec2.DescribeLaun
 	}, nil
 }
 
-func LaunchTemplateInputMapperList(scope string) (*ec2.DescribeLaunchTemplatesInput, error) {
+func launchTemplateInputMapperList(scope string) (*ec2.DescribeLaunchTemplatesInput, error) {
 	return &ec2.DescribeLaunchTemplatesInput{}, nil
 }
 
-func LaunchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInput, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
+func launchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInput, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, LaunchTemplate := range output.LaunchTemplates {
@@ -60,11 +60,11 @@ func NewLaunchTemplateSource(config aws.Config, accountID string, limit *LimitBu
 			<-limit.C // Wait for late limiting
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
-		InputMapperGet:  LaunchTemplateInputMapperGet,
-		InputMapperList: LaunchTemplateInputMapperList,
+		InputMapperGet:  launchTemplateInputMapperGet,
+		InputMapperList: launchTemplateInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplatesInput) sources.Paginator[*ec2.DescribeLaunchTemplatesOutput, *ec2.Options] {
 			return ec2.NewDescribeLaunchTemplatesPaginator(client, params)
 		},
-		OutputMapper: LaunchTemplateOutputMapper,
+		OutputMapper: launchTemplateOutputMapper,
 	}
 }

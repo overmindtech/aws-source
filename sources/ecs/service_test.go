@@ -215,7 +215,7 @@ func (t *TestClient) ListServices(context.Context, *ecs.ListServicesInput, ...fu
 }
 
 func TestServiceGetFunc(t *testing.T) {
-	item, err := ServiceGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeServicesInput{})
+	item, err := serviceGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeServicesInput{})
 
 	if err != nil {
 		t.Error(err)

@@ -110,7 +110,7 @@ func TestGetUserGroups(t *testing.T) {
 }
 
 func TestUserGetFunc(t *testing.T) {
-	user, err := UserGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
+	user, err := userGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -127,7 +127,7 @@ func TestUserGetFunc(t *testing.T) {
 }
 
 func TestUserListFunc(t *testing.T) {
-	users, err := UserListFunc(context.Background(), &TestIAMClient{}, "foo")
+	users, err := userListFunc(context.Background(), &TestIAMClient{}, "foo")
 
 	if err != nil {
 		t.Error(err)
@@ -164,7 +164,7 @@ func TestUserItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := UserItemMapper("foo", &details)
+	item, err := userItemMapper("foo", &details)
 
 	if err != nil {
 		t.Error(err)

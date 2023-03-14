@@ -35,7 +35,7 @@ var FargateTestClient = TestClient{
 }
 
 func TestFargateProfileGetFunc(t *testing.T) {
-	item, err := FargateProfileGetFunc(context.Background(), FargateTestClient, "foo", &eks.DescribeFargateProfileInput{})
+	item, err := fargateProfileGetFunc(context.Background(), FargateTestClient, "foo", &eks.DescribeFargateProfileInput{})
 
 	if err != nil {
 		t.Error(err)

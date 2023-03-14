@@ -12,7 +12,7 @@ import (
 )
 
 func TestNetworkAclInputMapperGet(t *testing.T) {
-	input, err := NetworkAclInputMapperGet("foo", "bar")
+	input, err := networkAclInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestNetworkAclInputMapperGet(t *testing.T) {
 }
 
 func TestNetworkAclInputMapperList(t *testing.T) {
-	input, err := NetworkAclInputMapperList("foo")
+	input, err := networkAclInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -85,7 +85,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkAclOutputMapper("foo", nil, output)
+	items, err := networkAclOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)
