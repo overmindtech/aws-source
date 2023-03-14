@@ -128,6 +128,15 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		}
 	}
 
+	if task.AvailabilityZone != nil {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			Type:   "ec2-availability-zone",
+			Method: sdp.QueryMethod_GET,
+			Query:  *task.AvailabilityZone,
+			Scope:  scope,
+		})
+	}
+
 	return &item, nil
 }
 

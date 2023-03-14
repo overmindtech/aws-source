@@ -45,7 +45,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 						ParameterApplyStatus: sources.PtrString("in-sync"),
 					},
 				},
-				AvailabilityZone: sources.PtrString("eu-west-2b"), // link?
+				AvailabilityZone: sources.PtrString("eu-west-2a"), // link
 				DBSubnetGroup: &types.DBSubnetGroup{
 					DBSubnetGroupName:        sources.PtrString("default-vpc-0d7892e00e573e701"), // link
 					DBSubnetGroupDescription: sources.PtrString("Created from the RDS Management Console"),
@@ -55,7 +55,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 						{
 							SubnetIdentifier: sources.PtrString("subnet-0d8ae4b4e07647efa"), // lnk
 							SubnetAvailabilityZone: &types.AvailabilityZone{
-								Name: sources.PtrString("eu-west-2b"), // link?
+								Name: sources.PtrString("eu-west-2b"),
 							},
 							SubnetOutpost: &types.Outpost{
 								Arn: sources.PtrString("arn:aws:service:region:account:type/id"), // link
@@ -218,7 +218,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		{
 			ExpectedType:   "ec2-availability-zone",
 			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2b",
+			ExpectedQuery:  "eu-west-2a",
 			ExpectedScope:  "foo",
 		},
 		{

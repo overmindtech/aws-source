@@ -112,7 +112,7 @@ func (t *TestClient) DescribeTable(context.Context, *dynamodb.DescribeTableInput
 						},
 					},
 					KMSMasterKeyId: sources.PtrString("keyID"),
-					RegionName:     sources.PtrString("eu-west-2"),
+					RegionName:     sources.PtrString("eu-west-2"), // link
 					ReplicaStatus:  types.ReplicaStatusActive,
 					ReplicaTableClassSummary: &types.TableClassSummary{
 						TableClass: types.TableClassStandard,
@@ -198,6 +198,12 @@ func TestTableGetFunc(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
+		},
+		{
+			ExpectedType:   "ec2-region",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-2",
+			ExpectedScope:  "foo",
 		},
 	}
 
