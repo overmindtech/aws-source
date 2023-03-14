@@ -29,7 +29,7 @@ func TestLayerItemMapper(t *testing.T) {
 		LayerName: sources.PtrString("name"),
 	}
 
-	item, err := LayerItemMapper("foo", &layer)
+	item, err := layerItemMapper("foo", &layer)
 
 	if err != nil {
 		t.Error(err)

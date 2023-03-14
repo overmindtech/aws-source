@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func BackupGetFunc(ctx context.Context, client Client, scope string, input *dynamodb.DescribeBackupInput) (*sdp.Item, error) {
+func backupGetFunc(ctx context.Context, client Client, scope string, input *dynamodb.DescribeBackupInput) (*sdp.Item, error) {
 	out, err := client.DescribeBackup(ctx, input)
 
 	if err != nil {
@@ -70,7 +70,7 @@ func NewBackupSource(config aws.Config, accountID string, region string) *source
 		Client:    dynamodb.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc:   BackupGetFunc,
+		GetFunc:   backupGetFunc,
 		ListInput: &dynamodb.ListBackupsInput{},
 		GetInputMapper: func(scope, query string) *dynamodb.DescribeBackupInput {
 			// Get is not supported since you can't search by name

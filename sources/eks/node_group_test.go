@@ -76,7 +76,7 @@ var NodeGroupClient = TestClient{
 }
 
 func TestNodegroupGetFunc(t *testing.T) {
-	item, err := NodegroupGetFunc(context.Background(), NodeGroupClient, "foo", &eks.DescribeNodegroupInput{})
+	item, err := nodegroupGetFunc(context.Background(), NodeGroupClient, "foo", &eks.DescribeNodegroupInput{})
 
 	if err != nil {
 		t.Error(err)

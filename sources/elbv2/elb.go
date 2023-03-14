@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LoadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
+func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, lb := range output.LoadBalancers {
@@ -172,6 +172,6 @@ func NewLoadBalancerSource(config aws.Config, accountID string) *sources.Describ
 		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeLoadBalancersInput) sources.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeLoadBalancersPaginator(client, params)
 		},
-		OutputMapper: LoadBalancerOutputMapper,
+		OutputMapper: loadBalancerOutputMapper,
 	}
 }

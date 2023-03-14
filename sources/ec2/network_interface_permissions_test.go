@@ -12,7 +12,7 @@ import (
 )
 
 func TestNetworkInterfacePermissionInputMapperGet(t *testing.T) {
-	input, err := NetworkInterfacePermissionInputMapperGet("foo", "bar")
+	input, err := networkInterfacePermissionInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestNetworkInterfacePermissionInputMapperGet(t *testing.T) {
 }
 
 func TestNetworkInterfacePermissionInputMapperList(t *testing.T) {
-	input, err := NetworkInterfacePermissionInputMapperList("foo")
+	input, err := networkInterfacePermissionInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -54,7 +54,7 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkInterfacePermissionOutputMapper("foo", nil, output)
+	items, err := networkInterfacePermissionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

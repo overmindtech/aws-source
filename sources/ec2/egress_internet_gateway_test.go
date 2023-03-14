@@ -12,7 +12,7 @@ import (
 )
 
 func TestEgressOnlyInternetGatewayInputMapperGet(t *testing.T) {
-	input, err := EgressOnlyInternetGatewayInputMapperGet("foo", "bar")
+	input, err := egressOnlyInternetGatewayInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestEgressOnlyInternetGatewayInputMapperGet(t *testing.T) {
 }
 
 func TestEgressOnlyInternetGatewayInputMapperList(t *testing.T) {
-	input, err := EgressOnlyInternetGatewayInputMapperList("foo")
+	input, err := egressOnlyInternetGatewayInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -54,7 +54,7 @@ func TestEgressOnlyInternetGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := EgressOnlyInternetGatewayOutputMapper("foo", nil, output)
+	items, err := egressOnlyInternetGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

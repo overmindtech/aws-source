@@ -12,7 +12,7 @@ import (
 )
 
 func TestSnapshotInputMapperGet(t *testing.T) {
-	input, err := SnapshotInputMapperGet("foo", "bar")
+	input, err := snapshotInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestSnapshotInputMapperGet(t *testing.T) {
 }
 
 func TestSnapshotInputMapperList(t *testing.T) {
-	input, err := SnapshotInputMapperList("foo")
+	input, err := snapshotInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -64,7 +64,7 @@ func TestSnapshotOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SnapshotOutputMapper("foo", nil, output)
+	items, err := snapshotOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

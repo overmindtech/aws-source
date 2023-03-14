@@ -25,7 +25,7 @@ func TestHostedZoneItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := HostedZoneItemMapper("foo", &zone)
+	item, err := hostedZoneItemMapper("foo", &zone)
 
 	if err != nil {
 		t.Error(err)

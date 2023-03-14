@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func VolumeInputMapperGet(scope string, query string) (*ec2.DescribeVolumesInput, error) {
+func volumeInputMapperGet(scope string, query string) (*ec2.DescribeVolumesInput, error) {
 	return &ec2.DescribeVolumesInput{
 		VolumeIds: []string{
 			query,
@@ -17,11 +17,11 @@ func VolumeInputMapperGet(scope string, query string) (*ec2.DescribeVolumesInput
 	}, nil
 }
 
-func VolumeInputMapperList(scope string) (*ec2.DescribeVolumesInput, error) {
+func volumeInputMapperList(scope string) (*ec2.DescribeVolumesInput, error) {
 	return &ec2.DescribeVolumesInput{}, nil
 }
 
-func VolumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.DescribeVolumesOutput) ([]*sdp.Item, error) {
+func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.DescribeVolumesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, volume := range output.Volumes {
@@ -69,11 +69,11 @@ func NewVolumeSource(config aws.Config, accountID string, limit *LimitBucket) *s
 			<-limit.C // Wait for late limiting
 			return client.DescribeVolumes(ctx, input)
 		},
-		InputMapperGet:  VolumeInputMapperGet,
-		InputMapperList: VolumeInputMapperList,
+		InputMapperGet:  volumeInputMapperGet,
+		InputMapperList: volumeInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumesInput) sources.Paginator[*ec2.DescribeVolumesOutput, *ec2.Options] {
 			return ec2.NewDescribeVolumesPaginator(client, params)
 		},
-		OutputMapper: VolumeOutputMapper,
+		OutputMapper: volumeOutputMapper,
 	}
 }

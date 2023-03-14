@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func AutoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScalingGroupsInput, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
+func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScalingGroupsInput, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	var item sdp.Item
@@ -148,6 +148,6 @@ func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *ec2.L
 		DescribeFunc: func(ctx context.Context, client *autoscaling.Client, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
 			return client.DescribeAutoScalingGroups(ctx, input)
 		},
-		OutputMapper: AutoScalingGroupOutputMapper,
+		OutputMapper: autoScalingGroupOutputMapper,
 	}
 }

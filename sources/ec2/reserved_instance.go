@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ReservedInstanceInputMapperGet(scope, query string) (*ec2.DescribeReservedInstancesInput, error) {
+func reservedInstanceInputMapperGet(scope, query string) (*ec2.DescribeReservedInstancesInput, error) {
 	return &ec2.DescribeReservedInstancesInput{
 		ReservedInstancesIds: []string{
 			query,
@@ -17,11 +17,11 @@ func ReservedInstanceInputMapperGet(scope, query string) (*ec2.DescribeReservedI
 	}, nil
 }
 
-func ReservedInstanceInputMapperList(scope string) (*ec2.DescribeReservedInstancesInput, error) {
+func reservedInstanceInputMapperList(scope string) (*ec2.DescribeReservedInstancesInput, error) {
 	return &ec2.DescribeReservedInstancesInput{}, nil
 }
 
-func ReservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstancesInput, output *ec2.DescribeReservedInstancesOutput) ([]*sdp.Item, error) {
+func reservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstancesInput, output *ec2.DescribeReservedInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, reservation := range output.ReservedInstances {
@@ -67,8 +67,8 @@ func NewReservedInstanceSource(config aws.Config, accountID string, limit *Limit
 			<-limit.C // Wait for late limiting
 			return client.DescribeReservedInstances(ctx, input)
 		},
-		InputMapperGet:  ReservedInstanceInputMapperGet,
-		InputMapperList: ReservedInstanceInputMapperList,
-		OutputMapper:    ReservedInstanceOutputMapper,
+		InputMapperGet:  reservedInstanceInputMapperGet,
+		InputMapperList: reservedInstanceInputMapperList,
+		OutputMapper:    reservedInstanceOutputMapper,
 	}
 }

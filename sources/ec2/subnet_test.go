@@ -12,7 +12,7 @@ import (
 )
 
 func TestSubnetInputMapperGet(t *testing.T) {
-	input, err := SubnetInputMapperGet("foo", "bar")
+	input, err := subnetInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestSubnetInputMapperGet(t *testing.T) {
 }
 
 func TestSubnetInputMapperList(t *testing.T) {
-	input, err := SubnetInputMapperList("foo")
+	input, err := subnetInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -78,7 +78,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SubnetOutputMapper("foo", nil, output)
+	items, err := subnetOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

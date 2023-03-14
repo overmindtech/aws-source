@@ -325,7 +325,7 @@ func (t *TestClient) ListContainerInstances(context.Context, *ecs.ListContainerI
 }
 
 func TestContainerInstanceGetFunc(t *testing.T) {
-	item, err := ContainerInstanceGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeContainerInstancesInput{})
+	item, err := containerInstanceGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeContainerInstancesInput{})
 
 	if err != nil {
 		t.Error(err)

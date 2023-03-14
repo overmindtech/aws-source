@@ -164,7 +164,7 @@ func (t *TestClient) DescribeKinesisStreamingDestination(ctx context.Context, pa
 }
 
 func TestTableGetFunc(t *testing.T) {
-	item, err := TableGetFunc(context.Background(), &TestClient{}, "foo", &dynamodb.DescribeTableInput{})
+	item, err := tableGetFunc(context.Background(), &TestClient{}, "foo", &dynamodb.DescribeTableInput{})
 
 	if err != nil {
 		t.Fatal(err)

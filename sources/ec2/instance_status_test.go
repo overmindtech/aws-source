@@ -12,7 +12,7 @@ import (
 )
 
 func TestInstanceStatusInputMapperGet(t *testing.T) {
-	input, err := InstanceStatusInputMapperGet("foo", "bar")
+	input, err := instanceStatusInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestInstanceStatusInputMapperGet(t *testing.T) {
 }
 
 func TestInstanceStatusInputMapperList(t *testing.T) {
-	input, err := InstanceStatusInputMapperList("foo")
+	input, err := instanceStatusInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -71,7 +71,7 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InstanceStatusOutputMapper("foo", nil, output)
+	items, err := instanceStatusOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

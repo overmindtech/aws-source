@@ -12,7 +12,7 @@ import (
 )
 
 func TestNetworkInterfaceInputMapperGet(t *testing.T) {
-	input, err := NetworkInterfaceInputMapperGet("foo", "bar")
+	input, err := networkInterfaceInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestNetworkInterfaceInputMapperGet(t *testing.T) {
 }
 
 func TestNetworkInterfaceInputMapperList(t *testing.T) {
-	input, err := NetworkInterfaceInputMapperList("foo")
+	input, err := networkInterfaceInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -104,7 +104,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := NetworkInterfaceOutputMapper("foo", nil, output)
+	items, err := networkInterfaceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

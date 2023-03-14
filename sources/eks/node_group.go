@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func NodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeNodegroupInput) (*sdp.Item, error) {
+func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeNodegroupInput) (*sdp.Item, error) {
 	out, err := client.DescribeNodegroup(ctx, input)
 
 	if err != nil {
@@ -153,6 +153,6 @@ func NewNodegroupSource(config aws.Config, accountID string, region string) *sou
 
 			return inputs, nil
 		},
-		GetFunc: NodegroupGetFunc,
+		GetFunc: nodegroupGetFunc,
 	}
 }

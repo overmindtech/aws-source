@@ -88,7 +88,7 @@ func (t *TestClient) ListBackups(ctx context.Context, params *dynamodb.ListBacku
 }
 
 func TestBackupGetFunc(t *testing.T) {
-	item, err := BackupGetFunc(context.Background(), &TestClient{}, "foo", &dynamodb.DescribeBackupInput{})
+	item, err := backupGetFunc(context.Background(), &TestClient{}, "foo", &dynamodb.DescribeBackupInput{})
 
 	if err != nil {
 		t.Fatal(err)

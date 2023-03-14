@@ -11,7 +11,7 @@ import (
 )
 
 // AvailabilityZoneInputMapperGet Maps source calls to the correct input for the AZ API
-func AvailabilityZoneInputMapperGet(scope, query string) (*ec2.DescribeAvailabilityZonesInput, error) {
+func availabilityZoneInputMapperGet(scope, query string) (*ec2.DescribeAvailabilityZonesInput, error) {
 	return &ec2.DescribeAvailabilityZonesInput{
 		ZoneNames: []string{
 			query,
@@ -20,12 +20,12 @@ func AvailabilityZoneInputMapperGet(scope, query string) (*ec2.DescribeAvailabil
 }
 
 // AvailabilityZoneInputMapperList Maps source calls to the correct input for the AZ API
-func AvailabilityZoneInputMapperList(scope string) (*ec2.DescribeAvailabilityZonesInput, error) {
+func availabilityZoneInputMapperList(scope string) (*ec2.DescribeAvailabilityZonesInput, error) {
 	return &ec2.DescribeAvailabilityZonesInput{}, nil
 }
 
 // AvailabilityZoneOutputMapper Maps API output to items
-func AvailabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZonesInput, output *ec2.DescribeAvailabilityZonesOutput) ([]*sdp.Item, error) {
+func availabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZonesInput, output *ec2.DescribeAvailabilityZonesOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("empty output")
 	}
@@ -75,8 +75,8 @@ func NewAvailabilityZoneSource(config aws.Config, accountID string, limit *Limit
 			<-limit.C // Wait for late limiting
 			return client.DescribeAvailabilityZones(ctx, input)
 		},
-		InputMapperGet:  AvailabilityZoneInputMapperGet,
-		InputMapperList: AvailabilityZoneInputMapperList,
-		OutputMapper:    AvailabilityZoneOutputMapper,
+		InputMapperGet:  availabilityZoneInputMapperGet,
+		InputMapperList: availabilityZoneInputMapperList,
+		OutputMapper:    availabilityZoneOutputMapper,
 	}
 }

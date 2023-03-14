@@ -18,7 +18,7 @@ var TaskIncludeFields = []types.TaskField{
 	types.TaskFieldTags,
 }
 
-func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeTasksInput) (*sdp.Item, error) {
+func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeTasksInput) (*sdp.Item, error) {
 	out, err := client.DescribeTasks(ctx, input)
 
 	if err != nil {
@@ -131,7 +131,7 @@ func TaskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	return &item, nil
 }
 
-func TaskGetInputMapper(scope, query string) *ecs.DescribeTasksInput {
+func taskGetInputMapper(scope, query string) *ecs.DescribeTasksInput {
 	// `id` is {clusterName}/{id} so split on '/'
 	sections := strings.Split(query, "/")
 
@@ -148,7 +148,7 @@ func TaskGetInputMapper(scope, query string) *ecs.DescribeTasksInput {
 	}
 }
 
-func TasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasksInput) ([]*ecs.DescribeTasksInput, error) {
+func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasksInput) ([]*ecs.DescribeTasksInput, error) {
 	inputs := make([]*ecs.DescribeTasksInput, 0)
 
 	for _, taskArn := range output.TaskArns {
@@ -179,9 +179,9 @@ func NewTaskSource(config aws.Config, accountID string, region string) *sources.
 		Client:         ecs.NewFromConfig(config),
 		AccountID:      accountID,
 		Region:         region,
-		GetFunc:        TaskGetFunc,
+		GetFunc:        taskGetFunc,
 		ListInput:      &ecs.ListTasksInput{},
-		GetInputMapper: TaskGetInputMapper,
+		GetInputMapper: taskGetInputMapper,
 		DisableList:    true,
 		SearchInputMapper: func(scope, query string) (*ecs.ListTasksInput, error) {
 			// Search by cluster
@@ -192,6 +192,6 @@ func NewTaskSource(config aws.Config, accountID string, region string) *sources.
 		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListTasksInput) sources.Paginator[*ecs.ListTasksOutput, *ecs.Options] {
 			return ecs.NewListTasksPaginator(client, input)
 		},
-		ListFuncOutputMapper: TasksListFuncOutputMapper,
+		ListFuncOutputMapper: tasksListFuncOutputMapper,
 	}
 }

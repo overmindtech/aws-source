@@ -17,7 +17,7 @@ var ServiceIncludeFields = []types.ServiceField{
 	types.ServiceFieldTags,
 }
 
-func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeServicesInput) (*sdp.Item, error) {
+func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeServicesInput) (*sdp.Item, error) {
 	out, err := client.DescribeServices(ctx, input)
 
 	if err != nil {
@@ -220,7 +220,7 @@ func ServiceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	return &item, nil
 }
 
-func ServiceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.ListServicesInput) ([]*ecs.DescribeServicesInput, error) {
+func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.ListServicesInput) ([]*ecs.DescribeServicesInput, error) {
 	inputs := make([]*ecs.DescribeServicesInput, 0)
 
 	var a *sources.ARN
@@ -257,7 +257,7 @@ func NewServiceSource(config aws.Config, accountID string, region string) *sourc
 		Client:      ecs.NewFromConfig(config),
 		AccountID:   accountID,
 		Region:      region,
-		GetFunc:     ServiceGetFunc,
+		GetFunc:     serviceGetFunc,
 		DisableList: true,
 		GetInputMapper: func(scope, query string) *ecs.DescribeServicesInput {
 			// We are using a custom id of {clusterName}/{id} e.g.
@@ -286,6 +286,6 @@ func NewServiceSource(config aws.Config, accountID string, region string) *sourc
 				Cluster: sources.PtrString(query),
 			}, nil
 		},
-		ListFuncOutputMapper: ServiceListFuncOutputMapper,
+		ListFuncOutputMapper: serviceListFuncOutputMapper,
 	}
 }

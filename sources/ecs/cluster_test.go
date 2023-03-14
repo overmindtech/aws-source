@@ -92,7 +92,7 @@ func (t *TestClient) ListClusters(context.Context, *ecs.ListClustersInput, ...fu
 }
 
 func TestClusterGetFunc(t *testing.T) {
-	item, err := ClusterGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeClustersInput{})
+	item, err := clusterGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeClustersInput{})
 
 	if err != nil {
 		t.Error(err)

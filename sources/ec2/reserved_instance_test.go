@@ -12,7 +12,7 @@ import (
 )
 
 func TestReservedInstanceInputMapperGet(t *testing.T) {
-	input, err := ReservedInstanceInputMapperGet("foo", "bar")
+	input, err := reservedInstanceInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestReservedInstanceInputMapperGet(t *testing.T) {
 }
 
 func TestReservedInstanceInputMapperList(t *testing.T) {
-	input, err := ReservedInstanceInputMapperList("foo")
+	input, err := reservedInstanceInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -69,7 +69,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := ReservedInstanceOutputMapper("foo", nil, output)
+	items, err := reservedInstanceOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

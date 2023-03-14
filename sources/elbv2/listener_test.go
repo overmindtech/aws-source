@@ -34,7 +34,7 @@ func TestListenerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := ListenerOutputMapper("foo", nil, &output)
+	items, err := listenerOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

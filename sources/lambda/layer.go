@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LayerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]*types.LayersListItem, error) {
+func layerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]*types.LayersListItem, error) {
 	paginator := lambda.NewListLayersPaginator(client, &lambda.ListLayersInput{})
 	layers := make([]*types.LayersListItem, 0)
 
@@ -31,7 +31,7 @@ func LayerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]
 	return layers, nil
 }
 
-func LayerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
+func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -67,7 +67,7 @@ func NewLayerSource(config aws.Config, accountID string, region string) *sources
 			// Layers can only be listed
 			return nil, errors.New("get is not supported for lambda-layers")
 		},
-		ListFunc:   LayerListFunc,
-		ItemMapper: LayerItemMapper,
+		ListFunc:   layerListFunc,
+		ItemMapper: layerItemMapper,
 	}
 }

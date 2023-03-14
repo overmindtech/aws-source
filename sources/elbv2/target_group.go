@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TargetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
+func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, tg := range output.TargetGroups {
@@ -87,6 +87,6 @@ func NewTargetGroupSource(config aws.Config, accountID string) *sources.Describe
 		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeTargetGroupsInput) sources.Paginator[*elbv2.DescribeTargetGroupsOutput, *elbv2.Options] {
 			return elbv2.NewDescribeTargetGroupsPaginator(client, params)
 		},
-		OutputMapper: TargetGroupOutputMapper,
+		OutputMapper: targetGroupOutputMapper,
 	}
 }

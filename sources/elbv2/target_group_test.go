@@ -40,7 +40,7 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := TargetGroupOutputMapper("foo", nil, &output)
+	items, err := targetGroupOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

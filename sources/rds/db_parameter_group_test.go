@@ -61,7 +61,7 @@ func TestDBParameterGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	item, err := DBParameterGroupItemMapper("foo", &group)
+	item, err := dBParameterGroupItemMapper("foo", &group)
 
 	if err != nil {
 		t.Fatal(err)

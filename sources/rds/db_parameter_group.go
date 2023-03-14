@@ -17,7 +17,7 @@ type ParameterGroup struct {
 	Parameters []types.Parameter
 }
 
-func DBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
+func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -92,6 +92,6 @@ func NewDBParameterGroupSource(config aws.Config, accountID string, region strin
 
 			return groups, nil
 		},
-		ItemMapper: DBParameterGroupItemMapper,
+		ItemMapper: dBParameterGroupItemMapper,
 	}
 }

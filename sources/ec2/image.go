@@ -12,7 +12,7 @@ import (
 // ImageInputMapperGet Gets a given image. As opposed to list, get will get
 // details of any image given a correct ID, not just images owned by the current
 // account
-func ImageInputMapperGet(scope string, query string) (*ec2.DescribeImagesInput, error) {
+func imageInputMapperGet(scope string, query string) (*ec2.DescribeImagesInput, error) {
 	return &ec2.DescribeImagesInput{
 		ImageIds: []string{
 			query,
@@ -22,7 +22,7 @@ func ImageInputMapperGet(scope string, query string) (*ec2.DescribeImagesInput, 
 
 // ImageInputMapperList Lists images that are owned by the current account, as
 // opposed to all available images since this is simply way too much data
-func ImageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
+func imageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
 	return &ec2.DescribeImagesInput{
 		Owners: []string{
 			// Avoid getting every image in existence, just get the ones
@@ -32,7 +32,7 @@ func ImageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
 	}, nil
 }
 
-func ImageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
+func imageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, image := range output.Images {
@@ -71,8 +71,8 @@ func NewImageSource(config aws.Config, accountID string, limit *LimitBucket) *so
 			<-limit.C // Wait for late limiting
 			return client.DescribeImages(ctx, input)
 		},
-		InputMapperGet:  ImageInputMapperGet,
-		InputMapperList: ImageInputMapperList,
-		OutputMapper:    ImageOutputMapper,
+		InputMapperGet:  imageInputMapperGet,
+		InputMapperList: imageInputMapperList,
+		OutputMapper:    imageOutputMapper,
 	}
 }

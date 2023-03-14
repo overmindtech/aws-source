@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func GroupGetFunc(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
+func groupGetFunc(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
 	out, err := client.GetGroup(ctx, &iam.GetGroupInput{
 		GroupName: &query,
 	})
@@ -23,7 +23,7 @@ func GroupGetFunc(ctx context.Context, client *iam.Client, scope, query string) 
 	return out.Group, nil
 }
 
-func GroupListFunc(ctx context.Context, client *iam.Client, scope string) ([]*types.Group, error) {
+func groupListFunc(ctx context.Context, client *iam.Client, scope string) ([]*types.Group, error) {
 	out, err := client.ListGroups(ctx, &iam.ListGroupsInput{})
 
 	if err != nil {
@@ -39,7 +39,7 @@ func GroupListFunc(ctx context.Context, client *iam.Client, scope string) ([]*ty
 	return zones, nil
 }
 
-func GroupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
+func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
@@ -62,8 +62,8 @@ func NewGroupSource(config aws.Config, accountID string, region string) *sources
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
 		Region:     region,
-		GetFunc:    GroupGetFunc,
-		ListFunc:   GroupListFunc,
-		ItemMapper: GroupItemMapper,
+		GetFunc:    groupGetFunc,
+		ListFunc:   groupListFunc,
+		ItemMapper: groupItemMapper,
 	}
 }

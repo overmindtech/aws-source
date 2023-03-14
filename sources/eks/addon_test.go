@@ -36,7 +36,7 @@ var AddonTestClient = TestClient{
 }
 
 func TestAddonGetFunc(t *testing.T) {
-	item, err := AddonGetFunc(context.Background(), AddonTestClient, "foo", &eks.DescribeAddonInput{})
+	item, err := addonGetFunc(context.Background(), AddonTestClient, "foo", &eks.DescribeAddonInput{})
 
 	if err != nil {
 		t.Error(err)

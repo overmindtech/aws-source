@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ClusterGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeClusterInput) (*sdp.Item, error) {
+func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeClusterInput) (*sdp.Item, error) {
 	output, err := client.DescribeCluster(ctx, input)
 
 	if err != nil {
@@ -176,6 +176,6 @@ func NewClusterSource(config aws.Config, accountID string, region string) *sourc
 
 			return inputs, nil
 		},
-		GetFunc: ClusterGetFunc,
+		GetFunc: clusterGetFunc,
 	}
 }

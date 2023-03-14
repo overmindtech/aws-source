@@ -12,7 +12,7 @@ import (
 )
 
 func TestInternetGatewayInputMapperGet(t *testing.T) {
-	input, err := InternetGatewayInputMapperGet("foo", "bar")
+	input, err := internetGatewayInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestInternetGatewayInputMapperGet(t *testing.T) {
 }
 
 func TestInternetGatewayInputMapperList(t *testing.T) {
-	input, err := InternetGatewayInputMapperList("foo")
+	input, err := internetGatewayInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -61,7 +61,7 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := InternetGatewayOutputMapper("foo", nil, output)
+	items, err := internetGatewayOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -64,7 +64,7 @@ func TestRuleOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := RuleOutputMapper("foo", nil, &output)
+	items, err := ruleOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

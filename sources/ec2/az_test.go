@@ -11,7 +11,7 @@ import (
 )
 
 func TestAvailabilityZoneInputMapperGet(t *testing.T) {
-	input, err := AvailabilityZoneInputMapperGet("foo", "az-name")
+	input, err := availabilityZoneInputMapperGet("foo", "az-name")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestAvailabilityZoneInputMapperGet(t *testing.T) {
 
 func TestAvailabilityZoneInputMapperList(t *testing.T) {
 
-	input, err := AvailabilityZoneInputMapperList("foo")
+	input, err := availabilityZoneInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -71,7 +71,7 @@ func TestAvailabilityZoneOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AvailabilityZoneOutputMapper("foo", nil, &output)
+	items, err := availabilityZoneOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

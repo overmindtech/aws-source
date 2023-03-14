@@ -20,7 +20,7 @@ type PolicyDetails struct {
 	PolicyUsers  []types.PolicyUser
 }
 
-func PolicyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
+func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
 	// Construct the ARN from the name etc.
 	a := sources.ARN{
 		ARN: arn.ARN{
@@ -86,7 +86,7 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 // PolicyListFunc Lists all attached policies. There is no way to list
 // unattached policies since I don't think it will be very valuable, there are
 // hundreds by default and if you aren't using them they aren't very interesting
-func PolicyListFunc(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
+func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
 	policies := make([]types.Policy, 0)
 
 	paginator := iam.NewListPoliciesPaginator(client, &iam.ListPoliciesInput{
@@ -122,7 +122,7 @@ func PolicyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 	return policyDetails, nil
 }
 
-func PolicyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
+func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem.Policy)
 
 	if err != nil {
@@ -188,8 +188,8 @@ func NewPolicySource(config aws.Config, accountID string, _ string) *sources.Get
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
 		Region:     "", // IAM policies aren't tied to a region
-		GetFunc:    PolicyGetFunc,
-		ListFunc:   PolicyListFunc,
-		ItemMapper: PolicyItemMapper,
+		GetFunc:    policyGetFunc,
+		ListFunc:   policyListFunc,
+		ItemMapper: policyItemMapper,
 	}
 }

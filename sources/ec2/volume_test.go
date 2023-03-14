@@ -12,7 +12,7 @@ import (
 )
 
 func TestVolumeInputMapperGet(t *testing.T) {
-	input, err := VolumeInputMapperGet("foo", "bar")
+	input, err := volumeInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestVolumeInputMapperGet(t *testing.T) {
 }
 
 func TestVolumeInputMapperList(t *testing.T) {
-	input, err := VolumeInputMapperList("foo")
+	input, err := volumeInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -67,7 +67,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := VolumeOutputMapper("foo", nil, output)
+	items, err := volumeOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

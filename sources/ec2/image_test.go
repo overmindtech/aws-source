@@ -11,7 +11,7 @@ import (
 )
 
 func TestImageInputMapperGet(t *testing.T) {
-	input, err := ImageInputMapperGet("foo", "az-name")
+	input, err := imageInputMapperGet("foo", "az-name")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestImageInputMapperGet(t *testing.T) {
 
 func TestImageInputMapperList(t *testing.T) {
 
-	input, err := ImageInputMapperList("foo")
+	input, err := imageInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -76,7 +76,7 @@ func TestImageOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := ImageOutputMapper("foo", nil, &output)
+	items, err := imageOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

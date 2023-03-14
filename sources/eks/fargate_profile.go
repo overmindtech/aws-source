@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func FargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeFargateProfileInput) (*sdp.Item, error) {
+func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, input *eks.DescribeFargateProfileInput) (*sdp.Item, error) {
 	out, err := client.DescribeFargateProfile(ctx, input)
 
 	if err != nil {
@@ -109,6 +109,6 @@ func NewFargateProfileSource(config aws.Config, accountID string, region string)
 
 			return inputs, nil
 		},
-		GetFunc: FargateProfileGetFunc,
+		GetFunc: fargateProfileGetFunc,
 	}
 }

@@ -164,7 +164,7 @@ func (t *TestLambdaClient) ListFunctions(context.Context, *lambda.ListFunctionsI
 }
 
 func TestFunctionGetFunc(t *testing.T) {
-	item, err := FunctionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetFunctionInput{})
+	item, err := functionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetFunctionInput{})
 
 	if err != nil {
 		t.Error(err)

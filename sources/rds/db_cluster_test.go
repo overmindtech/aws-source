@@ -128,7 +128,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := DBClusterOutputMapper("foo", nil, &output)
+	items, err := dBClusterOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

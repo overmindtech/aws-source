@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func SnapshotInputMapperGet(scope string, query string) (*ec2.DescribeSnapshotsInput, error) {
+func snapshotInputMapperGet(scope string, query string) (*ec2.DescribeSnapshotsInput, error) {
 	return &ec2.DescribeSnapshotsInput{
 		SnapshotIds: []string{
 			query,
@@ -17,7 +17,7 @@ func SnapshotInputMapperGet(scope string, query string) (*ec2.DescribeSnapshotsI
 	}, nil
 }
 
-func SnapshotInputMapperList(scope string) (*ec2.DescribeSnapshotsInput, error) {
+func snapshotInputMapperList(scope string) (*ec2.DescribeSnapshotsInput, error) {
 	return &ec2.DescribeSnapshotsInput{
 		OwnerIds: []string{
 			// Avoid getting every snapshot in existence, just get the ones
@@ -27,7 +27,7 @@ func SnapshotInputMapperList(scope string) (*ec2.DescribeSnapshotsInput, error) 
 	}, nil
 }
 
-func SnapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
+func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, snapshot := range output.Snapshots {
@@ -78,11 +78,11 @@ func NewSnapshotSource(config aws.Config, accountID string, limit *LimitBucket) 
 			<-limit.C // Wait for late limiting
 			return client.DescribeSnapshots(ctx, input)
 		},
-		InputMapperGet:  SnapshotInputMapperGet,
-		InputMapperList: SnapshotInputMapperList,
+		InputMapperGet:  snapshotInputMapperGet,
+		InputMapperList: snapshotInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSnapshotsInput) sources.Paginator[*ec2.DescribeSnapshotsOutput, *ec2.Options] {
 			return ec2.NewDescribeSnapshotsPaginator(client, params)
 		},
-		OutputMapper: SnapshotOutputMapper,
+		OutputMapper: snapshotOutputMapper,
 	}
 }

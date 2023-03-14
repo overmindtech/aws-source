@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func VpcInputMapperGet(scope string, query string) (*ec2.DescribeVpcsInput, error) {
+func vpcInputMapperGet(scope string, query string) (*ec2.DescribeVpcsInput, error) {
 	return &ec2.DescribeVpcsInput{
 		VpcIds: []string{
 			query,
@@ -17,11 +17,11 @@ func VpcInputMapperGet(scope string, query string) (*ec2.DescribeVpcsInput, erro
 	}, nil
 }
 
-func VpcInputMapperList(scope string) (*ec2.DescribeVpcsInput, error) {
+func vpcInputMapperList(scope string) (*ec2.DescribeVpcsInput, error) {
 	return &ec2.DescribeVpcsInput{}, nil
 }
 
-func VpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
+func vpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, vpc := range output.Vpcs {
@@ -60,11 +60,11 @@ func NewVpcSource(config aws.Config, accountID string, limit *LimitBucket) *sour
 			<-limit.C // Wait for late limiting
 			return client.DescribeVpcs(ctx, input)
 		},
-		InputMapperGet:  VpcInputMapperGet,
-		InputMapperList: VpcInputMapperList,
+		InputMapperGet:  vpcInputMapperGet,
+		InputMapperList: vpcInputMapperList,
 		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcsInput) sources.Paginator[*ec2.DescribeVpcsOutput, *ec2.Options] {
 			return ec2.NewDescribeVpcsPaginator(client, params)
 		},
-		OutputMapper: VpcOutputMapper,
+		OutputMapper: vpcOutputMapper,
 	}
 }

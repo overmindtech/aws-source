@@ -149,7 +149,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AutoScalingGroupOutputMapper("foo", nil, &output)
+	items, err := autoScalingGroupOutputMapper("foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func DBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
+func dBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instance := range output.DBInstances {
@@ -307,6 +307,6 @@ func NewDBInstanceSource(config aws.Config, accountID string) *sources.DescribeO
 		InputMapperList: func(scope string) (*rds.DescribeDBInstancesInput, error) {
 			return &rds.DescribeDBInstancesInput{}, nil
 		},
-		OutputMapper: DBInstanceOutputMapper,
+		OutputMapper: dBInstanceOutputMapper,
 	}
 }

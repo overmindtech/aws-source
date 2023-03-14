@@ -12,7 +12,7 @@ import (
 )
 
 func TestLaunchTemplateVersionInputMapperGet(t *testing.T) {
-	input, err := LaunchTemplateVersionInputMapperGet("foo", "bar.10")
+	input, err := launchTemplateVersionInputMapperGet("foo", "bar.10")
 
 	if err != nil {
 		t.Error(err)
@@ -32,7 +32,7 @@ func TestLaunchTemplateVersionInputMapperGet(t *testing.T) {
 }
 
 func TestLaunchTemplateVersionInputMapperList(t *testing.T) {
-	input, err := LaunchTemplateVersionInputMapperList("foo")
+	input, err := launchTemplateVersionInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -109,7 +109,7 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := LaunchTemplateVersionOutputMapper("foo", nil, output)
+	items, err := launchTemplateVersionOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

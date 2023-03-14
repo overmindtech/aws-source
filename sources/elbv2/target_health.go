@@ -72,7 +72,7 @@ func ToTargetHealthUniqueID(id string) (TargetHealthUniqueID, error) {
 	return healthId, nil
 }
 
-func TargetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInput, output *elbv2.DescribeTargetHealthOutput) ([]*sdp.Item, error) {
+func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInput, output *elbv2.DescribeTargetHealthOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, desc := range output.TargetHealthDescriptions {
@@ -204,6 +204,6 @@ func NewTargetHealthSource(config aws.Config, accountID string) *sources.Describ
 				TargetGroupArn: &query,
 			}, nil
 		},
-		OutputMapper: TargetHealthOutputMapper,
+		OutputMapper: targetHealthOutputMapper,
 	}
 }

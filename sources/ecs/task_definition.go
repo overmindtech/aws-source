@@ -17,7 +17,7 @@ var TaskDefinitionIncludeFields = []types.TaskDefinitionField{
 	types.TaskDefinitionFieldTags,
 }
 
-func TaskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeTaskDefinitionInput) (*sdp.Item, error) {
+func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeTaskDefinitionInput) (*sdp.Item, error) {
 	out, err := client.DescribeTaskDefinition(ctx, input)
 
 	if err != nil {
@@ -136,7 +136,7 @@ func NewTaskDefinitionSource(config aws.Config, accountID string, region string)
 		Client:    ecs.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc:   TaskDefinitionGetFunc,
+		GetFunc:   taskDefinitionGetFunc,
 		ListInput: &ecs.ListTaskDefinitionsInput{},
 		GetInputMapper: func(scope, query string) *ecs.DescribeTaskDefinitionInput {
 			// AWS actually supports "family:revision" format as an input here

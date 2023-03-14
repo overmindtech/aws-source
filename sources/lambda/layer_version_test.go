@@ -40,7 +40,7 @@ func TestLayerVersionGetInputMapper(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Query, func(t *testing.T) {
-			input := LayerVersionGetInputMapper("foo", test.Query)
+			input := layerVersionGetInputMapper("foo", test.Query)
 
 			if input == nil && !test.ExpectNil {
 				t.Error("input was nil unexpectedly")
@@ -82,7 +82,7 @@ func (t *TestLambdaClient) ListLayerVersions(context.Context, *lambda.ListLayerV
 }
 
 func TestLayerVersionGetFunc(t *testing.T) {
-	item, err := LayerVersionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetLayerVersionInput{
+	item, err := layerVersionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetLayerVersionInput{
 		LayerName:     sources.PtrString("layer"),
 		VersionNumber: 999,
 	})

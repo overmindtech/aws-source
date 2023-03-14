@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func LayerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInput {
+func layerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInput {
 	sections := strings.Split(query, ":")
 
 	if len(sections) < 2 {
@@ -33,7 +33,7 @@ func LayerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInpu
 	}
 }
 
-func LayerVersionGetFunc(ctx context.Context, client LambdaClient, scope string, input *lambda.GetLayerVersionInput) (*sdp.Item, error) {
+func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string, input *lambda.GetLayerVersionInput) (*sdp.Item, error) {
 	if input == nil {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOTFOUND,
@@ -102,8 +102,8 @@ func NewLayerVersionSource(config aws.Config, accountID string, region string) *
 		AccountID:      accountID,
 		Region:         region,
 		DisableList:    true,
-		GetInputMapper: LayerVersionGetInputMapper,
-		GetFunc:        LayerVersionGetFunc,
+		GetInputMapper: layerVersionGetInputMapper,
+		GetFunc:        layerVersionGetFunc,
 		ListInput:      &lambda.ListLayerVersionsInput{},
 		ListFuncOutputMapper: func(output *lambda.ListLayerVersionsOutput, input *lambda.ListLayerVersionsInput) ([]*lambda.GetLayerVersionInput, error) {
 			return []*lambda.GetLayerVersionInput{}, nil

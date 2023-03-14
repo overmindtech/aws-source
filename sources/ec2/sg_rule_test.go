@@ -12,7 +12,7 @@ import (
 )
 
 func TestSecurityGroupRuleInputMapperGet(t *testing.T) {
-	input, err := SecurityGroupRuleInputMapperGet("foo", "bar")
+	input, err := securityGroupRuleInputMapperGet("foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -28,7 +28,7 @@ func TestSecurityGroupRuleInputMapperGet(t *testing.T) {
 }
 
 func TestSecurityGroupRuleInputMapperList(t *testing.T) {
-	input, err := SecurityGroupRuleInputMapperList("foo")
+	input, err := securityGroupRuleInputMapperList("foo")
 
 	if err != nil {
 		t.Error(err)
@@ -75,7 +75,7 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := SecurityGroupRuleOutputMapper("foo", nil, output)
+	items, err := securityGroupRuleOutputMapper("foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

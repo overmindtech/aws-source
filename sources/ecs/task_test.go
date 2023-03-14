@@ -120,7 +120,7 @@ func (t *TestClient) ListTasks(context.Context, *ecs.ListTasksInput, ...func(*ec
 
 func TestTaskGetInputMapper(t *testing.T) {
 	t.Run("test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2", func(t *testing.T) {
-		input := TaskGetInputMapper("foo", "test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2")
+		input := taskGetInputMapper("foo", "test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2")
 
 		if input == nil {
 			t.Fatal("input is nil")
@@ -136,7 +136,7 @@ func TestTaskGetInputMapper(t *testing.T) {
 	})
 
 	t.Run("2ffd7ed376c841bcb0e6795ddb6e72e2", func(t *testing.T) {
-		input := TaskGetInputMapper("foo", "2ffd7ed376c841bcb0e6795ddb6e72e2")
+		input := taskGetInputMapper("foo", "2ffd7ed376c841bcb0e6795ddb6e72e2")
 
 		if input != nil {
 			t.Error("expected input to be nil")
@@ -144,7 +144,7 @@ func TestTaskGetInputMapper(t *testing.T) {
 	})
 
 	t.Run("blah", func(t *testing.T) {
-		input := TaskGetInputMapper("foo", "blah")
+		input := taskGetInputMapper("foo", "blah")
 
 		if input != nil {
 			t.Error("expected input to be nil")
@@ -153,7 +153,7 @@ func TestTaskGetInputMapper(t *testing.T) {
 }
 
 func TestTasksListFuncOutputMapper(t *testing.T) {
-	inputs, err := TasksListFuncOutputMapper(&ecs.ListTasksOutput{
+	inputs, err := tasksListFuncOutputMapper(&ecs.ListTasksOutput{
 		TaskArns: []string{
 			"arn:aws:ecs:eu-west-1:052392120703:task/test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2",
 			"bad",
@@ -178,7 +178,7 @@ func TestTasksListFuncOutputMapper(t *testing.T) {
 }
 
 func TestTaskGetFunc(t *testing.T) {
-	item, err := TaskGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeTasksInput{})
+	item, err := taskGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeTasksInput{})
 
 	if err != nil {
 		t.Error(err)

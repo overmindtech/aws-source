@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func KeyPairInputMapperGet(scope string, query string) (*ec2.DescribeKeyPairsInput, error) {
+func keyPairInputMapperGet(scope string, query string) (*ec2.DescribeKeyPairsInput, error) {
 	return &ec2.DescribeKeyPairsInput{
 		KeyNames: []string{
 			query,
@@ -17,11 +17,11 @@ func KeyPairInputMapperGet(scope string, query string) (*ec2.DescribeKeyPairsInp
 	}, nil
 }
 
-func KeyPairInputMapperList(scope string) (*ec2.DescribeKeyPairsInput, error) {
+func keyPairInputMapperList(scope string) (*ec2.DescribeKeyPairsInput, error) {
 	return &ec2.DescribeKeyPairsInput{}, nil
 }
 
-func KeyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2.DescribeKeyPairsOutput) ([]*sdp.Item, error) {
+func keyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2.DescribeKeyPairsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.KeyPairs {
@@ -60,8 +60,8 @@ func NewKeyPairSource(config aws.Config, accountID string, limit *LimitBucket) *
 			<-limit.C // Wait for late limiting
 			return client.DescribeKeyPairs(ctx, input)
 		},
-		InputMapperGet:  KeyPairInputMapperGet,
-		InputMapperList: KeyPairInputMapperList,
-		OutputMapper:    KeyPairOutputMapper,
+		InputMapperGet:  keyPairInputMapperGet,
+		InputMapperList: keyPairInputMapperList,
+		OutputMapper:    keyPairOutputMapper,
 	}
 }
