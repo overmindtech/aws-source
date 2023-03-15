@@ -43,7 +43,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 				MaxSize:         sources.PtrInt32(3),
 				DesiredCapacity: sources.PtrInt32(1),
 				DefaultCooldown: sources.PtrInt32(300),
-				AvailabilityZones: []string{
+				AvailabilityZones: []string{ // link
 					"eu-west-2c",
 					"eu-west-2a",
 					"eu-west-2b",
@@ -216,6 +216,24 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-launch-template",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "lt-0174ff2b8909d0c75",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-availability-zone",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-2a",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-availability-zone",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-2b",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-availability-zone",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-2c",
 			ExpectedScope:  "foo",
 		},
 	}

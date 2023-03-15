@@ -56,7 +56,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 							State: types.MonitoringStateDisabled,
 						},
 						Placement: &types.Placement{
-							AvailabilityZone: sources.PtrString("eu-west-2c"),
+							AvailabilityZone: sources.PtrString("eu-west-2c"), // link
 							GroupName:        sources.PtrString(""),
 							GroupId:          sources.PtrString("groupId"),
 							Tenancy:          types.TenancyDefault,
@@ -252,6 +252,12 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-placement-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "groupId",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "ec2-availability-zone",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-2c",
 			ExpectedScope:  "foo",
 		},
 	}

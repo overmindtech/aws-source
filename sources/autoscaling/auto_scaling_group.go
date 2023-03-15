@@ -60,6 +60,15 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			}
 		}
 
+		for _, az := range asg.AvailabilityZones {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				Type:   "ec2-availability-zone",
+				Method: sdp.QueryMethod_GET,
+				Query:  az,
+				Scope:  scope,
+			})
+		}
+
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{

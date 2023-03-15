@@ -53,6 +53,15 @@ func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 			})
 		}
 
+		if volume.AvailabilityZone != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				Type:   "ec2-availability-zone",
+				Method: sdp.QueryMethod_GET,
+				Query:  *volume.AvailabilityZone,
+				Scope:  scope,
+			})
+		}
+
 		items = append(items, &item)
 	}
 

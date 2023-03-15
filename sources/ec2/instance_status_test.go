@@ -43,8 +43,8 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 	output := &ec2.DescribeInstanceStatusOutput{
 		InstanceStatuses: []types.InstanceStatus{
 			{
-				AvailabilityZone: sources.PtrString("eu-west-2c"),
-				InstanceId:       sources.PtrString("i-022bdccde30270570"),
+				AvailabilityZone: sources.PtrString("eu-west-2c"),          // link
+				InstanceId:       sources.PtrString("i-022bdccde30270570"), // link
 				InstanceState: &types.InstanceState{
 					Code: sources.PtrInt32(16),
 					Name: types.InstanceStateNameRunning,
@@ -96,6 +96,12 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-availability-zone",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eu-west-2c",
+			ExpectedScope:  item.Scope,
+		},
+		{
+			ExpectedType:   "ec2-instance",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "i-022bdccde30270570",
 			ExpectedScope:  item.Scope,
 		},
 	}

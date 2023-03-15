@@ -108,6 +108,15 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			continue
 		}
 
+		if desc.Target.AvailabilityZone != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				Type:   "ec2-availability-zone",
+				Method: sdp.QueryMethod_GET,
+				Query:  *desc.Target.AvailabilityZone,
+				Scope:  scope,
+			})
+		}
+
 		id := TargetHealthUniqueID{
 			TargetGroupArn:   *input.TargetGroupArn,
 			Id:               *desc.Target.Id,

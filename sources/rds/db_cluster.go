@@ -69,6 +69,15 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			}
 		}
 
+		for _, az := range cluster.AvailabilityZones {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				Type:   "ec2-availability-zone",
+				Method: sdp.QueryMethod_GET,
+				Query:  az,
+				Scope:  scope,
+			})
+		}
+
 		for _, member := range cluster.DBClusterMembers {
 			if member.DBInstanceIdentifier != nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{

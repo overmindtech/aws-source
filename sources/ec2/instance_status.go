@@ -40,6 +40,14 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 			UniqueAttribute: "instanceId",
 			Scope:           scope,
 			Attributes:      attrs,
+			LinkedItemQueries: []*sdp.Query{
+				{
+					Type:   "ec2-instance",
+					Method: sdp.QueryMethod_GET,
+					Query:  *instanceStatus.InstanceId,
+					Scope:  scope,
+				},
+			},
 		}
 
 		if instanceStatus.AvailabilityZone != nil {

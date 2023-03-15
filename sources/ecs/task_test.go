@@ -225,6 +225,12 @@ func TestTaskGetFunc(t *testing.T) {
 			ExpectedQuery:  "arn:aws:ecs:eu-west-1:052392120703:task-definition/test-ecs-demo-app:1",
 			ExpectedScope:  "052392120703.eu-west-1",
 		},
+		{
+			ExpectedType:   "ec2-availability-zone",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "eu-west-1c",
+			ExpectedScope:  "foo",
+		},
 	}
 
 	tests.Execute(t, item)
