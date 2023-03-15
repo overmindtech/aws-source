@@ -5,16 +5,16 @@ go 1.19
 // Direct dependencies
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.6
-	github.com/aws/aws-sdk-go-v2/config v1.18.16
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.16
+	github.com/aws/aws-sdk-go-v2/config v1.18.17
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.17
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.89.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.90.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.24.1
-	github.com/aws/aws-sdk-go-v2/service/eks v1.27.6
+	github.com/aws/aws-sdk-go-v2/service/eks v1.27.7
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.5
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.6
-	github.com/aws/aws-sdk-go-v2/service/iam v1.19.5
+	github.com/aws/aws-sdk-go-v2/service/iam v1.19.6
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.30.1
 	github.com/aws/aws-sdk-go-v2/service/rds v1.40.6
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.4
@@ -27,7 +27,7 @@ require (
 	github.com/nats-io/nkeys v0.3.0
 	github.com/overmindtech/connect v0.8.5
 	github.com/overmindtech/discovery v0.18.2
-	github.com/overmindtech/sdp-go v0.18.4
+	github.com/overmindtech/sdp-go v0.19.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
@@ -36,14 +36,14 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.14.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.14.0
 	go.opentelemetry.io/otel/sdk v1.14.0
-	google.golang.org/protobuf v1.29.0
+	google.golang.org/protobuf v1.29.1
 )
 
 // Transitive dependencies
 require (
-	github.com/aws/aws-sdk-go v1.44.219 // indirect
+	github.com/aws/aws-sdk-go v1.44.221 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.24 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.30 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.24 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.31 // indirect
