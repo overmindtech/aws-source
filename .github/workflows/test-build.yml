@@ -5,9 +5,9 @@ on:
   # but only for the main branch
   push:
     branches:
-      - 'main'
+      - "main"
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -65,24 +65,40 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
     needs:
       - test
-    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+    permissions:
+      contents: read # required for checkout
+      id-token: write # mint AWS credentials through OIDC
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: Dockerfile
+            image_name: aws-source
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          audience: sts.amazonaws.com # set default value to work around https://github.com/aws-actions/configure-aws-credentials/issues/271#issuecomment-1401481855
+          aws-region: eu-west-2
+          role-to-assume: ${{ vars.BUILDKIT_CONNECT_ARN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Fetch EKS Configuration
+        run: |
+          aws eks update-kubeconfig --name dogfood
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/overmindtech/${{ matrix.image_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -94,43 +110,42 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PUSH }}
 
-      - name: Go Build Cache for Docker
-        uses: actions/cache@v3
+      - name: Set up Docker Buildx
+        id: setup-builder
+        uses: docker/setup-buildx-action@v2
         with:
-          path: go-build-cache
-          key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
-
-      - name: inject go-build-cache into docker
-        uses: overmindtech/buildkit-cache-dance/inject@main
-        with:
-          cache-source: go-build-cache
+          driver: kubernetes
+          platforms: linux/amd64
+          driver-opts: |
+            namespace=buildkit,"nodeselector=kubernetes.io/arch=amd64"
+          append: |
+            - name: ${{ matrix.image_name }}-${{ github.run_id }}-${{ github.run_attempt }}-arm64
+              platforms: linux/arm64
+              driver-opts:
+                - namespace=buildkit,"nodeselector=kubernetes.io/arch=arm64"
 
       - name: Build and push
         id: push
         uses: docker/build-push-action@v4
         with:
+          builder: ${{ steps.setup-builder.outputs.name }}
           context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          file: build/package/Dockerfile
+          file: build/package/${{ matrix.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
 
-      - name: extract go-build-cache from docker
-        uses: overmindtech/buildkit-cache-dance/extract@main
-        with:
-          cache-source: go-build-cache
-
       - name: Prepare Deployment
         run: |
-          echo "ghcr.io/overmindtech/aws-source@${{ steps.push.outputs.digest }}" | tee aws-source.imageref
+          echo "ghcr.io/overmindtech/${{ matrix.image_name }}@${{ steps.push.outputs.digest }}" | tee ${{ matrix.image_name }}.imageref
 
       - name: Upload Deployment File
         uses: actions/upload-artifact@v3
         with:
-          name: aws-source.imageref
-          path: aws-source.imageref
+          name: ${{ matrix.image_name }}.imageref
+          path: ${{ matrix.image_name }}.imageref
