@@ -29,13 +29,27 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*R
 		Role: out.Role,
 	}
 
-	details.Policies, err = getRolePolicies(ctx, client, *out.Role.RoleName)
+	err = enrichRole(ctx, client, &details)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &details, nil
+}
+
+func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails) error {
+	var err error
+
+	roleDetails.Policies, err = getRolePolicies(ctx, client, *roleDetails.Role.RoleName)
+
+	if err != nil {
+		return err
+	}
+
+	roleDetails.Role.Tags, err = getRoleTags(ctx, client, *roleDetails.Role.RoleName)
+
+	return err
 }
 
 func getRolePolicies(ctx context.Context, client IAMClient, roleName string) ([]string, error) {
@@ -58,6 +72,18 @@ func getRolePolicies(ctx context.Context, client IAMClient, roleName string) ([]
 	return policies, nil
 }
 
+func getRoleTags(ctx context.Context, client IAMClient, roleName string) ([]types.Tag, error) {
+	out, err := client.ListRoleTags(ctx, &iam.ListRoleTagsInput{
+		RoleName: &roleName,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return out.Tags, nil
+}
+
 func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
@@ -74,7 +100,7 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 				Role: &out.Roles[i],
 			}
 
-			details.Policies, err = getRolePolicies(ctx, client, *out.Roles[i].RoleName)
+			err = enrichRole(ctx, client, &details)
 
 			if err != nil {
 				return nil, err

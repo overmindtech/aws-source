@@ -30,19 +30,33 @@ func userGetFunc(ctx context.Context, client IAMClient, scope, query string) (*U
 	}
 
 	if out.User != nil {
-		// Get the groups that the user is in too soe that we can create linked item requests
-		groups, err := GetUserGroups(ctx, client, out.User.UserName)
-
-		if err == nil {
-			details.UserGroups = groups
-		}
+		enrichUser(ctx, client, &details)
 	}
 
 	return &details, nil
 }
 
+// enrichUser Enriches the user with group and tag info
+func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails) error {
+	var err error
+
+	userDetails.UserGroups, err = getUserGroups(ctx, client, userDetails.User.UserName)
+
+	if err != nil {
+		return err
+	}
+
+	userDetails.User.Tags, err = getUserTags(ctx, client, userDetails.User.UserName)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Gets all of the groups that a user is in
-func GetUserGroups(ctx context.Context, client IAMClient, userName *string) ([]types.Group, error) {
+func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]types.Group, error) {
 	var out *iam.ListGroupsForUserOutput
 	var err error
 	groups := make([]types.Group, 0)
@@ -63,6 +77,32 @@ func GetUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 	}
 
 	return groups, nil
+}
+
+// GetUserTags Gets the tags for a user since the API doesn't actually return
+// this, even though it says it does see:
+// https://github.com/boto/boto3/issues/1855
+func getUserTags(ctx context.Context, client IAMClient, userName *string) ([]types.Tag, error) {
+	paginator := iam.NewListUserTagsPaginator(client, &iam.ListUserTagsInput{
+		UserName: userName,
+	})
+
+	var out *iam.ListUserTagsOutput
+	var err error
+
+	tags := make([]types.Tag, 0)
+
+	for paginator.HasMorePages() {
+		out, err = paginator.NextPage(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		tags = append(tags, out.Tags...)
+	}
+
+	return tags, err
 }
 
 func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
@@ -89,11 +129,7 @@ func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserD
 			User: &users[i],
 		}
 
-		groups, err := GetUserGroups(ctx, client, users[i].UserName)
-
-		if err == nil {
-			details.UserGroups = groups
-		}
+		enrichUser(ctx, client, &details)
 
 		userDetails[i] = &details
 	}

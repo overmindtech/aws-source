@@ -45,7 +45,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	}
 
 	if out.Policy != nil {
-		err := addPolicyEntities(ctx, client, &details)
+		err := enrichPolicy(ctx, client, &details)
 
 		if err != nil {
 			return nil, err
@@ -53,6 +53,32 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	}
 
 	return &details, nil
+}
+
+func enrichPolicy(ctx context.Context, client IAMClient, details *PolicyDetails) error {
+	err := addTags(ctx, client, details)
+
+	if err != nil {
+		return err
+	}
+
+	err = addPolicyEntities(ctx, client, details)
+
+	return err
+}
+
+func addTags(ctx context.Context, client IAMClient, details *PolicyDetails) error {
+	out, err := client.ListPolicyTags(ctx, &iam.ListPolicyTagsInput{
+		PolicyArn: details.Policy.Arn,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	details.Policy.Tags = out.Tags
+
+	return nil
 }
 
 func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails) error {
@@ -110,7 +136,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 			Policy: &policies[i],
 		}
 
-		err := addPolicyEntities(ctx, client, &details)
+		err := enrichPolicy(ctx, client, &details)
 
 		if err != nil {
 			return nil, err
