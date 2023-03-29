@@ -82,6 +82,17 @@ func (t *TestIAMClient) ListPolicies(context.Context, *iam.ListPoliciesInput, ..
 	}, nil
 }
 
+func (t *TestIAMClient) ListPolicyTags(ctx context.Context, params *iam.ListPolicyTagsInput, optFns ...func(*iam.Options)) (*iam.ListPolicyTagsOutput, error) {
+	return &iam.ListPolicyTagsOutput{
+		Tags: []types.Tag{
+			{
+				Key:   sources.PtrString("foo"),
+				Value: sources.PtrString("foo"),
+			},
+		},
+	}, nil
+}
+
 func TestPolicyGetFunc(t *testing.T) {
 	policy, err := policyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
@@ -104,6 +115,10 @@ func TestPolicyGetFunc(t *testing.T) {
 	if len(policy.PolicyUsers) != 1 {
 		t.Errorf("expected 1 User, got %v", len(policy.PolicyUsers))
 	}
+
+	if len(policy.Policy.Tags) == 0 {
+		t.Error("empty tags")
+	}
 }
 
 func TestPolicyListFunc(t *testing.T) {
@@ -115,6 +130,10 @@ func TestPolicyListFunc(t *testing.T) {
 
 	if len(policies) != 2 {
 		t.Errorf("expected 2 policies, got %v", len(policies))
+	}
+
+	if len(policies[0].Policy.Tags) == 0 {
+		t.Error("empty tags")
 	}
 }
 

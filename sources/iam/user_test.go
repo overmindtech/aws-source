@@ -97,8 +97,21 @@ func (t *TestIAMClient) ListUsers(ctx context.Context, params *iam.ListUsersInpu
 	}, nil
 }
 
+func (t *TestIAMClient) ListUserTags(context.Context, *iam.ListUserTagsInput, ...func(*iam.Options)) (*iam.ListUserTagsOutput, error) {
+	return &iam.ListUserTagsOutput{
+		Tags: []types.Tag{
+			{
+				Key:   sources.PtrString("foo"),
+				Value: sources.PtrString("bar"),
+			},
+		},
+		IsTruncated: false,
+		Marker:      nil,
+	}, nil
+}
+
 func TestGetUserGroups(t *testing.T) {
-	groups, err := GetUserGroups(context.Background(), &TestIAMClient{}, sources.PtrString("foo"))
+	groups, err := getUserGroups(context.Background(), &TestIAMClient{}, sources.PtrString("foo"))
 
 	if err != nil {
 		t.Error(err)
@@ -138,6 +151,10 @@ func TestUserListFunc(t *testing.T) {
 	}
 
 	for _, user := range users {
+		if len(user.User.Tags) != 1 {
+			t.Errorf("expected 1 tag, got %v", len(user.User.Tags))
+		}
+
 		if len(user.UserGroups) != 3 {
 			t.Errorf("expected 3 groups, got %v", len(user.UserGroups))
 		}

@@ -50,6 +50,17 @@ func (t *TestIAMClient) ListRoles(context.Context, *iam.ListRolesInput, ...func(
 	}, nil
 }
 
+func (t *TestIAMClient) ListRoleTags(ctx context.Context, params *iam.ListRoleTagsInput, optFns ...func(*iam.Options)) (*iam.ListRoleTagsOutput, error) {
+	return &iam.ListRoleTagsOutput{
+		Tags: []types.Tag{
+			{
+				Key:   sources.PtrString("foo"),
+				Value: sources.PtrString("bar"),
+			},
+		},
+	}, nil
+}
+
 func TestRoleGetFunc(t *testing.T) {
 	role, err := roleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
@@ -64,6 +75,10 @@ func TestRoleGetFunc(t *testing.T) {
 	if len(role.Policies) != 2 {
 		t.Errorf("expected 2 policies, got %v", len(role.Policies))
 	}
+
+	if len(role.Role.Tags) == 0 {
+		t.Error("got no role tags")
+	}
 }
 
 func TestRoleListFunc(t *testing.T) {
@@ -75,6 +90,10 @@ func TestRoleListFunc(t *testing.T) {
 
 	if len(roles) != 1 {
 		t.Errorf("expected 1 role, got %b", len(roles))
+	}
+
+	if len(roles[0].Role.Tags) == 0 {
+		t.Error("got no role tags")
 	}
 }
 
