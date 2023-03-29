@@ -47,6 +47,7 @@ jobs:
     permissions:
       contents: read # required for checkout
       id-token: write # mint AWS credentials through OIDC
+      packages: read/write
 
     strategy:
       fail-fast: false
@@ -83,8 +84,6 @@ jobs:
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
-        permissions:
-          packages: read/write
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
