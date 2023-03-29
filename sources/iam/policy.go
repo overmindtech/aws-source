@@ -105,9 +105,9 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 
 	policyDetails := make([]*PolicyDetails, len(policies))
 
-	for i, Policy := range policies {
+	for i := range policies {
 		details := PolicyDetails{
-			Policy: &Policy,
+			Policy: &policies[i],
 		}
 
 		err := addPolicyEntities(ctx, client, &details)
