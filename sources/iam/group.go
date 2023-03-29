@@ -32,8 +32,8 @@ func groupListFunc(ctx context.Context, client *iam.Client, scope string) ([]*ty
 
 	zones := make([]*types.Group, len(out.Groups))
 
-	for i, zone := range out.Groups {
-		zones[i] = &zone
+	for i := range out.Groups {
+		zones[i] = &out.Groups[i]
 	}
 
 	return zones, nil
@@ -61,7 +61,6 @@ func NewGroupSource(config aws.Config, accountID string, region string) *sources
 		ItemType:   "iam-group",
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
-		Region:     region,
 		GetFunc:    groupGetFunc,
 		ListFunc:   groupListFunc,
 		ItemMapper: groupItemMapper,

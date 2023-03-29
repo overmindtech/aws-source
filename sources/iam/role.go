@@ -69,12 +69,12 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 			return nil, err
 		}
 
-		for _, role := range out.Roles {
+		for i := range out.Roles {
 			details := RoleDetails{
-				Role: &role,
+				Role: &out.Roles[i],
 			}
 
-			details.Policies, err = getRolePolicies(ctx, client, *role.RoleName)
+			details.Policies, err = getRolePolicies(ctx, client, *out.Roles[i].RoleName)
 
 			if err != nil {
 				return nil, err
@@ -118,7 +118,6 @@ func NewRoleSource(config aws.Config, accountID string, region string) *sources.
 		ItemType:   "iam-role",
 		Client:     iam.NewFromConfig(config),
 		AccountID:  accountID,
-		Region:     region,
 		GetFunc:    roleGetFunc,
 		ListFunc:   roleListFunc,
 		ItemMapper: roleItemMapper,

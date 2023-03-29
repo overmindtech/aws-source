@@ -84,12 +84,12 @@ func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserD
 
 	userDetails := make([]*UserDetails, len(users))
 
-	for i, user := range users {
+	for i := range users {
 		details := UserDetails{
-			User: &user,
+			User: &users[i],
 		}
 
-		groups, err := GetUserGroups(ctx, client, user.UserName)
+		groups, err := GetUserGroups(ctx, client, users[i].UserName)
 
 		if err == nil {
 			details.UserGroups = groups

@@ -173,7 +173,15 @@ func (e E2ETest) Run(t *testing.T) {
 				t.Error(err)
 			}
 
+			allNames := make(map[string]bool)
+
 			for _, item := range items {
+				if _, exists := allNames[item.UniqueAttributeValue()]; exists {
+					t.Errorf("duplicate item found: %v", item.UniqueAttributeValue())
+				} else {
+					allNames[item.UniqueAttributeValue()] = true
+				}
+
 				if err = item.Validate(); err != nil {
 					t.Error(err)
 				}

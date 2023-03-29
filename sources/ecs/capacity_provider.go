@@ -18,18 +18,14 @@ var CapacityProviderIncludeFields = []types.CapacityProviderField{
 func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
-	var attributes *sdp.ItemAttributes
-	var err error
-	var item sdp.Item
-
 	for _, provider := range output.CapacityProviders {
-		attributes, err = sources.ToAttributesCase(provider)
+		attributes, err := sources.ToAttributesCase(provider)
 
 		if err != nil {
 			return nil, err
 		}
 
-		item = sdp.Item{
+		item := sdp.Item{
 			Type:            "ecs-capacity-provider",
 			UniqueAttribute: "name",
 			Attributes:      attributes,
