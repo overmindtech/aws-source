@@ -7,16 +7,16 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.7
 	github.com/aws/aws-sdk-go-v2/config v1.18.19
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.18
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.4
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.2
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.91.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.92.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.24.2
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.8
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.6
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.7
 	github.com/aws/aws-sdk-go-v2/service/iam v1.19.8
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.30.2
-	github.com/aws/aws-sdk-go-v2/service/rds v1.40.7
+	github.com/aws/aws-sdk-go-v2/service/rds v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.5
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.31.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.7

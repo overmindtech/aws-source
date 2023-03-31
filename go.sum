@@ -80,6 +80,8 @@ github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.3 h1:b5CCDFx12sCCz76gne19
 github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.3/go.mod h1:CCDCddrqy4DHe+h87aMQXCG99Hq5CbHN51iR90NtZM4=
 github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.4 h1:84le6m/jW8rBihdDb/9XDF6kRE4kj5OT6Fj3Wnjv+ak=
 github.com/aws/aws-sdk-go-v2/service/autoscaling v1.27.4/go.mod h1:j/DGDHYd2nuiBTS4YwOpmBENFtMLE87MEYJF6bqDSE4=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.0 h1:Svr1SeaJ+7o3RBBYhVQE9Fh4TfMlNmHDVDAMJbpxPUU=
+github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.0/go.mod h1:j/DGDHYd2nuiBTS4YwOpmBENFtMLE87MEYJF6bqDSE4=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.1 h1:kxoQbTou8MwI9GMMK17Sb0qJGz94LPs/Tza+USLlSeI=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.1/go.mod h1:XS1iAb6oRaCu7jPG/ytjQeR7LtH7GuX4QOrcQbVWUdo=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.2 h1:R9WCl8MVx38mKlPjkcDiwrM+yqPqcdtk6x7j7pUZj2o=
@@ -88,6 +90,8 @@ github.com/aws/aws-sdk-go-v2/service/ec2 v1.90.0 h1:oRl2nzkuU/qMPvudU3qQ+GUAMV5P
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.90.0/go.mod h1:zDr1uSSLVYc6KqXvrmqYkeqnfbmOOrbVloz4Eqsc83k=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.91.0 h1:b4Qme29Ml9nl3QBxWobytF5UxlfmYUJI7+u1FTqjehs=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.91.0/go.mod h1:ZZLfkd1Y7fjXujjMg1CFqNmaTl314eCbShlHQO7VTWo=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.92.0 h1:QeuHIHls8g2gG7WmFSv+Hgce6/o/HTE5UZJ+ymlMQNI=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.92.0/go.mod h1:ZZLfkd1Y7fjXujjMg1CFqNmaTl314eCbShlHQO7VTWo=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.24.1 h1:1KstveT+qTo9wCxWS033UxwpZhY8/DPajsvxL4MJzE4=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.24.1/go.mod h1:JZDnHUNtmhnwhS8RA2mMejUpJDDDEabmyagCHHj0wMI=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.24.2 h1:W94oEzOVUhefAqBtt33gOnsIEB0qFwK4akzhfD/eReI=
@@ -134,6 +138,8 @@ github.com/aws/aws-sdk-go-v2/service/rds v1.40.6 h1:6+TwyX5iCbAZE5KwzCKDKowUnFSY
 github.com/aws/aws-sdk-go-v2/service/rds v1.40.6/go.mod h1:AJLw3mrKo1Yj6HWcFUgqNVQGR3KgCmMsKXyI2AxBVKI=
 github.com/aws/aws-sdk-go-v2/service/rds v1.40.7 h1:sM5284kIpXLvkHUgR3FBfWMf7HJ8KZjSG1ST0hTqhxk=
 github.com/aws/aws-sdk-go-v2/service/rds v1.40.7/go.mod h1:es+Xl+GSYsY3ESUW8H6zwieX0ePwycTheaC91KgrpJI=
+github.com/aws/aws-sdk-go-v2/service/rds v1.42.0 h1:/FdXrQQyMCi1UwkrkrTRVv+PCj3cYC8cKn30YuSIVso=
+github.com/aws/aws-sdk-go-v2/service/rds v1.42.0/go.mod h1:es+Xl+GSYsY3ESUW8H6zwieX0ePwycTheaC91KgrpJI=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.27.4 h1:gG5VWXug3l6YyxadyjUt8KMXp9pOJ0/126i1ZB1kgVc=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.27.4/go.mod h1:em9ocPRWGal4zQYR4Xu6FJXytenpPwBPbGE0NV2zzDc=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.27.5 h1:m223LdVWU3SPDQ4dk1qjupdcr8j5iGO2xoVbxbpKz3g=
