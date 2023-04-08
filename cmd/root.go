@@ -219,6 +219,7 @@ var rootCmd = &cobra.Command{
 				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),

@@ -51,6 +51,19 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 		Attributes:      attributes,
 	}
 
+	if containerInstance.HealthStatus != nil {
+		switch containerInstance.HealthStatus.OverallStatus {
+		case types.InstanceHealthCheckStateOk:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.InstanceHealthCheckStateImpaired:
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		case types.InstanceHealthCheckStateInsufficientData:
+			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+		case types.InstanceHealthCheckStateInitializing:
+			item.Health = sdp.Health_HEALTH_WARNING.Enum()
+		}
+	}
+
 	if containerInstance.Ec2InstanceId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-instance",

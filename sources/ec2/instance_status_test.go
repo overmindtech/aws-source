@@ -65,7 +65,7 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 							Status: types.StatusTypePassed,
 						},
 					},
-					Status: types.SummaryStatusOk,
+					Status: types.SummaryStatusImpaired,
 				},
 			},
 		},

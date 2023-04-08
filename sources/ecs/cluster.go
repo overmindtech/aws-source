@@ -82,6 +82,22 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		},
 	}
 
+	if cluster.Status != nil {
+		switch *cluster.Status {
+		case "ACTIVE":
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case "PROVISIONING":
+			// TODO: What should this be? Another case for pending?
+		case "DEPROVISIONING":
+			item.Health = sdp.Health_HEALTH_WARNING.Enum()
+		case "FAILED":
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		case "INACTIVE":
+			// This means it's a deleted cluster
+			item.Health = nil
+		}
+	}
+
 	if cluster.Configuration != nil {
 		if cluster.Configuration.ExecuteCommandConfiguration != nil {
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {

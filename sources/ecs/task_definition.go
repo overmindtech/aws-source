@@ -51,6 +51,15 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		Scope:           scope,
 	}
 
+	switch td.Status {
+	case types.TaskDefinitionStatusActive:
+		item.Health = sdp.Health_HEALTH_OK.Enum()
+	case types.TaskDefinitionStatusInactive:
+		item.Health = nil
+	case types.TaskDefinitionStatusDeleteInProgress:
+		item.Health = sdp.Health_HEALTH_WARNING.Enum()
+	}
+
 	var a *sources.ARN
 	var link *sdp.Query
 
