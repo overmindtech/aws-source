@@ -153,7 +153,6 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}
 
 	bucket := Bucket{
-		// TODO: Where do we get this from??
 		Bucket: types.Bucket{
 			Name: bucketName,
 		},
