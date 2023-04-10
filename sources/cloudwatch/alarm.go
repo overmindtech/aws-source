@@ -34,11 +34,33 @@ func FromQueryString(query string) (*cloudwatch.DescribeAlarmsForMetricInput, er
 	return input, nil
 }
 
+type Alarm struct {
+	Metric    *types.MetricAlarm
+	Composite *types.CompositeAlarm
+}
+
 func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, output *cloudwatch.DescribeAlarmsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
-	for _, alarm := range output.MetricAlarms {
-		attrs, err := sources.ToAttributesCase(alarm)
+	allAlarms := make([]Alarm, 0)
+
+	for i := range output.MetricAlarms {
+		allAlarms = append(allAlarms, Alarm{Metric: &output.MetricAlarms[i]})
+	}
+	for i := range output.CompositeAlarms {
+		allAlarms = append(allAlarms, Alarm{Composite: &output.CompositeAlarms[i]})
+	}
+
+	for _, alarm := range allAlarms {
+		var attrs *sdp.ItemAttributes
+		var err error
+
+		if alarm.Metric != nil {
+			attrs, err = sources.ToAttributesCase(alarm.Metric)
+		}
+		if alarm.Composite != nil {
+			attrs, err = sources.ToAttributesCase(alarm.Composite)
+		}
 
 		if err != nil {
 			return nil, err
@@ -51,10 +73,18 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			Attributes:      attrs,
 		}
 
+		// Combine all actions so that we can link the targeted item
 		allActions := make([]string, 0)
-		allActions = append(allActions, alarm.OKActions...)
-		allActions = append(allActions, alarm.AlarmActions...)
-		allActions = append(allActions, alarm.InsufficientDataActions...)
+		if alarm.Metric != nil {
+			allActions = append(allActions, alarm.Metric.OKActions...)
+			allActions = append(allActions, alarm.Metric.AlarmActions...)
+			allActions = append(allActions, alarm.Metric.InsufficientDataActions...)
+		}
+		if alarm.Composite != nil {
+			allActions = append(allActions, alarm.Composite.OKActions...)
+			allActions = append(allActions, alarm.Composite.AlarmActions...)
+			allActions = append(allActions, alarm.Composite.InsufficientDataActions...)
+		}
 
 		for _, action := range allActions {
 			if q, err := actionToLink(action); err == nil {
@@ -62,7 +92,16 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			}
 		}
 
-		switch alarm.StateValue {
+		// Calculate state and convert this to health
+		var stateValue types.StateValue
+		if alarm.Metric != nil {
+			stateValue = alarm.Metric.StateValue
+		}
+		if alarm.Composite != nil {
+			stateValue = alarm.Composite.StateValue
+		}
+
+		switch stateValue {
 		case types.StateValueOk:
 			item.Health = sdp.Health_HEALTH_OK.Enum()
 		case types.StateValueAlarm:
@@ -71,36 +110,9 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
 		}
 
-		items = append(items, &item)
-	}
-
-	for _, alarm := range output.CompositeAlarms {
-		attrs, err := sources.ToAttributesCase(alarm)
-
-		if err != nil {
-			return nil, err
-		}
-
-		item := sdp.Item{
-			Type:            "cloudwatch-alarm",
-			UniqueAttribute: "alarmName",
-			Scope:           scope,
-			Attributes:      attrs,
-		}
-
-		allActions := make([]string, 0)
-		allActions = append(allActions, alarm.OKActions...)
-		allActions = append(allActions, alarm.AlarmActions...)
-		allActions = append(allActions, alarm.InsufficientDataActions...)
-
-		for _, action := range allActions {
-			if q, err := actionToLink(action); err == nil {
-				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
-			}
-		}
-
-		if alarm.ActionsSuppressor != nil {
-			if arn, err := sources.ParseARN(*alarm.ActionsSuppressor); err == nil {
+		// Link to the suppressor alarm
+		if alarm.Composite != nil && alarm.Composite.ActionsSuppressor != nil {
+			if arn, err := sources.ParseARN(*alarm.Composite.ActionsSuppressor); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "cloudwatch-alarm",
 					Method: sdp.QueryMethod_GET,
@@ -110,13 +122,13 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			}
 		}
 
-		switch alarm.StateValue {
-		case types.StateValueOk:
-			item.Health = sdp.Health_HEALTH_OK.Enum()
-		case types.StateValueAlarm:
-			item.Health = sdp.Health_HEALTH_ERROR.Enum()
-		case types.StateValueInsufficientData:
-			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+		if alarm.Metric != nil && alarm.Metric.Namespace != nil {
+			// Check for links based on the metric that is being monitored
+			q, err := SuggestedQuery(*alarm.Metric.Namespace, scope, alarm.Metric.Dimensions)
+
+			if err == nil {
+				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
+			}
 		}
 
 		items = append(items, &item)

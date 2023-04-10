@@ -87,7 +87,7 @@ func TestAlarmOutputMapper(t *testing.T) {
 	}
 
 	if len(items) != 2 {
-		t.Errorf("Expected 2 items, got %d", len(items))
+		t.Fatalf("Expected 2 items, got %d", len(items))
 	}
 
 	item := items[1]
@@ -102,6 +102,23 @@ func TestAlarmOutputMapper(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d",
 			ExpectedScope:  "052392120703.eu-west-2",
+		},
+	}
+
+	tests.Execute(t, item)
+
+	item = items[0]
+
+	if err = item.Validate(); err != nil {
+		t.Error(err)
+	}
+
+	tests = sources.ItemRequestTests{
+		{
+			ExpectedType:   "dynamodb-table",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "dylan-tfstate",
+			ExpectedScope:  "foo",
 		},
 	}
 
