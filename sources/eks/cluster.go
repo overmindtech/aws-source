@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
+	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -56,6 +57,21 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 				Scope:  scope,
 			},
 		},
+	}
+
+	switch cluster.Status {
+	case types.ClusterStatusCreating:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	case types.ClusterStatusActive:
+		item.Health = sdp.Health_HEALTH_OK.Enum()
+	case types.ClusterStatusDeleting:
+		item.Health = sdp.Health_HEALTH_WARNING.Enum()
+	case types.ClusterStatusFailed:
+		item.Health = sdp.Health_HEALTH_ERROR.Enum()
+	case types.ClusterStatusUpdating:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	case types.ClusterStatusPending:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
 	}
 
 	var a *sources.ARN

@@ -55,6 +55,17 @@ func instanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput
 			Scope:           scope,
 		}
 
+		if is.State != nil {
+			switch *is.State {
+			case "InService":
+				item.Health = sdp.Health_HEALTH_OK.Enum()
+			case "OutOfService":
+				item.Health = sdp.Health_HEALTH_ERROR.Enum()
+			case "Unknown":
+				item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+			}
+		}
+
 		if is.InstanceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",

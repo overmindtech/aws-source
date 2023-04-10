@@ -61,8 +61,7 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 		case types.SummaryStatusNotApplicable:
 			item.Health = nil
 		case types.SummaryStatusInitializing:
-			// TODO: Decide if I need this
-			item.Health = nil
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		}
 
 		if instanceStatus.AvailabilityZone != nil {

@@ -89,6 +89,23 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			Scope:           scope,
 		}
 
+		if desc.TargetHealth != nil {
+			switch desc.TargetHealth.State {
+			case types.TargetHealthStateEnumInitial:
+				item.Health = sdp.Health_HEALTH_PENDING.Enum()
+			case types.TargetHealthStateEnumHealthy:
+				item.Health = sdp.Health_HEALTH_OK.Enum()
+			case types.TargetHealthStateEnumUnhealthy:
+				item.Health = sdp.Health_HEALTH_ERROR.Enum()
+			case types.TargetHealthStateEnumUnused:
+				item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+			case types.TargetHealthStateEnumDraining:
+				item.Health = sdp.Health_HEALTH_PENDING.Enum()
+			case types.TargetHealthStateEnumUnavailable:
+				item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+			}
+		}
+
 		// Check that we have an input and not a nil pointer
 		if input == nil {
 			return nil, fmt.Errorf("input cannot be nil")

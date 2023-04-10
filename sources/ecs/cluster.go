@@ -87,7 +87,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		case "ACTIVE":
 			item.Health = sdp.Health_HEALTH_OK.Enum()
 		case "PROVISIONING":
-			// TODO: What should this be? Another case for pending?
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		case "DEPROVISIONING":
 			item.Health = sdp.Health_HEALTH_WARNING.Enum()
 		case "FAILED":

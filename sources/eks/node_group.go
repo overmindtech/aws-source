@@ -43,6 +43,18 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		Scope:           scope,
 	}
 
+	if ng.Health != nil {
+		if len(ng.Health.Issues) > 0 {
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		} else {
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		}
+
+		// NOTE: It would be good if we could link to the resource if there is a
+		// health issue, but I can't find any examples of the format that the
+		// `ResourceIds` array is in. If someone can find one, please add it here.
+	}
+
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
