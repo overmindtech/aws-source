@@ -67,6 +67,7 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 
 		for _, event := range volume.Events {
 			if event.InstanceId != nil {
+				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
@@ -81,6 +82,14 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-volume-status
+// +overmind:descriptiveType EC2 Volume Status
+// +overmind:get Get a volume status by volume ID
+// +overmind:list List all volume statuses
+// +overmind:search Search for volume statuses by ARN
+// +overmind:group AWS
 
 func NewVolumeStatusSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{

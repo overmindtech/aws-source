@@ -96,6 +96,7 @@ func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error
 	})
 
 	if err == nil {
+		// +overmind:link cloudwatch-alarm
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "cloudwatch-alarm",
 			Query:  query,
@@ -122,6 +123,14 @@ func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type route53-health-check
+// +overmind:descriptiveType Route53 Health Check
+// +overmind:get Get health check by ID
+// +overmind:list List all health checks
+// +overmind:search Search for health checks by ARN
+// +overmind:group AWS
 
 func NewHealthCheckSource(config aws.Config, accountID string, region string) *sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options]{
