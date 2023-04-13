@@ -293,7 +293,7 @@ func TestServiceGetFunc(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ecs-security-group",
+			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg2",
 			ExpectedScope:  "foo",

@@ -1,0 +1,11 @@
+{
+	"type": "route53-health-check",
+	"descriptiveType": "Route53 Health Check",
+	"getDescription": "Get health check by ID",
+	"listDescription": "List all health checks",
+	"searchDescription": "Search for health checks by ARN",
+	"group": "AWS",
+	"links": [
+		"cloudwatch-alarm"
+	]
+}
