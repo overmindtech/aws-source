@@ -10,6 +10,69 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+func statusToHealth(status string) *sdp.Health {
+	switch status {
+	case "Available":
+		return sdp.Health_HEALTH_OK.Enum()
+	case "Backing-up":
+		return sdp.Health_HEALTH_OK.Enum()
+	case "Configuring-enhanced-monitoring":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Configuring-iam-database-auth":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Configuring-log-exports":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Converting-to-vpc":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Creating":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Deleting":
+		return sdp.Health_HEALTH_WARNING.Enum()
+	case "Failed":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Inaccessible-encryption-credentials":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Inaccessible-encryption-credentials-recoverable":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Incompatible-network":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Incompatible-option-group":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Incompatible-parameters":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Incompatible-restore":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Maintenance":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Modifying":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Moving-to-vpc":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Rebooting":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Resetting-master-credentials":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Renaming":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Restore-error":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Starting":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Stopped":
+		return nil
+	case "Stopping":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	case "Storage-full":
+		return sdp.Health_HEALTH_ERROR.Enum()
+	case "Storage-optimization":
+		return sdp.Health_HEALTH_OK.Enum()
+	case "Upgrading":
+		return sdp.Health_HEALTH_PENDING.Enum()
+	}
+
+	return nil
+}
+
 func dBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
@@ -35,6 +98,10 @@ func dBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, outpu
 			UniqueAttribute: "dBInstanceIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
+		}
+
+		if instance.DBInstanceStatus != nil {
+			item.Health = statusToHealth(*instance.DBInstanceStatus)
 		}
 
 		var a *sources.ARN

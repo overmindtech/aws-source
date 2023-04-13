@@ -133,6 +133,17 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	var a *sources.ARN
 
 	if function.Configuration != nil {
+		switch function.Configuration.State {
+		case types.StatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.StateActive:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.StateInactive:
+			item.Health = nil
+		case types.StateFailed:
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		}
+
 		if function.Configuration.Role != nil {
 			if a, err = sources.ParseARN(*function.Configuration.Role); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{

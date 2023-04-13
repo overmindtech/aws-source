@@ -62,6 +62,17 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		Attributes:      attributes,
 	}
 
+	if service.Status != nil {
+		switch *service.Status {
+		case "ACTIVE":
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case "DRAINING":
+			item.Health = sdp.Health_HEALTH_WARNING.Enum()
+		case "INACTIVE":
+			item.Health = nil
+		}
+	}
+
 	var a *sources.ARN
 
 	if service.ClusterArn != nil {

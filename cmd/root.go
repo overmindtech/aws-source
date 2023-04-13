@@ -21,6 +21,7 @@ import (
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources/autoscaling"
+	"github.com/overmindtech/aws-source/sources/cloudwatch"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
@@ -219,6 +220,7 @@ var rootCmd = &cobra.Command{
 				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
@@ -232,6 +234,10 @@ var rootCmd = &cobra.Command{
 				// Route 53
 				route53.NewHostedZoneSource(cfg, *callerID.Account, region),
 				route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
+				route53.NewHealthCheckSource(cfg, *callerID.Account, region),
+
+				// Cloudwatch
+				cloudwatch.NewAlarmSource(cfg, *callerID.Account),
 
 				// IAM
 				iam.NewGroupSource(cfg, *callerID.Account, region),

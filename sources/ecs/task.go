@@ -58,6 +58,15 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		Scope:           scope,
 	}
 
+	switch task.HealthStatus {
+	case types.HealthStatusHealthy:
+		item.Health = sdp.Health_HEALTH_OK.Enum()
+	case types.HealthStatusUnhealthy:
+		item.Health = sdp.Health_HEALTH_ERROR.Enum()
+	case types.HealthStatusUnknown:
+		item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+	}
+
 	for _, attachment := range task.Attachments {
 		if attachment.Type != nil {
 			if *attachment.Type == "ElasticNetworkInterface" {

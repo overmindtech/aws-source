@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -48,6 +49,19 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 					Scope:  scope,
 				},
 			},
+		}
+
+		switch instanceStatus.SystemStatus.Status {
+		case types.SummaryStatusOk:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.SummaryStatusImpaired:
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		case types.SummaryStatusInsufficientData:
+			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+		case types.SummaryStatusNotApplicable:
+			item.Health = nil
+		case types.SummaryStatusInitializing:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		}
 
 		if instanceStatus.AvailabilityZone != nil {
