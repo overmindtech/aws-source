@@ -1,0 +1,22 @@
+{
+	"type": "ec2-route-table",
+	"descriptiveType": "Route Table",
+	"getDescription": "Get a route table by ID",
+	"listDescription": "List all route tables",
+	"searchDescription": "Search route tables by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-carrier-gateway",
+		"ec2-egress-only-internet-gateway",
+		"ec2-instance",
+		"ec2-internet-gateway",
+		"ec2-local-gateway",
+		"ec2-nat-gateway",
+		"ec2-network-interface",
+		"ec2-subnet",
+		"ec2-transit-gateway",
+		"ec2-vpc",
+		"ec2-vpc-endpoint",
+		"ec2-vpc-peering-connection"
+	]
+}

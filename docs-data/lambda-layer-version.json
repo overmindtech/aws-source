@@ -1,0 +1,11 @@
+{
+	"type": "lambda-layer-version",
+	"descriptiveType": "Lambda Layer Version",
+	"getDescription": "Get a layer version by full name ({layerName}:{versionNumber})",
+	"searchDescription": "Search for layer versions by ARN",
+	"group": "AWS",
+	"links": [
+		"signer-signing-job",
+		"signer-signing-profile"
+	]
+}

@@ -47,6 +47,7 @@ func internetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysIn
 		// VPCs
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
+				// +overmind:link ec2-vpc
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc",
 					Method: sdp.QueryMethod_GET,
@@ -61,6 +62,14 @@ func internetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysIn
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-internet-gateway
+// +overmind:descriptiveType Internet Gateway
+// +overmind:get Get an internet gateway by ID
+// +overmind:list List all internet gateways
+// +overmind:search Search internet gateways by ARN
+// +overmind:group AWS
 
 func NewInternetGatewaySource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

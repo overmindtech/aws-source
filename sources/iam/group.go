@@ -56,6 +56,14 @@ func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type iam-group
+// +overmind:descriptiveType IAM Group
+// +overmind:get Get a group by name
+// +overmind:list List all IAM groups
+// +overmind:search Search for a group by ARN
+// +overmind:group AWS
+
 func NewGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:   "iam-group",

@@ -1,0 +1,9 @@
+{
+	"type": "ec2-image",
+	"descriptiveType": "Amazon Machine Image (AMI)",
+	"getDescription": "Get an AMI by ID",
+	"listDescription": "List all AMIs",
+	"searchDescription": "Search AMIs by ARN",
+	"group": "AWS",
+	"links": []
+}

@@ -1,0 +1,26 @@
+{
+	"type": "rds-db-instance",
+	"descriptiveType": "RDS Instance",
+	"getDescription": "Get an instance by ID",
+	"listDescription": "List all instances",
+	"searchDescription": "Search for instances by ARN",
+	"group": "AWS",
+	"links": [
+		"backup-recovery-point",
+		"dns",
+		"ec2-availability-zone",
+		"ec2-security-group",
+		"iam-instance-profile",
+		"iam-role",
+		"kinesis-stream",
+		"kms-key",
+		"logs-log-stream",
+		"networksocket",
+		"rds-db-cluster",
+		"rds-db-instance-automated-backup",
+		"rds-db-parameter-group",
+		"rds-db-subnet-group",
+		"route53-hosted-zone",
+		"secretsmanager-secret"
+	]
+}

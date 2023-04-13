@@ -1,0 +1,17 @@
+{
+	"type": "autoscaling-auto-scaling-group",
+	"descriptiveType": "Autoscaling Group",
+	"getDescription": "Get an Autoscaling Group by name",
+	"listDescription": "List Autoscaling Groups",
+	"searchDescription": "Search for Autoscaling Groups by ARN",
+	"group": "AWS",
+	"links": [
+		"autoscaling-launch-configuration",
+		"ec2-availability-zone",
+		"ec2-instance",
+		"ec2-launch-template",
+		"ec2-placement-group",
+		"elbv2-target-group",
+		"iam-role"
+	]
+}

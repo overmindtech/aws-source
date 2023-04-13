@@ -50,6 +50,7 @@ func availabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZones
 
 		// Link to region
 		if az.RegionName != nil {
+			// +overmind:link ec2-region
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-region",
 				Method: sdp.QueryMethod_GET,
@@ -63,6 +64,13 @@ func availabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZones
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-availability-zone
+// +overmind:descriptiveType Availability Zone
+// +overmind:get Get an Availability Zone by Name
+// +overmind:list List all Availability Zones
+// +overmind:group AWS
 
 // NewAvailabilityZoneSource Creates a new source for aws-availabilityzone resources
 func NewAvailabilityZoneSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options] {

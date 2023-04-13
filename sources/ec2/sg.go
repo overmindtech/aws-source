@@ -47,6 +47,7 @@ func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 
 		// VPC
 		if securityGroup.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -63,6 +64,14 @@ func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-security-group
+// +overmind:descriptiveType Security Group
+// +overmind:get Get a security group by ID
+// +overmind:list List all security groups
+// +overmind:search Search for security groups by ARN
+// +overmind:group AWS
 
 func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{

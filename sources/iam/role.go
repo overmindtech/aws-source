@@ -128,6 +128,7 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	}
 
 	for _, policy := range awsItem.Policies {
+		// +overmind:link iam-role-policy
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-role-policy",
 			Method: sdp.QueryMethod_GET,
@@ -138,6 +139,14 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type iam-role
+// +overmind:descriptiveType IAM Role
+// +overmind:get Get an IAM role by name
+// +overmind:list List all IAM roles
+// +overmind:search Search for IAM roles by ARN
+// +overmind:group AWS
 
 func NewRoleSource(config aws.Config, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{

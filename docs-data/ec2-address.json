@@ -1,0 +1,13 @@
+{
+	"type": "ec2-address",
+	"descriptiveType": "EC2 Address",
+	"getDescription": "Get an EC2 address by Public IP",
+	"listDescription": "List EC2 addresses",
+	"searchDescription": "Search for EC2 addresses by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-instance",
+		"ec2-network-interface",
+		"ip"
+	]
+}

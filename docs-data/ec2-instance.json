@@ -1,0 +1,21 @@
+{
+	"type": "ec2-instance",
+	"descriptiveType": "EC2 Instance",
+	"getDescription": "Get an EC2 instance by ID",
+	"listDescription": "List all EC2 instances",
+	"searchDescription": "Search EC2 instances by ARN",
+	"group": "AWS",
+	"links": [
+		"dns",
+		"ec2-availability-zone",
+		"ec2-image",
+		"ec2-instance-status",
+		"ec2-key-pair",
+		"ec2-placement-group",
+		"ec2-security-group",
+		"ec2-subnet",
+		"ec2-volume",
+		"ec2-vpc",
+		"ip"
+	]
+}

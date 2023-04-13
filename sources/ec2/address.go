@@ -57,6 +57,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.InstanceId != nil {
+			// +overmind:link ec2-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.QueryMethod_GET,
@@ -66,6 +67,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.CarrierIp != nil {
+			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
@@ -75,6 +77,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.CustomerOwnedIp != nil {
+			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
@@ -84,6 +87,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.NetworkInterfaceId != nil {
+			// +overmind:link ec2-network-interface
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-network-interface",
 				Method: sdp.QueryMethod_GET,
@@ -93,6 +97,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 		}
 
 		if address.PrivateIpAddress != nil {
+			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
@@ -106,6 +111,14 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-address
+// +overmind:descriptiveType EC2 Address
+// +overmind:get Get an EC2 address by Public IP
+// +overmind:list List EC2 addresses
+// +overmind:search Search for EC2 addresses by ARN
+// +overmind:group AWS
 
 // NewAddressSource Creates a new source for aws-Address resources
 func NewAddressSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {

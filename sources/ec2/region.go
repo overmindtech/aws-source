@@ -50,6 +50,13 @@ func regionOutputMapper(scope string, _ *ec2.DescribeRegionsInput, output *ec2.D
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-region
+// +overmind:descriptiveType Region
+// +overmind:get Get a region by name
+// +overmind:list List all regions
+// +overmind:group AWS
+
 func NewRegionSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRegionsInput, *ec2.DescribeRegionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,

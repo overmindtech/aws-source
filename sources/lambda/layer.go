@@ -46,6 +46,7 @@ func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, er
 	}
 
 	if awsItem.LatestMatchingVersion != nil {
+		// +overmind:link lambda-layer-version
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "lambda-layer-version",
 			Method: sdp.QueryMethod_GET,
@@ -56,6 +57,12 @@ func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, er
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type lambda-layer
+// +overmind:descriptiveType Lambda Layer
+// +overmind:list List all lambda layers
+// +overmind:group AWS
 
 func NewLayerSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options] {
 	return &sources.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options]{

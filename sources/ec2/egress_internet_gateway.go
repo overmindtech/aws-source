@@ -46,6 +46,7 @@ func egressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOn
 
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
+				// +overmind:link ec2-vpc
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-vpc",
 					Method: sdp.QueryMethod_GET,
@@ -60,6 +61,14 @@ func egressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOn
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-egress-only-internet-gateway
+// +overmind:descriptiveType Egress Only Internet Gateway
+// +overmind:get Get an egress only internet gateway by ID
+// +overmind:list List all egress only internet gateways
+// +overmind:search Search egress only internet gateways by ARN
+// +overmind:group AWS
 
 func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

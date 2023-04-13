@@ -1,0 +1,13 @@
+{
+	"type": "elbv2-target-health",
+	"descriptiveType": "ELB Target Health",
+	"getDescription": "Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})",
+	"searchDescription": "Search for target health by target group ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-instance",
+		"elbv2-load-balancer",
+		"ip",
+		"lambda-function"
+	]
+}

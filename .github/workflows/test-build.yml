@@ -30,6 +30,11 @@ jobs:
       - name: Vet
         run: go vet
 
+      - name: Validate Docs Data
+        run: |
+          go generate ./...
+          git diff --exit-code
+
       - name: Run tests
         run: go test ./...
         env:

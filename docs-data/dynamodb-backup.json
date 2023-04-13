@@ -1,0 +1,10 @@
+{
+	"type": "dynamodb-backup",
+	"descriptiveType": "DynamoDB Backup",
+	"listDescription": "List all DynamoDB backups",
+	"searchDescription": "Search for a DynamoDB backup by table name",
+	"group": "AWS",
+	"links": [
+		"dynamodb-table"
+	]
+}

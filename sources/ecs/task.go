@@ -71,6 +71,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		if attachment.Type != nil {
 			if *attachment.Type == "ElasticNetworkInterface" {
 				if attachment.Id != nil {
+					// +overmind:link ec2-network-interface
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-network-interface",
 						Method: sdp.QueryMethod_GET,
@@ -84,6 +85,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.ClusterArn != nil {
 		if a, err = sources.ParseARN(*task.ClusterArn); err == nil {
+			// +overmind:link ecs-cluster
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
 				Method: sdp.QueryMethod_SEARCH,
@@ -95,6 +97,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.ContainerInstanceArn != nil {
 		if a, err = sources.ParseARN(*task.ContainerInstanceArn); err == nil {
+			// +overmind:link ecs-container-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-container-instance",
 				Method: sdp.QueryMethod_GET,
@@ -107,6 +110,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	for _, container := range task.Containers {
 		for _, ni := range container.NetworkInterfaces {
 			if ni.Ipv6Address != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -116,6 +120,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			}
 
 			if ni.PrivateIpv4Address != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -128,6 +133,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	if task.TaskDefinitionArn != nil {
 		if a, err = sources.ParseARN(*task.TaskDefinitionArn); err == nil {
+			// +overmind:link ecs-task-definition
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
 				Method: sdp.QueryMethod_SEARCH,
@@ -138,6 +144,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	}
 
 	if task.AvailabilityZone != nil {
+		// +overmind:link ec2-availability-zone
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-availability-zone",
 			Method: sdp.QueryMethod_GET,
@@ -190,6 +197,14 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 
 	return inputs, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ecs-task
+// +overmind:descriptiveType ECS Task
+// +overmind:get Get an ECS task by ID
+// +overmind:list List all ECS tasks
+// +overmind:search Search for ECS tasks by cluster
+// +overmind:group AWS
 
 func NewTaskSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{

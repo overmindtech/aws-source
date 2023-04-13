@@ -35,6 +35,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			if asg.MixedInstancesPolicy.LaunchTemplate != nil {
 				if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification != nil {
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
+						// +overmind:link ec2-launch-template
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ec2-launch-template",
 							Method: sdp.QueryMethod_GET,
@@ -51,6 +52,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 
 		for _, tgARN := range asg.TargetGroupARNs {
 			if a, err = sources.ParseARN(tgARN); err == nil {
+				// +overmind:link elbv2-target-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.QueryMethod_SEARCH,
@@ -61,6 +63,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		}
 
 		for _, az := range asg.AvailabilityZones {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -71,6 +74,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
+				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
@@ -81,6 +85,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 
 			if instance.LaunchTemplate != nil {
 				if instance.LaunchTemplate.LaunchTemplateId != nil {
+					// +overmind:link ec2-launch-template
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-launch-template",
 						Method: sdp.QueryMethod_GET,
@@ -93,6 +98,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 
 		if asg.ServiceLinkedRoleARN != nil {
 			if a, err = sources.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
+				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
@@ -103,6 +109,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		}
 
 		if asg.LaunchConfigurationName != nil {
+			// +overmind:link autoscaling-launch-configuration
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "autoscaling-launch-configuration",
 				Method: sdp.QueryMethod_GET,
@@ -113,6 +120,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 
 		if asg.LaunchTemplate != nil {
 			if asg.LaunchTemplate.LaunchTemplateId != nil {
+				// +overmind:link ec2-launch-template
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-launch-template",
 					Method: sdp.QueryMethod_GET,
@@ -123,6 +131,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		}
 
 		if asg.PlacementGroup != nil {
+			// +overmind:link ec2-placement-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-placement-group",
 				Method: sdp.QueryMethod_GET,
@@ -137,6 +146,14 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 	return items, nil
 }
 
+// +overmind:type autoscaling-auto-scaling-group
+// +overmind:descriptiveType Autoscaling Group
+// +overmind:get Get an Autoscaling Group by name
+// +overmind:list List Autoscaling Groups
+// +overmind:search Search for Autoscaling Groups by ARN
+// +overmind:group AWS
+//
+//go:generate docgen ../../docs-data
 func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *ec2.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:  "autoscaling-auto-scaling-group",

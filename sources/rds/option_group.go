@@ -32,6 +32,14 @@ func optionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, out
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type rds-option-group
+// +overmind:descriptiveType RDS Option Group
+// +overmind:get Get an option group by name
+// +overmind:list List all RDS option groups
+// +overmind:search Search for an option group by ARN
+// +overmind:group AWS
+
 func NewOptionGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options]{
 		ItemType:  "rds-option-group",

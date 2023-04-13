@@ -1,0 +1,11 @@
+{
+	"type": "ec2-network-interface-permission",
+	"descriptiveType": "Network Interface Permission",
+	"getDescription": "Get a network interface permission by ID",
+	"listDescription": "List all network interface permissions",
+	"searchDescription": "Search network interface permissions by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-network-interface"
+	]
+}

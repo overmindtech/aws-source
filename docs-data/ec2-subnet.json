@@ -1,0 +1,12 @@
+{
+	"type": "ec2-subnet",
+	"descriptiveType": "EC2 Subnet",
+	"getDescription": "Get a subnet by ID",
+	"listDescription": "List all subnets",
+	"searchDescription": "Search for subnets by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-availability-zone",
+		"ec2-vpc"
+	]
+}

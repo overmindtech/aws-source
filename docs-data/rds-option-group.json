@@ -1,0 +1,9 @@
+{
+	"type": "rds-option-group",
+	"descriptiveType": "RDS Option Group",
+	"getDescription": "Get an option group by name",
+	"listDescription": "List all RDS option groups",
+	"searchDescription": "Search for an option group by ARN",
+	"group": "AWS",
+	"links": []
+}

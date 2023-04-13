@@ -1,0 +1,21 @@
+{
+	"type": "elbv2-load-balancer",
+	"descriptiveType": "Elastic Load Balancer",
+	"getDescription": "Get an ELB by name",
+	"listDescription": "List all ELBs",
+	"searchDescription": "Search for ELBs by ARN",
+	"group": "AWS",
+	"links": [
+		"dns",
+		"ec2-address",
+		"ec2-availability-zone",
+		"ec2-coip-pool",
+		"ec2-security-group",
+		"ec2-subnet",
+		"ec2-vpc",
+		"elbv2-listener",
+		"elbv2-target-group",
+		"ip",
+		"route53-hosted-zone"
+	]
+}

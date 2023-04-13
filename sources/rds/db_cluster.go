@@ -30,6 +30,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		var a *sources.ARN
 
 		if cluster.DBSubnetGroup != nil {
+			// +overmind:link rds-db-subnet-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "rds-db-subnet-group",
 				Method: sdp.QueryMethod_GET,
@@ -40,6 +41,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		for _, endpoint := range []*string{cluster.Endpoint, cluster.ReaderEndpoint} {
 			if endpoint != nil {
+				// +overmind:link dns
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
@@ -48,6 +50,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 				})
 
 				if cluster.Port != nil {
+					// +overmind:link networksocket
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "networksocket",
 						Method: sdp.QueryMethod_SEARCH,
@@ -60,6 +63,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		for _, replica := range cluster.ReadReplicaIdentifiers {
 			if a, err = sources.ParseARN(replica); err == nil {
+				// +overmind:link rds-db-cluster
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-cluster",
 					Method: sdp.QueryMethod_SEARCH,
@@ -70,6 +74,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		}
 
 		for _, az := range cluster.AvailabilityZones {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -80,6 +85,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		for _, member := range cluster.DBClusterMembers {
 			if member.DBInstanceIdentifier != nil {
+				// +overmind:link rds-db-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-instance",
 					Method: sdp.QueryMethod_GET,
@@ -91,6 +97,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		for _, sg := range cluster.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
+				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
@@ -101,6 +108,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		}
 
 		if cluster.HostedZoneId != nil {
+			// +overmind:link route53-hosted-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "route53-hosted-zone",
 				Method: sdp.QueryMethod_GET,
@@ -111,6 +119,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		if cluster.KmsKeyId != nil {
 			if a, err = sources.ParseARN(*cluster.KmsKeyId); err == nil {
+				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_SEARCH,
@@ -121,6 +130,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		}
 
 		if cluster.ActivityStreamKinesisStreamName != nil {
+			// +overmind:link kinesis-stream
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "kinesis-stream",
 				Method: sdp.QueryMethod_GET,
@@ -130,6 +140,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		}
 
 		for _, endpoint := range cluster.CustomEndpoints {
+			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -140,6 +151,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		for _, optionGroup := range cluster.DBClusterOptionGroupMemberships {
 			if optionGroup.DBClusterOptionGroupName != nil {
+				// +overmind:link rds-option-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-option-group",
 					Method: sdp.QueryMethod_GET,
@@ -152,6 +164,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.MasterUserSecret != nil {
 			if cluster.MasterUserSecret.KmsKeyId != nil {
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.KmsKeyId); err == nil {
+					// +overmind:link kms-key
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "kms-key",
 						Method: sdp.QueryMethod_SEARCH,
@@ -163,6 +176,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 			if cluster.MasterUserSecret.SecretArn != nil {
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.SecretArn); err == nil {
+					// +overmind:link secretsmanager-secret
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "secretsmanager-secret",
 						Method: sdp.QueryMethod_SEARCH,
@@ -175,6 +189,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		if cluster.MonitoringRoleArn != nil {
 			if a, err = sources.ParseARN(*cluster.MonitoringRoleArn); err == nil {
+				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
@@ -187,6 +202,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.PerformanceInsightsKMSKeyId != nil {
 			// This is an ARN
 			if a, err = sources.ParseARN(*cluster.PerformanceInsightsKMSKeyId); err == nil {
+				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_SEARCH,
@@ -198,6 +214,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		if cluster.ReplicationSourceIdentifier != nil {
 			if a, err = sources.ParseARN(*cluster.ReplicationSourceIdentifier); err == nil {
+				// +overmind:link rds-db-cluster
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "rds-db-cluster",
 					Method: sdp.QueryMethod_SEARCH,
@@ -212,6 +229,14 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type rds-db-cluster
+// +overmind:descriptiveType RDS Cluster
+// +overmind:get Get a cluster by ID
+// +overmind:list List all clusters
+// +overmind:search Search for clusters by ARN
+// +overmind:group AWS
 
 func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options]{

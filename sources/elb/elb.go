@@ -27,6 +27,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		if desc.DNSName != nil {
+			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -36,6 +37,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		if desc.CanonicalHostedZoneName != nil {
+			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -45,6 +47,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		if desc.CanonicalHostedZoneNameID != nil {
+			// +overmind:link route53-hosted-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "route53-hosted-zone",
 				Method: sdp.QueryMethod_GET,
@@ -54,6 +57,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		for _, az := range desc.AvailabilityZones {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -63,6 +67,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		for _, subnet := range desc.Subnets {
+			// +overmind:link ec2-subnet
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
@@ -72,6 +77,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		if desc.VPCId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -82,6 +88,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 
 		for _, instance := range desc.Instances {
 			if instance.InstanceId != nil {
+				// +overmind:link ec2-instance
 				// The EC2 instance itself
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
@@ -96,6 +103,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 						InstanceId:       *instance.InstanceId,
 					}
 
+					// +overmind:link elb-instance-health
 					// The health for that instance
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "elb-instance-health",
@@ -109,6 +117,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 
 		if desc.SourceSecurityGroup != nil {
 			if desc.SourceSecurityGroup.GroupName != nil {
+				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_SEARCH,
@@ -119,6 +128,7 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		}
 
 		for _, sg := range desc.SecurityGroups {
+			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
@@ -132,6 +142,14 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type elb-load-balancer
+// +overmind:descriptiveType Classic Load Balancer
+// +overmind:get Get a classic load balancer by name
+// +overmind:list List all classic load balancers
+// +overmind:search Search for classic load balancers by ARN
+// +overmind:group AWS
 
 func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options]{

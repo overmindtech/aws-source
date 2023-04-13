@@ -1,0 +1,11 @@
+{
+	"type": "iam-role",
+	"descriptiveType": "IAM Role",
+	"getDescription": "Get an IAM role by name",
+	"listDescription": "List all IAM roles",
+	"searchDescription": "Search for IAM roles by ARN",
+	"group": "AWS",
+	"links": [
+		"iam-role-policy"
+	]
+}

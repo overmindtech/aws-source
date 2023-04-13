@@ -50,6 +50,14 @@ func launchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInpu
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-launch-template
+// +overmind:descriptiveType Launch Template
+// +overmind:get Get a launch template by ID
+// +overmind:list List all launch templates
+// +overmind:search Search for launch templates by ARN
+// +overmind:group AWS
+
 func NewLaunchTemplateSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,

@@ -50,6 +50,7 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 
 		if listener.LoadBalancerArn != nil {
 			if a, err := sources.ParseARN(*listener.LoadBalancerArn); err == nil {
+				// +overmind:link elbv2-load-balancer
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.QueryMethod_SEARCH,
@@ -62,6 +63,7 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 		for _, cert := range listener.Certificates {
 			if cert.CertificateArn != nil {
 				if a, err := sources.ParseARN(*cert.CertificateArn); err == nil {
+					// +overmind:link acm-certificate
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "acm-certificate",
 						Method: sdp.QueryMethod_SEARCH,
@@ -75,6 +77,11 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 		var requests []*sdp.Query
 
 		for _, action := range listener.DefaultActions {
+			// These types can be returned by `ActionToRequests()`
+			// +overmind:link cognito-idp-user-pool
+			// +overmind:link http
+			// +overmind:link elbv2-target-group
+
 			requests = ActionToRequests(action)
 			item.LinkedItemQueries = append(item.LinkedItemQueries, requests...)
 		}
@@ -84,6 +91,13 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type elbv2-listener
+// +overmind:descriptiveType ELB Listener
+// +overmind:get Get a listener by ARN
+// +overmind:search Search for listeners by load balancer ARN
+// +overmind:group AWS
 
 func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options]{

@@ -1,0 +1,23 @@
+{
+	"type": "rds-db-cluster",
+	"descriptiveType": "RDS Cluster",
+	"getDescription": "Get a cluster by ID",
+	"listDescription": "List all clusters",
+	"searchDescription": "Search for clusters by ARN",
+	"group": "AWS",
+	"links": [
+		"dns",
+		"ec2-availability-zone",
+		"ec2-security-group",
+		"iam-role",
+		"kinesis-stream",
+		"kms-key",
+		"networksocket",
+		"rds-db-cluster",
+		"rds-db-instance",
+		"rds-db-subnet-group",
+		"rds-option-group",
+		"route53-hosted-zone",
+		"secretsmanager-secret"
+	]
+}

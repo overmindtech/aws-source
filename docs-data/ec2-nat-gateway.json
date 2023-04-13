@@ -1,0 +1,14 @@
+{
+	"type": "ec2-nat-gateway",
+	"descriptiveType": "NAT Gateway",
+	"getDescription": "Get a NAT Gateway by ID",
+	"listDescription": "List all NAT gateways",
+	"searchDescription": "Search for NAT gateways by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-network-interface",
+		"ec2-subnet",
+		"ec2-vpc",
+		"ip"
+	]
+}

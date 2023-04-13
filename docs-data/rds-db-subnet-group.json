@@ -1,0 +1,14 @@
+{
+	"type": "rds-db-subnet-group",
+	"descriptiveType": "RDS Subnet Group",
+	"getDescription": "Get a subnet group by name",
+	"listDescription": "List all subnet groups",
+	"searchDescription": "Search for subnet groups by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-availability-zone",
+		"ec2-subnet",
+		"ec2-vpc",
+		"outposts-outpost"
+	]
+}

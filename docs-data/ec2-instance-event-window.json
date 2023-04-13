@@ -1,0 +1,12 @@
+{
+	"type": "ec2-instance-event-window",
+	"descriptiveType": "EC2 Instance Event Window",
+	"getDescription": "Get an event window by ID",
+	"listDescription": "List all event windows",
+	"searchDescription": "Search for event windows by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-host",
+		"ec2-instance"
+	]
+}

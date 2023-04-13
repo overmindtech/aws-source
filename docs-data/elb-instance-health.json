@@ -1,0 +1,10 @@
+{
+	"type": "elb-instance-health",
+	"descriptiveType": "ELB Instance Health",
+	"getDescription": "Get instance health by ID ({LoadBalancerName}/{InstanceId})",
+	"listDescription": "List all instance healths",
+	"group": "AWS",
+	"links": [
+		"ec2-instance"
+	]
+}

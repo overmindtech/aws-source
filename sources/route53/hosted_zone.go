@@ -52,6 +52,7 @@ func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 		Scope:           scope,
 		LinkedItemQueries: []*sdp.Query{
 			{
+				// +overmind:link route53-resource-record-set
 				Type:   "route53-resource-record-set",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *awsItem.Id,
@@ -62,6 +63,14 @@ func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type route53-hosted-zone
+// +overmind:descriptiveType Route53 Hosted Zone
+// +overmind:get Get a hosted zone by ID
+// +overmind:list List all hosted zones
+// +overmind:search Search for a hosted zone by ARN
+// +overmind:group AWS
 
 func NewHostedZoneSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options]{

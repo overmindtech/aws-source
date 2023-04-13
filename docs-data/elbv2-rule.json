@@ -1,0 +1,8 @@
+{
+	"type": "elbv2-rule",
+	"descriptiveType": "ELB Rule",
+	"getDescription": "Get a rule by ARN",
+	"searchDescription": "Search for rules by listener ARN",
+	"group": "AWS",
+	"links": []
+}

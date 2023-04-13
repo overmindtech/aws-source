@@ -21,6 +21,13 @@ func NewS3Source(config aws.Config, accountID string) *S3Source {
 	}
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:descriptiveType S3 Bucket
+// +overmind:get Get an S3 bucket by name
+// +overmind:list List all S3 buckets
+// +overmind:search Search for S3 buckets by ARN
+// +overmind:group AWS
+
 type S3Source struct {
 	// AWS Config including region and credentials
 	config aws.Config
@@ -53,6 +60,7 @@ func (s *S3Source) Client() *s3.Client {
 
 // Type The type of items that this source is capable of finding
 func (s *S3Source) Type() string {
+	// +overmind:type s3-bucket
 	return "s3-bucket"
 }
 
@@ -339,6 +347,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 				url = "https://" + *bucket.RedirectAllRequestsTo.HostName
 			}
 
+			// +overmind:link http
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
@@ -353,6 +362,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
 			if a, err = sources.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
+				// +overmind:link lambda-function
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.QueryMethod_SEARCH,
@@ -366,6 +376,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
 			if a, err = sources.ParseARN(*q.QueueArn); err == nil {
+				// +overmind:link sqs-queue
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sqs-queue",
 					Method: sdp.QueryMethod_SEARCH,
@@ -379,6 +390,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
 			if a, err = sources.ParseARN(*topic.TopicArn); err == nil {
+				// +overmind:link sns-topic
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "sns-topic",
 					Method: sdp.QueryMethod_SEARCH,
@@ -391,6 +403,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 
 	if bucket.LoggingEnabled != nil {
 		if bucket.LoggingEnabled.TargetBucket != nil {
+			// +overmind:link s3-bucket
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "s3-bucket",
 				Method: sdp.QueryMethod_GET,
@@ -401,6 +414,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	}
 
 	if bucket.LocationConstraint != "" {
+		// +overmind:link ec2-region
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-region",
 			Method: sdp.QueryMethod_GET,
@@ -414,6 +428,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
 					if a, err = sources.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
+						// +overmind:link s3-bucket
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "s3-bucket",
 							Method: sdp.QueryMethod_SEARCH,
@@ -435,6 +450,7 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
 							if a, err = sources.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
+								// +overmind:link s3-bucket
 								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 									Type:   "s3-bucket",
 									Method: sdp.QueryMethod_SEARCH,

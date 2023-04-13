@@ -85,6 +85,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.ExecutionRoleArn != nil {
 		if a, err = sources.ParseARN(*td.ExecutionRoleArn); err == nil {
+			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_SEARCH,
@@ -96,6 +97,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.TaskRoleArn != nil {
 		if a, err = sources.ParseARN(*td.TaskRoleArn); err == nil {
+			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_SEARCH,
@@ -119,6 +121,7 @@ func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 
 			switch a.Service {
 			case "secretsmanager":
+				// +overmind:link secretsmanager-secret
 				return &sdp.Query{
 					Type:   "secretsmanager-secret",
 					Method: sdp.QueryMethod_SEARCH,
@@ -126,6 +129,7 @@ func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 					Scope:  secretScope,
 				}
 			case "ssm":
+				// +overmind:link ssm-parameter
 				return &sdp.Query{
 					Type:   "ssm-parameter",
 					Method: sdp.QueryMethod_SEARCH,
@@ -138,6 +142,14 @@ func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 
 	return nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ecs-task-definition
+// +overmind:descriptiveType Task Definition
+// +overmind:get Get a task definition by revision name ({family}:{revision})
+// +overmind:list List all task definitions
+// +overmind:search Search for task definitions by ARN
+// +overmind:group AWS
 
 func NewTaskDefinitionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{

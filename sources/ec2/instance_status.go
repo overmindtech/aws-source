@@ -65,6 +65,7 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 		}
 
 		if instanceStatus.AvailabilityZone != nil {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -78,6 +79,14 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-instance-status
+// +overmind:descriptiveType EC2 Instance Status
+// +overmind:get Get an EC2 instance status by Instance ID
+// +overmind:list List all EC2 instance statuses
+// +overmind:search Search EC2 instance statuses by ARN
+// +overmind:group AWS
 
 func NewInstanceStatusSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{

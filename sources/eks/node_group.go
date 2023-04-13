@@ -57,6 +57,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
+			// +overmind:link ec2-key-pair
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-key-pair",
 				Method: sdp.QueryMethod_GET,
@@ -66,6 +67,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
+			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
@@ -76,6 +78,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	}
 
 	for _, subnet := range ng.Subnets {
+		// +overmind:link ec2-subnet
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ec2-subnet",
 			Method: sdp.QueryMethod_GET,
@@ -87,6 +90,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	if ng.Resources != nil {
 		for _, g := range ng.Resources.AutoScalingGroups {
 			if g.Name != nil {
+				// +overmind:link autoscaling-auto-scaling-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "autoscaling-auto-scaling-group",
 					Method: sdp.QueryMethod_GET,
@@ -97,6 +101,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
+			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
@@ -108,6 +113,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.LaunchTemplate != nil {
 		if ng.LaunchTemplate.Id != nil {
+			// +overmind:link ec2-launch-template
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-launch-template",
 				Method: sdp.QueryMethod_GET,
@@ -119,6 +125,14 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type eks-nodegroup
+// +overmind:descriptiveType EKS Nodegroup
+// +overmind:get Get a node group by unique name ({clusterName}/{NodegroupName})
+// +overmind:list List all node groups
+// +overmind:search Search for node groups by cluster name
+// +overmind:group AWS
 
 func NewNodegroupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{

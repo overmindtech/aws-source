@@ -46,6 +46,7 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
+				// +overmind:link ec2-subnet
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
@@ -56,6 +57,7 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		}
 
 		if networkAcl.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -69,6 +71,14 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-network-acl
+// +overmind:descriptiveType Network ACL
+// +overmind:get Get a network ACL
+// +overmind:list List all network ACLs
+// +overmind:search Search for network ACLs by ARN
+// +overmind:group AWS
 
 func NewNetworkAclSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{

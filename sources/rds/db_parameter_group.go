@@ -34,6 +34,14 @@ func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Ite
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type rds-db-parameter-group
+// +overmind:descriptiveType RDS Parameter Group
+// +overmind:get Get a parameter group by name
+// +overmind:list List all parameter groups
+// +overmind:search Search for a parameter group by ARN
+// +overmind:group AWS
+
 func NewDBParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options] {
 	return &sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options]{
 		ItemType:  "rds-db-parameter-group",

@@ -43,6 +43,7 @@ func reservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstances
 		}
 
 		if reservation.AvailabilityZone != nil {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -56,6 +57,14 @@ func reservedInstanceOutputMapper(scope string, _ *ec2.DescribeReservedInstances
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-reserved-instance
+// +overmind:descriptiveType Reserved EC2 Instance
+// +overmind:get Get a reserved EC2 instance by ID
+// +overmind:list List all reserved EC2 instances
+// +overmind:search Search reserved EC2 instances by ARN
+// +overmind:group AWS
 
 func NewReservedInstanceSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{

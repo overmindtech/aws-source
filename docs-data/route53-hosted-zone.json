@@ -1,0 +1,11 @@
+{
+	"type": "route53-hosted-zone",
+	"descriptiveType": "Route53 Hosted Zone",
+	"getDescription": "Get a hosted zone by ID",
+	"listDescription": "List all hosted zones",
+	"searchDescription": "Search for a hosted zone by ARN",
+	"group": "AWS",
+	"links": [
+		"route53-resource-record-set"
+	]
+}
