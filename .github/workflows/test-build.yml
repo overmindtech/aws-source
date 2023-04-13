@@ -32,6 +32,7 @@ jobs:
 
       - name: Validate Docs Data
         run: |
+          mkdir -p ~/.local/bin/ && curl -Lo ~/.local/bin/docgen https://github.com/overmindtech/docgen/releases/latest/download/docgen-amd64 && chmod +x ~/.local/bin/docgen
           go generate ./...
           git diff --exit-code
 
