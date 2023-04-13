@@ -1,0 +1,10 @@
+{
+	"type": "ec2-availability-zone",
+	"descriptiveType": "Availability Zone",
+	"getDescription": "Get an Availability Zone by Name",
+	"listDescription": "List all Availability Zones",
+	"group": "AWS",
+	"links": [
+		"ec2-region"
+	]
+}

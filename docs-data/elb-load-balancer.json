@@ -1,0 +1,18 @@
+{
+	"type": "elb-load-balancer",
+	"descriptiveType": "Classic Load Balancer",
+	"getDescription": "Get a classic load balancer by name",
+	"listDescription": "List all classic load balancers",
+	"searchDescription": "Search for classic load balancers by ARN",
+	"group": "AWS",
+	"links": [
+		"dns",
+		"ec2-availability-zone",
+		"ec2-instance",
+		"ec2-security-group",
+		"ec2-subnet",
+		"ec2-vpc",
+		"elb-instance-health",
+		"route53-hosted-zone"
+	]
+}

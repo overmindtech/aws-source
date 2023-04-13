@@ -1,0 +1,9 @@
+{
+	"type": "rds-db-parameter-group",
+	"descriptiveType": "RDS Parameter Group",
+	"getDescription": "Get a parameter group by name",
+	"listDescription": "List all parameter groups",
+	"searchDescription": "Search for a parameter group by ARN",
+	"group": "AWS",
+	"links": []
+}

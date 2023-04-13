@@ -77,6 +77,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	if service.ClusterArn != nil {
 		if a, err = sources.ParseARN(*service.ClusterArn); err == nil {
+			// +overmind:link ecs-cluster
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-cluster",
 				Method: sdp.QueryMethod_SEARCH,
@@ -89,6 +90,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, lb := range service.LoadBalancers {
 		if lb.TargetGroupArn != nil {
 			if a, err = sources.ParseARN(*lb.TargetGroupArn); err == nil {
+				// +overmind:link elbv2-target-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.QueryMethod_SEARCH,
@@ -102,6 +104,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, sr := range service.ServiceRegistries {
 		if sr.RegistryArn != nil {
 			if a, err = sources.ParseARN(*sr.RegistryArn); err == nil {
+				// +overmind:link servicediscovery-service
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "servicediscovery-service",
 					Method: sdp.QueryMethod_SEARCH,
@@ -114,6 +117,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	if service.TaskDefinition != nil {
 		if a, err = sources.ParseARN(*service.TaskDefinition); err == nil {
+			// +overmind:link ecs-task-definition
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ecs-task-definition",
 				Method: sdp.QueryMethod_SEARCH,
@@ -126,6 +130,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	for _, deployment := range service.Deployments {
 		if deployment.TaskDefinition != nil {
 			if a, err = sources.ParseARN(*deployment.TaskDefinition); err == nil {
+				// +overmind:link ecs-task-definition
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-task-definition",
 					Method: sdp.QueryMethod_SEARCH,
@@ -137,6 +142,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 		for _, strategy := range deployment.CapacityProviderStrategy {
 			if strategy.CapacityProvider != nil {
+				// +overmind:link ecs-capacity-provider
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ecs-capacity-provider",
 					Method: sdp.QueryMethod_GET,
@@ -149,6 +155,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if deployment.NetworkConfiguration != nil {
 			if deployment.NetworkConfiguration.AwsvpcConfiguration != nil {
 				for _, subnet := range deployment.NetworkConfiguration.AwsvpcConfiguration.Subnets {
+					// +overmind:link ec2-subnet
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.QueryMethod_GET,
@@ -158,6 +165,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				}
 
 				for _, sg := range deployment.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
+					// +overmind:link ec2-security-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ecs-security-group",
 						Method: sdp.QueryMethod_GET,
@@ -172,6 +180,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			for _, svc := range deployment.ServiceConnectConfiguration.Services {
 				for _, alias := range svc.ClientAliases {
 					if alias.DnsName != nil {
+						// +overmind:link dns
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "dns",
 							Method: sdp.QueryMethod_SEARCH,
@@ -186,6 +195,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		for _, cr := range deployment.ServiceConnectResources {
 			if cr.DiscoveryArn != nil {
 				if a, err = sources.ParseARN(*cr.DiscoveryArn); err == nil {
+					// +overmind:link servicediscovery-service
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "servicediscovery-service",
 						Method: sdp.QueryMethod_SEARCH,
@@ -200,6 +210,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	if service.NetworkConfiguration != nil {
 		if service.NetworkConfiguration.AwsvpcConfiguration != nil {
 			for _, subnet := range service.NetworkConfiguration.AwsvpcConfiguration.Subnets {
+				// +overmind:link ec2-subnet
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
@@ -209,8 +220,9 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			}
 
 			for _, sg := range service.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
+				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
-					Type:   "ecs-security-group",
+					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  sg,
 					Scope:  scope,
@@ -220,6 +232,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	}
 
 	for _, id := range taskSetIds {
+		// +overmind:link ecs-task-set
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "ecs-task-set",
 			Method: sdp.QueryMethod_GET,
@@ -261,6 +274,14 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 
 	return inputs, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ecs-service
+// +overmind:descriptiveType ECS Service
+// +overmind:get Get an ECS service by full name ({clusterName}/{id})
+// +overmind:list List all ECS services
+// +overmind:search Search for ECS services by cluster
+// +overmind:group AWS
 
 func NewServiceSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{

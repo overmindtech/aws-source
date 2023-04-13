@@ -39,6 +39,13 @@ func ruleOutputMapper(scope string, _ *elbv2.DescribeRulesInput, output *elbv2.D
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type elbv2-rule
+// +overmind:descriptiveType ELB Rule
+// +overmind:get Get a rule by ARN
+// +overmind:search Search for rules by listener ARN
+// +overmind:group AWS
+
 func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, *elbv2.Client, *elbv2.Options]{
 		Config:    config,

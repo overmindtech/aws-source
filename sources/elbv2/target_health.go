@@ -21,6 +21,8 @@ type TargetHealthUniqueID struct {
 	Port             *int32
 }
 
+// String returns a string representation of the TargetHealthUniqueID in the
+// format: TargetGroupArn|Id|AvailabilityZone|Port
 func (id TargetHealthUniqueID) String() string {
 	var az string
 	var port string
@@ -41,6 +43,7 @@ func (id TargetHealthUniqueID) String() string {
 	}, "|")
 }
 
+// ToTargetHealthUniqueID converts a string to a TargetHealthUniqueID
 func ToTargetHealthUniqueID(id string) (TargetHealthUniqueID, error) {
 	sections := strings.Split(id, "|")
 
@@ -149,6 +152,7 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 		if err == nil {
 			switch a.Service {
 			case "lambda":
+				// +overmind:link lambda-function
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.QueryMethod_SEARCH,
@@ -156,6 +160,7 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
 				})
 			case "elasticloadbalancing":
+				// +overmind:link elbv2-load-balancer
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.QueryMethod_SEARCH,
@@ -167,6 +172,7 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			// In this case it could be an instance ID or an IP. We will check
 			// for IP first
 			if net.ParseIP(*desc.Target.Id) != nil {
+				// +overmind:link ip
 				// This means it's an IP
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
@@ -175,6 +181,7 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 					Scope:  "global",
 				})
 			} else {
+				// +overmind:link ec2-instance
 				// If all else fails it must be an instance ID
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
@@ -190,6 +197,13 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type elbv2-target-health
+// +overmind:descriptiveType ELB Target Health
+// +overmind:get Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})
+// +overmind:search Search for target health by target group ARN
+// +overmind:group AWS
 
 func NewTargetHealthSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{

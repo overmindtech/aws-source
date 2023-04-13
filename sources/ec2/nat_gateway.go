@@ -46,6 +46,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 
 		for _, address := range ng.NatGatewayAddresses {
 			if address.NetworkInterfaceId != nil {
+				// +overmind:link ec2-network-interface
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-network-interface",
 					Method: sdp.QueryMethod_GET,
@@ -55,6 +56,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			}
 
 			if address.PrivateIp != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -64,6 +66,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			}
 
 			if address.PublicIp != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -74,6 +77,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		}
 
 		if ng.SubnetId != nil {
+			// +overmind:link ec2-subnet
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
@@ -83,6 +87,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		}
 
 		if ng.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -96,6 +101,14 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-nat-gateway
+// +overmind:descriptiveType NAT Gateway
+// +overmind:get Get a NAT Gateway by ID
+// +overmind:list List all NAT gateways
+// +overmind:search Search for NAT gateways by ARN
+// +overmind:group AWS
 
 func NewNatGatewaySource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{

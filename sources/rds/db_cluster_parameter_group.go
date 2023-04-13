@@ -34,6 +34,14 @@ func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type rds-db-cluster-parameter-group
+// +overmind:descriptiveType RDS Cluster Parameter Group
+// +overmind:get Get a parameter group by name
+// +overmind:list List all RDS parameter groups
+// +overmind:search Search for a parameter group by ARN
+// +overmind:group AWS
+
 func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options] {
 	return &sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options]{
 		ItemType:  "rds-db-cluster-parameter-group",

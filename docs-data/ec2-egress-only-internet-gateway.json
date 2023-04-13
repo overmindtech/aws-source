@@ -1,0 +1,11 @@
+{
+	"type": "ec2-egress-only-internet-gateway",
+	"descriptiveType": "Egress Only Internet Gateway",
+	"getDescription": "Get an egress only internet gateway by ID",
+	"listDescription": "List all egress only internet gateways",
+	"searchDescription": "Search egress only internet gateways by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-vpc"
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"type": "route53-resource-record-set",
+	"descriptiveType": "Route53 Record Set",
+	"getDescription": "Get a Route53 record Set by name",
+	"listDescription": "List all record sets",
+	"searchDescription": "Search for a record set by ARN",
+	"group": "AWS",
+	"links": [
+		"dns"
+	]
+}

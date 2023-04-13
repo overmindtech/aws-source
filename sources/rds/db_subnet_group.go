@@ -29,6 +29,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 		var a *sources.ARN
 
 		if sg.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -39,6 +40,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
+				// +overmind:link ec2-subnet
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
@@ -49,6 +51,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 			if subnet.SubnetAvailabilityZone != nil {
 				if subnet.SubnetAvailabilityZone.Name != nil {
+					// +overmind:link ec2-availability-zone
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.QueryMethod_GET,
@@ -61,6 +64,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 			if subnet.SubnetOutpost != nil {
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = sources.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
+						// +overmind:link outposts-outpost
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "outposts-outpost",
 							Method: sdp.QueryMethod_SEARCH,
@@ -77,6 +81,14 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type rds-db-subnet-group
+// +overmind:descriptiveType RDS Subnet Group
+// +overmind:get Get a subnet group by name
+// +overmind:list List all subnet groups
+// +overmind:search Search for subnet groups by ARN
+// +overmind:group AWS
 
 func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options]{

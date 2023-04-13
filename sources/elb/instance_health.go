@@ -67,6 +67,7 @@ func instanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput
 		}
 
 		if is.InstanceId != nil {
+			// +overmind:link ec2-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.QueryMethod_GET,
@@ -80,6 +81,13 @@ func instanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type elb-instance-health
+// +overmind:descriptiveType ELB Instance Health
+// +overmind:get Get instance health by ID ({LoadBalancerName}/{InstanceId})
+// +overmind:list List all instance healths
+// +overmind:group AWS
 
 func NewInstanceHealthSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{

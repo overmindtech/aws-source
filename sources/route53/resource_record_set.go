@@ -51,6 +51,7 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 
 	if awsItem.AliasTarget != nil {
 		if awsItem.AliasTarget.DNSName != nil {
+			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -62,6 +63,14 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type route53-resource-record-set
+// +overmind:descriptiveType Route53 Record Set
+// +overmind:get Get a Route53 record Set by name
+// +overmind:list List all record sets
+// +overmind:search Search for a record set by ARN
+// +overmind:group AWS
 
 func NewResourceRecordSetSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options]{

@@ -1,0 +1,16 @@
+{
+	"type": "s3-bucket",
+	"descriptiveType": "S3 Bucket",
+	"getDescription": "Get an S3 bucket by name",
+	"listDescription": "List all S3 buckets",
+	"searchDescription": "Search for S3 buckets by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-region",
+		"http",
+		"lambda-function",
+		"s3-bucket",
+		"sns-topic",
+		"sqs-queue"
+	]
+}

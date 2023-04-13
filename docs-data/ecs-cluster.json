@@ -1,0 +1,17 @@
+{
+	"type": "ecs-cluster",
+	"descriptiveType": "ECS Cluster",
+	"getDescription": "Get a cluster by name",
+	"listDescription": "List all clusters",
+	"searchDescription": "Search for a cluster by ARN",
+	"group": "AWS",
+	"links": [
+		"ecs-capacity-provider",
+		"ecs-container-instance",
+		"ecs-service",
+		"ecs-task",
+		"kms-key",
+		"logs-log-group",
+		"s3-bucket"
+	]
+}

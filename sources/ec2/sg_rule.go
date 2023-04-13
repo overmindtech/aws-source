@@ -45,6 +45,7 @@ func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 		}
 
 		if securityGroupRule.GroupId != nil {
+			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
@@ -55,6 +56,7 @@ func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 
 		if rg := securityGroupRule.ReferencedGroupInfo; rg != nil {
 			if rg.GroupId != nil {
+				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
@@ -69,6 +71,14 @@ func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-security-group-rule
+// +overmind:descriptiveType Security Group Rule
+// +overmind:get Get a security group rule by ID
+// +overmind:list List all security group rules
+// +overmind:search Search security group rules by ARN
+// +overmind:group AWS
 
 func NewSecurityGroupRuleSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{

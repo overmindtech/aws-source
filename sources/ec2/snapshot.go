@@ -53,6 +53,7 @@ func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 		if snapshot.VolumeId != nil {
 			// Ignore the arbitrary ID that is used by Amazon
 			if *snapshot.VolumeId != "vol-ffffffff" {
+				// +overmind:link ec2-volume
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-volume",
 					Method: sdp.QueryMethod_GET,
@@ -67,6 +68,14 @@ func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-snapshot
+// +overmind:descriptiveType EC2 Snapshot
+// +overmind:get Get a snapshot by ID
+// +overmind:list List all snapshots
+// +overmind:search Search snapshots by ARN
+// +overmind:group AWS
 
 func NewSnapshotSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{

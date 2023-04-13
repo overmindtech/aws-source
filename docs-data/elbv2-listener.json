@@ -1,0 +1,14 @@
+{
+	"type": "elbv2-listener",
+	"descriptiveType": "ELB Listener",
+	"getDescription": "Get a listener by ARN",
+	"searchDescription": "Search for listeners by load balancer ARN",
+	"group": "AWS",
+	"links": [
+		"acm-certificate",
+		"cognito-idp-user-pool",
+		"elbv2-load-balancer",
+		"elbv2-target-group",
+		"http"
+	]
+}

@@ -1,0 +1,12 @@
+{
+	"type": "ec2-network-acl",
+	"descriptiveType": "Network ACL",
+	"getDescription": "Get a network ACL",
+	"listDescription": "List all network ACLs",
+	"searchDescription": "Search for network ACLs by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-subnet",
+		"ec2-vpc"
+	]
+}

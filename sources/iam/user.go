@@ -152,6 +152,7 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	}
 
 	for _, group := range awsItem.UserGroups {
+		// +overmind:link iam-group
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 			Type:   "iam-group",
 			Method: sdp.QueryMethod_GET,
@@ -162,6 +163,14 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type iam-user
+// +overmind:descriptiveType IAM User
+// +overmind:get Get a user by name
+// +overmind:list List all users
+// +overmind:search Search for users by ARN
+// +overmind:group AWS
 
 func NewUserSource(config aws.Config, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{

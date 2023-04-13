@@ -43,6 +43,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				Attributes:      attrs,
 				LinkedItemQueries: []*sdp.Query{
 					{
+						// +overmind:link ec2-instance-status
 						// Always get the status
 						Type:   "ec2-instance-status",
 						Method: sdp.QueryMethod_GET,
@@ -53,6 +54,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.ImageId != nil {
+				// +overmind:link ec2-image
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-image",
 					Method: sdp.QueryMethod_GET,
@@ -62,6 +64,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.KeyName != nil {
+				// +overmind:link ec2-key-pair
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-key-pair",
 					Method: sdp.QueryMethod_GET,
@@ -72,6 +75,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 			if instance.Placement != nil {
 				if instance.Placement.AvailabilityZone != nil {
+					// +overmind:link ec2-availability-zone
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.QueryMethod_GET,
@@ -81,6 +85,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				}
 
 				if instance.Placement.GroupId != nil {
+					// +overmind:link ec2-placement-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-placement-group",
 						Method: sdp.QueryMethod_GET,
@@ -94,6 +99,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				// IPs
 				for _, ip := range nic.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
+						// +overmind:link ip
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
@@ -105,6 +111,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				for _, ip := range nic.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
+						// +overmind:link ip
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
@@ -116,6 +123,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				// Subnet
 				if nic.SubnetId != nil {
+					// +overmind:link ec2-subnet
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.QueryMethod_GET,
@@ -126,6 +134,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 				// VPC
 				if nic.VpcId != nil {
+					// +overmind:link ec2-vpc
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-vpc",
 						Method: sdp.QueryMethod_GET,
@@ -136,6 +145,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
+				// +overmind:link dns
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
@@ -145,6 +155,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			}
 
 			if instance.PublicIpAddress != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -156,6 +167,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 			// Security groups
 			for _, group := range instance.SecurityGroups {
 				if group.GroupId != nil {
+					// +overmind:link ec2-security-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-security-group",
 						Method: sdp.QueryMethod_GET,
@@ -167,6 +179,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 			for _, mapping := range instance.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.VolumeId != nil {
+					// +overmind:link ec2-volume
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ec2-volume",
 						Method: sdp.QueryMethod_GET,
@@ -182,6 +195,14 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-instance
+// +overmind:descriptiveType EC2 Instance
+// +overmind:get Get an EC2 instance by ID
+// +overmind:list List all EC2 instances
+// +overmind:search Search EC2 instances by ARN
+// +overmind:group AWS
 
 func NewInstanceSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options]{

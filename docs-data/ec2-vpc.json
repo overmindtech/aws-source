@@ -1,0 +1,8 @@
+{
+	"type": "ec2-vpc",
+	"descriptiveType": "VPC",
+	"getDescription": "Get a VPC by ID",
+	"listDescription": "List all VPCs",
+	"group": "AWS",
+	"links": []
+}

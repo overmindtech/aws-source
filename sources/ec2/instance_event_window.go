@@ -44,6 +44,7 @@ func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 
 		if at := ew.AssociationTarget; at != nil {
 			for _, id := range at.DedicatedHostIds {
+				// +overmind:link ec2-host
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-host",
 					Method: sdp.QueryMethod_GET,
@@ -53,6 +54,7 @@ func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 			}
 
 			for _, id := range at.InstanceIds {
+				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
@@ -67,6 +69,14 @@ func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-instance-event-window
+// +overmind:descriptiveType EC2 Instance Event Window
+// +overmind:get Get an event window by ID
+// +overmind:list List all event windows
+// +overmind:search Search for event windows by ARN
+// +overmind:group AWS
 
 func NewInstanceEventWindowSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{

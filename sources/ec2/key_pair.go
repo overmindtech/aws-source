@@ -50,6 +50,14 @@ func keyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-key-pair
+// +overmind:descriptiveType Key Pair
+// +overmind:get Get a key pair by name
+// +overmind:list List all key pairs
+// +overmind:search Search for key pairs by ARN
+// +overmind:group AWS
+
 func NewKeyPairSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,

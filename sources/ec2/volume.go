@@ -45,6 +45,7 @@ func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 		}
 
 		for _, attachment := range volume.Attachments {
+			// +overmind:link ec2-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.QueryMethod_GET,
@@ -54,6 +55,7 @@ func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 		}
 
 		if volume.AvailabilityZone != nil {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -67,6 +69,14 @@ func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-volume
+// +overmind:descriptiveType EC2 Volume
+// +overmind:get Get a volume by ID
+// +overmind:list List all volumes
+// +overmind:search Search volumes by ARN
+// +overmind:group AWS
 
 func NewVolumeSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{

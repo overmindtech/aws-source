@@ -1,0 +1,13 @@
+{
+	"type": "ecs-task-definition",
+	"descriptiveType": "Task Definition",
+	"getDescription": "Get a task definition by revision name ({family}:{revision})",
+	"listDescription": "List all task definitions",
+	"searchDescription": "Search for task definitions by ARN",
+	"group": "AWS",
+	"links": [
+		"iam-role",
+		"secretsmanager-secret",
+		"ssm-parameter"
+	]
+}

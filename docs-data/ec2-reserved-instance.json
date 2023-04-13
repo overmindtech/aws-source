@@ -1,0 +1,11 @@
+{
+	"type": "ec2-reserved-instance",
+	"descriptiveType": "Reserved EC2 Instance",
+	"getDescription": "Get a reserved EC2 instance by ID",
+	"listDescription": "List all reserved EC2 instances",
+	"searchDescription": "Search reserved EC2 instances by ARN",
+	"group": "AWS",
+	"links": [
+		"ec2-availability-zone"
+	]
+}

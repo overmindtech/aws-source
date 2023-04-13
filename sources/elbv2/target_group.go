@@ -27,6 +27,7 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		}
 
 		if tg.TargetGroupArn != nil {
+			// +overmind:link elbv2-target-health
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "elbv2-target-health",
 				Method: sdp.QueryMethod_SEARCH,
@@ -36,6 +37,7 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 		}
 
 		if tg.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -46,6 +48,7 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 
 		for _, lbArn := range tg.LoadBalancerArns {
 			if a, err := sources.ParseARN(lbArn); err == nil {
+				// +overmind:link elbv2-load-balancer
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.QueryMethod_SEARCH,
@@ -60,6 +63,14 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type elbv2-target-group
+// +overmind:descriptiveType Target Group
+// +overmind:get Get a target group by name
+// +overmind:list List all target groups
+// +overmind:search Search for target groups by load balancer ARN
+// +overmind:group AWS
 
 func NewTargetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options]{

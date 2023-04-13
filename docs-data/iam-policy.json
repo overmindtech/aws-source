@@ -1,0 +1,13 @@
+{
+	"type": "iam-policy",
+	"descriptiveType": "IAM Policy",
+	"getDescription": "Get an IAM policy by policyFullName ({path} + {policyName})",
+	"listDescription": "List all IAM policies",
+	"searchDescription": "Search for IAM policies by ARN",
+	"group": "AWS",
+	"links": [
+		"iam-group",
+		"iam-role",
+		"iam-user"
+	]
+}

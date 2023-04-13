@@ -1,0 +1,15 @@
+{
+	"type": "dynamodb-table",
+	"descriptiveType": "DynamoDB Table",
+	"getDescription": "Get a DynamoDB table by name",
+	"listDescription": "List all DynamoDB tables",
+	"searchDescription": "Search for DynamoDB tables by ARN",
+	"group": "AWS",
+	"links": [
+		"backup-recovery-point",
+		"dynamodb-table",
+		"ec2-region",
+		"kinesis-stream",
+		"kms-key"
+	]
+}

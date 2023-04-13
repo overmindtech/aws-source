@@ -50,6 +50,13 @@ func vpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.Describ
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-vpc
+// +overmind:descriptiveType VPC
+// +overmind:get Get a VPC by ID
+// +overmind:list List all VPCs
+// +overmind:group AWS
+
 func NewVpcSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,

@@ -1,0 +1,9 @@
+{
+	"type": "ec2-launch-template",
+	"descriptiveType": "Launch Template",
+	"getDescription": "Get a launch template by ID",
+	"listDescription": "List all launch templates",
+	"searchDescription": "Search for launch templates by ARN",
+	"group": "AWS",
+	"links": []
+}

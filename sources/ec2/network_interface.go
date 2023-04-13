@@ -46,6 +46,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 
 		if ni.Attachment != nil {
 			if ni.Attachment.InstanceId != nil {
+				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
@@ -56,6 +57,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		}
 
 		if ni.AvailabilityZone != nil {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -66,6 +68,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 
 		for _, sg := range ni.Groups {
 			if sg.GroupId != nil {
+				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
@@ -77,6 +80,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 
 		for _, ip := range ni.Ipv6Addresses {
 			if ip.Ipv6Address != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -89,6 +93,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		for _, ip := range ni.PrivateIpAddresses {
 			if assoc := ip.Association; assoc != nil {
 				if assoc.PublicDnsName != nil {
+					// +overmind:link dns
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "dns",
 						Method: sdp.QueryMethod_SEARCH,
@@ -98,6 +103,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				}
 
 				if assoc.PublicIp != nil {
+					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
@@ -107,6 +113,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				}
 
 				if assoc.CarrierIp != nil {
+					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
@@ -116,6 +123,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 				}
 
 				if assoc.CustomerOwnedIp != nil {
+					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
@@ -126,6 +134,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			}
 
 			if ip.PrivateDnsName != nil {
+				// +overmind:link dns
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
@@ -135,6 +144,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			}
 
 			if ip.PrivateIpAddress != nil {
+				// +overmind:link ip
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
@@ -145,6 +155,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		}
 
 		if ni.SubnetId != nil {
+			// +overmind:link ec2-subnet
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
@@ -154,6 +165,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		}
 
 		if ni.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -167,6 +179,14 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-network-interface
+// +overmind:descriptiveType EC2 Network Interface
+// +overmind:get Get a network interface by ID
+// +overmind:list List all network interfaces
+// +overmind:search Search network interfaces by ARN
+// +overmind:group AWS
 
 func NewNetworkInterfaceSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{

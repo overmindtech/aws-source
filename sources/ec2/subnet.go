@@ -45,6 +45,7 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		}
 
 		if subnet.AvailabilityZone != nil {
+			// +overmind:link ec2-availability-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
@@ -54,6 +55,7 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 		}
 
 		if subnet.VpcId != nil {
+			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -67,6 +69,14 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
+// +overmind:type ec2-subnet
+// +overmind:descriptiveType EC2 Subnet
+// +overmind:get Get a subnet by ID
+// +overmind:list List all subnets
+// +overmind:search Search for subnets by ARN
+// +overmind:group AWS
 
 func NewSubnetSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
