@@ -34,7 +34,13 @@ jobs:
         run: |
           mkdir -p ~/.local/bin/ && curl -Lo ~/.local/bin/docgen https://github.com/overmindtech/docgen/releases/latest/download/docgen-amd64 && chmod +x ~/.local/bin/docgen
           go generate ./...
-          git diff --exit-code
+          if [ -z "$(git status --porcelain)" ]; then 
+            echo "No pending docs changes"
+          else 
+            echo "Pending docs changes found, please run 'go generate ./...' and commit the changes"
+            git status
+            exit 1
+          fi
 
       - name: Run tests
         run: go test ./...
