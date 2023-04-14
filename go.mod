@@ -5,21 +5,21 @@ go 1.19
 // Direct dependencies
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.8
-	github.com/aws/aws-sdk-go-v2/config v1.18.20
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.19
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.2
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.3
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.1
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.24.4
-	github.com/aws/aws-sdk-go-v2/service/eks v1.27.9
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.7
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.8
-	github.com/aws/aws-sdk-go-v2/service/iam v1.19.9
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.31.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.42.2
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.6
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.31.2
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.8
+	github.com/aws/aws-sdk-go-v2/config v1.18.21
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.20
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.3
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.4
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.2
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.27.10
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.8
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.9
+	github.com/aws/aws-sdk-go-v2/service/iam v1.19.10
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.31.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.42.3
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.27.7
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.31.3
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.9
 	github.com/aws/smithy-go v1.13.5
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/iancoleman/strcase v0.2.0
@@ -54,8 +54,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.26 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.26 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.12.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.7 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.8 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -104,4 +104,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.25.8
+require github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.25.9
