@@ -2,6 +2,43 @@
 
 This source integrates with AWS, allowing Overmind to pull data about many types of AWS resources.
 
+## Required Permissions
+
+This source requies the following IAM Policy
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:Describe*",
+        "cloudwatch:Describe*",
+        "dynamodb:Describe*",
+        "dynamodb:List*",
+        "ec2:Describe*",
+        "ecs:Describe*",
+        "ecs:List*",
+        "eks:Describe*",
+        "eks:List*",
+        "elasticloadbalancing:Describe*",
+        "iam:Get*",
+        "iam:List*",
+        "lambda:Get*",
+        "lambda:List*",
+        "rds:Describe*",
+        "route53:Get*",
+        "route53:List*",
+        "s3:GetBucket*",
+        "s3:ListAllMyBuckets"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
 ## Naming Conventions
 
 Types are named to match the `describe-*`, `get-*` or `list-*` command within the AWS CLI, with the service that they are part of as a prefix. For example to get the details if a security group you would run:
