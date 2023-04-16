@@ -143,6 +143,10 @@ var rootCmd = &cobra.Command{
 		}
 		e.MaxParallelExecutions = maxParallel
 
+		if len(regions) == 0 {
+			log.Fatal("No regions specified")
+		}
+
 		for _, region := range regions {
 			region = strings.Trim(region, " ")
 
