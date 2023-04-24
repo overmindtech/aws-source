@@ -6,6 +6,6 @@
 	"searchDescription": "Search for IAM roles by ARN",
 	"group": "AWS",
 	"links": [
-		"iam-role-policy"
+		"iam-policy"
 	]
 }

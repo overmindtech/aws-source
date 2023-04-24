@@ -151,3 +151,11 @@ Note that these tests require building real AWS resources in order to test again
 ### Packaging
 
 Docker images can be created manually using `docker build`, but GitHub actions also exist that are able to create, tag and push images. Images will be build for the `main` branch, and also for any commits tagged with a version such as `v1.2.0`
+
+### Generating Docs
+
+Source data for docs is stored in `docs-data` and can be generated using:
+
+```
+go generate ./...
+```
