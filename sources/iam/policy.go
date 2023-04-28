@@ -163,7 +163,7 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	// this can then be constructed into an ARN when a user calls GET
 	attributes.Set("policyFullName", *awsItem.Policy.Path+*awsItem.Policy.PolicyName)
 
-	// Some IAM policies are lgobal
+	// Some IAM policies are global
 
 	item := sdp.Item{
 		Type:            "iam-policy",
