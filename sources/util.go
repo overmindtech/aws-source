@@ -123,8 +123,8 @@ func (e E2ETest) Run(t *testing.T) {
 
 	// Determine the scope so that we can use this for all queries
 	scopes := e.Source.Scopes()
-	if len(scopes) != 1 {
-		t.Fatalf("expected 1 scope, got %v", len(scopes))
+	if len(scopes) == 0 {
+		t.Fatalf("some scopes, got %v", len(scopes))
 	}
 	scope := scopes[0]
 

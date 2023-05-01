@@ -170,8 +170,6 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	// this can then be constructed into an ARN when a user calls GET
 	attributes.Set("policyFullName", policyFullName)
 
-	// Some IAM policies are global
-
 	item := sdp.Item{
 		Type:            "iam-policy",
 		UniqueAttribute: "policyFullName",
@@ -228,12 +226,17 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 // https://github.com/overmindtech/aws-source/issues/68
 func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType:   "iam-policy",
-		Client:     iam.NewFromConfig(config),
-		AccountID:  accountID,
-		Region:     "", // IAM policies aren't tied to a region
-		GetFunc:    policyGetFunc,
-		ListFunc:   policyListFunc,
-		ItemMapper: policyItemMapper,
+		ItemType:  "iam-policy",
+		Client:    iam.NewFromConfig(config),
+		AccountID: accountID,
+		Region:    "", // IAM policies aren't tied to a region
+
+		// Some IAM policies are global, this means that their ARN doesn't
+		// contain an account name and instead just says "aws". Enabling this
+		// setting means these also work
+		SupportGlobalResources: true,
+		GetFunc:                policyGetFunc,
+		ListFunc:               policyListFunc,
+		ItemMapper:             policyItemMapper,
 	}
 }

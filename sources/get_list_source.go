@@ -11,10 +11,11 @@ import (
 // GetListSource A source for AWS APIs where the Get and List functions both
 // return the full item, such as many of the IAM APIs
 type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
-	ItemType  string       // The type of items that will be returned
-	Client    ClientStruct // The AWS API client
-	AccountID string       // The AWS account ID
-	Region    string       // The AWS region this is related to
+	ItemType               string       // The type of items that will be returned
+	Client                 ClientStruct // The AWS API client
+	AccountID              string       // The AWS account ID
+	Region                 string       // The AWS region this is related to
+	SupportGlobalResources bool         // If true, this will also support resources in the "aws" scope which are global
 
 	// Disables List(), meaning all calls will return empty results. This does
 	// not affect Search()
@@ -65,13 +66,36 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Name() string {
 // List of scopes that this source is capable of find items for. This will be
 // in the format {accountID}.{region}
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Scopes() []string {
-	return []string{
-		FormatScope(s.AccountID, s.Region),
+	scopes := make([]string, 0)
+
+	scopes = append(scopes, FormatScope(s.AccountID, s.Region))
+
+	if s.SupportGlobalResources {
+		scopes = append(scopes, "aws")
 	}
+
+	return scopes
+}
+
+// hasScope Returns whether or not this source has the given scope
+func (s *GetListSource[AWSItem, ClientStruct, Options]) hasScope(scope string) bool {
+	if scope == "aws" && s.SupportGlobalResources {
+		// There is a special global "account" that is used for global resources
+		// called "aws"
+		return true
+	}
+
+	for _, s := range s.Scopes() {
+		if s == scope {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
-	if scope != s.Scopes()[0] {
+	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
@@ -96,7 +120,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 // List Lists all available items. This is done by running the ListFunc, then
 // passing these results to GetFunc in order to get the details
 func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
-	if scope != s.Scopes()[0] {
+	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
@@ -132,7 +156,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 
 // Search Searches for AWS resources by ARN
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
-	if scope != s.Scopes()[0] {
+	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
