@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
@@ -28,7 +29,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 			Service:   "iam",
 			Region:    "", // IAM doesn't have a region
 			AccountID: scope,
-			Resource:  "policy" + query, // The query should policyFullName which is (path + name)
+			Resource:  "policy/" + query, // The query should policyFullName which is (path + name)
 		},
 	}
 
@@ -159,9 +160,15 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 		return nil, errors.New("policy Path and PolicyName must be populated")
 	}
 
+	// Combine the path and policy name to create a unique attribute
+	policyFullName := *awsItem.Policy.Path + *awsItem.Policy.PolicyName
+
+	// Trim the leading slash
+	policyFullName, _ = strings.CutPrefix(policyFullName, "/")
+
 	// Create a new attribute which is a combination of `path` and `policyName`,
 	// this can then be constructed into an ARN when a user calls GET
-	attributes.Set("policyFullName", *awsItem.Policy.Path+*awsItem.Policy.PolicyName)
+	attributes.Set("policyFullName", policyFullName)
 
 	// Some IAM policies are global
 
