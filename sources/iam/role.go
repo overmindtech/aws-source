@@ -11,6 +11,7 @@ import (
 
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
+	"github.com/sourcegraph/conc/iter"
 )
 
 type RoleDetails struct {
@@ -169,9 +170,9 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 			return nil, err
 		}
 
-		for i := range out.Roles {
+		newRoles, err := iter.MapErr(out.Roles, func(role *types.Role) (*RoleDetails, error) {
 			details := RoleDetails{
-				Role: &out.Roles[i],
+				Role: role,
 			}
 
 			err = enrichRole(ctx, client, &details)
@@ -180,8 +181,14 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 				return nil, err
 			}
 
-			roles = append(roles, &details)
+			return &details, nil
+		})
+
+		if err != nil {
+			return nil, err
 		}
+
+		roles = append(roles, newRoles...)
 	}
 
 	return roles, nil
@@ -221,7 +228,6 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 				})
 			}
 		}
-
 	}
 
 	return &item, nil
