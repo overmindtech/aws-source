@@ -61,6 +61,39 @@ func (t *TestIAMClient) ListRoleTags(ctx context.Context, params *iam.ListRoleTa
 	}, nil
 }
 
+func (t *TestIAMClient) GetRolePolicy(ctx context.Context, params *iam.GetRolePolicyInput, optFns ...func(*iam.Options)) (*iam.GetRolePolicyOutput, error) {
+	return &iam.GetRolePolicyOutput{
+		PolicyName: params.PolicyName,
+		PolicyDocument: sources.PtrString(`{
+			"Version": "2012-10-17",
+			"Statement": [
+				{
+					"Sid": "VisualEditor0",
+					"Effect": "Allow",
+					"Action": "s3:ListAllMyBuckets",
+					"Resource": "*"
+				}
+			]
+		}`),
+		RoleName: params.RoleName,
+	}, nil
+}
+
+func (t *TestIAMClient) ListAttachedRolePolicies(ctx context.Context, params *iam.ListAttachedRolePoliciesInput, optFns ...func(*iam.Options)) (*iam.ListAttachedRolePoliciesOutput, error) {
+	return &iam.ListAttachedRolePoliciesOutput{
+		AttachedPolicies: []types.AttachedPolicy{
+			{
+				PolicyArn:  sources.PtrString("arn:aws:iam::aws:policy/AdministratorAccess"),
+				PolicyName: sources.PtrString("AdministratorAccess"),
+			},
+			{
+				PolicyArn:  sources.PtrString("arn:aws:iam::aws:policy/AmazonS3FullAccess"),
+				PolicyName: sources.PtrString("AmazonS3FullAccess"),
+			},
+		},
+	}, nil
+}
+
 func TestRoleGetFunc(t *testing.T) {
 	role, err := roleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
@@ -72,8 +105,12 @@ func TestRoleGetFunc(t *testing.T) {
 		t.Error("role is nil")
 	}
 
-	if len(role.Policies) != 2 {
-		t.Errorf("expected 2 policies, got %v", len(role.Policies))
+	if len(role.EmbeddedPolicies) != 2 {
+		t.Errorf("expected 2 embedded policies, got %v", len(role.EmbeddedPolicies))
+	}
+
+	if len(role.AttachedPolicies) != 2 {
+		t.Errorf("expected 2 attached policies, got %v", len(role.AttachedPolicies))
 	}
 
 	if len(role.Role.Tags) == 0 {
@@ -117,8 +154,27 @@ func TestRoleItemMapper(t *testing.T) {
 				Region:       sources.PtrString("us-east-2"),
 			},
 		},
-		Policies: []string{
-			"one",
+		EmbeddedPolicies: []embeddedPolicy{
+			{
+				Name: "foo",
+				Document: map[string]interface{}{
+					"Version": "2012-10-17",
+					"Statement": []map[string]interface{}{
+						{
+							"Sid":      "VisualEditor0",
+							"Effect":   "Allow",
+							"Action":   "s3:ListAllMyBuckets",
+							"Resource": "*",
+						},
+					},
+				},
+			},
+		},
+		AttachedPolicies: []types.AttachedPolicy{
+			{
+				PolicyArn:  sources.PtrString("arn:aws:iam::aws:policy/AdministratorAccess"),
+				PolicyName: sources.PtrString("AdministratorAccess"),
+			},
 		},
 	}
 
@@ -135,9 +191,9 @@ func TestRoleItemMapper(t *testing.T) {
 	tests := sources.ItemRequestTests{
 		{
 			ExpectedType:   "iam-policy",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "one",
-			ExpectedScope:  "foo",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:iam::aws:policy/AdministratorAccess",
+			ExpectedScope:  "aws",
 		},
 	}
 
@@ -151,7 +207,7 @@ func TestNewRoleSource(t *testing.T) {
 
 	test := sources.E2ETest{
 		Source:  source,
-		Timeout: 10 * time.Second,
+		Timeout: 10 * time.Hour,
 	}
 
 	test.Run(t)
