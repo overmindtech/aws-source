@@ -2,6 +2,8 @@ package iam
 
 import (
 	"context"
+	"encoding/json"
+	"net/url"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -12,8 +14,9 @@ import (
 )
 
 type RoleDetails struct {
-	Role     *types.Role
-	Policies []string
+	Role             *types.Role
+	EmbeddedPolicies []embeddedPolicy
+	AttachedPolicies []types.AttachedPolicy
 }
 
 func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
@@ -41,7 +44,18 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*R
 func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails) error {
 	var err error
 
-	roleDetails.Policies, err = getRolePolicies(ctx, client, *roleDetails.Role.RoleName)
+	// In this section we want to get the embedded polices, and determine links
+	// to the attached policies
+
+	// Get embedded policies
+	roleDetails.EmbeddedPolicies, err = getEmbeddedPolicies(ctx, client, *roleDetails.Role.RoleName)
+
+	if err != nil {
+		return err
+	}
+
+	// Get the attached policies and create links to these
+	roleDetails.AttachedPolicies, err = getAttachedPolicies(ctx, client, *roleDetails.Role.RoleName)
 
 	if err != nil {
 		return err
@@ -52,12 +66,18 @@ func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails)
 	return err
 }
 
-func getRolePolicies(ctx context.Context, client IAMClient, roleName string) ([]string, error) {
+type embeddedPolicy struct {
+	Name     string
+	Document map[string]interface{}
+}
+
+// getEmbeddedPolicies returns a list of inline policies embedded in the role
+func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string) ([]embeddedPolicy, error) {
 	policiesPaginator := iam.NewListRolePoliciesPaginator(client, &iam.ListRolePoliciesInput{
 		RoleName: &roleName,
 	})
 
-	policies := make([]string, 0)
+	policies := make([]embeddedPolicy, 0)
 
 	for policiesPaginator.HasMorePages() {
 		out, err := policiesPaginator.NextPage(ctx)
@@ -66,10 +86,64 @@ func getRolePolicies(ctx context.Context, client IAMClient, roleName string) ([]
 			return nil, err
 		}
 
-		policies = append(policies, out.PolicyNames...)
+		for _, policyName := range out.PolicyNames {
+			policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
+				RoleName:   &roleName,
+				PolicyName: &policyName,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			if policy != nil && policy.PolicyDocument != nil {
+				// URL Decode the policy document
+				unescaped, err := url.QueryUnescape(*policy.PolicyDocument)
+
+				if err != nil {
+					return nil, err
+				}
+
+				// Parse the policy into a map[string]interface{} from JSON
+				var policyDoc map[string]interface{}
+
+				err = json.Unmarshal([]byte(unescaped), &policyDoc)
+
+				if err != nil {
+					return nil, err
+				}
+
+				policies = append(policies, embeddedPolicy{
+					Name:     policyName,
+					Document: policyDoc,
+				})
+			}
+		}
 	}
 
 	return policies, nil
+}
+
+// getAttachedPolicies Gets the attached policies for a role, these are actual
+// managed policies that can be linked to rather than embedded ones
+func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string) ([]types.AttachedPolicy, error) {
+	paginator := iam.NewListAttachedRolePoliciesPaginator(client, &iam.ListAttachedRolePoliciesInput{
+		RoleName: &roleName,
+	})
+
+	attachedPolicies := make([]types.AttachedPolicy, 0)
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attachedPolicies = append(attachedPolicies, out.AttachedPolicies...)
+	}
+
+	return attachedPolicies, nil
 }
 
 func getRoleTags(ctx context.Context, client IAMClient, roleName string) ([]types.Tag, error) {
@@ -114,7 +188,15 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 }
 
 func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem.Role)
+	enrichedRole := struct {
+		*types.Role
+		EmbeddedPolicies []embeddedPolicy
+	}{
+		Role:             awsItem.Role,
+		EmbeddedPolicies: awsItem.EmbeddedPolicies,
+	}
+
+	attributes, err := sources.ToAttributesCase(enrichedRole)
 
 	if err != nil {
 		return nil, err
@@ -127,14 +209,19 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 		Scope:           scope,
 	}
 
-	for _, policy := range awsItem.Policies {
-		// +overmind:link iam-policy
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
-			Type:   "iam-policy",
-			Method: sdp.QueryMethod_GET,
-			Query:  policy,
-			Scope:  scope,
-		})
+	for _, policy := range awsItem.AttachedPolicies {
+		if policy.PolicyArn != nil {
+			if a, err := sources.ParseARN(*policy.PolicyArn); err == nil {
+				// +overmind:link iam-policy
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					Type:   "iam-policy",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *policy.PolicyArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				})
+			}
+		}
+
 	}
 
 	return &item, nil
