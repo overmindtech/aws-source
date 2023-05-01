@@ -80,4 +80,18 @@ func TestParseARN(t *testing.T) {
 			t.Errorf("expected account ID to be i-054dsfg34gdsfg38, got %v", a.ResourceID())
 		}
 	})
+
+	t.Run("arn:aws:iam::942836531449:policy/OvermindReadonly", func(t *testing.T) {
+		arn := "arn:aws:iam::942836531449:policy/OvermindReadonly"
+
+		a, err := ParseARN(arn)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if a.ResourceID() != "OvermindReadonly" {
+			t.Errorf("expected account ID to be OvermindReadonly, got %v", a.ResourceID())
+		}
+	})
 }

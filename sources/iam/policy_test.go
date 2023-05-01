@@ -201,6 +201,10 @@ func TestPolicyItemMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+
+	if item.UniqueAttributeValue() != "service-role/AWSControlTowerAdminPolicy" {
+		t.Errorf("unexpected unique attribute value, got %s", item.UniqueAttributeValue())
+	}
 }
 
 func TestNewPolicySource(t *testing.T) {
