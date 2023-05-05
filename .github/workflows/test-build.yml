@@ -34,9 +34,9 @@ jobs:
         run: |
           mkdir -p ~/.local/bin/ && curl -Lo ~/.local/bin/docgen https://github.com/overmindtech/docgen/releases/latest/download/docgen-amd64 && chmod +x ~/.local/bin/docgen
           go generate ./...
-          if [ -z "$(git status --porcelain)" ]; then 
+          if [ -z "$(git status --porcelain)" ]; then
             echo "No pending docs changes"
-          else 
+          else
             echo "Pending docs changes found, please run 'go generate ./...' and commit the changes"
             git status
             exit 1
@@ -108,12 +108,12 @@ jobs:
           driver: kubernetes
           platforms: linux/amd64
           driver-opts: |
-            namespace=buildkit,"nodeselector=kubernetes.io/arch=amd64"
+            namespace=buildkit,"nodeselector=kubernetes.io/arch=amd64",requests.cpu=1,requests.mem=1G,limits.mem=4G
           append: |
             - name: ${{ matrix.image_name }}-${{ github.run_id }}-${{ github.run_attempt }}-arm64
               platforms: linux/arm64
               driver-opts:
-                - namespace=buildkit,"nodeselector=kubernetes.io/arch=arm64"
+                - namespace=buildkit,"nodeselector=kubernetes.io/arch=arm64",requests.cpu=1,requests.mem=1G,limits.mem=4G
 
       - name: Build and push
         id: push
