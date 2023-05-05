@@ -121,7 +121,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 // +overmind:group AWS
 
 // NewAddressSource Creates a new source for aws-Address resources
-func NewAddressSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
+func NewAddressSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),

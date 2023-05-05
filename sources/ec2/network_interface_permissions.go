@@ -68,7 +68,7 @@ func networkInterfacePermissionOutputMapper(scope string, _ *ec2.DescribeNetwork
 // +overmind:search Search network interface permissions by ARN
 // +overmind:group AWS
 
-func NewNetworkInterfacePermissionSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkInterfacePermissionSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),

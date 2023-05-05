@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
@@ -21,7 +22,7 @@ type PolicyDetails struct {
 	PolicyUsers  []types.PolicyUser
 }
 
-func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
+func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*PolicyDetails, error) {
 	// Construct the ARN from the name etc.
 	a := sources.ARN{
 		ARN: arn.ARN{
@@ -33,6 +34,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 		},
 	}
 
+	<-limit.C
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
 		PolicyArn: sources.PtrString(a.String()),
 	})
@@ -46,7 +48,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	}
 
 	if out.Policy != nil {
-		err := enrichPolicy(ctx, client, &details)
+		err := enrichPolicy(ctx, client, &details, limit)
 
 		if err != nil {
 			return nil, err
@@ -56,19 +58,20 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	return &details, nil
 }
 
-func enrichPolicy(ctx context.Context, client IAMClient, details *PolicyDetails) error {
-	err := addTags(ctx, client, details)
+func enrichPolicy(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
+	err := addTags(ctx, client, details, limit)
 
 	if err != nil {
 		return err
 	}
 
-	err = addPolicyEntities(ctx, client, details)
+	err = addPolicyEntities(ctx, client, details, limit)
 
 	return err
 }
 
-func addTags(ctx context.Context, client IAMClient, details *PolicyDetails) error {
+func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
+	<-limit.C
 	out, err := client.ListPolicyTags(ctx, &iam.ListPolicyTagsInput{
 		PolicyArn: details.Policy.Arn,
 	})
@@ -82,7 +85,7 @@ func addTags(ctx context.Context, client IAMClient, details *PolicyDetails) erro
 	return nil
 }
 
-func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails) error {
+func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
 	if details == nil {
 		return errors.New("details is nil")
 	}
@@ -96,6 +99,7 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 	})
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -113,7 +117,7 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 // PolicyListFunc Lists all attached policies. There is no way to list
 // unattached policies since I don't think it will be very valuable, there are
 // hundreds by default and if you aren't using them they aren't very interesting
-func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
+func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*PolicyDetails, error) {
 	policies := make([]types.Policy, 0)
 
 	paginator := iam.NewListPoliciesPaginator(client, &iam.ListPoliciesInput{
@@ -121,6 +125,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 	})
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -137,7 +142,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 			Policy: &policies[i],
 		}
 
-		err := enrichPolicy(ctx, client, &details)
+		err := enrichPolicy(ctx, client, &details, limit)
 
 		if err != nil {
 			return nil, err
@@ -224,19 +229,24 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-source/issues/68
-func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
+func NewPolicySource(config aws.Config, accountID string, _ string, limit *sources.LimitBucket) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType:  "iam-policy",
-		Client:    iam.NewFromConfig(config),
-		AccountID: accountID,
-		Region:    "", // IAM policies aren't tied to a region
+		ItemType:      "iam-policy",
+		Client:        iam.NewFromConfig(config),
+		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:     accountID,
+		Region:        "", // IAM policies aren't tied to a region
 
 		// Some IAM policies are global, this means that their ARN doesn't
 		// contain an account name and instead just says "aws". Enabling this
 		// setting means these also work
 		SupportGlobalResources: true,
-		GetFunc:                policyGetFunc,
-		ListFunc:               policyListFunc,
-		ItemMapper:             policyItemMapper,
+		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
+			return policyGetFunc(ctx, client, scope, query, limit)
+		},
+		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
+			return policyListFunc(ctx, client, scope, limit)
+		},
+		ItemMapper: policyItemMapper,
 	}
 }

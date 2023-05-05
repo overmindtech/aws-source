@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -75,17 +74,7 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 func TestNewPlacementGroupSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewPlacementGroupSource(config, account, &rateLimit)
+	source := NewPlacementGroupSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

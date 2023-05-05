@@ -1,4 +1,4 @@
-package iam
+package ec2
 
 import (
 	"context"
@@ -8,12 +8,9 @@ import (
 	"github.com/overmindtech/aws-source/sources"
 )
 
-// TestIAMClient Test client that returns three pages
-type TestIAMClient struct{}
-
 var TestRateLimit = sources.LimitBucket{
-	MaxCapacity: 20,
-	RefillRate:  15,
+	MaxCapacity: 50,
+	RefillRate:  20,
 }
 
 func TestMain(m *testing.M) {

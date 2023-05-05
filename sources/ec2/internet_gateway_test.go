@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -97,17 +96,7 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 func TestNewInternetGatewaySource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewInternetGatewaySource(config, account, &rateLimit)
+	source := NewInternetGatewaySource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

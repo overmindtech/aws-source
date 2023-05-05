@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -64,13 +65,20 @@ func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:search Search for a group by ARN
 // +overmind:group AWS
 
-func NewGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
+func NewGroupSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
-		ItemType:   "iam-group",
-		Client:     iam.NewFromConfig(config),
-		AccountID:  accountID,
-		GetFunc:    groupGetFunc,
-		ListFunc:   groupListFunc,
+		ItemType:      "iam-group",
+		Client:        iam.NewFromConfig(config),
+		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:     accountID,
+		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
+			<-limit.C
+			return groupGetFunc(ctx, client, scope, query)
+		},
+		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.Group, error) {
+			<-limit.C
+			return groupListFunc(ctx, client, scope)
+		},
 		ItemMapper: groupItemMapper,
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/aws-source/sources/autoscaling"
 	"github.com/overmindtech/aws-source/sources/cloudwatch"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
@@ -178,7 +179,7 @@ var rootCmd = &cobra.Command{
 
 			// Create an EC2 rate limit which limits the source to 50% of the
 			// overall rate limit
-			ec2RateLimit := ec2.LimitBucket{
+			ec2RateLimit := sources.LimitBucket{
 				MaxCapacity: 50,
 				RefillRate:  10,
 			}
@@ -186,8 +187,16 @@ var rootCmd = &cobra.Command{
 			// Apparently Autoscaling has a separate bucket to EC2 but I'm going
 			// to assume the values are the same, the documentation for rate
 			// limiting for everything other than EC2 is very poor
-			autoScalingRateLimit := ec2.LimitBucket{
+			autoScalingRateLimit := sources.LimitBucket{
 				MaxCapacity: 50,
+				RefillRate:  10,
+			}
+
+			// IAM's rate limit is 20 per second, so we'll use 50% of that at
+			// maximum. See:
+			// https://docs.aws.amazon.com/singlesignon/latest/userguide/limits.html
+			iamRateLimit := sources.LimitBucket{
+				MaxCapacity: 10,
 				RefillRate:  10,
 			}
 
@@ -196,6 +205,7 @@ var rootCmd = &cobra.Command{
 
 			ec2RateLimit.Start(rateLimitCtx)
 			autoScalingRateLimit.Start(rateLimitCtx)
+			iamRateLimit.Start(rateLimitCtx)
 
 			sources := []discovery.Source{
 				// EC2
@@ -244,10 +254,10 @@ var rootCmd = &cobra.Command{
 				cloudwatch.NewAlarmSource(cfg, *callerID.Account),
 
 				// IAM
-				iam.NewGroupSource(cfg, *callerID.Account, region),
-				iam.NewUserSource(cfg, *callerID.Account, region),
-				iam.NewRoleSource(cfg, *callerID.Account, region),
-				iam.NewPolicySource(cfg, *callerID.Account, region),
+				iam.NewGroupSource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewUserSource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewRoleSource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewPolicySource(cfg, *callerID.Account, region, &iamRateLimit),
 
 				// Lambda
 				lambda.NewFunctionSource(cfg, *callerID.Account, region),

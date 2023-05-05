@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -85,17 +84,7 @@ func TestRegionOutputMapper(t *testing.T) {
 func TestNewRegionSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewRegionSource(config, account, &rateLimit)
+	source := NewRegionSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

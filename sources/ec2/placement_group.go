@@ -58,7 +58,7 @@ func placementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInpu
 // +overmind:search Search for placement groups by ARN
 // +overmind:group AWS
 
-func NewPlacementGroupSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
+func NewPlacementGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),

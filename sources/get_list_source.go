@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/overmindtech/sdp-go"
 )
@@ -11,11 +12,12 @@ import (
 // GetListSource A source for AWS APIs where the Get and List functions both
 // return the full item, such as many of the IAM APIs
 type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
-	ItemType               string       // The type of items that will be returned
-	Client                 ClientStruct // The AWS API client
-	AccountID              string       // The AWS account ID
-	Region                 string       // The AWS region this is related to
-	SupportGlobalResources bool         // If true, this will also support resources in the "aws" scope which are global
+	ItemType               string        // The type of items that will be returned
+	Client                 ClientStruct  // The AWS API client
+	AccountID              string        // The AWS account ID
+	Region                 string        // The AWS region this is related to
+	SupportGlobalResources bool          // If true, this will also support resources in the "aws" scope which are global
+	CacheDuration          time.Duration // How long to cache items for
 
 	// Disables List(), meaning all calls will return empty results. This does
 	// not affect Search()
@@ -61,6 +63,15 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Type() string {
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
+}
+
+// DefaultCacheDuration Returns the default cache duration for this source
+func (s *GetListSource[AWSItem, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
+	if s.CacheDuration == 0 {
+		return 10 * time.Minute
+	}
+
+	return s.CacheDuration
 }
 
 // List of scopes that this source is capable of find items for. This will be

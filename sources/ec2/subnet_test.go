@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -120,17 +119,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 func TestNewSubnetSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewSubnetSource(config, account, &rateLimit)
+	source := NewSubnetSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

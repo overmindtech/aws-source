@@ -73,7 +73,7 @@ func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 // +overmind:search Search for security groups by ARN
 // +overmind:group AWS
 
-func NewSecurityGroupSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
+func NewSecurityGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),

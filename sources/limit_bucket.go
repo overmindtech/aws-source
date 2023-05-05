@@ -1,4 +1,4 @@
-package ec2
+package sources
 
 import (
 	"context"
@@ -13,7 +13,7 @@ const DefaultRefillDuration = time.Second
 // LimitBucket A struct that limits API usage in the same way that EC2 does:
 // https://docs.aws.amazon.com/AWSEC2/latest/APIReference/throttling.html
 type LimitBucket struct {
-	// The maximum number of tokens taht can be the bucket
+	// The maximum number of tokens that can be the bucket
 	MaxCapacity int
 
 	// How many tokens refill per refillDuration
@@ -26,7 +26,7 @@ type LimitBucket struct {
 	C <-chan struct{}
 	c chan struct{} // Internal version of `C`
 
-	// Channel that sends whicther or not the bucket is full each time the
+	// Channel that sends whether or not the bucket is full each time the
 	// bucket is refilled
 	bucketFull chan bool
 }

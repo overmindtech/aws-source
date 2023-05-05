@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -109,17 +108,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 func TestNewVolumeSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewVolumeSource(config, account, &rateLimit)
+	source := NewVolumeSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

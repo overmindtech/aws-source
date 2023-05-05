@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"github.com/overmindtech/aws-source/sources"
-	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -154,7 +153,7 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 // +overmind:group AWS
 //
 //go:generate docgen ../../docs-data
-func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *ec2.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
+func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:  "autoscaling-auto-scaling-group",
 		Config:    config,
@@ -172,6 +171,7 @@ func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *ec2.L
 			return autoscaling.NewDescribeAutoScalingGroupsPaginator(client, params)
 		},
 		DescribeFunc: func(ctx context.Context, client *autoscaling.Client, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
+			<-limit.C // Wait for rate limiting
 			return client.DescribeAutoScalingGroups(ctx, input)
 		},
 		OutputMapper: autoScalingGroupOutputMapper,

@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -16,7 +17,8 @@ type UserDetails struct {
 	UserGroups []types.Group
 }
 
-func userGetFunc(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
+func userGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*UserDetails, error) {
+	<-limit.C
 	out, err := client.GetUser(ctx, &iam.GetUserInput{
 		UserName: &query,
 	})
@@ -30,23 +32,23 @@ func userGetFunc(ctx context.Context, client IAMClient, scope, query string) (*U
 	}
 
 	if out.User != nil {
-		enrichUser(ctx, client, &details)
+		enrichUser(ctx, client, &details, limit)
 	}
 
 	return &details, nil
 }
 
 // enrichUser Enriches the user with group and tag info
-func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails) error {
+func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails, limit *sources.LimitBucket) error {
 	var err error
 
-	userDetails.UserGroups, err = getUserGroups(ctx, client, userDetails.User.UserName)
+	userDetails.UserGroups, err = getUserGroups(ctx, client, userDetails.User.UserName, limit)
 
 	if err != nil {
 		return err
 	}
 
-	userDetails.User.Tags, err = getUserTags(ctx, client, userDetails.User.UserName)
+	userDetails.User.Tags, err = getUserTags(ctx, client, userDetails.User.UserName, limit)
 
 	if err != nil {
 		return err
@@ -56,7 +58,7 @@ func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails)
 }
 
 // Gets all of the groups that a user is in
-func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]types.Group, error) {
+func getUserGroups(ctx context.Context, client IAMClient, userName *string, limit *sources.LimitBucket) ([]types.Group, error) {
 	var out *iam.ListGroupsForUserOutput
 	var err error
 	groups := make([]types.Group, 0)
@@ -66,6 +68,7 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 	})
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -82,7 +85,7 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 // GetUserTags Gets the tags for a user since the API doesn't actually return
 // this, even though it says it does see:
 // https://github.com/boto/boto3/issues/1855
-func getUserTags(ctx context.Context, client IAMClient, userName *string) ([]types.Tag, error) {
+func getUserTags(ctx context.Context, client IAMClient, userName *string, limit *sources.LimitBucket) ([]types.Tag, error) {
 	paginator := iam.NewListUserTagsPaginator(client, &iam.ListUserTagsInput{
 		UserName: userName,
 	})
@@ -93,6 +96,7 @@ func getUserTags(ctx context.Context, client IAMClient, userName *string) ([]typ
 	tags := make([]types.Tag, 0)
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -105,7 +109,7 @@ func getUserTags(ctx context.Context, client IAMClient, userName *string) ([]typ
 	return tags, err
 }
 
-func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
+func userListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*UserDetails, error) {
 	var out *iam.ListUsersOutput
 	var err error
 	users := make([]types.User, 0)
@@ -113,6 +117,7 @@ func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserD
 	paginator := iam.NewListUsersPaginator(client, &iam.ListUsersInput{})
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -129,7 +134,7 @@ func userListFunc(ctx context.Context, client IAMClient, scope string) ([]*UserD
 			User: &users[i],
 		}
 
-		enrichUser(ctx, client, &details)
+		enrichUser(ctx, client, &details, limit)
 
 		userDetails[i] = &details
 	}
@@ -172,14 +177,19 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 // +overmind:search Search for users by ARN
 // +overmind:group AWS
 
-func NewUserSource(config aws.Config, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
+func NewUserSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{
-		ItemType:   "iam-user",
-		Client:     iam.NewFromConfig(config),
-		AccountID:  accountID,
-		Region:     region,
-		GetFunc:    userGetFunc,
-		ListFunc:   userListFunc,
+		ItemType:      "iam-user",
+		Client:        iam.NewFromConfig(config),
+		AccountID:     accountID,
+		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		Region:        region,
+		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
+			return userGetFunc(ctx, client, scope, query, limit)
+		},
+		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
+			return userListFunc(ctx, client, scope, limit)
+		},
 		ItemMapper: userItemMapper,
 	}
 }
