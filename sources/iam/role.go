@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/url"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -20,7 +21,8 @@ type RoleDetails struct {
 	AttachedPolicies []types.AttachedPolicy
 }
 
-func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
+func roleGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*RoleDetails, error) {
+	<-limit.C
 	out, err := client.GetRole(ctx, &iam.GetRoleInput{
 		RoleName: &query,
 	})
@@ -33,7 +35,7 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*R
 		Role: out.Role,
 	}
 
-	err = enrichRole(ctx, client, &details)
+	err = enrichRole(ctx, client, &details, limit)
 
 	if err != nil {
 		return nil, err
@@ -42,27 +44,27 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string) (*R
 	return &details, nil
 }
 
-func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails) error {
+func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails, limit *sources.LimitBucket) error {
 	var err error
 
 	// In this section we want to get the embedded polices, and determine links
 	// to the attached policies
 
 	// Get embedded policies
-	roleDetails.EmbeddedPolicies, err = getEmbeddedPolicies(ctx, client, *roleDetails.Role.RoleName)
+	roleDetails.EmbeddedPolicies, err = getEmbeddedPolicies(ctx, client, *roleDetails.Role.RoleName, limit)
 
 	if err != nil {
 		return err
 	}
 
 	// Get the attached policies and create links to these
-	roleDetails.AttachedPolicies, err = getAttachedPolicies(ctx, client, *roleDetails.Role.RoleName)
+	roleDetails.AttachedPolicies, err = getAttachedPolicies(ctx, client, *roleDetails.Role.RoleName, limit)
 
 	if err != nil {
 		return err
 	}
 
-	roleDetails.Role.Tags, err = getRoleTags(ctx, client, *roleDetails.Role.RoleName)
+	roleDetails.Role.Tags, err = getRoleTags(ctx, client, *roleDetails.Role.RoleName, limit)
 
 	return err
 }
@@ -73,7 +75,7 @@ type embeddedPolicy struct {
 }
 
 // getEmbeddedPolicies returns a list of inline policies embedded in the role
-func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string) ([]embeddedPolicy, error) {
+func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]embeddedPolicy, error) {
 	policiesPaginator := iam.NewListRolePoliciesPaginator(client, &iam.ListRolePoliciesInput{
 		RoleName: &roleName,
 	})
@@ -81,6 +83,7 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string)
 	policies := make([]embeddedPolicy, 0)
 
 	for policiesPaginator.HasMorePages() {
+		<-limit.C
 		out, err := policiesPaginator.NextPage(ctx)
 
 		if err != nil {
@@ -88,6 +91,7 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string)
 		}
 
 		for _, policyName := range out.PolicyNames {
+			<-limit.C
 			policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
 				RoleName:   &roleName,
 				PolicyName: &policyName,
@@ -127,7 +131,7 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string)
 
 // getAttachedPolicies Gets the attached policies for a role, these are actual
 // managed policies that can be linked to rather than embedded ones
-func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string) ([]types.AttachedPolicy, error) {
+func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]types.AttachedPolicy, error) {
 	paginator := iam.NewListAttachedRolePoliciesPaginator(client, &iam.ListAttachedRolePoliciesInput{
 		RoleName: &roleName,
 	})
@@ -135,6 +139,7 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string)
 	attachedPolicies := make([]types.AttachedPolicy, 0)
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -147,7 +152,8 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string)
 	return attachedPolicies, nil
 }
 
-func getRoleTags(ctx context.Context, client IAMClient, roleName string) ([]types.Tag, error) {
+func getRoleTags(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]types.Tag, error) {
+	<-limit.C
 	out, err := client.ListRoleTags(ctx, &iam.ListRoleTagsInput{
 		RoleName: &roleName,
 	})
@@ -159,11 +165,12 @@ func getRoleTags(ctx context.Context, client IAMClient, roleName string) ([]type
 	return out.Tags, nil
 }
 
-func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
+func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
 
 	for paginator.HasMorePages() {
+		<-limit.C
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -175,7 +182,7 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string) ([]*RoleD
 				Role: role,
 			}
 
-			err = enrichRole(ctx, client, &details)
+			err = enrichRole(ctx, client, &details, limit)
 
 			if err != nil {
 				return nil, err
@@ -241,13 +248,18 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 // +overmind:search Search for IAM roles by ARN
 // +overmind:group AWS
 
-func NewRoleSource(config aws.Config, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
+func NewRoleSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
-		ItemType:   "iam-role",
-		Client:     iam.NewFromConfig(config),
-		AccountID:  accountID,
-		GetFunc:    roleGetFunc,
-		ListFunc:   roleListFunc,
+		ItemType:      "iam-role",
+		Client:        iam.NewFromConfig(config),
+		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:     accountID,
+		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
+			return roleGetFunc(ctx, client, scope, query, limit)
+		},
+		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
+			return roleListFunc(ctx, client, scope, limit)
+		},
 		ItemMapper: roleItemMapper,
 	}
 }

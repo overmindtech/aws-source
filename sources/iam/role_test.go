@@ -95,7 +95,7 @@ func (t *TestIAMClient) ListAttachedRolePolicies(ctx context.Context, params *ia
 }
 
 func TestRoleGetFunc(t *testing.T) {
-	role, err := roleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
+	role, err := roleGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar", &TestRateLimit)
 
 	if err != nil {
 		t.Error(err)
@@ -119,7 +119,7 @@ func TestRoleGetFunc(t *testing.T) {
 }
 
 func TestRoleListFunc(t *testing.T) {
-	roles, err := roleListFunc(context.Background(), &TestIAMClient{}, "foo")
+	roles, err := roleListFunc(context.Background(), &TestIAMClient{}, "foo", &TestRateLimit)
 
 	if err != nil {
 		t.Error(err)
@@ -203,11 +203,11 @@ func TestRoleItemMapper(t *testing.T) {
 func TestNewRoleSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
-	source := NewRoleSource(config, account, region)
+	source := NewRoleSource(config, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,
-		Timeout: 10 * time.Hour,
+		Timeout: 30 * time.Hour,
 	}
 
 	test.Run(t)

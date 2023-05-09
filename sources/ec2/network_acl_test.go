@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -133,17 +132,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 func TestNewNetworkAclSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewNetworkAclSource(config, account, &rateLimit)
+	source := NewNetworkAclSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

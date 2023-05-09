@@ -32,11 +32,11 @@ func TestGroupItemMapper(t *testing.T) {
 func TestNewGroupSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
-	source := NewGroupSource(config, account, region)
+	source := NewGroupSource(config, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,
-		Timeout: 10 * time.Second,
+		Timeout: 30 * time.Second,
 	}
 
 	test.Run(t)

@@ -73,7 +73,7 @@ func availabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZones
 // +overmind:group AWS
 
 // NewAvailabilityZoneSource Creates a new source for aws-availabilityzone resources
-func NewAvailabilityZoneSource(config aws.Config, accountID string, limit *LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options] {
+func NewAvailabilityZoneSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeAvailabilityZonesInput, *ec2.DescribeAvailabilityZonesOutput, *ec2.Client, *ec2.Options]{
 		Config:    config,
 		Client:    ec2.NewFromConfig(config),

@@ -1,7 +1,6 @@
 package ec2
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -100,17 +99,7 @@ func TestVpcOutputMapper(t *testing.T) {
 func TestNewVpcSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
 
-	rateLimit := LimitBucket{
-		MaxCapacity: 50,
-		RefillRate:  10,
-	}
-
-	rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-	defer rateLimitCancel()
-
-	rateLimit.Start(rateLimitCtx)
-
-	source := NewVpcSource(config, account, &rateLimit)
+	source := NewVpcSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,
