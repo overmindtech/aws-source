@@ -35,12 +35,12 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 				if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification != nil {
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
 						// +overmind:link ec2-launch-template
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ec2-launch-template",
 							Method: sdp.QueryMethod_GET,
 							Query:  *asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId,
 							Scope:  scope,
-						})
+						}})
 					}
 				}
 			}
@@ -52,45 +52,45 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		for _, tgARN := range asg.TargetGroupARNs {
 			if a, err = sources.ParseARN(tgARN); err == nil {
 				// +overmind:link elbv2-target-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  tgARN,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		for _, az := range asg.AvailabilityZones {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  az,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *instance.InstanceId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if instance.LaunchTemplate != nil {
 				if instance.LaunchTemplate.LaunchTemplateId != nil {
 					// +overmind:link ec2-launch-template
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-launch-template",
 						Method: sdp.QueryMethod_GET,
 						Query:  *instance.LaunchTemplate.LaunchTemplateId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 		}
@@ -98,45 +98,45 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		if asg.ServiceLinkedRoleARN != nil {
 			if a, err = sources.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *asg.ServiceLinkedRoleARN,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if asg.LaunchConfigurationName != nil {
 			// +overmind:link autoscaling-launch-configuration
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "autoscaling-launch-configuration",
 				Method: sdp.QueryMethod_GET,
 				Query:  *asg.LaunchConfigurationName,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if asg.LaunchTemplate != nil {
 			if asg.LaunchTemplate.LaunchTemplateId != nil {
 				// +overmind:link ec2-launch-template
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-launch-template",
 					Method: sdp.QueryMethod_GET,
 					Query:  *asg.LaunchTemplate.LaunchTemplateId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if asg.PlacementGroup != nil {
 			// +overmind:link ec2-placement-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-placement-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  *asg.PlacementGroup,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

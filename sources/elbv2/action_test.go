@@ -74,7 +74,7 @@ func TestActionToRequests(t *testing.T) {
 		LinkedItemQueries: ActionToRequests(action),
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "cognito-idp-user-pool",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

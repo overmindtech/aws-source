@@ -95,7 +95,7 @@ func TestLayerVersionGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "signer-signing-job",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

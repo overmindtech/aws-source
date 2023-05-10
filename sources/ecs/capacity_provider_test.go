@@ -109,7 +109,7 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "autoscaling-auto-scaling-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

@@ -47,46 +47,46 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 		if ni.Attachment != nil {
 			if ni.Attachment.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *ni.Attachment.InstanceId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if ni.AvailabilityZone != nil {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ni.AvailabilityZone,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, sg := range ni.Groups {
 			if sg.GroupId != nil {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *sg.GroupId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		for _, ip := range ni.Ipv6Addresses {
 			if ip.Ipv6Address != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
 					Query:  *ip.Ipv6Address,
 					Scope:  "global",
-				})
+				}})
 			}
 		}
 
@@ -94,84 +94,84 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 			if assoc := ip.Association; assoc != nil {
 				if assoc.PublicDnsName != nil {
 					// +overmind:link dns
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "dns",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *assoc.PublicDnsName,
 						Scope:  "global",
-					})
+					}})
 				}
 
 				if assoc.PublicIp != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.PublicIp,
 						Scope:  "global",
-					})
+					}})
 				}
 
 				if assoc.CarrierIp != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.CarrierIp,
 						Scope:  "global",
-					})
+					}})
 				}
 
 				if assoc.CustomerOwnedIp != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ip",
 						Method: sdp.QueryMethod_GET,
 						Query:  *assoc.CustomerOwnedIp,
 						Scope:  "global",
-					})
+					}})
 				}
 			}
 
 			if ip.PrivateDnsName != nil {
 				// +overmind:link dns
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *ip.PrivateDnsName,
 					Scope:  "global",
-				})
+				}})
 			}
 
 			if ip.PrivateIpAddress != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
 					Query:  *ip.PrivateIpAddress,
 					Scope:  "global",
-				})
+				}})
 			}
 		}
 
 		if ni.SubnetId != nil {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ni.SubnetId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if ni.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ni.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

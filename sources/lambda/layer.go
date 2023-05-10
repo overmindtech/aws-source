@@ -47,12 +47,12 @@ func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, er
 
 	if awsItem.LatestMatchingVersion != nil {
 		// +overmind:link lambda-layer-version
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "lambda-layer-version",
 			Method: sdp.QueryMethod_GET,
 			Query:  fmt.Sprintf("%v:%v", *awsItem.LayerName, awsItem.LatestMatchingVersion.Version),
 			Scope:  scope,
-		})
+		}})
 	}
 
 	return &item, nil

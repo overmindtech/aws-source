@@ -45,22 +45,22 @@ func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 		if at := ew.AssociationTarget; at != nil {
 			for _, id := range at.DedicatedHostIds {
 				// +overmind:link ec2-host
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-host",
 					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			for _, id := range at.InstanceIds {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 

@@ -46,22 +46,22 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 
 		if subnet.AvailabilityZone != nil {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *subnet.AvailabilityZone,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if subnet.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *subnet.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

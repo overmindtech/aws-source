@@ -74,7 +74,7 @@ func TestS3GetImpl(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "http",
 			ExpectedMethod: sdp.QueryMethod_GET,

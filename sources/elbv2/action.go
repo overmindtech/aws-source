@@ -9,60 +9,60 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ActionToRequests(action types.Action) []*sdp.Query {
-	requests := make([]*sdp.Query, 0)
+func ActionToRequests(action types.Action) []*sdp.LinkedItemQuery {
+	requests := make([]*sdp.LinkedItemQuery, 0)
 
 	if action.AuthenticateCognitoConfig != nil {
 		if action.AuthenticateCognitoConfig.UserPoolArn != nil {
 			if a, err := sources.ParseARN(*action.AuthenticateCognitoConfig.UserPoolArn); err == nil {
-				requests = append(requests, &sdp.Query{
+				requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "cognito-idp-user-pool",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *action.AuthenticateCognitoConfig.UserPoolArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}
 
 	if action.AuthenticateOidcConfig != nil {
 		if action.AuthenticateOidcConfig.AuthorizationEndpoint != nil {
-			requests = append(requests, &sdp.Query{
+			requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.AuthorizationEndpoint,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if action.AuthenticateOidcConfig.TokenEndpoint != nil {
-			requests = append(requests, &sdp.Query{
+			requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.TokenEndpoint,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if action.AuthenticateOidcConfig.UserInfoEndpoint != nil {
-			requests = append(requests, &sdp.Query{
+			requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *action.AuthenticateOidcConfig.UserInfoEndpoint,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if action.ForwardConfig != nil {
 			for _, tg := range action.ForwardConfig.TargetGroups {
 				if tg.TargetGroupArn != nil {
 					if a, err := sources.ParseARN(*tg.TargetGroupArn); err == nil {
-						requests = append(requests, &sdp.Query{
+						requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "elbv2-target-group",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *tg.TargetGroupArn,
 							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						})
+						}})
 					}
 				}
 			}
@@ -96,23 +96,23 @@ func ActionToRequests(action types.Action) []*sdp.Query {
 			}
 
 			if u.Scheme == "http" || u.Scheme == "https" {
-				requests = append(requests, &sdp.Query{
+				requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "http",
 					Method: sdp.QueryMethod_GET,
 					Query:  u.String(),
 					Scope:  "global",
-				})
+				}})
 			}
 		}
 
 		if action.TargetGroupArn != nil {
 			if a, err := sources.ParseARN(*action.TargetGroupArn); err == nil {
-				requests = append(requests, &sdp.Query{
+				requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "elbv2-target-group",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *action.TargetGroupArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}

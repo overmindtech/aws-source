@@ -35,7 +35,7 @@ func TestHostedZoneItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "route53-resource-record-set",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

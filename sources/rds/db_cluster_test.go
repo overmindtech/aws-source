@@ -144,7 +144,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "rds-db-subnet-group",
 			ExpectedMethod: sdp.QueryMethod_GET,

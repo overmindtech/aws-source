@@ -30,34 +30,34 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 		if sg.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *sg.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
 					Query:  *subnet.SubnetIdentifier,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if subnet.SubnetAvailabilityZone != nil {
 				if subnet.SubnetAvailabilityZone.Name != nil {
 					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.QueryMethod_GET,
 						Query:  *subnet.SubnetAvailabilityZone.Name,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
@@ -65,12 +65,12 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = sources.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
 						// +overmind:link outposts-outpost
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "outposts-outpost",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *subnet.SubnetOutpost.Arn,
 							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						})
+						}})
 					}
 				}
 			}

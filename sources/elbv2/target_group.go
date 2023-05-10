@@ -28,33 +28,33 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 
 		if tg.TargetGroupArn != nil {
 			// +overmind:link elbv2-target-health
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "elbv2-target-health",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *tg.TargetGroupArn,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if tg.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *tg.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, lbArn := range tg.LoadBalancerArns {
 			if a, err := sources.ParseARN(lbArn); err == nil {
 				// +overmind:link elbv2-load-balancer
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  lbArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 

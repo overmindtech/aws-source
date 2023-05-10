@@ -58,68 +58,68 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
 			// +overmind:link ec2-key-pair
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-key-pair",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ng.RemoteAccess.Ec2SshKey,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  sg,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 
 	for _, subnet := range ng.Subnets {
 		// +overmind:link ec2-subnet
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "ec2-subnet",
 			Method: sdp.QueryMethod_GET,
 			Query:  subnet,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	if ng.Resources != nil {
 		for _, g := range ng.Resources.AutoScalingGroups {
 			if g.Name != nil {
 				// +overmind:link autoscaling-auto-scaling-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "autoscaling-auto-scaling-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *g.Name,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ng.Resources.RemoteAccessSecurityGroup,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 
 	if ng.LaunchTemplate != nil {
 		if ng.LaunchTemplate.Id != nil {
 			// +overmind:link ec2-launch-template
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-launch-template",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ng.LaunchTemplate.Id,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 

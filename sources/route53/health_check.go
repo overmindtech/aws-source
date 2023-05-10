@@ -97,12 +97,12 @@ func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error
 
 	if err == nil {
 		// +overmind:link cloudwatch-alarm
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "cloudwatch-alarm",
 			Query:  query,
 			Method: sdp.QueryMethod_SEARCH,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	healthy := true

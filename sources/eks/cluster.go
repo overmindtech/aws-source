@@ -37,27 +37,33 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
-		LinkedItemQueries: []*sdp.Query{
+		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
-				// +overmind:link eks-addon
-				Type:   "eks-addon",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.Name,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link eks-addon
+					Type:   "eks-addon",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.Name,
+					Scope:  scope,
+				},
 			},
 			{
-				// +overmind:link eks-fargate-profile
-				Type:   "eks-fargate-profile",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.Name,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link eks-fargate-profile
+					Type:   "eks-fargate-profile",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.Name,
+					Scope:  scope,
+				},
 			},
 			{
-				// +overmind:link eks-nodegroup
-				Type:   "eks-nodegroup",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.Name,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link eks-nodegroup
+					Type:   "eks-nodegroup",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.Name,
+					Scope:  scope,
+				},
 			},
 		},
 	}
@@ -83,12 +89,12 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if cluster.ConnectorConfig.RoleArn != nil {
 			if a, err = sources.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ConnectorConfig.RoleArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}
@@ -98,12 +104,12 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 			if conf.Provider.KeyArn != nil {
 				if a, err = sources.ParseARN(*conf.Provider.KeyArn); err == nil {
 					// +overmind:link kms-key
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "kms-key",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *conf.Provider.KeyArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 		}
@@ -111,65 +117,65 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.Endpoint != nil {
 		// +overmind:link http
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "http",
 			Method: sdp.QueryMethod_GET,
 			Query:  *cluster.Endpoint,
 			Scope:  "global",
-		})
+		}})
 	}
 
 	if cluster.ResourcesVpcConfig != nil {
 		if cluster.ResourcesVpcConfig.ClusterSecurityGroupId != nil {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.ClusterSecurityGroupId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SecurityGroupIds {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  id,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SubnetIds {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
 				Query:  id,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if cluster.ResourcesVpcConfig.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ResourcesVpcConfig.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 
 	if cluster.RoleArn != nil {
 		if a, err = sources.ParseARN(*cluster.RoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *cluster.RoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			})
+			}})
 		}
 	}
 

@@ -70,7 +70,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "elbv2-target-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

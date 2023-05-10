@@ -48,22 +48,22 @@ func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 		for _, assoc := range rt.Associations {
 			if assoc.SubnetId != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
 					Query:  *assoc.SubnetId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if assoc.GatewayId != nil {
 				// +overmind:link ec2-internet-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-internet-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *assoc.GatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
@@ -71,105 +71,105 @@ func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 			if route.GatewayId != nil {
 				if strings.HasPrefix(*route.GatewayId, "igw") {
 					// +overmind:link ec2-internet-gateway
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-internet-gateway",
 						Method: sdp.QueryMethod_GET,
 						Query:  *route.GatewayId,
 						Scope:  scope,
-					})
+					}})
 				}
 				if strings.HasPrefix(*route.GatewayId, "vpce") {
 					// +overmind:link ec2-vpc-endpoint
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-vpc-endpoint",
 						Method: sdp.QueryMethod_GET,
 						Query:  *route.GatewayId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 			if route.CarrierGatewayId != nil {
 				// +overmind:link ec2-carrier-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-carrier-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.CarrierGatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.EgressOnlyInternetGatewayId != nil {
 				// +overmind:link ec2-egress-only-internet-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-egress-only-internet-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.EgressOnlyInternetGatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.InstanceId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.LocalGatewayId != nil {
 				// +overmind:link ec2-local-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-local-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.LocalGatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.NatGatewayId != nil {
 				// +overmind:link ec2-nat-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-nat-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.NatGatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.NetworkInterfaceId != nil {
 				// +overmind:link ec2-network-interface
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-network-interface",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.NetworkInterfaceId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.TransitGatewayId != nil {
 				// +overmind:link ec2-transit-gateway
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-transit-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.TransitGatewayId,
 					Scope:  scope,
-				})
+				}})
 			}
 			if route.VpcPeeringConnectionId != nil {
 				// +overmind:link ec2-vpc-peering-connection
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-vpc-peering-connection",
 					Method: sdp.QueryMethod_GET,
 					Query:  *route.VpcPeeringConnectionId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if rt.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *rt.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

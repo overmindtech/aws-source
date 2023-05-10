@@ -188,7 +188,7 @@ func TestTaskGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "ec2-network-interface",
 			ExpectedMethod: sdp.QueryMethod_GET,

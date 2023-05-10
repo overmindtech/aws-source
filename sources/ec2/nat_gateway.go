@@ -47,53 +47,53 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		for _, address := range ng.NatGatewayAddresses {
 			if address.NetworkInterfaceId != nil {
 				// +overmind:link ec2-network-interface
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-network-interface",
 					Method: sdp.QueryMethod_GET,
 					Query:  *address.NetworkInterfaceId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if address.PrivateIp != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
 					Query:  *address.PrivateIp,
 					Scope:  "global",
-				})
+				}})
 			}
 
 			if address.PublicIp != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
 					Query:  *address.PublicIp,
 					Scope:  "global",
-				})
+				}})
 			}
 		}
 
 		if ng.SubnetId != nil {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ng.SubnetId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if ng.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ng.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

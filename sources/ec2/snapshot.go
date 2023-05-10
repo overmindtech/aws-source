@@ -54,12 +54,12 @@ func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 			// Ignore the arbitrary ID that is used by Amazon
 			if *snapshot.VolumeId != "vol-ffffffff" {
 				// +overmind:link ec2-volume
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-volume",
 					Method: sdp.QueryMethod_GET,
 					Query:  *snapshot.VolumeId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 

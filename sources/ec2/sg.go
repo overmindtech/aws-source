@@ -48,12 +48,12 @@ func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 		// VPC
 		if securityGroup.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *securityGroup.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		item.LinkedItemQueries = append(item.LinkedItemQueries, extractLinkedSecurityGroups(securityGroup.IpPermissions, scope)...)
@@ -99,9 +99,9 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *sources.
 
 // extractLinkedSecurityGroups Extracts related security groups from IP
 // permissions
-func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string) []*sdp.Query {
+func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string) []*sdp.LinkedItemQuery {
 	currentAccount, region, err := sources.ParseScope(scope)
-	requests := make([]*sdp.Query, 0)
+	requests := make([]*sdp.LinkedItemQuery, 0)
 	var relatedAccount string
 
 	if err != nil {
@@ -117,12 +117,12 @@ func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string)
 			}
 
 			if idGroup.GroupId != nil {
-				requests = append(requests, &sdp.Query{
+				requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *idGroup.GroupId,
 					Scope:  sources.FormatScope(relatedAccount, region),
-				})
+				}})
 			}
 		}
 	}

@@ -174,7 +174,7 @@ func TestFunctionGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "http",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -323,8 +323,8 @@ func TestGetEventLinkedItem(t *testing.T) {
 					t.Error(err)
 				}
 
-				if req.Type != test.ExpectedType {
-					t.Errorf("expected request type to be %v, got %v", test.ExpectedType, req.Type)
+				if req.Query.Type != test.ExpectedType {
+					t.Errorf("expected request type to be %v, got %v", test.ExpectedType, req.Query.Type)
 				}
 			}
 		})

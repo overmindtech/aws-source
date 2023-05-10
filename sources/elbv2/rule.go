@@ -26,7 +26,7 @@ func ruleOutputMapper(scope string, _ *elbv2.DescribeRulesInput, output *elbv2.D
 			Scope:           scope,
 		}
 
-		var requests []*sdp.Query
+		var requests []*sdp.LinkedItemQuery
 
 		for _, action := range rule.Actions {
 			requests = ActionToRequests(action)

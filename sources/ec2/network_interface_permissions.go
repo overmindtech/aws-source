@@ -46,12 +46,12 @@ func networkInterfacePermissionOutputMapper(scope string, _ *ec2.DescribeNetwork
 
 		if ni.NetworkInterfaceId != nil {
 			// +overmind:link ec2-network-interface
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-network-interface",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ni.NetworkInterfaceId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

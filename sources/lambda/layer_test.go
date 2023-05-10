@@ -39,7 +39,7 @@ func TestLayerItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "lambda-layer-version",
 			ExpectedMethod: sdp.QueryMethod_GET,

@@ -348,12 +348,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 			}
 
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  url,
 				Scope:  "global",
-			})
+			}})
 		}
 	}
 
@@ -363,12 +363,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if lambdaConfig.LambdaFunctionArn != nil {
 			if a, err = sources.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
 				// +overmind:link lambda-function
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *lambdaConfig.LambdaFunctionArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}
@@ -377,12 +377,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if q.QueueArn != nil {
 			if a, err = sources.ParseARN(*q.QueueArn); err == nil {
 				// +overmind:link sqs-queue
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "sqs-queue",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *q.QueueArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}
@@ -391,12 +391,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		if topic.TopicArn != nil {
 			if a, err = sources.ParseARN(*topic.TopicArn); err == nil {
 				// +overmind:link sns-topic
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "sns-topic",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *topic.TopicArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}
@@ -404,23 +404,23 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	if bucket.LoggingEnabled != nil {
 		if bucket.LoggingEnabled.TargetBucket != nil {
 			// +overmind:link s3-bucket
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "s3-bucket",
 				Method: sdp.QueryMethod_GET,
 				Query:  *bucket.LoggingEnabled.TargetBucket,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 
 	if bucket.LocationConstraint != "" {
 		// +overmind:link ec2-region
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "ec2-region",
 			Method: sdp.QueryMethod_GET,
 			Query:  string(bucket.LocationConstraint),
 			Scope:  scope,
-		})
+		}})
 	}
 
 	if bucket.InventoryConfiguration != nil {
@@ -429,12 +429,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
 					if a, err = sources.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
 						// +overmind:link s3-bucket
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "s3-bucket",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket,
 							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						})
+						}})
 					}
 				}
 			}
@@ -451,12 +451,12 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
 							if a, err = sources.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
 								// +overmind:link s3-bucket
-								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 									Type:   "s3-bucket",
 									Method: sdp.QueryMethod_SEARCH,
 									Query:  *bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket,
 									Scope:  sources.FormatScope(a.AccountID, a.Region),
-								})
+								}})
 							}
 						}
 					}

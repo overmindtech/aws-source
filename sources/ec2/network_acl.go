@@ -47,23 +47,23 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
 					Query:  *assoc.SubnetId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if networkAcl.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *networkAcl.VpcId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

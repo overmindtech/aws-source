@@ -104,32 +104,32 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	if function.Code != nil {
 		if function.Code.Location != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.Location,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if function.Code.ImageUri != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.ImageUri,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if function.Code.ResolvedImageUri != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *function.Code.ResolvedImageUri,
 				Scope:  "global",
-			})
+			}})
 		}
 	}
 
@@ -150,12 +150,12 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.Role != nil {
 			if a, err = sources.ParseARN(*function.Configuration.Role); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.Role,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
@@ -171,12 +171,12 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if fsConfig.Arn != nil {
 				if a, err = sources.ParseARN(*fsConfig.Arn); err == nil {
 					// +overmind:link efs-access-point
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "efs-access-point",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *fsConfig.Arn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 		}
@@ -184,12 +184,12 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.KMSKeyArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.KMSKeyArn); err == nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.KMSKeyArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
@@ -200,36 +200,36 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 					name := strings.TrimPrefix(a.Resource, "layer:")
 
 					// +overmind:link lambda-layer-version
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "lambda-layer-version",
 						Method: sdp.QueryMethod_GET,
 						Query:  name,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 
 			if layer.SigningJobArn != nil {
 				if a, err = sources.ParseARN(*layer.SigningJobArn); err == nil {
 					// +overmind:link signer-signing-job
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "signer-signing-job",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *layer.SigningJobArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 
 			if layer.SigningProfileVersionArn != nil {
 				if a, err = sources.ParseARN(*layer.SigningProfileVersionArn); err == nil {
 					// +overmind:link signer-signing-profile
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "signer-signing-profile",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *layer.SigningProfileVersionArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 		}
@@ -237,68 +237,68 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.MasterArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.MasterArn); err == nil {
 				// +overmind:link lambda-function
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "lambda-function",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.MasterArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if function.Configuration.SigningJobArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.SigningJobArn); err == nil {
 				// +overmind:link signer-signing-job
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "signer-signing-job",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.SigningJobArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if function.Configuration.SigningProfileVersionArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.SigningProfileVersionArn); err == nil {
 				// +overmind:link signer-signing-profile
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "signer-signing-profile",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *function.Configuration.SigningProfileVersionArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if function.Configuration.VpcConfig != nil {
 			for _, id := range function.Configuration.VpcConfig.SecurityGroupIds {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			for _, id := range function.Configuration.VpcConfig.SubnetIds {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-subnet",
 					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if function.Configuration.VpcConfig.VpcId != nil {
 				// +overmind:link ec2-vpc
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-vpc",
 					Method: sdp.QueryMethod_GET,
 					Query:  *function.Configuration.VpcConfig.VpcId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 	}
@@ -306,12 +306,12 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	for _, config := range function.UrlConfigs {
 		if config.FunctionUrl != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "http",
 				Method: sdp.QueryMethod_GET,
 				Query:  *config.FunctionUrl,
 				Scope:  "global",
-			})
+			}})
 		}
 	}
 
@@ -350,7 +350,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 }
 
 // GetEventLinkedItem Gets the linked item request for a given destination ARN
-func GetEventLinkedItem(destinationARN string) (*sdp.Query, error) {
+func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 	parsed, err := sources.ParseARN(destinationARN)
 
 	if err != nil {
@@ -362,33 +362,33 @@ func GetEventLinkedItem(destinationARN string) (*sdp.Query, error) {
 	switch parsed.Service {
 	case "sns":
 		// In this case it's an SNS topic
-		return &sdp.Query{
+		return &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "sns-topic",
 			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
-		}, nil
+		}}, nil
 	case "sqs":
-		return &sdp.Query{
+		return &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "sqs-queue",
 			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
-		}, nil
+		}}, nil
 	case "lambda":
-		return &sdp.Query{
+		return &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "lambda-function",
 			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
-		}, nil
+		}}, nil
 	case "events":
-		return &sdp.Query{
+		return &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "events-event-bus",
 			Method: sdp.QueryMethod_SEARCH,
 			Query:  destinationARN,
 			Scope:  scope,
-		}, nil
+		}}, nil
 	}
 
 	return nil, errors.New("could not find matching request")
