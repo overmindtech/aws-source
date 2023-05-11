@@ -61,7 +61,7 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

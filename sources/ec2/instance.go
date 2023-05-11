@@ -41,57 +41,59 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				UniqueAttribute: "instanceId",
 				Scope:           scope,
 				Attributes:      attrs,
-				LinkedItemQueries: []*sdp.Query{
+				LinkedItemQueries: []*sdp.LinkedItemQuery{
 					{
-						// +overmind:link ec2-instance-status
-						// Always get the status
-						Type:   "ec2-instance-status",
-						Method: sdp.QueryMethod_GET,
-						Query:  *instance.InstanceId,
-						Scope:  scope,
+						Query: &sdp.Query{
+							// +overmind:link ec2-instance-status
+							// Always get the status
+							Type:   "ec2-instance-status",
+							Method: sdp.QueryMethod_GET,
+							Query:  *instance.InstanceId,
+							Scope:  scope,
+						},
 					},
 				},
 			}
 
 			if instance.ImageId != nil {
 				// +overmind:link ec2-image
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-image",
 					Method: sdp.QueryMethod_GET,
 					Query:  *instance.ImageId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if instance.KeyName != nil {
 				// +overmind:link ec2-key-pair
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-key-pair",
 					Method: sdp.QueryMethod_GET,
 					Query:  *instance.KeyName,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if instance.Placement != nil {
 				if instance.Placement.AvailabilityZone != nil {
 					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.QueryMethod_GET,
 						Query:  *instance.Placement.AvailabilityZone,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				if instance.Placement.GroupId != nil {
 					// +overmind:link ec2-placement-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-placement-group",
 						Method: sdp.QueryMethod_GET,
 						Query:  *instance.Placement.GroupId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
@@ -100,92 +102,92 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				for _, ip := range nic.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
 							Query:  *ip.Ipv6Address,
 							Scope:  "global",
-						})
+						}})
 					}
 				}
 
 				for _, ip := range nic.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
 							Query:  *ip.PrivateIpAddress,
 							Scope:  "global",
-						})
+						}})
 					}
 				}
 
 				// Subnet
 				if nic.SubnetId != nil {
 					// +overmind:link ec2-subnet
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.QueryMethod_GET,
 						Query:  *nic.SubnetId,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				// VPC
 				if nic.VpcId != nil {
 					// +overmind:link ec2-vpc
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-vpc",
 						Method: sdp.QueryMethod_GET,
 						Query:  *nic.VpcId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
 			if instance.PublicDnsName != nil && *instance.PublicDnsName != "" {
 				// +overmind:link dns
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *instance.PublicDnsName,
 					Scope:  "global",
-				})
+				}})
 			}
 
 			if instance.PublicIpAddress != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ip",
 					Method: sdp.QueryMethod_GET,
 					Query:  *instance.PublicIpAddress,
 					Scope:  "global",
-				})
+				}})
 			}
 
 			// Security groups
 			for _, group := range instance.SecurityGroups {
 				if group.GroupId != nil {
 					// +overmind:link ec2-security-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-security-group",
 						Method: sdp.QueryMethod_GET,
 						Query:  *group.GroupId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
 			for _, mapping := range instance.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.VolumeId != nil {
 					// +overmind:link ec2-volume
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-volume",
 						Method: sdp.QueryMethod_GET,
 						Query:  *mapping.Ebs.VolumeId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 

@@ -188,7 +188,7 @@ func TestRoleItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "iam-policy",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

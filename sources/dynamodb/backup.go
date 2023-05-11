@@ -49,12 +49,12 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 	if out.BackupDescription.SourceTableDetails != nil {
 		if out.BackupDescription.SourceTableDetails.TableName != nil {
 			// +overmind:link dynamodb-table
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dynamodb-table",
 				Method: sdp.QueryMethod_GET,
 				Query:  *out.BackupDescription.SourceTableDetails.TableName,
 				Scope:  scope,
-			})
+			}})
 		}
 	}
 

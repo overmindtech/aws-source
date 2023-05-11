@@ -28,74 +28,74 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 
 		if desc.DNSName != nil {
 			// +overmind:link dns
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *desc.DNSName,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if desc.CanonicalHostedZoneName != nil {
 			// +overmind:link dns
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *desc.CanonicalHostedZoneName,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if desc.CanonicalHostedZoneNameID != nil {
 			// +overmind:link route53-hosted-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "route53-hosted-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *desc.CanonicalHostedZoneNameID,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, az := range desc.AvailabilityZones {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  az,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, subnet := range desc.Subnets {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
 				Query:  subnet,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if desc.VPCId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
 				Query:  *desc.VPCId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, instance := range desc.Instances {
 			if instance.InstanceId != nil {
 				// +overmind:link ec2-instance
 				// The EC2 instance itself
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *instance.InstanceId,
 					Scope:  scope,
-				})
+				}})
 
 				if desc.LoadBalancerName != nil {
 					name := InstanceHealthName{
@@ -105,12 +105,12 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 
 					// +overmind:link elb-instance-health
 					// The health for that instance
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "elb-instance-health",
 						Method: sdp.QueryMethod_GET,
 						Query:  name.String(),
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 		}
@@ -118,23 +118,23 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 		if desc.SourceSecurityGroup != nil {
 			if desc.SourceSecurityGroup.GroupName != nil {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *desc.SourceSecurityGroup.GroupName,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		for _, sg := range desc.SecurityGroups {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  sg,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

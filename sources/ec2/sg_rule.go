@@ -46,23 +46,23 @@ func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 
 		if securityGroupRule.GroupId != nil {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  *securityGroupRule.GroupId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if rg := securityGroupRule.ReferencedGroupInfo; rg != nil {
 			if rg.GroupId != nil {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *rg.GroupId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 

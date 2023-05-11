@@ -212,7 +212,7 @@ func TestTaskDefinitionGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "secretsmanager-secret",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

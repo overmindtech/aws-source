@@ -184,32 +184,32 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 
 	for _, group := range awsItem.PolicyGroups {
 		// +overmind:link iam-group
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "iam-group",
 			Query:  *group.GroupName,
 			Method: sdp.QueryMethod_GET,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	for _, user := range awsItem.PolicyUsers {
 		// +overmind:link iam-user
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "iam-user",
 			Method: sdp.QueryMethod_GET,
 			Query:  *user.UserName,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	for _, role := range awsItem.PolicyRoles {
 		// +overmind:link iam-role
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			Type:   "iam-role",
 			Method: sdp.QueryMethod_GET,
 			Query:  *role.RoleName,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	return &item, nil

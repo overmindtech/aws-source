@@ -120,7 +120,7 @@ func TestClusterGetFunc(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "iam-role",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

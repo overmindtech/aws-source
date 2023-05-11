@@ -102,7 +102,7 @@ func TestClusterGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,

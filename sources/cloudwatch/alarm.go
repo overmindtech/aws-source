@@ -88,7 +88,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 
 		for _, action := range allActions {
 			if q, err := actionToLink(action); err == nil {
-				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: q})
 			}
 		}
 
@@ -114,12 +114,12 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 		if alarm.Composite != nil && alarm.Composite.ActionsSuppressor != nil {
 			if arn, err := sources.ParseARN(*alarm.Composite.ActionsSuppressor); err == nil {
 				// +overmind:link cloudwatch-alarm
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "cloudwatch-alarm",
 					Method: sdp.QueryMethod_GET,
 					Query:  arn.ResourceID(),
 					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
-				})
+				}})
 			}
 		}
 
@@ -151,7 +151,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			q, err := SuggestedQuery(*alarm.Metric.Namespace, scope, alarm.Metric.Dimensions)
 
 			if err == nil {
-				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: q})
 			}
 		}
 

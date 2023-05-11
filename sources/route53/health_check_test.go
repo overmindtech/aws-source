@@ -58,7 +58,7 @@ func TestHealthCheckItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "cloudwatch-alarm",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

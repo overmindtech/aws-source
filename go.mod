@@ -26,9 +26,9 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nkeys v0.4.4
-	github.com/overmindtech/connect v0.9.0
-	github.com/overmindtech/discovery v0.19.0
-	github.com/overmindtech/sdp-go v0.28.2
+	github.com/overmindtech/connect v0.10.0
+	github.com/overmindtech/discovery v0.20.0
+	github.com/overmindtech/sdp-go v0.30.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
@@ -79,16 +79,16 @@ require (
 	github.com/nats-io/nats.go v1.25.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/api-client v0.14.0 // indirect
-	github.com/overmindtech/sdpcache v1.3.0 // indirect
+	github.com/overmindtech/sdpcache v1.3.1-0.20230510124051-b75e8c6774cb // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.1 // indirect
-	go.opentelemetry.io/otel/metric v0.37.0 // indirect
+	go.opentelemetry.io/otel/metric v0.38.1 // indirect
 	go.opentelemetry.io/otel/trace v1.15.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

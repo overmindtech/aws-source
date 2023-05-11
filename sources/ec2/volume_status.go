@@ -43,13 +43,15 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 			UniqueAttribute: "volumeId",
 			Scope:           scope,
 			Attributes:      attrs,
-			LinkedItemQueries: []*sdp.Query{
+			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
-					// Always get the volume
-					Type:   "ec2-volume",
-					Method: sdp.QueryMethod_GET,
-					Query:  *volume.VolumeId,
-					Scope:  scope,
+					Query: &sdp.Query{
+						// Always get the volume
+						Type:   "ec2-volume",
+						Method: sdp.QueryMethod_GET,
+						Query:  *volume.VolumeId,
+						Scope:  scope,
+					},
 				},
 			},
 		}
@@ -68,12 +70,12 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 		for _, event := range volume.Events {
 			if event.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *event.InstanceId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 

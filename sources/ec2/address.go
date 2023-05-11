@@ -46,64 +46,66 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 			UniqueAttribute: "publicIp",
 			Scope:           scope,
 			Attributes:      attrs,
-			LinkedItemQueries: []*sdp.Query{
+			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *address.PublicIp,
-					Scope:  "global",
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *address.PublicIp,
+						Scope:  "global",
+					},
 				},
 			},
 		}
 
 		if address.InstanceId != nil {
 			// +overmind:link ec2-instance
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.QueryMethod_GET,
 				Query:  *address.InstanceId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if address.CarrierIp != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
 				Query:  *address.CarrierIp,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if address.CustomerOwnedIp != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
 				Query:  *address.CustomerOwnedIp,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		if address.NetworkInterfaceId != nil {
 			// +overmind:link ec2-network-interface
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-network-interface",
 				Method: sdp.QueryMethod_GET,
 				Query:  *address.NetworkInterfaceId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if address.PrivateIpAddress != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ip",
 				Method: sdp.QueryMethod_GET,
 				Query:  *address.PrivateIpAddress,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		items = append(items, &item)

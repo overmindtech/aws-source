@@ -61,7 +61,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	}
 
 	var a *sources.ARN
-	var link *sdp.Query
+	var link *sdp.LinkedItemQuery
 
 	for _, cd := range td.ContainerDefinitions {
 		for _, secret := range cd.Secrets {
@@ -86,24 +86,24 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	if td.ExecutionRoleArn != nil {
 		if a, err = sources.ParseARN(*td.ExecutionRoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *td.ExecutionRoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			})
+			}})
 		}
 	}
 
 	if td.TaskRoleArn != nil {
 		if a, err = sources.ParseARN(*td.TaskRoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *td.TaskRoleArn,
 				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			})
+			}})
 		}
 	}
 
@@ -112,7 +112,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 // getSecretLinkedItem Converts a `types.Secret` to the linked item that the
 // secret is related to, if relevant
-func getSecretLinkedItem(secret types.Secret) *sdp.Query {
+func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 	if secret.ValueFrom != nil {
 		if a, err := sources.ParseARN(*secret.ValueFrom); err == nil {
 			// The secret can refer to either something from secrets
@@ -122,20 +122,20 @@ func getSecretLinkedItem(secret types.Secret) *sdp.Query {
 			switch a.Service {
 			case "secretsmanager":
 				// +overmind:link secretsmanager-secret
-				return &sdp.Query{
+				return &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "secretsmanager-secret",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *secret.ValueFrom,
 					Scope:  secretScope,
-				}
+				}}
 			case "ssm":
 				// +overmind:link ssm-parameter
-				return &sdp.Query{
+				return &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ssm-parameter",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *secret.ValueFrom,
 					Scope:  secretScope,
-				}
+				}}
 			}
 		}
 	}

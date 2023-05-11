@@ -174,7 +174,7 @@ func TestTableGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "kinesis-stream",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

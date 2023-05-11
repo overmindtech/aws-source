@@ -87,7 +87,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -106,7 +106,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 
 	item = items[1]
 
-	tests = sources.ItemRequestTests{
+	tests = sources.QueryTests{
 		{
 			ExpectedType:   "elbv2-load-balancer",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -119,7 +119,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 
 	item = items[2]
 
-	tests = sources.ItemRequestTests{
+	tests = sources.QueryTests{
 		{
 			ExpectedType:   "ec2-instance",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -132,7 +132,7 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 
 	item = items[3]
 
-	tests = sources.ItemRequestTests{
+	tests = sources.QueryTests{
 		{
 			ExpectedType:   "lambda-function",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

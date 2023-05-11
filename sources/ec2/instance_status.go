@@ -41,12 +41,14 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 			UniqueAttribute: "instanceId",
 			Scope:           scope,
 			Attributes:      attrs,
-			LinkedItemQueries: []*sdp.Query{
+			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
-					Type:   "ec2-instance",
-					Method: sdp.QueryMethod_GET,
-					Query:  *instanceStatus.InstanceId,
-					Scope:  scope,
+					Query: &sdp.Query{
+						Type:   "ec2-instance",
+						Method: sdp.QueryMethod_GET,
+						Query:  *instanceStatus.InstanceId,
+						Scope:  scope,
+					},
 				},
 			},
 		}
@@ -66,12 +68,12 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 
 		if instanceStatus.AvailabilityZone != nil {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *instanceStatus.AvailabilityZone,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

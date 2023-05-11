@@ -191,7 +191,7 @@ func TestUserItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := sources.ItemRequestTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "iam-group",
 			ExpectedMethod: sdp.QueryMethod_GET,

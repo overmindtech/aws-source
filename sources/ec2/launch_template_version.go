@@ -73,87 +73,87 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				for _, ip := range ni.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
 							Query:  *ip.Ipv6Address,
 							Scope:  "global",
-						})
+						}})
 					}
 				}
 
 				if ni.NetworkInterfaceId != nil {
 					// +overmind:link ec2-network-interface
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-network-interface",
 						Method: sdp.QueryMethod_GET,
 						Query:  *ni.NetworkInterfaceId,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				for _, ip := range ni.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ip",
 							Method: sdp.QueryMethod_GET,
 							Query:  *ip.PrivateIpAddress,
 							Scope:  "global",
-						})
+						}})
 					}
 				}
 
 				if ni.SubnetId != nil {
 					// +overmind:link ec2-subnet
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-subnet",
 						Method: sdp.QueryMethod_GET,
 						Query:  *ni.SubnetId,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				for _, group := range ni.Groups {
 					// +overmind:link ec2-security-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-security-group",
 						Method: sdp.QueryMethod_GET,
 						Query:  group,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
 			if lt.ImageId != nil {
 				// +overmind:link ec2-image
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-image",
 					Method: sdp.QueryMethod_GET,
 					Query:  *lt.ImageId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if lt.KeyName != nil {
 				// +overmind:link ec2-key-pair
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-key-pair",
 					Method: sdp.QueryMethod_GET,
 					Query:  *lt.KeyName,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			for _, mapping := range lt.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.SnapshotId != nil {
 					// +overmind:link ec2-snapshot
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-snapshot",
 						Method: sdp.QueryMethod_GET,
 						Query:  *mapping.Ebs.SnapshotId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
@@ -161,12 +161,12 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if target := spec.CapacityReservationTarget; target != nil {
 					if target.CapacityReservationId != nil {
 						// +overmind:link ec2-capacity-reservation
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 							Type:   "ec2-capacity-reservation",
 							Method: sdp.QueryMethod_GET,
 							Query:  *target.CapacityReservationId,
 							Scope:  scope,
-						})
+						}})
 					}
 				}
 			}
@@ -174,43 +174,43 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 			if lt.Placement != nil {
 				if lt.Placement.AvailabilityZone != nil {
 					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-availability-zone",
 						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.AvailabilityZone,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				if lt.Placement.GroupId != nil {
 					// +overmind:link ec2-placement-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-placement-group",
 						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.GroupId,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				if lt.Placement.HostId != nil {
 					// +overmind:link ec2-host
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "ec2-host",
 						Method: sdp.QueryMethod_GET,
 						Query:  *lt.Placement.HostId,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 
 			for _, id := range lt.SecurityGroupIds {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  id,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 

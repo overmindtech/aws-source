@@ -209,21 +209,21 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
 }
 
-type ItemRequestTest struct {
+type QueryTest struct {
 	ExpectedType   string
 	ExpectedMethod sdp.QueryMethod
 	ExpectedQuery  string
 	ExpectedScope  string
 }
 
-type ItemRequestTests []ItemRequestTest
+type QueryTests []QueryTest
 
-func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
+func (i QueryTests) Execute(t *testing.T, item *sdp.Item) {
 	for _, test := range i {
 		var found bool
 
 		for _, lir := range item.LinkedItemQueries {
-			if lirMatches(test, lir) {
+			if lirMatches(test, lir.Query) {
 				found = true
 				break
 			}
@@ -235,15 +235,15 @@ func (i ItemRequestTests) Execute(t *testing.T, item *sdp.Item) {
 	}
 }
 
-func lirMatches(test ItemRequestTest, req *sdp.Query) bool {
+func lirMatches(test QueryTest, req *sdp.Query) bool {
 	return (test.ExpectedMethod == req.Method &&
 		test.ExpectedQuery == req.Query &&
 		test.ExpectedScope == req.Scope &&
 		test.ExpectedType == req.Type)
 }
 
-// CheckItemRequest Checks that an item request matches the expected params
-func CheckItemRequest(t *testing.T, item *sdp.Query, itemName string, expectedType string, expectedQuery string, expectedScope string) {
+// CheckQuery Checks that an item request matches the expected params
+func CheckQuery(t *testing.T, item *sdp.Query, itemName string, expectedType string, expectedQuery string, expectedScope string) {
 	if item.Type != expectedType {
 		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
 	}

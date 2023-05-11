@@ -46,22 +46,22 @@ func volumeOutputMapper(scope string, _ *ec2.DescribeVolumesInput, output *ec2.D
 
 		for _, attachment := range volume.Attachments {
 			// +overmind:link ec2-instance
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-instance",
 				Method: sdp.QueryMethod_GET,
 				Query:  *attachment.InstanceId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if volume.AvailabilityZone != nil {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *volume.AvailabilityZone,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		items = append(items, &item)

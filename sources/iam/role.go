@@ -227,12 +227,12 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 		if policy.PolicyArn != nil {
 			if a, err := sources.ParseARN(*policy.PolicyArn); err == nil {
 				// +overmind:link iam-policy
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "iam-policy",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *policy.PolicyArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 	}

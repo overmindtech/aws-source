@@ -51,12 +51,12 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 		if listener.LoadBalancerArn != nil {
 			if a, err := sources.ParseARN(*listener.LoadBalancerArn); err == nil {
 				// +overmind:link elbv2-load-balancer
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "elbv2-load-balancer",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *listener.LoadBalancerArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
@@ -64,17 +64,17 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 			if cert.CertificateArn != nil {
 				if a, err := sources.ParseARN(*cert.CertificateArn); err == nil {
 					// +overmind:link acm-certificate
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "acm-certificate",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cert.CertificateArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 		}
 
-		var requests []*sdp.Query
+		var requests []*sdp.LinkedItemQuery
 
 		for _, action := range listener.DefaultActions {
 			// These types can be returned by `ActionToRequests()`

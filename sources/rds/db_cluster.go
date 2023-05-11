@@ -31,32 +31,32 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 
 		if cluster.DBSubnetGroup != nil {
 			// +overmind:link rds-db-subnet-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "rds-db-subnet-group",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.DBSubnetGroup,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, endpoint := range []*string{cluster.Endpoint, cluster.ReaderEndpoint} {
 			if endpoint != nil {
 				// +overmind:link dns
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "dns",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *endpoint,
 					Scope:  "global",
-				})
+				}})
 
 				if cluster.Port != nil {
 					// +overmind:link networksocket
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "networksocket",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  fmt.Sprintf("%v:%v", *endpoint, *cluster.Port),
 						Scope:  "global",
-					})
+					}})
 				}
 			}
 		}
@@ -64,100 +64,100 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		for _, replica := range cluster.ReadReplicaIdentifiers {
 			if a, err = sources.ParseARN(replica); err == nil {
 				// +overmind:link rds-db-cluster
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "rds-db-cluster",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  replica,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		for _, az := range cluster.AvailabilityZones {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-availability-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  az,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, member := range cluster.DBClusterMembers {
 			if member.DBInstanceIdentifier != nil {
 				// +overmind:link rds-db-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "rds-db-instance",
 					Method: sdp.QueryMethod_GET,
 					Query:  *member.DBInstanceIdentifier,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		for _, sg := range cluster.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *sg.VpcSecurityGroupId,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
 		if cluster.HostedZoneId != nil {
 			// +overmind:link route53-hosted-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "route53-hosted-zone",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.HostedZoneId,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		if cluster.KmsKeyId != nil {
 			if a, err = sources.ParseARN(*cluster.KmsKeyId); err == nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.KmsKeyId,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if cluster.ActivityStreamKinesisStreamName != nil {
 			// +overmind:link kinesis-stream
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "kinesis-stream",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cluster.ActivityStreamKinesisStreamName,
 				Scope:  scope,
-			})
+			}})
 		}
 
 		for _, endpoint := range cluster.CustomEndpoints {
 			// +overmind:link dns
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  endpoint,
 				Scope:  "global",
-			})
+			}})
 		}
 
 		for _, optionGroup := range cluster.DBClusterOptionGroupMemberships {
 			if optionGroup.DBClusterOptionGroupName != nil {
 				// +overmind:link rds-option-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "rds-option-group",
 					Method: sdp.QueryMethod_GET,
 					Query:  *optionGroup.DBClusterOptionGroupName,
 					Scope:  scope,
-				})
+				}})
 			}
 		}
 
@@ -165,24 +165,24 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			if cluster.MasterUserSecret.KmsKeyId != nil {
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.KmsKeyId); err == nil {
 					// +overmind:link kms-key
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "kms-key",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cluster.MasterUserSecret.KmsKeyId,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 
 			if cluster.MasterUserSecret.SecretArn != nil {
 				if a, err = sources.ParseARN(*cluster.MasterUserSecret.SecretArn); err == nil {
 					// +overmind:link secretsmanager-secret
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "secretsmanager-secret",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cluster.MasterUserSecret.SecretArn,
 						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					})
+					}})
 				}
 			}
 		}
@@ -190,12 +190,12 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 		if cluster.MonitoringRoleArn != nil {
 			if a, err = sources.ParseARN(*cluster.MonitoringRoleArn); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.MonitoringRoleArn,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
@@ -203,24 +203,24 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			// This is an ARN
 			if a, err = sources.ParseARN(*cluster.PerformanceInsightsKMSKeyId); err == nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.PerformanceInsightsKMSKeyId,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 
 		if cluster.ReplicationSourceIdentifier != nil {
 			if a, err = sources.ParseARN(*cluster.ReplicationSourceIdentifier); err == nil {
 				// +overmind:link rds-db-cluster
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "rds-db-cluster",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ReplicationSourceIdentifier,
 					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				})
+				}})
 			}
 		}
 

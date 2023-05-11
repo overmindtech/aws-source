@@ -59,28 +59,34 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		UniqueAttribute: "clusterName",
 		Scope:           scope,
 		Attributes:      attributes,
-		LinkedItemQueries: []*sdp.Query{
+		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
-				// +overmind:link ecs-container-instance
-				// Search for all container instances on this cluster
-				Type:   "ecs-container-instance",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.ClusterName,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link ecs-container-instance
+					// Search for all container instances on this cluster
+					Type:   "ecs-container-instance",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.ClusterName,
+					Scope:  scope,
+				},
 			},
 			{
-				// +overmind:link ecs-service
-				Type:   "ecs-service",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.ClusterName,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link ecs-service
+					Type:   "ecs-service",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.ClusterName,
+					Scope:  scope,
+				},
 			},
 			{
-				// +overmind:link ecs-task
-				Type:   "ecs-task",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.ClusterName,
-				Scope:  scope,
+				Query: &sdp.Query{
+					// +overmind:link ecs-task
+					Type:   "ecs-task",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.ClusterName,
+					Scope:  scope,
+				},
 			},
 		},
 	}
@@ -105,46 +111,46 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if cluster.Configuration.ExecuteCommandConfiguration != nil {
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "kms-key",
 					Method: sdp.QueryMethod_GET,
 					Query:  *cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId,
 					Scope:  scope,
-				})
+				}})
 			}
 
 			if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration != nil {
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName != nil {
 					// +overmind:link logs-log-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "logs-log-group",
 						Method: sdp.QueryMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName,
 						Scope:  scope,
-					})
+					}})
 				}
 
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName != nil {
 					// +overmind:link s3-bucket
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 						Type:   "s3-bucket",
 						Method: sdp.QueryMethod_GET,
 						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
 						Scope:  scope,
-					})
+					}})
 				}
 			}
 		}
 	}
 
 	for _, provider := range cluster.CapacityProviders {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.Query{
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 			// +overmind:link ecs-capacity-provider
 			Type:   "ecs-capacity-provider",
 			Method: sdp.QueryMethod_GET,
 			Query:  provider,
 			Scope:  scope,
-		})
+		}})
 	}
 
 	return &item, nil
