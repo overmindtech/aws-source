@@ -5,22 +5,22 @@ go 1.19
 // Direct dependencies
 require (
 	github.com/aws/aws-sdk-go-v2 v1.18.0
-	github.com/aws/aws-sdk-go-v2/config v1.18.23
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.22
+	github.com/aws/aws-sdk-go-v2/config v1.18.25
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.24
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.26.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.7
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.96.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.97.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.27.0
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.12
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.10
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.11
 	github.com/aws/aws-sdk-go-v2/service/iam v1.19.12
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.34.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.43.3
+	github.com/aws/aws-sdk-go-v2/service/rds v1.44.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.28.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.11
+	github.com/aws/aws-sdk-go-v2/service/sts v1.19.0
 	github.com/aws/smithy-go v1.13.5
 	github.com/getsentry/sentry-go v0.21.0
 	github.com/iancoleman/strcase v0.2.0
