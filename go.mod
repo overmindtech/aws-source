@@ -10,14 +10,14 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.28.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.26.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.7
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.97.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.27.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.98.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.27.1
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.12
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.10
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.11
 	github.com/aws/aws-sdk-go-v2/service/iam v1.19.12
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.34.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.44.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.44.1
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.28.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.33.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.19.0
@@ -27,9 +27,9 @@ require (
 	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/connect v0.10.0
-	github.com/overmindtech/discovery v0.20.0
-	github.com/overmindtech/sdp-go v0.30.0
-	github.com/sirupsen/logrus v1.9.0
+	github.com/overmindtech/discovery v0.20.2
+	github.com/overmindtech/sdp-go v0.30.1
+	github.com/sirupsen/logrus v1.9.2
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -79,7 +79,7 @@ require (
 	github.com/nats-io/nats.go v1.25.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/api-client v0.14.0 // indirect
-	github.com/overmindtech/sdpcache v1.3.1-0.20230510124051-b75e8c6774cb // indirect
+	github.com/overmindtech/sdpcache v1.4.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
