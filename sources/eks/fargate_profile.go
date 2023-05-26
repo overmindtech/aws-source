@@ -44,23 +44,39 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	if out.FargateProfile.PodExecutionRoleArn != nil {
 		if a, err := sources.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "iam-role",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *out.FargateProfile.PodExecutionRoleArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "iam-role",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *out.FargateProfile.PodExecutionRoleArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The execution role will affect the fargate profile
+					In: true,
+					// The fargate profile can't affect the execution role
+					Out: false,
+				},
+			})
 		}
 	}
 
 	for _, subnet := range out.FargateProfile.Subnets {
 		// +overmind:link ec2-subnet
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "ec2-subnet",
-			Method: sdp.QueryMethod_GET,
-			Query:  subnet,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ec2-subnet",
+				Method: sdp.QueryMethod_GET,
+				Query:  subnet,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// The subnet will affect the fargate profile
+				In: true,
+				// The fargate profile can't affect the subnet
+				Out: false,
+			},
+		})
 	}
 
 	return &item, nil

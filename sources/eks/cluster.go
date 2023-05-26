@@ -46,6 +46,11 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 					Query:  *cluster.Name,
 					Scope:  scope,
 				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					In:  true,
+					Out: true,
+				},
 			},
 			{
 				Query: &sdp.Query{
@@ -55,6 +60,11 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 					Query:  *cluster.Name,
 					Scope:  scope,
 				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					In:  true,
+					Out: true,
+				},
 			},
 			{
 				Query: &sdp.Query{
@@ -63,6 +73,11 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.Name,
 					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					In:  true,
+					Out: true,
 				},
 			},
 		},
@@ -89,12 +104,20 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if cluster.ConnectorConfig.RoleArn != nil {
 			if a, err = sources.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "iam-role",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *cluster.ConnectorConfig.RoleArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "iam-role",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *cluster.ConnectorConfig.RoleArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The role can affect the cluster
+						In: true,
+						// The cluster can't affect the role
+						Out: false,
+					},
+				})
 			}
 		}
 	}
@@ -104,12 +127,20 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 			if conf.Provider.KeyArn != nil {
 				if a, err = sources.ParseARN(*conf.Provider.KeyArn); err == nil {
 					// +overmind:link kms-key
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "kms-key",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *conf.Provider.KeyArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "kms-key",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *conf.Provider.KeyArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// The key can affect the cluster
+							In: true,
+							// The cluster can't affect the key
+							Out: false,
+						},
+					})
 				}
 			}
 		}
@@ -117,65 +148,112 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.Endpoint != nil {
 		// +overmind:link http
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "http",
-			Method: sdp.QueryMethod_GET,
-			Query:  *cluster.Endpoint,
-			Scope:  "global",
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "http",
+				Method: sdp.QueryMethod_GET,
+				Query:  *cluster.Endpoint,
+				Scope:  "global",
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// HTTP should be linked bidirectionally
+				In:  true,
+				Out: true,
+			},
+		})
 	}
 
 	if cluster.ResourcesVpcConfig != nil {
 		if cluster.ResourcesVpcConfig.ClusterSecurityGroupId != nil {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-security-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  *cluster.ResourcesVpcConfig.ClusterSecurityGroupId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-security-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  *cluster.ResourcesVpcConfig.ClusterSecurityGroupId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The SG can affect the cluster
+					In: true,
+					// The cluster can't affect the SG
+					Out: false,
+				},
+			})
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SecurityGroupIds {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-security-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  id,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-security-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  id,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The SG can affect the cluster
+					In: true,
+					// The cluster can't affect the SG
+					Out: false,
+				},
+			})
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SubnetIds {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-subnet",
-				Method: sdp.QueryMethod_GET,
-				Query:  id,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-subnet",
+					Method: sdp.QueryMethod_GET,
+					Query:  id,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The subnet can affect the cluster
+					In: true,
+					// The cluster can't affect the subnet
+					Out: false,
+				},
+			})
 		}
 
 		if cluster.ResourcesVpcConfig.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *cluster.ResourcesVpcConfig.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *cluster.ResourcesVpcConfig.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The VPC can affect the cluster
+					In: true,
+					// The cluster can't affect the VPC
+					Out: false,
+				},
+			})
 		}
 	}
 
 	if cluster.RoleArn != nil {
 		if a, err = sources.ParseARN(*cluster.RoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "iam-role",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *cluster.RoleArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "iam-role",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *cluster.RoleArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The role can affect the cluster
+					In: true,
+					// The cluster can't affect the role
+					Out: false,
+				},
+			})
 		}
 	}
 
