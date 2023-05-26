@@ -86,24 +86,40 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	if td.ExecutionRoleArn != nil {
 		if a, err = sources.ParseARN(*td.ExecutionRoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "iam-role",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *td.ExecutionRoleArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "iam-role",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *td.ExecutionRoleArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The role can affect the task definition
+					In: true,
+					// The task definition can't affect the role
+					Out: false,
+				},
+			})
 		}
 	}
 
 	if td.TaskRoleArn != nil {
 		if a, err = sources.ParseARN(*td.TaskRoleArn); err == nil {
 			// +overmind:link iam-role
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "iam-role",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *td.TaskRoleArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "iam-role",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *td.TaskRoleArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The role can affect the task definition
+					In: true,
+					// The task definition can't affect the role
+					Out: false,
+				},
+			})
 		}
 	}
 
@@ -122,20 +138,36 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 			switch a.Service {
 			case "secretsmanager":
 				// +overmind:link secretsmanager-secret
-				return &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "secretsmanager-secret",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *secret.ValueFrom,
-					Scope:  secretScope,
-				}}
+				return &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "secretsmanager-secret",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *secret.ValueFrom,
+						Scope:  secretScope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The secret can affect the task definition
+						In: true,
+						// The task definition can't affect the secret
+						Out: false,
+					},
+				}
 			case "ssm":
 				// +overmind:link ssm-parameter
-				return &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ssm-parameter",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *secret.ValueFrom,
-					Scope:  secretScope,
-				}}
+				return &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ssm-parameter",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *secret.ValueFrom,
+						Scope:  secretScope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The secret can affect the task definition
+						In: true,
+						// The task definition can't affect the secret
+						Out: false,
+					},
+				}
 			}
 		}
 	}

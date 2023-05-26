@@ -72,12 +72,19 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 			if *attachment.Type == "ElasticNetworkInterface" {
 				if attachment.Id != nil {
 					// +overmind:link ec2-network-interface
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-network-interface",
-						Method: sdp.QueryMethod_GET,
-						Query:  *attachment.Id,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-network-interface",
+							Method: sdp.QueryMethod_GET,
+							Query:  *attachment.Id,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}
@@ -86,24 +93,40 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	if task.ClusterArn != nil {
 		if a, err = sources.ParseARN(*task.ClusterArn); err == nil {
 			// +overmind:link ecs-cluster
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ecs-cluster",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *task.ClusterArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ecs-cluster",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *task.ClusterArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The cluster can affect the task
+					In: true,
+					// The task can't affect the cluster
+					Out: false,
+				},
+			})
 		}
 	}
 
 	if task.ContainerInstanceArn != nil {
 		if a, err = sources.ParseARN(*task.ContainerInstanceArn); err == nil {
 			// +overmind:link ecs-container-instance
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ecs-container-instance",
-				Method: sdp.QueryMethod_GET,
-				Query:  a.ResourceID(),
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ecs-container-instance",
+					Method: sdp.QueryMethod_GET,
+					Query:  a.ResourceID(),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The container instance can affect the task
+					In: true,
+					// The task can't affect the container instance
+					Out: false,
+				},
+			})
 		}
 	}
 
@@ -111,22 +134,36 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		for _, ni := range container.NetworkInterfaces {
 			if ni.Ipv6Address != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *ni.Ipv6Address,
-					Scope:  "global",
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *ni.Ipv6Address,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// IPs are always linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 
 			if ni.PrivateIpv4Address != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *ni.PrivateIpv4Address,
-					Scope:  "global",
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *ni.PrivateIpv4Address,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// IPs are always linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 	}
@@ -134,23 +171,39 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	if task.TaskDefinitionArn != nil {
 		if a, err = sources.ParseARN(*task.TaskDefinitionArn); err == nil {
 			// +overmind:link ecs-task-definition
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ecs-task-definition",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *task.TaskDefinitionArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ecs-task-definition",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *task.TaskDefinitionArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The task definition can affect the task
+					In: true,
+					// The task can't affect the task definition
+					Out: false,
+				},
+			})
 		}
 	}
 
 	if task.AvailabilityZone != nil {
 		// +overmind:link ec2-availability-zone
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "ec2-availability-zone",
-			Method: sdp.QueryMethod_GET,
-			Query:  *task.AvailabilityZone,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ec2-availability-zone",
+				Method: sdp.QueryMethod_GET,
+				Query:  *task.AvailabilityZone,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// The availability zone can affect the task
+				In: true,
+				// The task can't affect the availability zone
+				Out: false,
+			},
+		})
 	}
 
 	return &item, nil

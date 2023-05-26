@@ -78,12 +78,20 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	if service.ClusterArn != nil {
 		if a, err = sources.ParseARN(*service.ClusterArn); err == nil {
 			// +overmind:link ecs-cluster
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ecs-cluster",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *service.ClusterArn,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ecs-cluster",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *service.ClusterArn,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changes to the cluster will affect the service
+					In: true,
+					// The service should be able to affect the cluster
+					Out: false,
+				},
+			})
 		}
 	}
 
@@ -91,12 +99,19 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if lb.TargetGroupArn != nil {
 			if a, err = sources.ParseARN(*lb.TargetGroupArn); err == nil {
 				// +overmind:link elbv2-target-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "elbv2-target-group",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *lb.TargetGroupArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-target-group",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *lb.TargetGroupArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// These are tightly linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 	}
@@ -105,12 +120,19 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if sr.RegistryArn != nil {
 			if a, err = sources.ParseARN(*sr.RegistryArn); err == nil {
 				// +overmind:link servicediscovery-service
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "servicediscovery-service",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *sr.RegistryArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "servicediscovery-service",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *sr.RegistryArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// These are tightly linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 	}
@@ -118,12 +140,20 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 	if service.TaskDefinition != nil {
 		if a, err = sources.ParseARN(*service.TaskDefinition); err == nil {
 			// +overmind:link ecs-task-definition
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ecs-task-definition",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *service.TaskDefinition,
-				Scope:  sources.FormatScope(a.AccountID, a.Region),
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ecs-task-definition",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *service.TaskDefinition,
+					Scope:  sources.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the task definition will affect the service
+					In: true,
+					// The service shouldn't affect the task definition itself
+					Out: false,
+				},
+			})
 		}
 	}
 
@@ -131,24 +161,40 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if deployment.TaskDefinition != nil {
 			if a, err = sources.ParseARN(*deployment.TaskDefinition); err == nil {
 				// +overmind:link ecs-task-definition
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ecs-task-definition",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *deployment.TaskDefinition,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ecs-task-definition",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *deployment.TaskDefinition,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the task definition will affect the service
+						In: true,
+						// The service shouldn't affect the task definition itself
+						Out: false,
+					},
+				})
 			}
 		}
 
 		for _, strategy := range deployment.CapacityProviderStrategy {
 			if strategy.CapacityProvider != nil {
 				// +overmind:link ecs-capacity-provider
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ecs-capacity-provider",
-					Method: sdp.QueryMethod_GET,
-					Query:  *strategy.CapacityProvider,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ecs-capacity-provider",
+						Method: sdp.QueryMethod_GET,
+						Query:  *strategy.CapacityProvider,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the capacity provider will affect the service
+						In: true,
+						// The service shouldn't affect the capacity provider itself
+						Out: false,
+					},
+				})
 			}
 		}
 
@@ -156,22 +202,38 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if deployment.NetworkConfiguration.AwsvpcConfiguration != nil {
 				for _, subnet := range deployment.NetworkConfiguration.AwsvpcConfiguration.Subnets {
 					// +overmind:link ec2-subnet
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-subnet",
-						Method: sdp.QueryMethod_GET,
-						Query:  subnet,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-subnet",
+							Method: sdp.QueryMethod_GET,
+							Query:  subnet,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the subnet will affect the service
+							In: true,
+							// The service shouldn't affect the subnet
+							Out: false,
+						},
+					})
 				}
 
 				for _, sg := range deployment.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
 					// +overmind:link ec2-security-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ecs-security-group",
-						Method: sdp.QueryMethod_GET,
-						Query:  sg,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ecs-security-group",
+							Method: sdp.QueryMethod_GET,
+							Query:  sg,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the security group will affect the service
+							In: true,
+							// The service shouldn't affect the security group
+							Out: false,
+						},
+					})
 				}
 			}
 		}
@@ -181,12 +243,19 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 				for _, alias := range svc.ClientAliases {
 					if alias.DnsName != nil {
 						// +overmind:link dns
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "dns",
-							Method: sdp.QueryMethod_SEARCH,
-							Query:  *alias.DnsName,
-							Scope:  "global",
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "dns",
+								Method: sdp.QueryMethod_SEARCH,
+								Query:  *alias.DnsName,
+								Scope:  "global",
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// DNS always links
+								In:  true,
+								Out: true,
+							},
+						})
 					}
 				}
 			}
@@ -196,12 +265,19 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 			if cr.DiscoveryArn != nil {
 				if a, err = sources.ParseARN(*cr.DiscoveryArn); err == nil {
 					// +overmind:link servicediscovery-service
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "servicediscovery-service",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *cr.DiscoveryArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "servicediscovery-service",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *cr.DiscoveryArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}
@@ -211,34 +287,57 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if service.NetworkConfiguration.AwsvpcConfiguration != nil {
 			for _, subnet := range service.NetworkConfiguration.AwsvpcConfiguration.Subnets {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-subnet",
-					Method: sdp.QueryMethod_GET,
-					Query:  subnet,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-subnet",
+						Method: sdp.QueryMethod_GET,
+						Query:  subnet,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the subnet will affect the service
+						In: true,
+						// The service shouldn't affect the subnet
+						Out: false,
+					},
+				})
 			}
 
 			for _, sg := range service.NetworkConfiguration.AwsvpcConfiguration.SecurityGroups {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-security-group",
-					Method: sdp.QueryMethod_GET,
-					Query:  sg,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-security-group",
+						Method: sdp.QueryMethod_GET,
+						Query:  sg,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the security group will affect the service
+						In: true,
+						// The service shouldn't affect the security group
+						Out: false,
+					},
+				})
 			}
 		}
 	}
 
 	for _, id := range taskSetIds {
 		// +overmind:link ecs-task-set
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "ecs-task-set",
-			Method: sdp.QueryMethod_GET,
-			Query:  id,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ecs-task-set",
+				Method: sdp.QueryMethod_GET,
+				Query:  id,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		})
 	}
 
 	return &item, nil

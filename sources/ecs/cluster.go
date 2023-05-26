@@ -69,6 +69,13 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 					Query:  *cluster.ClusterName,
 					Scope:  scope,
 				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Container instances can affect the cluster
+					In: true,
+					// The cluster will definitely affect the container
+					// instances
+					Out: true,
+				},
 			},
 			{
 				Query: &sdp.Query{
@@ -78,6 +85,12 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 					Query:  *cluster.ClusterName,
 					Scope:  scope,
 				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Services won't affect the cluster
+					In: false,
+					// The cluster will definitely affect the services
+					Out: true,
+				},
 			},
 			{
 				Query: &sdp.Query{
@@ -86,6 +99,12 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ClusterName,
 					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Tasks won't affect the cluster
+					In: false,
+					// The cluster will definitely affect the tasks
+					Out: true,
 				},
 			},
 		},
@@ -111,46 +130,75 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		if cluster.Configuration.ExecuteCommandConfiguration != nil {
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_GET,
-					Query:  *cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "kms-key",
+						Method: sdp.QueryMethod_GET,
+						Query:  *cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the KMS key will probably affect the cluster
+						In: true,
+						// The cluster won't affect the KMS key though
+						Out: false,
+					},
+				})
 			}
 
 			if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration != nil {
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName != nil {
 					// +overmind:link logs-log-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "logs-log-group",
-						Method: sdp.QueryMethod_GET,
-						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "logs-log-group",
+							Method: sdp.QueryMethod_GET,
+							Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName != nil {
 					// +overmind:link s3-bucket
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "s3-bucket",
-						Method: sdp.QueryMethod_GET,
-						Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "s3-bucket",
+							Method: sdp.QueryMethod_GET,
+							Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}
 	}
 
 	for _, provider := range cluster.CapacityProviders {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			// +overmind:link ecs-capacity-provider
-			Type:   "ecs-capacity-provider",
-			Method: sdp.QueryMethod_GET,
-			Query:  provider,
-			Scope:  scope,
-		}})
+		// +overmind:link ecs-capacity-provider
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ecs-capacity-provider",
+				Method: sdp.QueryMethod_GET,
+				Query:  provider,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		})
 	}
 
 	return &item, nil
