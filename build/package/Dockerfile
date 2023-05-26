@@ -1,5 +1,5 @@
 # Build the source binary
-FROM golang:1.20-alpine3.17 as builder
+FROM golang:1.20-alpine3.18 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -22,7 +22,7 @@ COPY sources/ sources/
 RUN --mount=type=cache,target=/root/.cache/go-build \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o source main.go
 
-FROM alpine:3.17
+FROM alpine:3.18
 WORKDIR /
 COPY --from=builder /workspace/source .
 USER 65534:65534
