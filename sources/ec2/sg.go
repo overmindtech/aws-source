@@ -48,12 +48,20 @@ func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput,
 		// VPC
 		if securityGroup.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *securityGroup.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *securityGroup.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changes to the VPC could affect the security group
+					In: true,
+					// The security group won't affect the VPC though
+					Out: false,
+				},
+			})
 		}
 
 		item.LinkedItemQueries = append(item.LinkedItemQueries, extractLinkedSecurityGroups(securityGroup.IpPermissions, scope)...)
@@ -117,12 +125,19 @@ func extractLinkedSecurityGroups(permissions []types.IpPermission, scope string)
 			}
 
 			if idGroup.GroupId != nil {
-				requests = append(requests, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-security-group",
-					Method: sdp.QueryMethod_GET,
-					Query:  *idGroup.GroupId,
-					Scope:  sources.FormatScope(relatedAccount, region),
-				}})
+				requests = append(requests, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-security-group",
+						Method: sdp.QueryMethod_GET,
+						Query:  *idGroup.GroupId,
+						Scope:  sources.FormatScope(relatedAccount, region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Linked security groups affect each other
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 	}

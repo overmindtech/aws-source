@@ -47,23 +47,39 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-subnet",
-					Method: sdp.QueryMethod_GET,
-					Query:  *assoc.SubnetId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-subnet",
+						Method: sdp.QueryMethod_GET,
+						Query:  *assoc.SubnetId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the subnet won't affect the ACL
+						In: false,
+						// Changing the ACL will affect the subnet
+						Out: true,
+					},
+				})
 			}
 		}
 
 		if networkAcl.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *networkAcl.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *networkAcl.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC won't affect the ACL
+					In: false,
+					// Changing the ACL will affect the VPC
+					Out: true,
+				},
+			})
 		}
 
 		items = append(items, &item)

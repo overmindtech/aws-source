@@ -34,6 +34,14 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 	var err error
 	var attrs *sdp.ItemAttributes
 
+	// An EC2-address, along with an IP is an item that inherently links things
+	// and therefore should propagate blast radius in both directions on all
+	// links
+	bp := &sdp.BlastPropagation{
+		In:  true,
+		Out: true,
+	}
+
 	for _, address := range output.Addresses {
 		attrs, err = sources.ToAttributesCase(address)
 
@@ -54,58 +62,74 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 						Query:  *address.PublicIp,
 						Scope:  "global",
 					},
+					BlastPropagation: bp,
 				},
 			},
 		}
 
 		if address.InstanceId != nil {
 			// +overmind:link ec2-instance
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-instance",
-				Method: sdp.QueryMethod_GET,
-				Query:  *address.InstanceId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-instance",
+					Method: sdp.QueryMethod_GET,
+					Query:  *address.InstanceId,
+					Scope:  scope,
+				},
+				BlastPropagation: bp,
+			})
 		}
 
 		if address.CarrierIp != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ip",
-				Method: sdp.QueryMethod_GET,
-				Query:  *address.CarrierIp,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ip",
+					Method: sdp.QueryMethod_GET,
+					Query:  *address.CarrierIp,
+					Scope:  "global",
+				},
+				BlastPropagation: bp,
+			})
 		}
 
 		if address.CustomerOwnedIp != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ip",
-				Method: sdp.QueryMethod_GET,
-				Query:  *address.CustomerOwnedIp,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ip",
+					Method: sdp.QueryMethod_GET,
+					Query:  *address.CustomerOwnedIp,
+					Scope:  "global",
+				},
+				BlastPropagation: bp,
+			})
 		}
 
 		if address.NetworkInterfaceId != nil {
 			// +overmind:link ec2-network-interface
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-network-interface",
-				Method: sdp.QueryMethod_GET,
-				Query:  *address.NetworkInterfaceId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-network-interface",
+					Method: sdp.QueryMethod_GET,
+					Query:  *address.NetworkInterfaceId,
+					Scope:  scope,
+				},
+				BlastPropagation: bp,
+			})
 		}
 
 		if address.PrivateIpAddress != nil {
 			// +overmind:link ip
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ip",
-				Method: sdp.QueryMethod_GET,
-				Query:  *address.PrivateIpAddress,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ip",
+					Method: sdp.QueryMethod_GET,
+					Query:  *address.PrivateIpAddress,
+					Scope:  "global",
+				},
+				BlastPropagation: bp,
+			})
 		}
 
 		items = append(items, &item)

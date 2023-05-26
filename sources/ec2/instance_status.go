@@ -49,6 +49,12 @@ func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput
 						Query:  *instanceStatus.InstanceId,
 						Scope:  scope,
 					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The statius and the instance are closely linked and
+						// affect each other
+						In:  true,
+						Out: true,
+					},
 				},
 			},
 		}
