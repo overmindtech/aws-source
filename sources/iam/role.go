@@ -227,12 +227,20 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 		if policy.PolicyArn != nil {
 			if a, err := sources.ParseARN(*policy.PolicyArn); err == nil {
 				// +overmind:link iam-policy
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "iam-policy",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *policy.PolicyArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "iam-policy",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *policy.PolicyArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the policy will affect the role
+						In: true,
+						// Changing the role won't affect the policy
+						Out: false,
+					},
+				})
 			}
 		}
 	}

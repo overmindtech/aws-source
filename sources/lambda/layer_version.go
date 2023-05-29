@@ -72,24 +72,40 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 		if out.Content.SigningJobArn != nil {
 			if a, err = sources.ParseARN(*out.Content.SigningJobArn); err == nil {
 				// +overmind:link signer-signing-job
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "signer-signing-job",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *out.Content.SigningJobArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "signer-signing-job",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *out.Content.SigningJobArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Signing jobs can affect layers
+						In: true,
+						// Changing the layer won't affect the signing job
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if out.Content.SigningProfileVersionArn != nil {
 			if a, err = sources.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
 				// +overmind:link signer-signing-profile
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "signer-signing-profile",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *out.Content.SigningProfileVersionArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "signer-signing-profile",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *out.Content.SigningProfileVersionArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Signing profiles can affect layers
+						In: true,
+						// Changing the layer won't affect the signing profile
+						Out: false,
+					},
+				})
 			}
 		}
 	}

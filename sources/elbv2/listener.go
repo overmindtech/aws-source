@@ -51,12 +51,19 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 		if listener.LoadBalancerArn != nil {
 			if a, err := sources.ParseARN(*listener.LoadBalancerArn); err == nil {
 				// +overmind:link elbv2-load-balancer
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "elbv2-load-balancer",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *listener.LoadBalancerArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-load-balancer",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *listener.LoadBalancerArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Load balancers and their listeners are tightly coupled
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 
@@ -64,12 +71,20 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 			if cert.CertificateArn != nil {
 				if a, err := sources.ParseARN(*cert.CertificateArn); err == nil {
 					// +overmind:link acm-certificate
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "acm-certificate",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *cert.CertificateArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "acm-certificate",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *cert.CertificateArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the cert will affect the LB
+							In: true,
+							// The LB won't affect the cert
+							Out: false,
+						},
+					})
 				}
 			}
 		}

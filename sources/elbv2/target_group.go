@@ -28,33 +28,55 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 
 		if tg.TargetGroupArn != nil {
 			// +overmind:link elbv2-target-health
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "elbv2-target-health",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *tg.TargetGroupArn,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "elbv2-target-health",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *tg.TargetGroupArn,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Target groups and their target health are tightly coupled
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 
 		if tg.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *tg.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *tg.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC can affect the target group
+					In: true,
+					// The target group won't affect the VPC
+					Out: false,
+				},
+			})
 		}
 
 		for _, lbArn := range tg.LoadBalancerArns {
 			if a, err := sources.ParseARN(lbArn); err == nil {
 				// +overmind:link elbv2-load-balancer
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "elbv2-load-balancer",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  lbArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-load-balancer",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  lbArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Load balancers and their target groups are tightly coupled
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 

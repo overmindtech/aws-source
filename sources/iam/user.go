@@ -158,12 +158,20 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 
 	for _, group := range awsItem.UserGroups {
 		// +overmind:link iam-group
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "iam-group",
-			Method: sdp.QueryMethod_GET,
-			Query:  *group.GroupName,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "iam-group",
+				Method: sdp.QueryMethod_GET,
+				Query:  *group.GroupName,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing the group can affect the user
+				In: true,
+				// Changing the user won't affect the group
+				Out: false,
+			},
+		})
 	}
 
 	return &item, nil
