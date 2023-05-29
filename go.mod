@@ -27,7 +27,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/connect v0.11.0
-	github.com/overmindtech/discovery v0.21.2
+	github.com/overmindtech/discovery v0.21.1
 	github.com/overmindtech/sdp-go v0.32.0
 	github.com/sirupsen/logrus v1.9.2
 	github.com/sourcegraph/conc v0.3.0
@@ -74,6 +74,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/nats-io/nats.go v1.26.0 // indirect
