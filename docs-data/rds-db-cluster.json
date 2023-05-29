@@ -12,7 +12,6 @@
 		"iam-role",
 		"kinesis-stream",
 		"kms-key",
-		"networksocket",
 		"rds-db-cluster",
 		"rds-db-instance",
 		"rds-db-subnet-group",

@@ -15,7 +15,6 @@
 		"kinesis-stream",
 		"kms-key",
 		"logs-log-stream",
-		"networksocket",
 		"rds-db-cluster",
 		"rds-db-instance-automated-backup",
 		"rds-db-parameter-group",
