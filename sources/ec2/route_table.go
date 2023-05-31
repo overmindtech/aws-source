@@ -56,8 +56,8 @@ func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 						Scope:  scope,
 					},
 					BlastPropagation: &sdp.BlastPropagation{
-						// All things in a route table could affect each other I
-						// think. since changing the target could affect the
+						// All things in a route table could affect each other
+						// since changing the target could affect the
 						// traffic that is routed to it. And changing the route
 						// table could affect the target
 						In:  true,

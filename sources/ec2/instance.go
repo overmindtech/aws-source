@@ -52,7 +52,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 							Scope:  scope,
 						},
 						BlastPropagation: &sdp.BlastPropagation{
-							// The statius and the instance are closely linked and
+							// The status and the instance are closely linked and
 							// affect each other
 							In:  true,
 							Out: true,
@@ -241,7 +241,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 						Scope:  "global",
 					},
 					BlastPropagation: &sdp.BlastPropagation{
-						// IPs are always linked
+						// IPs are always propagating
 						In:  true,
 						Out: true,
 					},

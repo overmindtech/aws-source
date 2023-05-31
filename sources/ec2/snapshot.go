@@ -64,7 +64,9 @@ func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changing the volume will probably affect the snapshot
 						In: true,
-						// Changing the snapshot will affect the volume??? Maybe?
+						// Changing the snapshot will affect the volume indirectly
+						// as applications might rely on snapshots as backups
+						// or other use-cases
 						Out: true,
 					},
 				})
