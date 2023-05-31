@@ -47,12 +47,20 @@ func egressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOn
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
 				// +overmind:link ec2-vpc
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-vpc",
-					Method: sdp.QueryMethod_GET,
-					Query:  *attachment.VpcId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-vpc",
+						Method: sdp.QueryMethod_GET,
+						Query:  *attachment.VpcId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the VPC won't affect the gateway
+						In: false,
+						// Changing the gateway will affect the VPC
+						Out: true,
+					},
+				})
 			}
 		}
 

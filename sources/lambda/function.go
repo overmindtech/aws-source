@@ -104,32 +104,55 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	if function.Code != nil {
 		if function.Code.Location != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "http",
-				Method: sdp.QueryMethod_GET,
-				Query:  *function.Code.Location,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "http",
+					Method: sdp.QueryMethod_GET,
+					Query:  *function.Code.Location,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					In:  true,
+					Out: false,
+				},
+			})
 		}
 
 		if function.Code.ImageUri != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "http",
-				Method: sdp.QueryMethod_GET,
-				Query:  *function.Code.ImageUri,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "http",
+					Method: sdp.QueryMethod_GET,
+					Query:  *function.Code.ImageUri,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the image will affect the function
+					In: true,
+					// Changing the function won't affect the image
+					Out: false,
+				},
+			})
 		}
 
 		if function.Code.ResolvedImageUri != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "http",
-				Method: sdp.QueryMethod_GET,
-				Query:  *function.Code.ResolvedImageUri,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "http",
+					Method: sdp.QueryMethod_GET,
+					Query:  *function.Code.ResolvedImageUri,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the image will affect the function
+					In: true,
+					// Changing the function won't affect the image
+					Out: false,
+				},
+			})
 		}
 	}
 
@@ -150,12 +173,20 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.Role != nil {
 			if a, err = sources.ParseARN(*function.Configuration.Role); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "iam-role",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *function.Configuration.Role,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "iam-role",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *function.Configuration.Role,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the role will affect the function
+						In: true,
+						// Changing the function won't affect the role
+						Out: false,
+					},
+				})
 			}
 		}
 
@@ -171,12 +202,19 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if fsConfig.Arn != nil {
 				if a, err = sources.ParseARN(*fsConfig.Arn); err == nil {
 					// +overmind:link efs-access-point
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "efs-access-point",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *fsConfig.Arn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "efs-access-point",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *fsConfig.Arn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are really tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}
@@ -184,12 +222,20 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.KMSKeyArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.KMSKeyArn); err == nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *function.Configuration.KMSKeyArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "kms-key",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *function.Configuration.KMSKeyArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the key will affect the function
+						In: true,
+						// Changing the function won't affect the key
+						Out: false,
+					},
+				})
 			}
 		}
 
@@ -200,36 +246,59 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 					name := strings.TrimPrefix(a.Resource, "layer:")
 
 					// +overmind:link lambda-layer-version
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "lambda-layer-version",
-						Method: sdp.QueryMethod_GET,
-						Query:  name,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "lambda-layer-version",
+							Method: sdp.QueryMethod_GET,
+							Query:  name,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 
 			if layer.SigningJobArn != nil {
 				if a, err = sources.ParseARN(*layer.SigningJobArn); err == nil {
 					// +overmind:link signer-signing-job
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "signer-signing-job",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *layer.SigningJobArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "signer-signing-job",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *layer.SigningJobArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the signing will affect the function
+							In: true,
+							// Changing the function won't affect the signing
+							Out: false,
+						},
+					})
 				}
 			}
 
 			if layer.SigningProfileVersionArn != nil {
 				if a, err = sources.ParseARN(*layer.SigningProfileVersionArn); err == nil {
 					// +overmind:link signer-signing-profile
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "signer-signing-profile",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *layer.SigningProfileVersionArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "signer-signing-profile",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *layer.SigningProfileVersionArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the signing will affect the function
+							In: true,
+							// Changing the function won't affect the signing
+							Out: false,
+						},
+					})
 				}
 			}
 		}
@@ -237,68 +306,110 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		if function.Configuration.MasterArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.MasterArn); err == nil {
 				// +overmind:link lambda-function
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "lambda-function",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *function.Configuration.MasterArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "lambda-function",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *function.Configuration.MasterArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Tightly linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 
 		if function.Configuration.SigningJobArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.SigningJobArn); err == nil {
 				// +overmind:link signer-signing-job
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "signer-signing-job",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *function.Configuration.SigningJobArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "signer-signing-job",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *function.Configuration.SigningJobArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the signing will affect the function
+						In: true,
+						// Changing the function won't affect the signing
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if function.Configuration.SigningProfileVersionArn != nil {
 			if a, err = sources.ParseARN(*function.Configuration.SigningProfileVersionArn); err == nil {
 				// +overmind:link signer-signing-profile
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "signer-signing-profile",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *function.Configuration.SigningProfileVersionArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "signer-signing-profile",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *function.Configuration.SigningProfileVersionArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the signing will affect the function
+						In: true,
+						// Changing the function won't affect the signing
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if function.Configuration.VpcConfig != nil {
 			for _, id := range function.Configuration.VpcConfig.SecurityGroupIds {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-security-group",
-					Method: sdp.QueryMethod_GET,
-					Query:  id,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-security-group",
+						Method: sdp.QueryMethod_GET,
+						Query:  id,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the security group will affect the function
+						In: true,
+						// Changing the function won't affect the security group
+						Out: false,
+					},
+				})
 			}
 
 			for _, id := range function.Configuration.VpcConfig.SubnetIds {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-subnet",
-					Method: sdp.QueryMethod_GET,
-					Query:  id,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-subnet",
+						Method: sdp.QueryMethod_GET,
+						Query:  id,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the subnet will affect the function
+						In: true,
+						// Changing the function won't affect the subnet
+						Out: false,
+					},
+				})
 			}
 
 			if function.Configuration.VpcConfig.VpcId != nil {
 				// +overmind:link ec2-vpc
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-vpc",
-					Method: sdp.QueryMethod_GET,
-					Query:  *function.Configuration.VpcConfig.VpcId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-vpc",
+						Method: sdp.QueryMethod_GET,
+						Query:  *function.Configuration.VpcConfig.VpcId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{},
+				})
 			}
 		}
 	}
@@ -306,12 +417,19 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	for _, config := range function.UrlConfigs {
 		if config.FunctionUrl != nil {
 			// +overmind:link http
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "http",
-				Method: sdp.QueryMethod_GET,
-				Query:  *config.FunctionUrl,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "http",
+					Method: sdp.QueryMethod_GET,
+					Query:  *config.FunctionUrl,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 	}
 
@@ -362,33 +480,61 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 	switch parsed.Service {
 	case "sns":
 		// In this case it's an SNS topic
-		return &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "sns-topic",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  destinationARN,
-			Scope:  scope,
-		}}, nil
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "sns-topic",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  destinationARN,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		}, nil
 	case "sqs":
-		return &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "sqs-queue",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  destinationARN,
-			Scope:  scope,
-		}}, nil
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "sqs-queue",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  destinationARN,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		}, nil
 	case "lambda":
-		return &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "lambda-function",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  destinationARN,
-			Scope:  scope,
-		}}, nil
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "lambda-function",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  destinationARN,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		}, nil
 	case "events":
-		return &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "events-event-bus",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  destinationARN,
-			Scope:  scope,
-		}}, nil
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "events-event-bus",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  destinationARN,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These are tightly linked
+				In:  true,
+				Out: true,
+			},
+		}, nil
 	}
 
 	return nil, errors.New("could not find matching request")

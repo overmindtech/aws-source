@@ -184,32 +184,56 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 
 	for _, group := range awsItem.PolicyGroups {
 		// +overmind:link iam-group
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "iam-group",
-			Query:  *group.GroupName,
-			Method: sdp.QueryMethod_GET,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "iam-group",
+				Query:  *group.GroupName,
+				Method: sdp.QueryMethod_GET,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing the group won't affect the policy
+				In: false,
+				// Changing the policy will affect the group
+				Out: true,
+			},
+		})
 	}
 
 	for _, user := range awsItem.PolicyUsers {
 		// +overmind:link iam-user
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "iam-user",
-			Method: sdp.QueryMethod_GET,
-			Query:  *user.UserName,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "iam-user",
+				Method: sdp.QueryMethod_GET,
+				Query:  *user.UserName,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing the user won't affect the policy
+				In: false,
+				// Changing the policy will affect the user
+				Out: true,
+			},
+		})
 	}
 
 	for _, role := range awsItem.PolicyRoles {
 		// +overmind:link iam-role
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "iam-role",
-			Method: sdp.QueryMethod_GET,
-			Query:  *role.RoleName,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "iam-role",
+				Method: sdp.QueryMethod_GET,
+				Query:  *role.RoleName,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing the role won't affect the policy
+				In: false,
+				// Changing the policy will affect the role
+				Out: true,
+			},
+		})
 	}
 
 	return &item, nil

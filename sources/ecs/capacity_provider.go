@@ -36,12 +36,19 @@ func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProviders
 			if provider.AutoScalingGroupProvider.AutoScalingGroupArn != nil {
 				if a, err := sources.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
 					// +overmind:link autoscaling-auto-scaling-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query:&sdp.Query{
-						Type:   "autoscaling-auto-scaling-group",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *provider.AutoScalingGroupProvider.AutoScalingGroupArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "autoscaling-auto-scaling-group",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *provider.AutoScalingGroupProvider.AutoScalingGroupArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// These are tightly linked
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}

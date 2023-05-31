@@ -192,12 +192,6 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 			ExpectedScope:  "global",
 		},
 		{
-			ExpectedType:   "networksocket",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "database-1-instance-1.camcztjohmlj.eu-west-2.rds.amazonaws.com:3306",
-			ExpectedScope:  "global",
-		},
-		{
 			ExpectedType:   "route53-hosted-zone",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "Z1TTGA775OQIYO",
@@ -291,12 +285,6 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "foo.bar.com",
-			ExpectedScope:  "global",
-		},
-		{
-			ExpectedType:   "networksocket",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "foo.bar.com:5432",
 			ExpectedScope:  "global",
 		},
 		{

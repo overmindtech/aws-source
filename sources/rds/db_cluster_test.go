@@ -158,21 +158,9 @@ func TestDBClusterOutputMapper(t *testing.T) {
 			ExpectedScope:  "global",
 		},
 		{
-			ExpectedType:   "networksocket",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "database-2.cluster-ro-camcztjohmlj.eu-west-2.rds.amazonaws.com:5432",
-			ExpectedScope:  "global",
-		},
-		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "database-2.cluster-camcztjohmlj.eu-west-2.rds.amazonaws.com",
-			ExpectedScope:  "global",
-		},
-		{
-			ExpectedType:   "networksocket",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "database-2.cluster-camcztjohmlj.eu-west-2.rds.amazonaws.com:5432",
 			ExpectedScope:  "global",
 		},
 		{

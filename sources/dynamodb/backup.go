@@ -49,12 +49,22 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 	if out.BackupDescription.SourceTableDetails != nil {
 		if out.BackupDescription.SourceTableDetails.TableName != nil {
 			// +overmind:link dynamodb-table
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "dynamodb-table",
-				Method: sdp.QueryMethod_GET,
-				Query:  *out.BackupDescription.SourceTableDetails.TableName,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "dynamodb-table",
+					Method: sdp.QueryMethod_GET,
+					Query:  *out.BackupDescription.SourceTableDetails.TableName,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the table could probably affect the backup
+					In: true,
+					// Changing the backup won't exactly affect the table in
+					// that it won't break it. But it could mean that it's no
+					// longer backed up so, blast propagation should be here too
+					Out: true,
+				},
+			})
 		}
 	}
 

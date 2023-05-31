@@ -88,7 +88,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 
 		for _, action := range allActions {
 			if q, err := actionToLink(action); err == nil {
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: q})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
 			}
 		}
 
@@ -114,12 +114,20 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 		if alarm.Composite != nil && alarm.Composite.ActionsSuppressor != nil {
 			if arn, err := sources.ParseARN(*alarm.Composite.ActionsSuppressor); err == nil {
 				// +overmind:link cloudwatch-alarm
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "cloudwatch-alarm",
-					Method: sdp.QueryMethod_GET,
-					Query:  arn.ResourceID(),
-					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "cloudwatch-alarm",
+						Method: sdp.QueryMethod_GET,
+						Query:  arn.ResourceID(),
+						Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changes to the suppressor alarm will affect this alarm
+						In: true,
+						// Changes to this alarm won't affect the suppressor alarm
+						Out: false,
+					},
+				})
 			}
 		}
 
@@ -151,7 +159,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			q, err := SuggestedQuery(*alarm.Metric.Namespace, scope, alarm.Metric.Dimensions)
 
 			if err == nil {
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: q})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, q)
 			}
 		}
 
@@ -258,7 +266,7 @@ func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySo
 // * arn:aws:ssm:region:account-id:opsitem:severity#CATEGORY=category-name
 //
 // * arn:aws:ssm-incidents::account-id:responseplan/response-plan-name
-func actionToLink(action string) (*sdp.Query, error) {
+func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 	arn, err := sources.ParseARN(action)
 
 	if err != nil {
@@ -268,35 +276,67 @@ func actionToLink(action string) (*sdp.Query, error) {
 	switch arn.Service {
 	case "autoscaling":
 		// +overmind:link autoscaling-policy
-		return &sdp.Query{
-			Type:   "autoscaling-policy",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  action,
-			Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "autoscaling-policy",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  action,
+				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changes to the policy won't affect the alarm
+				In: false,
+				// Changes to the metric alarm will affect the policy
+				Out: true,
+			},
 		}, nil
 	case "sns":
 		// +overmind:link sns-topic
-		return &sdp.Query{
-			Type:   "sns-topic",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  action,
-			Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "sns-topic",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  action,
+				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changes to the topic won't affect the alarm
+				In: false,
+				// Changes to the alarm will affect the topic
+				Out: true,
+			},
 		}, nil
 	case "ssm":
 		// +overmind:link ssm-ops-item
-		return &sdp.Query{
-			Type:   "ssm-ops-item",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  action,
-			Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ssm-ops-item",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  action,
+				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changes to an ops item won't affect the alarm
+				In: false,
+				// Changes to the alarm will affect the ops item
+				Out: true,
+			},
 		}, nil
 	case "ssm-incidents":
 		// +overmind:link ssm-incidents-response-plan
-		return &sdp.Query{
-			Type:   "ssm-incidents-response-plan",
-			Method: sdp.QueryMethod_SEARCH,
-			Query:  action,
-			Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ssm-incidents-response-plan",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  action,
+				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changes to a response plan won't affect the alarm
+				In: false,
+				// Changes to the alarm will affect the response plan
+				Out: true,
+			},
 		}, nil
 	default:
 		return nil, errors.New("unknown service in ARN: " + arn.Service)

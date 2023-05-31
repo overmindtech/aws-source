@@ -59,6 +59,12 @@ func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 					Query:  *awsItem.Id,
 					Scope:  scope,
 				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the hosted zone can affect the resource record set
+					In: true,
+					// The resource record set won't affect the hosted zone
+					Out: false,
+				},
 			},
 		},
 	}

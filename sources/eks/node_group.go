@@ -58,68 +58,115 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
 			// +overmind:link ec2-key-pair
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-key-pair",
-				Method: sdp.QueryMethod_GET,
-				Query:  *ng.RemoteAccess.Ec2SshKey,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-key-pair",
+					Method: sdp.QueryMethod_GET,
+					Query:  *ng.RemoteAccess.Ec2SshKey,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The key pair can affect the node group
+					In: true,
+					// The node group can't affect the key pair
+					Out: false,
+				},
+			})
 		}
 
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-security-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  sg,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-security-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  sg,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The security group can affect the node group
+					In: true,
+					// The node group can't affect the security group
+					Out: false,
+				},
+			})
 		}
 	}
 
 	for _, subnet := range ng.Subnets {
 		// +overmind:link ec2-subnet
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "ec2-subnet",
-			Method: sdp.QueryMethod_GET,
-			Query:  subnet,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ec2-subnet",
+				Method: sdp.QueryMethod_GET,
+				Query:  subnet,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// The subnet can affect the node group
+				In: true,
+				// The node group can't affect the subnet
+				Out: false,
+			},
+		})
 	}
 
 	if ng.Resources != nil {
 		for _, g := range ng.Resources.AutoScalingGroups {
 			if g.Name != nil {
 				// +overmind:link autoscaling-auto-scaling-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "autoscaling-auto-scaling-group",
-					Method: sdp.QueryMethod_GET,
-					Query:  *g.Name,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "autoscaling-auto-scaling-group",
+						Method: sdp.QueryMethod_GET,
+						Query:  *g.Name,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// These are tightly coupled
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-security-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  *ng.Resources.RemoteAccessSecurityGroup,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-security-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  *ng.Resources.RemoteAccessSecurityGroup,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The security group can affect the node group
+					In: true,
+					// The node group can't affect the security group
+					Out: false,
+				},
+			})
 		}
 	}
 
 	if ng.LaunchTemplate != nil {
 		if ng.LaunchTemplate.Id != nil {
 			// +overmind:link ec2-launch-template
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-launch-template",
-				Method: sdp.QueryMethod_GET,
-				Query:  *ng.LaunchTemplate.Id,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-launch-template",
+					Method: sdp.QueryMethod_GET,
+					Query:  *ng.LaunchTemplate.Id,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// The launch template can affect the node group
+					In: true,
+					// The node group can't affect the launch template
+					Out: false,
+				},
+			})
 		}
 	}
 

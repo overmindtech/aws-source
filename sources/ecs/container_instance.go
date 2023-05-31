@@ -66,12 +66,19 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 
 	if containerInstance.Ec2InstanceId != nil {
 		// +overmind:link ec2-instance
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-			Type:   "ec2-instance",
-			Method: sdp.QueryMethod_GET,
-			Query:  *containerInstance.Ec2InstanceId,
-			Scope:  scope,
-		}})
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "ec2-instance",
+				Method: sdp.QueryMethod_GET,
+				Query:  *containerInstance.Ec2InstanceId,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// These represent the same thing
+				In:  true,
+				Out: true,
+			},
+		})
 	}
 
 	return &item, nil

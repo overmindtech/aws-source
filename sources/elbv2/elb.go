@@ -29,134 +29,232 @@ func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 
 		if lb.LoadBalancerArn != nil {
 			// +overmind:link elbv2-target-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "elbv2-target-group",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *lb.LoadBalancerArn,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "elbv2-target-group",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *lb.LoadBalancerArn,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Load balancers and their target groups are tightly coupled
+					In:  true,
+					Out: true,
+				},
+			})
 
 			// +overmind:link elbv2-listener
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "elbv2-listener",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *lb.LoadBalancerArn,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "elbv2-listener",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *lb.LoadBalancerArn,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Load balancers and their listeners are tightly coupled
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 
 		if lb.DNSName != nil {
 			// +overmind:link dns
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "dns",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *lb.DNSName,
-				Scope:  "global",
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "dns",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *lb.DNSName,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// DNS always links
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 
 		if lb.CanonicalHostedZoneId != nil {
 			// +overmind:link route53-hosted-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "route53-hosted-zone",
-				Method: sdp.QueryMethod_GET,
-				Query:  *lb.CanonicalHostedZoneId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "route53-hosted-zone",
+					Method: sdp.QueryMethod_GET,
+					Query:  *lb.CanonicalHostedZoneId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the hosted zone could affect the LB
+					In: true,
+					// The LB won't affect the hosted zone
+					Out: false,
+				},
+			})
 		}
 
 		if lb.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *lb.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *lb.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC could affect the LB
+					In: true,
+					// The LB won't affect the VPC
+					Out: false,
+				},
+			})
 		}
 
 		for _, az := range lb.AvailabilityZones {
 			if az.ZoneName != nil {
 				// +overmind:link ec2-availability-zone
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *az.ZoneName,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-availability-zone",
+						Method: sdp.QueryMethod_GET,
+						Query:  *az.ZoneName,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the availability zone could affect the LB
+						In: true,
+						// The LB won't affect the availability zone
+						Out: false,
+					},
+				})
 			}
 
 			if az.SubnetId != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-subnet",
-					Method: sdp.QueryMethod_GET,
-					Query:  *az.SubnetId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-subnet",
+						Method: sdp.QueryMethod_GET,
+						Query:  *az.SubnetId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the subnet could affect the LB
+						In: true,
+						// The LB won't affect the subnet
+						Out: false,
+					},
+				})
 			}
 
 			for _, address := range az.LoadBalancerAddresses {
 				// +overmind:link ec2-address
 				if address.AllocationId != nil {
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-address",
-						Method: sdp.QueryMethod_GET,
-						Query:  *address.AllocationId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-address",
+							Method: sdp.QueryMethod_GET,
+							Query:  *address.AllocationId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the address could affect the LB
+							In: true,
+							// The LB can also affect the address
+							Out: true,
+						},
+					})
 				}
 
 				if address.IPv6Address != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ip",
-						Method: sdp.QueryMethod_GET,
-						Query:  *address.IPv6Address,
-						Scope:  "global",
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ip",
+							Method: sdp.QueryMethod_GET,
+							Query:  *address.IPv6Address,
+							Scope:  "global",
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// IPs always link
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 
 				if address.IpAddress != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ip",
-						Method: sdp.QueryMethod_GET,
-						Query:  *address.IpAddress,
-						Scope:  "global",
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ip",
+							Method: sdp.QueryMethod_GET,
+							Query:  *address.IpAddress,
+							Scope:  "global",
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// IPs always link
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 
 				if address.PrivateIPv4Address != nil {
 					// +overmind:link ip
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ip",
-						Method: sdp.QueryMethod_GET,
-						Query:  *address.PrivateIPv4Address,
-						Scope:  "global",
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ip",
+							Method: sdp.QueryMethod_GET,
+							Query:  *address.PrivateIPv4Address,
+							Scope:  "global",
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// IPs always link
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 			}
 		}
 
 		for _, sg := range lb.SecurityGroups {
 			// +overmind:link ec2-security-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-security-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  sg,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-security-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  sg,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the security group could affect the LB
+					In: true,
+					// The LB won't affect the security group
+					Out: false,
+				},
+			})
 		}
 
 		if lb.CustomerOwnedIpv4Pool != nil {
 			// +overmind:link ec2-coip-pool
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-coip-pool",
-				Method: sdp.QueryMethod_GET,
-				Query:  *lb.CustomerOwnedIpv4Pool,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-coip-pool",
+					Method: sdp.QueryMethod_GET,
+					Query:  *lb.CustomerOwnedIpv4Pool,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the COIP pool could affect the LB
+					In: true,
+					// The LB won't affect the COIP pool
+					Out: false,
+				},
+			})
 		}
 
 		items = append(items, &item)

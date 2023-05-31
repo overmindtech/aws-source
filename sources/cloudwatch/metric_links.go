@@ -19,9 +19,17 @@ var ErrNoQuery = errors.New("no query found")
 // https://github.com/awsdocs/amazon-cloudwatch-user-guide/blob/master/doc_source/aws-services-cloudwatch-metrics.md
 //
 // The below list is not exhaustive and improvements are welcome
-func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension) (*sdp.Query, error) {
+func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension) (*sdp.LinkedItemQuery, error) {
 	var query *sdp.Query
 	var err error
+
+	bp := &sdp.BlastPropagation{
+		// These links are the metrics that feed the alarms. If the thing that
+		// we're measuring changes, we definitely want the alarm to be in the
+		// blast radius. But an alarm on its own doesn't affect these things
+		In:  false,
+		Out: true,
+	}
 
 	switch namespace {
 	case "AWS/Route53":
@@ -227,7 +235,10 @@ func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension
 		err = ErrNoQuery
 	}
 
-	return query, err
+	return &sdp.LinkedItemQuery{
+		Query:            query,
+		BlastPropagation: bp,
+	}, err
 }
 
 func getDimension(name string, dimensions []types.Dimension) *types.Dimension {

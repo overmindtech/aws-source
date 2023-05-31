@@ -30,34 +30,58 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 
 		if sg.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *sg.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *sg.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC can affect the subnet group
+					In: true,
+					// The subnet group won't affect the VPC
+					Out: false,
+				},
+			})
 		}
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
 				// +overmind:link ec2-subnet
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-subnet",
-					Method: sdp.QueryMethod_GET,
-					Query:  *subnet.SubnetIdentifier,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-subnet",
+						Method: sdp.QueryMethod_GET,
+						Query:  *subnet.SubnetIdentifier,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the subnet can affect the subnet group
+						In: true,
+						// The subnet group won't affect the subnet
+						Out: false,
+					},
+				})
 			}
 
 			if subnet.SubnetAvailabilityZone != nil {
 				if subnet.SubnetAvailabilityZone.Name != nil {
 					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-availability-zone",
-						Method: sdp.QueryMethod_GET,
-						Query:  *subnet.SubnetAvailabilityZone.Name,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-availability-zone",
+							Method: sdp.QueryMethod_GET,
+							Query:  *subnet.SubnetAvailabilityZone.Name,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the availability zone can affect the subnet group
+							In: true,
+							// The subnet group won't affect the availability zone
+							Out: false,
+						},
+					})
 				}
 			}
 
@@ -65,12 +89,20 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = sources.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
 						// +overmind:link outposts-outpost
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "outposts-outpost",
-							Method: sdp.QueryMethod_SEARCH,
-							Query:  *subnet.SubnetOutpost.Arn,
-							Scope:  sources.FormatScope(a.AccountID, a.Region),
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "outposts-outpost",
+								Method: sdp.QueryMethod_SEARCH,
+								Query:  *subnet.SubnetOutpost.Arn,
+								Scope:  sources.FormatScope(a.AccountID, a.Region),
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changing the outpost can affect the subnet group
+								In: true,
+								// The subnet group won't affect the outpost
+								Out: false,
+							},
+						})
 					}
 				}
 			}

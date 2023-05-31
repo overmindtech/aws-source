@@ -52,6 +52,11 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 						Query:  *volume.VolumeId,
 						Scope:  scope,
 					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Volume and status are tightly coupled
+						In:  true,
+						Out: true,
+					},
 				},
 			},
 		}
@@ -70,12 +75,19 @@ func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, ou
 		for _, event := range volume.Events {
 			if event.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-instance",
-					Method: sdp.QueryMethod_GET,
-					Query:  *event.InstanceId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-instance",
+						Method: sdp.QueryMethod_GET,
+						Query:  *event.InstanceId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Instances and volumes can affect each other
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 

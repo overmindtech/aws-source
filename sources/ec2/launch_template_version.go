@@ -73,87 +73,151 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				for _, ip := range ni.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "ip",
-							Method: sdp.QueryMethod_GET,
-							Query:  *ip.Ipv6Address,
-							Scope:  "global",
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "ip",
+								Method: sdp.QueryMethod_GET,
+								Query:  *ip.Ipv6Address,
+								Scope:  "global",
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// IPs are always linked
+								In:  true,
+								Out: true,
+							},
+						})
 					}
 				}
 
 				if ni.NetworkInterfaceId != nil {
 					// +overmind:link ec2-network-interface
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-network-interface",
-						Method: sdp.QueryMethod_GET,
-						Query:  *ni.NetworkInterfaceId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-network-interface",
+							Method: sdp.QueryMethod_GET,
+							Query:  *ni.NetworkInterfaceId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the network interface will affect the
+							// template and vice versa
+							In:  true,
+							Out: true,
+						},
+					})
 				}
 
 				for _, ip := range ni.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
 						// +overmind:link ip
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "ip",
-							Method: sdp.QueryMethod_GET,
-							Query:  *ip.PrivateIpAddress,
-							Scope:  "global",
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "ip",
+								Method: sdp.QueryMethod_GET,
+								Query:  *ip.PrivateIpAddress,
+								Scope:  "global",
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// IPs are always linked
+								In:  true,
+								Out: true,
+							},
+						})
 					}
 				}
 
 				if ni.SubnetId != nil {
 					// +overmind:link ec2-subnet
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-subnet",
-						Method: sdp.QueryMethod_GET,
-						Query:  *ni.SubnetId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-subnet",
+							Method: sdp.QueryMethod_GET,
+							Query:  *ni.SubnetId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the subnet will affect the template
+							In: true,
+							// Changing the template won't affect the subnet
+							Out: false,
+						},
+					})
 				}
 
 				for _, group := range ni.Groups {
 					// +overmind:link ec2-security-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-security-group",
-						Method: sdp.QueryMethod_GET,
-						Query:  group,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-security-group",
+							Method: sdp.QueryMethod_GET,
+							Query:  group,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the security group will affect the
+							// template
+							In: true,
+							// Changing the template won't affect the security
+							// group
+							Out: false,
+						},
+					})
 				}
 			}
 
 			if lt.ImageId != nil {
 				// +overmind:link ec2-image
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-image",
-					Method: sdp.QueryMethod_GET,
-					Query:  *lt.ImageId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-image",
+						Method: sdp.QueryMethod_GET,
+						Query:  *lt.ImageId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the image will affect the template
+						In: true,
+						// Changing the template won't affect the image
+						Out: false,
+					},
+				})
 			}
 
 			if lt.KeyName != nil {
 				// +overmind:link ec2-key-pair
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-key-pair",
-					Method: sdp.QueryMethod_GET,
-					Query:  *lt.KeyName,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-key-pair",
+						Method: sdp.QueryMethod_GET,
+						Query:  *lt.KeyName,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the key pair will affect the template
+						In: true,
+						// Changing the template won't affect the key pair
+						Out: false,
+					},
+				})
 			}
 
 			for _, mapping := range lt.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.SnapshotId != nil {
 					// +overmind:link ec2-snapshot
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-snapshot",
-						Method: sdp.QueryMethod_GET,
-						Query:  *mapping.Ebs.SnapshotId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-snapshot",
+							Method: sdp.QueryMethod_GET,
+							Query:  *mapping.Ebs.SnapshotId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the snapshot will affect the template
+							In: true,
+							// Changing the template won't affect the snapshot
+							Out: false,
+						},
+					})
 				}
 			}
 
@@ -161,12 +225,22 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 				if target := spec.CapacityReservationTarget; target != nil {
 					if target.CapacityReservationId != nil {
 						// +overmind:link ec2-capacity-reservation
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "ec2-capacity-reservation",
-							Method: sdp.QueryMethod_GET,
-							Query:  *target.CapacityReservationId,
-							Scope:  scope,
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "ec2-capacity-reservation",
+								Method: sdp.QueryMethod_GET,
+								Query:  *target.CapacityReservationId,
+								Scope:  scope,
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changing the capacity reservation will affect
+								// the template
+								In: true,
+								// Changing the template could affect the
+								// capacity reservation since it uses it up
+								Out: true,
+							},
+						})
 					}
 				}
 			}
@@ -174,43 +248,77 @@ func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTempla
 			if lt.Placement != nil {
 				if lt.Placement.AvailabilityZone != nil {
 					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-availability-zone",
-						Method: sdp.QueryMethod_GET,
-						Query:  *lt.Placement.AvailabilityZone,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-availability-zone",
+							Method: sdp.QueryMethod_GET,
+							Query:  *lt.Placement.AvailabilityZone,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// AZs don't change
+							In:  false,
+							Out: false,
+						},
+					})
 				}
 
 				if lt.Placement.GroupId != nil {
 					// +overmind:link ec2-placement-group
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-placement-group",
-						Method: sdp.QueryMethod_GET,
-						Query:  *lt.Placement.GroupId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-placement-group",
+							Method: sdp.QueryMethod_GET,
+							Query:  *lt.Placement.GroupId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the placement group will affect the
+							// template
+							In: true,
+							// Changing the template won't affect the placement
+							// group
+							Out: false,
+						},
+					})
 				}
 
 				if lt.Placement.HostId != nil {
 					// +overmind:link ec2-host
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-host",
-						Method: sdp.QueryMethod_GET,
-						Query:  *lt.Placement.HostId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-host",
+							Method: sdp.QueryMethod_GET,
+							Query:  *lt.Placement.HostId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the host will affect the template
+							In: true,
+							// Changing the template could affect the host also
+							Out: true,
+						},
+					})
 				}
 			}
 
 			for _, id := range lt.SecurityGroupIds {
 				// +overmind:link ec2-security-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-security-group",
-					Method: sdp.QueryMethod_GET,
-					Query:  id,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-security-group",
+						Method: sdp.QueryMethod_GET,
+						Query:  id,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the security group will affect the template
+						In: true,
+						// Changing the template won't affect the security
+						// group
+						Out: false,
+					},
+				})
 			}
 		}
 

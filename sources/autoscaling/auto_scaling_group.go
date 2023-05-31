@@ -35,12 +35,20 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 				if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification != nil {
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
 						// +overmind:link ec2-launch-template
-						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-							Type:   "ec2-launch-template",
-							Method: sdp.QueryMethod_GET,
-							Query:  *asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId,
-							Scope:  scope,
-						}})
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "ec2-launch-template",
+								Method: sdp.QueryMethod_GET,
+								Query:  *asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId,
+								Scope:  scope,
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changes to a launch template will affect the ASG
+								In: true,
+								// Changes to an ASG won't affect the template
+								Out: false,
+							},
+						})
 					}
 				}
 			}
@@ -52,45 +60,78 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		for _, tgARN := range asg.TargetGroupARNs {
 			if a, err = sources.ParseARN(tgARN); err == nil {
 				// +overmind:link elbv2-target-group
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "elbv2-target-group",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  tgARN,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-target-group",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  tgARN,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changes to a target group won't affect the ASG
+						In: false,
+						// Changes to an ASG will affect the target group
+						Out: true,
+					},
+				})
 			}
 		}
 
 		for _, az := range asg.AvailabilityZones {
 			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-availability-zone",
-				Method: sdp.QueryMethod_GET,
-				Query:  az,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-availability-zone",
+					Method: sdp.QueryMethod_GET,
+					Query:  az,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// AZs don't change or affect anything
+					In:  false,
+					Out: false,
+				},
+			})
 		}
 
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
 				// +overmind:link ec2-instance
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-instance",
-					Method: sdp.QueryMethod_GET,
-					Query:  *instance.InstanceId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-instance",
+						Method: sdp.QueryMethod_GET,
+						Query:  *instance.InstanceId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changes to an instance could affect the ASG since it
+						// could cause it to scale
+						In: true,
+						// Changes to an ASG can definitely affect an instance
+						// since it might be terminated
+						Out: true,
+					},
+				})
 			}
 
 			if instance.LaunchTemplate != nil {
 				if instance.LaunchTemplate.LaunchTemplateId != nil {
 					// +overmind:link ec2-launch-template
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "ec2-launch-template",
-						Method: sdp.QueryMethod_GET,
-						Query:  *instance.LaunchTemplate.LaunchTemplateId,
-						Scope:  scope,
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-launch-template",
+							Method: sdp.QueryMethod_GET,
+							Query:  *instance.LaunchTemplate.LaunchTemplateId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changes to a launch template will affect the ASG
+							In: true,
+							// Changes to an ASG won't affect the template
+							Out: false,
+						},
+					})
 				}
 			}
 		}
@@ -98,45 +139,77 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 		if asg.ServiceLinkedRoleARN != nil {
 			if a, err = sources.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
 				// +overmind:link iam-role
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "iam-role",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *asg.ServiceLinkedRoleARN,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "iam-role",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *asg.ServiceLinkedRoleARN,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changes to a role can affect the functioning of the
+						// ASG
+						In: true,
+						// ASG changes wont affect the role though
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if asg.LaunchConfigurationName != nil {
 			// +overmind:link autoscaling-launch-configuration
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "autoscaling-launch-configuration",
-				Method: sdp.QueryMethod_GET,
-				Query:  *asg.LaunchConfigurationName,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "autoscaling-launch-configuration",
+					Method: sdp.QueryMethod_GET,
+					Query:  *asg.LaunchConfigurationName,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Very tightly coupled
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 
 		if asg.LaunchTemplate != nil {
 			if asg.LaunchTemplate.LaunchTemplateId != nil {
 				// +overmind:link ec2-launch-template
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-launch-template",
-					Method: sdp.QueryMethod_GET,
-					Query:  *asg.LaunchTemplate.LaunchTemplateId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-launch-template",
+						Method: sdp.QueryMethod_GET,
+						Query:  *asg.LaunchTemplate.LaunchTemplateId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changes to a launch template will affect the ASG
+						In: true,
+						// Changes to an ASG won't affect the template
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if asg.PlacementGroup != nil {
 			// +overmind:link ec2-placement-group
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-placement-group",
-				Method: sdp.QueryMethod_GET,
-				Query:  *asg.PlacementGroup,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-placement-group",
+					Method: sdp.QueryMethod_GET,
+					Query:  *asg.PlacementGroup,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changes to a placement group can affect the ASG
+					In: true,
+					// Changes to an ASG can affect the placement group
+					Out: true,
+				},
+			})
 		}
 
 		items = append(items, &item)

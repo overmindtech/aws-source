@@ -129,12 +129,20 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 		}
 
 		if desc.Target.AvailabilityZone != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-availability-zone",
-				Method: sdp.QueryMethod_GET,
-				Query:  *desc.Target.AvailabilityZone,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-availability-zone",
+					Method: sdp.QueryMethod_GET,
+					Query:  *desc.Target.AvailabilityZone,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the availability zone can affect the target health
+					In: true,
+					// The target health won't affect the availability zone
+					Out: false,
+				},
+			})
 		}
 
 		id := TargetHealthUniqueID{
@@ -153,20 +161,33 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			switch a.Service {
 			case "lambda":
 				// +overmind:link lambda-function
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "lambda-function",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *desc.Target.Id,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "lambda-function",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *desc.Target.Id,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Everything is tightly coupled with target health
+						In:  true,
+						Out: true,
+					},
+				})
 			case "elasticloadbalancing":
 				// +overmind:link elbv2-load-balancer
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "elbv2-load-balancer",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *desc.Target.Id,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-load-balancer",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *desc.Target.Id,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		} else {
 			// In this case it could be an instance ID or an IP. We will check
@@ -174,21 +195,33 @@ func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInp
 			if net.ParseIP(*desc.Target.Id) != nil {
 				// +overmind:link ip
 				// This means it's an IP
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *desc.Target.Id,
-					Scope:  "global",
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *desc.Target.Id,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  true,
+						Out: true,
+					},
+				})
 			} else {
 				// +overmind:link ec2-instance
 				// If all else fails it must be an instance ID
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-instance",
-					Method: sdp.QueryMethod_GET,
-					Query:  *desc.Target.Id,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-instance",
+						Method: sdp.QueryMethod_GET,
+						Query:  *desc.Target.Id,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 

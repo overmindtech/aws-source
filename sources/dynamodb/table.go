@@ -47,12 +47,22 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 			if dest.StreamArn != nil {
 				if a, err = sources.ParseARN(*dest.StreamArn); err == nil {
 					// +overmind:link kinesis-stream
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-						Type:   "kinesis-stream",
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  *dest.StreamArn,
-						Scope:  sources.FormatScope(a.AccountID, a.Region),
-					}})
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "kinesis-stream",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *dest.StreamArn,
+							Scope:  sources.FormatScope(a.AccountID, a.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// If you change the stream, it could mean the table
+							// is no longer replicated
+							In: true,
+							// Changing this table will affect the stream and
+							// whatever is listening to it
+							Out: true,
+						},
+					})
 				}
 			}
 		}
@@ -62,24 +72,44 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		if table.RestoreSummary.SourceBackupArn != nil {
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceBackupArn); err == nil {
 				// +overmind:link backup-recovery-point
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "backup-recovery-point",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *table.RestoreSummary.SourceBackupArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "backup-recovery-point",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *table.RestoreSummary.SourceBackupArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The backup is just the source from which the table
+						// was created, so I guess you'd say that the recovery
+						// point affects the table
+						In: true,
+						// Changing the table won't affect the recovery point
+						Out: false,
+					},
+				})
 			}
 		}
 
 		if table.RestoreSummary.SourceTableArn != nil {
 			if a, err = sources.ParseARN(*table.RestoreSummary.SourceTableArn); err == nil {
 				// +overmind:link dynamodb-table
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "dynamodb-table",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *table.RestoreSummary.SourceTableArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "dynamodb-table",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *table.RestoreSummary.SourceTableArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// If the table was restored from another table, and
+						// this is normal, then changing the source table could
+						// affect this one
+						In: true,
+						// Changing this table won't affect the source table
+						Out: false,
+					},
+				})
 			}
 		}
 	}
@@ -88,12 +118,20 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		if table.SSEDescription.KMSMasterKeyArn != nil {
 			if a, err = sources.ParseARN(*table.SSEDescription.KMSMasterKeyArn); err == nil {
 				// +overmind:link kms-key
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *table.SSEDescription.KMSMasterKeyArn,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "kms-key",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *table.SSEDescription.KMSMasterKeyArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the key could affect the table
+						In: true,
+						// Changing the table won't affect the key
+						Out: false,
+					},
+				})
 			}
 		}
 	}
@@ -101,12 +139,19 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	for _, replica := range table.Replicas {
 		if replica.RegionName != nil {
 			// +overmind:link ec2-region
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-region",
-				Method: sdp.QueryMethod_GET,
-				Query:  *replica.RegionName,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-region",
+					Method: sdp.QueryMethod_GET,
+					Query:  *replica.RegionName,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Regions don't change
+					In:  false,
+					Out: false,
+				},
+			})
 		}
 	}
 

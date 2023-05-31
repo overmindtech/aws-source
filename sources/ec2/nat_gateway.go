@@ -47,53 +47,92 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 		for _, address := range ng.NatGatewayAddresses {
 			if address.NetworkInterfaceId != nil {
 				// +overmind:link ec2-network-interface
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ec2-network-interface",
-					Method: sdp.QueryMethod_GET,
-					Query:  *address.NetworkInterfaceId,
-					Scope:  scope,
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-network-interface",
+						Method: sdp.QueryMethod_GET,
+						Query:  *address.NetworkInterfaceId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// The nat gateway and it's interfaces will affect each
+						// other
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 
 			if address.PrivateIp != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *address.PrivateIp,
-					Scope:  "global",
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *address.PrivateIp,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// IPs always link
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 
 			if address.PublicIp != nil {
 				// +overmind:link ip
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
-					Query:  *address.PublicIp,
-					Scope:  "global",
-				}})
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *address.PublicIp,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// IPs always link
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 
 		if ng.SubnetId != nil {
 			// +overmind:link ec2-subnet
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-subnet",
-				Method: sdp.QueryMethod_GET,
-				Query:  *ng.SubnetId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-subnet",
+					Method: sdp.QueryMethod_GET,
+					Query:  *ng.SubnetId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the subnet won't affect the gateway
+					In: false,
+					// Changing the gateway will affect the subnet since this
+					// will be gateway that subnet uses to access the internet
+					Out: true,
+				},
+			})
 		}
 
 		if ng.VpcId != nil {
 			// +overmind:link ec2-vpc
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-vpc",
-				Method: sdp.QueryMethod_GET,
-				Query:  *ng.VpcId,
-				Scope:  scope,
-			}})
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc",
+					Method: sdp.QueryMethod_GET,
+					Query:  *ng.VpcId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC could affect the gateway
+					In: true,
+					// Changing the gateway won't affect the VPC
+					Out: false,
+				},
+			})
 		}
 
 		items = append(items, &item)
