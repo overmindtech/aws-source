@@ -224,9 +224,10 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 						Scope:  scope,
 					},
 					BlastPropagation: &sdp.BlastPropagation{
-						// Tightly linked
-						In:  true,
-						Out: true,
+						// Changes to the option group can affect the cluster
+						In: true,
+						// Changes to the cluster won't affect the option group
+						Out: false,
 					},
 				})
 			}
