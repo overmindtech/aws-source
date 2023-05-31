@@ -172,6 +172,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 						// Changes to the KMS key can affect the cluster
 						In: true,
 						// The cluster won't affect the KMS key
+						Out: false,
 					},
 				})
 			}
