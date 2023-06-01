@@ -27,8 +27,8 @@ require (
 	github.com/nats-io/jwt/v2 v2.4.1
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/connect v0.11.0
-	github.com/overmindtech/discovery v0.21.1
-	github.com/overmindtech/sdp-go v0.32.0
+	github.com/overmindtech/discovery v0.21.2
+	github.com/overmindtech/sdp-go v0.32.2
 	github.com/sirupsen/logrus v1.9.2
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
