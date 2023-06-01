@@ -272,10 +272,10 @@ github.com/overmindtech/api-client v0.14.0 h1:zXyjJsIeawNqoWv7FqOjwcqgFpLrDYz7l9
 github.com/overmindtech/api-client v0.14.0/go.mod h1:msdkTAQFlvDGOU4tQk2adk2P8j23uaMWkJ9YRX4wGWI=
 github.com/overmindtech/connect v0.11.0 h1:sF9wUPT8I139PBJYgQwLsM2CLHwlDbuKhPAqg768bLc=
 github.com/overmindtech/connect v0.11.0/go.mod h1:Yryvzz2NMbYqrHirmE0R+xZlltZWFb7Ufwh8OzcJgjc=
-github.com/overmindtech/discovery v0.21.1 h1:WWdTuqkYm3Ekm18o3qwZ68nRp8VMQKwwAI2aJV5YVEI=
-github.com/overmindtech/discovery v0.21.1/go.mod h1:eG2ZeOXMxTYK6U0CnliC3rt/9bCTgEu2cT4tAuFegdk=
-github.com/overmindtech/sdp-go v0.32.0 h1:Etck1/W70YlZyD01u+65XVzFZhH0Bu44Ar7PRe1jjSc=
-github.com/overmindtech/sdp-go v0.32.0/go.mod h1:W6+M5cRKe+eNj0Ik9i/tXTIRLZOYlrHwQSnZ3haFVfw=
+github.com/overmindtech/discovery v0.21.3 h1:+xCr52c4TA1Lt/Nxq+JTgyB2pCObTAbLa9SyUQbzfY8=
+github.com/overmindtech/discovery v0.21.3/go.mod h1:eG2ZeOXMxTYK6U0CnliC3rt/9bCTgEu2cT4tAuFegdk=
+github.com/overmindtech/sdp-go v0.32.2 h1:TXacjNb1PKF4lj96ZRmFybmc7oes4vj6tOQElRqJ2cE=
+github.com/overmindtech/sdp-go v0.32.2/go.mod h1:W6+M5cRKe+eNj0Ik9i/tXTIRLZOYlrHwQSnZ3haFVfw=
 github.com/overmindtech/sdpcache v1.5.0 h1:QzHWQm1KGN9rNHPb/VZvz7WDCsyKOuVLlNUGF2CIFGc=
 github.com/overmindtech/sdpcache v1.5.0/go.mod h1:GFMMle860EWMDQXbk6dhLVSQrV0YlEqqJ6/VNxINb0o=
 github.com/pelletier/go-toml/v2 v2.0.8 h1:0ctb6s9mE31h0/lhu+J6OPmVeDxJn+kYnJc2jZR9tGQ=
