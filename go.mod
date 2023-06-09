@@ -29,7 +29,7 @@ require (
 	github.com/overmindtech/connect v0.11.0
 	github.com/overmindtech/discovery v0.21.4
 	github.com/overmindtech/sdp-go v0.32.2
-	github.com/sirupsen/logrus v1.9.2
+	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
