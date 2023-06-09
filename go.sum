@@ -70,6 +70,8 @@ github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.7 h1:yb2o8oh3Y+Gg2g+wlzrWS3p
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.7/go.mod h1:1MNss6sqoIsFGisX92do/5doiUCBrN7EjhZCS/8DUjI=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.98.0 h1:WblDV33AG9dhv0zFEPEmGtD5UECSNpKMxtdENULfR8M=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.98.0/go.mod h1:L3ZT0N/vBsw77mOAawXmRnREpEjcHd2v5Hzf7AkIH8M=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.99.0 h1:NXi4pNJWjAaiI56P1Rl8DC9A4jMNRE00WNBsDua5WRg=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.99.0/go.mod h1:L3ZT0N/vBsw77mOAawXmRnREpEjcHd2v5Hzf7AkIH8M=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.27.1 h1:54QSuWR3Pot7HqBRXd+c1yF97h2bqzDBID8qFSAkTlE=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.27.1/go.mod h1:SB6YszwN1iKvyt/Qk+ICeKsfBxjd0CTEwwkmej9qoa0=
 github.com/aws/aws-sdk-go-v2/service/eks v1.27.12 h1:eKidf2ebtleLtH67x02syhO9t3FItv9a7/ep9KC3TAM=
@@ -80,6 +82,8 @@ github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.11 h1:IN2XMTLm
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.11/go.mod h1:oPHYtcocUcfHOE7qygtvyZMw82nedCKZSop/R9jxlAM=
 github.com/aws/aws-sdk-go-v2/service/iam v1.19.12 h1:JH1H7POlsZt41X9JYIBLZoXW0Qv+WOuC48xsafsls2Q=
 github.com/aws/aws-sdk-go-v2/service/iam v1.19.12/go.mod h1:kAnokExGCYs7zfvZEZdFHvQ/x4ZKIci0Raps6mZI1Ag=
+github.com/aws/aws-sdk-go-v2/service/iam v1.20.0 h1:ywXSXkssdnuPlJyCZVO5kAUQhFm/RhsbvWRHklJ0uH4=
+github.com/aws/aws-sdk-go-v2/service/iam v1.20.0/go.mod h1:kAnokExGCYs7zfvZEZdFHvQ/x4ZKIci0Raps6mZI1Ag=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.11 h1:y2+VQzC6Zh2ojtV2LoC0MNwHWc6qXv/j2vrQtlftkdA=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.11/go.mod h1:iV4q2hsqtNECrfmlXyord9u4zyuFEJX9eLgLpSPzWA8=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.28 h1:vGWm5vTpMr39tEZfQeDiDAMgk+5qsnvRny3FjLpnH5w=
@@ -92,8 +96,12 @@ github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.2 h1:NbWkRxEEIRSCqx
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.2/go.mod h1:4tfW5l4IAB32VWCDEBxCRtR9T4BWy4I4kr1spr8NgZM=
 github.com/aws/aws-sdk-go-v2/service/lambda v1.34.1 h1:1Q4cSbM9p1aLhs4GKuvyyj46YwJ/E0/2kubFViF4NtA=
 github.com/aws/aws-sdk-go-v2/service/lambda v1.34.1/go.mod h1:i23nHcGEyswthctBfhEO1agGpM5Uyh83aSmSB6DmdCk=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.35.0 h1:iNLsDIOju/bbqw0mNaEXh+9Ms6Mm0RjcHPP9z4k9lUY=
+github.com/aws/aws-sdk-go-v2/service/lambda v1.35.0/go.mod h1:i23nHcGEyswthctBfhEO1agGpM5Uyh83aSmSB6DmdCk=
 github.com/aws/aws-sdk-go-v2/service/rds v1.44.1 h1:9nhtGFhgKBBqcsbHXCVxrFKZgb4EmVF30hG3s2WEdD8=
 github.com/aws/aws-sdk-go-v2/service/rds v1.44.1/go.mod h1:rS6T0DrjdZ5LDr8ZC/J9iZdD1oSbie5reWWzqv5zLOw=
+github.com/aws/aws-sdk-go-v2/service/rds v1.45.0 h1:Yi23UNiGidNfT7tIW0lbE6JtRR1ZN+cNZGRTKLB+opk=
+github.com/aws/aws-sdk-go-v2/service/rds v1.45.0/go.mod h1:rS6T0DrjdZ5LDr8ZC/J9iZdD1oSbie5reWWzqv5zLOw=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.28.1 h1:8e1fgdyer5IqBPtiWNsVLY/XFucmNTtYMqADyCFXTgQ=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.28.1/go.mod h1:9SEpwqaALzp34eCT6w5PTh4SDDT84wxfMRx9VJSJPsk=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.33.1 h1:O+9nAy9Bb6bJFTpeNFtd9UfHbgxO1o4ZDAM9rQp5NsY=
