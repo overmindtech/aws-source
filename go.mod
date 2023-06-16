@@ -28,7 +28,7 @@ require (
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/connect v0.11.0
 	github.com/overmindtech/discovery v0.21.4
-	github.com/overmindtech/sdp-go v0.32.2
+	github.com/overmindtech/sdp-go v0.33.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
@@ -59,7 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.14.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.12.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.10 // indirect
-	github.com/bufbuild/connect-go v1.7.0 // indirect
+	github.com/bufbuild/connect-go v1.8.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect

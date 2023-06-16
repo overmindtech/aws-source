@@ -116,6 +116,8 @@ github.com/aws/smithy-go v1.13.5 h1:hgz0X/DX0dGqTYpGALqXJoRKRj5oQ7150i5FdTePzO8=
 github.com/aws/smithy-go v1.13.5/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J3gBHzA=
 github.com/bufbuild/connect-go v1.7.0 h1:MGp82v7SCza+3RhsVhV7aMikwxvI3ZfD72YiGt8FYJo=
 github.com/bufbuild/connect-go v1.7.0/go.mod h1:GmMJYR6orFqD0Y6ZgX8pwQ8j9baizDrIQMm1/a6LnHk=
+github.com/bufbuild/connect-go v1.8.0 h1:srluNkFkZBfSfg9Qb6DrO+5nMaxix//h2ctrHZhMGKc=
+github.com/bufbuild/connect-go v1.8.0/go.mod h1:GmMJYR6orFqD0Y6ZgX8pwQ8j9baizDrIQMm1/a6LnHk=
 github.com/cenkalti/backoff/v4 v4.2.1 h1:y4OZtCnogmCPw98Zjyt5a6+QwPLGkiQsYW5oUqylYbM=
 github.com/cenkalti/backoff/v4 v4.2.1/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -284,6 +286,8 @@ github.com/overmindtech/discovery v0.21.4 h1:jnt/4K8eRfr2alu7KlD9woMzHAOVts1uP1r
 github.com/overmindtech/discovery v0.21.4/go.mod h1:t53X1tENVfeLkQxpQXCf2G+1SxK3wWmUoNZK/TPC+MQ=
 github.com/overmindtech/sdp-go v0.32.2 h1:TXacjNb1PKF4lj96ZRmFybmc7oes4vj6tOQElRqJ2cE=
 github.com/overmindtech/sdp-go v0.32.2/go.mod h1:W6+M5cRKe+eNj0Ik9i/tXTIRLZOYlrHwQSnZ3haFVfw=
+github.com/overmindtech/sdp-go v0.33.0 h1:1gdckSLO4ykjWPd8H+iZg2YKhX/K5N3JJsJ7wXBi9h8=
+github.com/overmindtech/sdp-go v0.33.0/go.mod h1:I7UbblOOjeJ/SAep+WJLEgVRYw8ZEsxBFfFo7trY9eE=
 github.com/overmindtech/sdpcache v1.5.0 h1:QzHWQm1KGN9rNHPb/VZvz7WDCsyKOuVLlNUGF2CIFGc=
 github.com/overmindtech/sdpcache v1.5.0/go.mod h1:GFMMle860EWMDQXbk6dhLVSQrV0YlEqqJ6/VNxINb0o=
 github.com/pelletier/go-toml/v2 v2.0.8 h1:0ctb6s9mE31h0/lhu+J6OPmVeDxJn+kYnJc2jZR9tGQ=
