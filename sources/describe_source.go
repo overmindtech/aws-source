@@ -181,6 +181,13 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 		}
 	}
 
+	if s.InputMapperList == nil {
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: fmt.Sprintf("list is not supported for %v resources", s.ItemType),
+		}
+	}
+
 	err := s.Validate()
 
 	if err != nil {

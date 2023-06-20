@@ -45,7 +45,7 @@ require (
 // Transitive dependencies
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.1.0 // indirect
-	github.com/aws/aws-sdk-go v1.44.271 // indirect
+	github.com/aws/aws-sdk-go v1.44.285 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.34 // indirect
@@ -107,3 +107,5 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require github.com/aws/aws-sdk-go-v2/service/efs v1.20.3 // indirect
