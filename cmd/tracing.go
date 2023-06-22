@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -36,8 +37,18 @@ import (
 // )
 
 func tracingResource() *resource.Resource {
+	// Identify your application using resource detection
+	detectors := []resource.Detector{}
+
+	// the EC2 detector takes ~10s to time out outside EC2
+	// disable it if we're running from a git checkout
+	_, err := os.Stat(".git")
+	if os.IsNotExist(err) {
+		detectors = append(detectors, ec2.NewResourceDetector())
+	}
+
 	res, err := resource.New(context.Background(),
-		resource.WithDetectors(ec2.NewResourceDetector()),
+		resource.WithDetectors(detectors...),
 		// Keep the default detectors
 		resource.WithHost(),
 		resource.WithOS(),
