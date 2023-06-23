@@ -19,7 +19,7 @@ func AccessPointOutputMapper(scope string, input *efs.DescribeAccessPointsInput,
 	items := make([]*sdp.Item, 0)
 
 	for _, ap := range output.AccessPoints {
-		attrs, err := sources.ToAttributesCase(output)
+		attrs, err := sources.ToAttributesCase(ap)
 
 		if err != nil {
 			return nil, err

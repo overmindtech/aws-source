@@ -60,7 +60,7 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 // not
 func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Validate() error {
 	if s.DescribeFunc == nil {
-		return errors.New("ec2 source describe func is nil")
+		return errors.New("source describe func is nil")
 	}
 
 	if s.MaxResultsPerPage == 0 {
@@ -68,15 +68,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Validate() er
 	}
 
 	if s.InputMapperGet == nil {
-		return errors.New("ec2 source get input mapper is nil")
-	}
-
-	if s.InputMapperList == nil {
-		return errors.New("ec2 source list input mapper is nil")
+		return errors.New("source get input mapper is nil")
 	}
 
 	if s.OutputMapper == nil {
-		return errors.New("ec2 source output mapper is nil")
+		return errors.New("source output mapper is nil")
 	}
 
 	return nil

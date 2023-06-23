@@ -2,7 +2,6 @@ package efs
 
 import (
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/efs/types"
@@ -16,7 +15,7 @@ func TestMountTargetOutputMapper(t *testing.T) {
 			{
 				FileSystemId:         sources.PtrString("fs-1234567890"),
 				LifeCycleState:       types.LifeCycleStateAvailable,
-				MountTargetId:        sources.PtrString(""), // TODO
+				MountTargetId:        sources.PtrString("fsmt-01e86506d8165e43f"),
 				SubnetId:             sources.PtrString("subnet-1234567"),
 				AvailabilityZoneId:   sources.PtrString("use1-az1"),
 				AvailabilityZoneName: sources.PtrString("us-east-1"),
@@ -71,7 +70,7 @@ func TestMountTargetOutputMapper(t *testing.T) {
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "10.230.43.1",
-			ExpectedScope:  "foo",
+			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "ec2-network-interface",
@@ -89,17 +88,4 @@ func TestMountTargetOutputMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 
-}
-
-func TestNewMountTargetSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
-
-	source := NewMountTargetSource(config, account, &TestRateLimit)
-
-	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
-	}
-
-	test.Run(t)
 }

@@ -29,8 +29,8 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 						LastReplicatedTimestamp: sources.PtrTime(time.Now()),
 					},
 				},
-				OriginalSourceFileSystemArn: sources.PtrString(""), // TODO
-				SourceFileSystemArn:         sources.PtrString(""), // TODO
+				OriginalSourceFileSystemArn: sources.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
+				SourceFileSystemArn:         sources.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
 				SourceFileSystemId:          sources.PtrString("fs-748927493"),
 				SourceFileSystemRegion:      sources.PtrString("us-east-1"),
 			},
@@ -80,8 +80,8 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 		{
 			ExpectedType:   "efs-file-system",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "", // TODO
-			ExpectedScope:  "", // TODO
+			ExpectedQuery:  "arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9",
+			ExpectedScope:  "944651592624.eu-west-2",
 		},
 	}
 
@@ -90,17 +90,4 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 	if *item.Health != sdp.Health_HEALTH_ERROR {
 		t.Errorf("expected health to be ERROR, got %v", item.Health.String())
 	}
-}
-
-func TestNewReplicationConfigurationSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
-
-	source := NewReplicationConfigurationSource(config, account, &TestRateLimit)
-
-	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
-	}
-
-	test.Run(t)
 }

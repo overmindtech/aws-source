@@ -20,7 +20,7 @@ func ReplicationConfigurationOutputMapper(scope string, input *efs.DescribeRepli
 	items := make([]*sdp.Item, 0)
 
 	for _, replication := range output.Replications {
-		attrs, err := sources.ToAttributesCase(output)
+		attrs, err := sources.ToAttributesCase(replication)
 
 		if err != nil {
 			return nil, err
@@ -42,7 +42,7 @@ func ReplicationConfigurationOutputMapper(scope string, input *efs.DescribeRepli
 
 		item := sdp.Item{
 			Type:            "efs-replication-configuration",
-			UniqueAttribute: "sourceFileSystemId", // TODO: Ensure that this is correct and not `OriginalSourceFileSystemArn`
+			UniqueAttribute: "sourceFileSystemId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          sdp.Health_HEALTH_OK.Enum(), // Default to OK

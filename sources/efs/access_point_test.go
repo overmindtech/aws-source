@@ -14,13 +14,13 @@ func TestAccessPointOutputMapper(t *testing.T) {
 	output := &efs.DescribeAccessPointsOutput{
 		AccessPoints: []types.AccessPointDescription{
 			{
-				AccessPointArn: sources.PtrString(""), // TODO
-				AccessPointId:  sources.PtrString(""), // TODO
-				ClientToken:    sources.PtrString(""), // TODO
-				FileSystemId:   sources.PtrString(""), // TODO
+				AccessPointArn: sources.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:access-point/fsap-073b1534eafbc5ee2"),
+				AccessPointId:  sources.PtrString("fsap-073b1534eafbc5ee2"),
+				ClientToken:    sources.PtrString("pvc-66e4418c-edf5-4a0e-9834-5945598d51fe"),
+				FileSystemId:   sources.PtrString("fs-0c6f2f41e957f42a9"),
 				LifeCycleState: types.LifeCycleStateAvailable,
 				Name:           sources.PtrString("example access point"),
-				OwnerId:        nil, // TODO
+				OwnerId:        sources.PtrString("944651592624"),
 				PosixUser: &types.PosixUser{
 					Gid: sources.PtrInt64(1000),
 					Uid: sources.PtrInt64(1000),
@@ -32,7 +32,7 @@ func TestAccessPointOutputMapper(t *testing.T) {
 					CreationInfo: &types.CreationInfo{
 						OwnerGid:    sources.PtrInt64(1000),
 						OwnerUid:    sources.PtrInt64(1000),
-						Permissions: nil, // TODO
+						Permissions: sources.PtrString("700"),
 					},
 					Path: sources.PtrString("/etc/foo"),
 				},
@@ -70,7 +70,7 @@ func TestAccessPointOutputMapper(t *testing.T) {
 		{
 			ExpectedType:   "efs-file-system",
 			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "", // TODO
+			ExpectedQuery:  "fs-0c6f2f41e957f42a9",
 			ExpectedScope:  "foo",
 		},
 	}

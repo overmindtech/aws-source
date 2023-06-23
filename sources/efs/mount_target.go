@@ -19,7 +19,7 @@ func MountTargetOutputMapper(scope string, input *efs.DescribeMountTargetsInput,
 	items := make([]*sdp.Item, 0)
 
 	for _, mt := range output.MountTargets {
-		attrs, err := sources.ToAttributesCase(output)
+		attrs, err := sources.ToAttributesCase(mt)
 
 		if err != nil {
 			return nil, err
@@ -143,8 +143,7 @@ func MountTargetOutputMapper(scope string, input *efs.DescribeMountTargetsInput,
 // +overmind:type efs-mount-target
 // +overmind:descriptiveType EFS Mount Target
 // +overmind:get Get an mount target by ID
-// +overmind:list List all mount targets
-// +overmind:search Search for an mount target by ARN
+// +overmind:search Search for mount targets by file system ID
 // +overmind:group AWS
 
 func NewMountTargetSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
@@ -163,8 +162,11 @@ func NewMountTargetSource(config aws.Config, accountID string, limit *sources.Li
 				MountTargetId: &query,
 			}, nil
 		},
-		InputMapperList: func(scope string) (*efs.DescribeMountTargetsInput, error) {
-			return &efs.DescribeMountTargetsInput{}, nil
+		// Search by file system ID
+		InputMapperSearch: func(ctx context.Context, client *efs.Client, scope, query string) (*efs.DescribeMountTargetsInput, error) {
+			return &efs.DescribeMountTargetsInput{
+				FileSystemId: &query,
+			}, nil
 		},
 		OutputMapper: MountTargetOutputMapper,
 	}

@@ -19,7 +19,7 @@ func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, o
 	items := make([]*sdp.Item, 0)
 
 	for _, fs := range output.FileSystems {
-		attrs, err := sources.ToAttributesCase(output)
+		attrs, err := sources.ToAttributesCase(fs)
 
 		if err != nil {
 			return nil, err
@@ -43,6 +43,26 @@ func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, o
 						Query:  *fs.FileSystemId,
 						Scope:  scope,
 					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the backup policy could effect the file
+						// system in that it might no longer be backed up
+						In: true,
+						// Changing the file system will not effect the backup
+						Out: false,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						Type:   "efs-mount-target",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *fs.FileSystemId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// These are tightly coupled
+						In:  true,
+						Out: true,
+					},
 				},
 			},
 		}
@@ -64,20 +84,23 @@ func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, o
 		}
 
 		if fs.KmsKeyId != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_GET,
-					Query:  *fs.KmsKeyId,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changing the key will affect us
-					In: true,
-					// We can't affect the key
-					Out: false,
-				},
-			})
+			// KMS key ID is an ARN
+			if arn, err := sources.ParseARN(*fs.KmsKeyId); err == nil {
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "kms-key",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *fs.KmsKeyId,
+						Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the key will affect us
+						In: true,
+						// We can't affect the key
+						Out: false,
+					},
+				})
+			}
 		}
 
 		items = append(items, &item)

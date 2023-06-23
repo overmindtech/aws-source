@@ -20,6 +20,10 @@ func BackupPolicyOutputMapper(scope string, input *efs.DescribeBackupPolicyInput
 		return nil, errors.New("output contains no backup policy")
 	}
 
+	if input == nil {
+		return nil, errors.New("nil input")
+	}
+
 	if input.FileSystemId == nil {
 		return nil, errors.New("nil filesystem ID on input")
 	}

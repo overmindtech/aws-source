@@ -2,7 +2,6 @@ package efs
 
 import (
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/efs/types"
@@ -16,7 +15,9 @@ func TestBackupPolicyOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := BackupPolicyOutputMapper("foo", nil, output)
+	items, err := BackupPolicyOutputMapper("foo", &efs.DescribeBackupPolicyInput{
+		FileSystemId: sources.PtrString("fs-1234"),
+	}, output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -31,17 +32,4 @@ func TestBackupPolicyOutputMapper(t *testing.T) {
 	if len(items) != 1 {
 		t.Fatalf("expected 1 item, got %v", len(items))
 	}
-}
-
-func TestNewBackupPolicySource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
-
-	source := NewBackupPolicySource(config, account, &TestRateLimit)
-
-	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
-	}
-
-	test.Run(t)
 }

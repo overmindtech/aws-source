@@ -19,7 +19,7 @@ func TestFileSystemOutputMapper(t *testing.T) {
 				FileSystemId:         sources.PtrString("fs-1231123123"),
 				LifeCycleState:       types.LifeCycleStateAvailable,
 				NumberOfMountTargets: 10,
-				OwnerId:              sources.PtrString(""), // TODO
+				OwnerId:              sources.PtrString("944651592624"),
 				PerformanceMode:      types.PerformanceModeGeneralPurpose,
 				SizeInBytes: &types.FileSystemSize{
 					Value:           1024,
@@ -36,8 +36,8 @@ func TestFileSystemOutputMapper(t *testing.T) {
 				AvailabilityZoneId:           sources.PtrString("use1-az1"),
 				AvailabilityZoneName:         sources.PtrString("us-east-1"),
 				Encrypted:                    sources.PtrBool(true),
-				FileSystemArn:                sources.PtrString(""), // TODO
-				KmsKeyId:                     sources.PtrString(""), // TODO
+				FileSystemArn:                sources.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
+				KmsKeyId:                     sources.PtrString("arn:aws:kms:eu-west-2:944651592624:key/be76a6fa-d307-41c2-a4e3-cbfba2440747"),
 				Name:                         sources.PtrString("test"),
 				ProvisionedThroughputInMibps: sources.PtrFloat64(64),
 				ThroughputMode:               types.ThroughputModeBursting,
@@ -80,8 +80,14 @@ func TestFileSystemOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "kms-key",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "", // TODO
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:kms:eu-west-2:944651592624:key/be76a6fa-d307-41c2-a4e3-cbfba2440747",
+			ExpectedScope:  "944651592624.eu-west-2",
+		},
+		{
+			ExpectedType:   "efs-mount-target",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "fs-1231123123",
 			ExpectedScope:  "foo",
 		},
 	}
