@@ -1,0 +1,9 @@
+{
+	"type": "efs-file-system",
+	"descriptiveType": "EFS File System",
+	"getDescription": "Get an file system by ID",
+	"listDescription": "List all file systems",
+	"searchDescription": "Search for an file system by ARN",
+	"group": "AWS",
+	"links": []
+}

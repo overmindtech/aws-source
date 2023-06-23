@@ -1,0 +1,8 @@
+{
+	"type": "efs-mount-target",
+	"descriptiveType": "EFS Mount Target",
+	"getDescription": "Get an mount target by ID",
+	"searchDescription": "Search for mount targets by file system ID",
+	"group": "AWS",
+	"links": []
+}

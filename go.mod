@@ -12,6 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.11
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.102.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.27.4
+	github.com/aws/aws-sdk-go-v2/service/efs v1.20.3
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.14
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.12
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.13
@@ -107,5 +108,3 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/aws/aws-sdk-go-v2/service/efs v1.20.3 // indirect
