@@ -12,6 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.19.11
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.102.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.27.4
+	github.com/aws/aws-sdk-go-v2/service/efs v1.20.3
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.14
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.15.12
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.19.13
@@ -45,7 +46,7 @@ require (
 // Transitive dependencies
 require (
 	github.com/auth0/go-jwt-middleware/v2 v2.1.0 // indirect
-	github.com/aws/aws-sdk-go v1.44.271 // indirect
+	github.com/aws/aws-sdk-go v1.44.285 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.34 // indirect

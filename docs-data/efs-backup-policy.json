@@ -1,0 +1,8 @@
+{
+	"type": "efs-backup-policy",
+	"descriptiveType": "EFS Backup Policy",
+	"getDescription": "Get an Backup Policy by file system ID",
+	"searchDescription": "Search for an Backup Policy by ARN",
+	"group": "AWS",
+	"links": []
+}

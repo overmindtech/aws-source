@@ -1,0 +1,9 @@
+{
+	"type": "efs-replication-configuration",
+	"descriptiveType": "EFS Replication Configuration",
+	"getDescription": "Get a replication configuration by file system ID",
+	"listDescription": "List all replication configurations",
+	"searchDescription": "Search for a replication configuration by ARN",
+	"group": "AWS",
+	"links": []
+}

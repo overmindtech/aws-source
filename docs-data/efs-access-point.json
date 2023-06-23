@@ -1,0 +1,9 @@
+{
+	"type": "efs-access-point",
+	"descriptiveType": "EFS Access Point",
+	"getDescription": "Get an access point by ID",
+	"listDescription": "List all access points",
+	"searchDescription": "Search for an access point by ARN",
+	"group": "AWS",
+	"links": []
+}
