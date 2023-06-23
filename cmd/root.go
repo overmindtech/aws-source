@@ -26,6 +26,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
+	"github.com/overmindtech/aws-source/sources/efs"
 	"github.com/overmindtech/aws-source/sources/eks"
 	"github.com/overmindtech/aws-source/sources/elb"
 	"github.com/overmindtech/aws-source/sources/elbv2"
@@ -238,6 +239,13 @@ var rootCmd = &cobra.Command{
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
+
+				// EFS (I'm assuming it shares its rate limit with EC2))
+				efs.NewAccessPointSource(cfg, *callerID.Account, &ec2RateLimit),
+				efs.NewBackupPolicySource(cfg, *callerID.Account, &ec2RateLimit),
+				efs.NewFileSystemSource(cfg, *callerID.Account, &ec2RateLimit),
+				efs.NewMountTargetSource(cfg, *callerID.Account, &ec2RateLimit),
+				efs.NewReplicationConfigurationSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// EKS
 				eks.NewClusterSource(cfg, *callerID.Account, region),
