@@ -22,6 +22,7 @@ This source requies the following IAM Policy
         "ecs:List*",
         "eks:Describe*",
         "eks:List*",
+        "elasticfilesystem:Describe*",
         "elasticloadbalancing:Describe*",
         "iam:Get*",
         "iam:List*",
