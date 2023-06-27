@@ -77,6 +77,7 @@ func egressOnlyInternetGatewayOutputMapper(scope string, _ *ec2.DescribeEgressOn
 // +overmind:list List all egress only internet gateways
 // +overmind:search Search egress only internet gateways by ARN
 // +overmind:group AWS
+// +overmind:terraform:query egress_only_internet_gateway.id
 
 func NewEgressOnlyInternetGatewaySource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
