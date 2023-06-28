@@ -5,5 +5,10 @@
 	"listDescription": "List all file systems",
 	"searchDescription": "Search for an file system by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_efs_file_system.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

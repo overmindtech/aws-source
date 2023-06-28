@@ -5,6 +5,11 @@
 	"listDescription": "List all DynamoDB tables",
 	"searchDescription": "Search for DynamoDB tables by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_dynamodb_table.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"backup-recovery-point",
 		"dynamodb-table",

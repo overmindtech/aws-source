@@ -5,5 +5,10 @@
 	"listDescription": "List all RDS option groups",
 	"searchDescription": "Search for an option group by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_db_option_group.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

@@ -4,5 +4,10 @@
 	"getDescription": "Get an mount target by ID",
 	"searchDescription": "Search for mount targets by file system ID",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_efs_mount_target.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

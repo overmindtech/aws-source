@@ -5,6 +5,11 @@
 	"listDescription": "List all network interfaces",
 	"searchDescription": "Search network interfaces by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_network_interface.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-availability-zone",

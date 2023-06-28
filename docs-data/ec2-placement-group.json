@@ -5,5 +5,10 @@
 	"listDescription": "List all placement groups",
 	"searchDescription": "Search for placement groups by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_placement_group.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

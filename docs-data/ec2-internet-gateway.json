@@ -5,6 +5,11 @@
 	"listDescription": "List all internet gateways",
 	"searchDescription": "Search internet gateways by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_internet_gateway.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-vpc"
 	]

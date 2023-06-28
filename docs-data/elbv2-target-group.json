@@ -5,6 +5,12 @@
 	"listDescription": "List all target groups",
 	"searchDescription": "Search for target groups by load balancer ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_alb_target_group.name",
+		"aws_lb_target_group.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-vpc",
 		"elbv2-load-balancer",

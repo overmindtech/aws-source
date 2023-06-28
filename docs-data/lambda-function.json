@@ -5,6 +5,14 @@
 	"listDescription": "List all lambda functions",
 	"searchDescription": "Search for lambda functions by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_lambda_function.name",
+		"aws_lambda_function_event_invoke_config.function_name",
+		"aws_lambda_function_url.function_name",
+		"aws_lambda_invocation.function_name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-security-group",
 		"ec2-subnet",

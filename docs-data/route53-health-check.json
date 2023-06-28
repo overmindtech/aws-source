@@ -5,6 +5,11 @@
 	"listDescription": "List all health checks",
 	"searchDescription": "Search for health checks by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_route53_health_check.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"cloudwatch-alarm"
 	]

@@ -4,6 +4,12 @@
 	"getDescription": "Get a listener by ARN",
 	"searchDescription": "Search for listeners by load balancer ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_alb_listener.arn",
+		"aws_lb_listener.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"acm-certificate",
 		"cognito-idp-user-pool",

@@ -4,6 +4,11 @@
 	"getDescription": "Get a layer version by full name ({layerName}:{versionNumber})",
 	"searchDescription": "Search for layer versions by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_lambda_layer_version.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"signer-signing-job",
 		"signer-signing-profile"

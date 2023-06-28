@@ -5,6 +5,11 @@
 	"listDescription": "List all clusters",
 	"searchDescription": "Search for clusters by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_rds_cluster.cluster_identifier"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-availability-zone",

@@ -5,6 +5,11 @@
 	"listDescription": "List all egress only internet gateways",
 	"searchDescription": "Search egress only internet gateways by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"egress_only_internet_gateway.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-vpc"
 	]

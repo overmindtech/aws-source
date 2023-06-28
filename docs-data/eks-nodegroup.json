@@ -5,6 +5,11 @@
 	"listDescription": "List all node groups",
 	"searchDescription": "Search for node groups by cluster name",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_eks_node_group.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"autoscaling-auto-scaling-group",
 		"ec2-key-pair",

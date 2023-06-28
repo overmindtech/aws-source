@@ -5,6 +5,12 @@
 	"listDescription": "List all instances",
 	"searchDescription": "Search for instances by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_db_instance.identifier",
+		"aws_db_instance_role_association.db_instance_identifier"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"backup-recovery-point",
 		"dns",

@@ -5,6 +5,11 @@
 	"listDescription": "List all ECS services",
 	"searchDescription": "Search for ECS services by cluster",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_ecs_service.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-security-group",

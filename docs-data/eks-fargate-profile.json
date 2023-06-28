@@ -5,6 +5,11 @@
 	"listDescription": "List all fargate profiles",
 	"searchDescription": "Search for fargate profiles by cluster name",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_eks_fargate_profile.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"ec2-subnet",
 		"iam-role"

@@ -5,6 +5,11 @@
 	"listDescription": "List all clusters",
 	"searchDescription": "Search for a cluster by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_ecs_cluster.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ecs-capacity-provider",
 		"ecs-container-instance",

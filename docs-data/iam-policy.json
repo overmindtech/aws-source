@@ -5,6 +5,13 @@
 	"listDescription": "List all IAM policies",
 	"searchDescription": "Search for IAM policies by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_iam_policy.arn",
+		"aws_iam_role_policy_attachment.policy_arn",
+		"aws_iam_user_policy_attachment.policy_arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"iam-group",
 		"iam-role",

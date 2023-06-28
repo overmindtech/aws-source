@@ -5,6 +5,12 @@
 	"listDescription": "List all IAM roles",
 	"searchDescription": "Search for IAM roles by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_iam_role.name",
+		"aws_iam_role_policy_attachment.role"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"iam-policy"
 	]

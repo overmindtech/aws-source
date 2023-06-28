@@ -5,5 +5,12 @@
 	"listDescription": "List all IAM groups",
 	"searchDescription": "Search for a group by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_iam_group.name",
+		"aws_iam_group_membership.group",
+		"aws_iam_user_group_membership.group"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

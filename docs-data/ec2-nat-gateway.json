@@ -5,6 +5,11 @@
 	"listDescription": "List all NAT gateways",
 	"searchDescription": "Search for NAT gateways by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_nat_gateway.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-network-interface",
 		"ec2-subnet",

@@ -5,6 +5,12 @@
 	"listDescription": "List all subnets",
 	"searchDescription": "Search for subnets by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_route_table_association.subnet_id",
+		"aws_subnet.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-availability-zone",
 		"ec2-vpc"

@@ -4,5 +4,10 @@
 	"getDescription": "Get a VPC by ID",
 	"listDescription": "List all VPCs",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_vpc.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

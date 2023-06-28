@@ -5,6 +5,11 @@
 	"listDescription": "List all ELBs",
 	"searchDescription": "Search for ELBs by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_lb.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-address",
