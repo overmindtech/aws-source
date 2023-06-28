@@ -524,6 +524,8 @@ func dBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, outpu
 // +overmind:list List all instances
 // +overmind:search Search for instances by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_db_instance.identifier
+// +overmind:terraform:queryMap aws_db_instance_role_association.db_instance_identifier
 
 func NewDBInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, *rds.Client, *rds.Options]{

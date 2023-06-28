@@ -176,7 +176,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 // +overmind:list List all alarms
 // +overmind:search Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`
 // +overmind:group AWS
-// +overmind:terraform:query aws_cloudwatch_metric_alarm.alarm_name
+// +overmind:terraform:queryMap aws_cloudwatch_metric_alarm.alarm_name
 
 func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, *cloudwatch.Client, *cloudwatch.Options] {
 	return &sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, *cloudwatch.Client, *cloudwatch.Options]{

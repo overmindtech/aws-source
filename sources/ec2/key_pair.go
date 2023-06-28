@@ -57,6 +57,7 @@ func keyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2
 // +overmind:list List all key pairs
 // +overmind:search Search for key pairs by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_key_pair.id
 
 func NewKeyPairSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{

@@ -145,6 +145,7 @@ func MountTargetOutputMapper(scope string, input *efs.DescribeMountTargetsInput,
 // +overmind:get Get an mount target by ID
 // +overmind:search Search for mount targets by file system ID
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_efs_mount_target.id
 
 func NewMountTargetSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{

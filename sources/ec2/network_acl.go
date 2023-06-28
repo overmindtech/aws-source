@@ -95,6 +95,7 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 // +overmind:list List all network ACLs
 // +overmind:search Search for network ACLs by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_network_acl.id
 
 func NewNetworkAclSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{

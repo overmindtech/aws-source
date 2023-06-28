@@ -92,6 +92,8 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 // +overmind:list List all subnets
 // +overmind:search Search for subnets by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_route_table_association.subnet_id
+// +overmind:terraform:queryMap aws_subnet.id
 
 func NewSubnetSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{

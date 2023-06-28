@@ -138,6 +138,7 @@ func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error
 // +overmind:list List all health checks
 // +overmind:search Search for health checks by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_route53_health_check.id
 
 func NewHealthCheckSource(config aws.Config, accountID string, region string) *sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options]{

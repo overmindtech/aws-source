@@ -304,7 +304,7 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 // +overmind:list List all EC2 instances
 // +overmind:search Search EC2 instances by ARN
 // +overmind:group AWS
-// +overmind:terraform:query aws_instance.id
+// +overmind:terraform:queryMap aws_instance.id
 
 func NewInstanceSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstancesInput, *ec2.DescribeInstancesOutput, *ec2.Client, *ec2.Options]{

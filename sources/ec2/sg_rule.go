@@ -93,6 +93,7 @@ func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRul
 // +overmind:list List all security group rules
 // +overmind:search Search security group rules by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_security_group_rule.id
 
 func NewSecurityGroupRuleSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{

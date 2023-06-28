@@ -57,6 +57,7 @@ func placementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInpu
 // +overmind:list List all placement groups
 // +overmind:search Search for placement groups by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_placement_group.id
 
 func NewPlacementGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{

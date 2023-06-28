@@ -148,6 +148,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 // +overmind:list List all NAT gateways
 // +overmind:search Search for NAT gateways by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_nat_gateway.id
 
 func NewNatGatewaySource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{

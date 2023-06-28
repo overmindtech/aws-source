@@ -56,6 +56,7 @@ func vpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.Describ
 // +overmind:get Get a VPC by ID
 // +overmind:list List all VPCs
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_vpc.id
 
 func NewVpcSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{

@@ -255,6 +255,8 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 // +overmind:list List all IAM roles
 // +overmind:search Search for IAM roles by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_iam_role.name
+// +overmind:terraform:queryMap aws_iam_role_policy_attachment.role
 
 func NewRoleSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{

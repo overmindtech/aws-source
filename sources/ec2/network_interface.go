@@ -276,6 +276,7 @@ func networkInterfaceOutputMapper(scope string, _ *ec2.DescribeNetworkInterfaces
 // +overmind:list List all network interfaces
 // +overmind:search Search network interfaces by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_network_interface.id
 
 func NewNetworkInterfaceSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{

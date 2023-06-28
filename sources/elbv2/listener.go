@@ -113,6 +113,9 @@ func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output 
 // +overmind:get Get a listener by ARN
 // +overmind:search Search for listeners by load balancer ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_alb_listener.arn
+// +overmind:terraform:queryMap aws_lb_listener.arn
+// +overmind:terraform:method SEARCH
 
 func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options]{

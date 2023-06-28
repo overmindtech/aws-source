@@ -64,6 +64,9 @@ func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:list List all IAM groups
 // +overmind:search Search for a group by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_iam_group.name
+// +overmind:terraform:queryMap aws_iam_group_membership.group
+// +overmind:terraform:queryMap aws_iam_user_group_membership.group
 
 func NewGroupSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{

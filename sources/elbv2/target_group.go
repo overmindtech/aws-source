@@ -93,6 +93,8 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 // +overmind:list List all target groups
 // +overmind:search Search for target groups by load balancer ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_alb_target_group.name
+// +overmind:terraform:queryMap aws_lb_target_group.name
 
 func NewTargetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options]{

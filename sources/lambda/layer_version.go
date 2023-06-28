@@ -119,6 +119,8 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 // +overmind:get Get a layer version by full name ({layerName}:{versionNumber})
 // +overmind:search Search for layer versions by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_lambda_layer_version.arn
+// +overmind:terraform:method SEARCH
 
 func NewLayerVersionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &sources.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{

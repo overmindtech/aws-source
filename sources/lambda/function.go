@@ -547,6 +547,10 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 // +overmind:list List all lambda functions
 // +overmind:search Search for lambda functions by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_lambda_function.name
+// +overmind:terraform:queryMap aws_lambda_function_event_invoke_config.function_name
+// +overmind:terraform:queryMap aws_lambda_function_url.function_name
+// +overmind:terraform:queryMap aws_lambda_invocation.function_name
 
 func NewFunctionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
 	return &sources.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{

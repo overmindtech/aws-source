@@ -182,6 +182,7 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 // +overmind:list List all task definitions
 // +overmind:search Search for task definitions by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_ecs_task_definition.revision
 
 func NewTaskDefinitionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{

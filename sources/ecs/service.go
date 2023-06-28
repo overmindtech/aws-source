@@ -381,6 +381,8 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 // +overmind:list List all ECS services
 // +overmind:search Search for ECS services by cluster
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_ecs_service.arn
+// +overmind:terraform:method SEARCH
 
 func NewServiceSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{

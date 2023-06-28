@@ -121,6 +121,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 // +overmind:list List all subnet groups
 // +overmind:search Search for subnet groups by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_db_subnet_group.name
 
 func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options]{
