@@ -29,7 +29,7 @@ require (
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/connect v0.11.3
 	github.com/overmindtech/discovery v0.21.4
-	github.com/overmindtech/sdp-go v0.34.2
+	github.com/overmindtech/sdp-go v0.34.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
@@ -77,7 +77,7 @@ require (
 	github.com/klauspost/compress v1.16.6 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/nats-io/nats.go v1.27.0 // indirect
+	github.com/nats-io/nats.go v1.27.1 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/overmindtech/api-client v0.14.0 // indirect
 	github.com/overmindtech/sdpcache v1.5.0 // indirect
