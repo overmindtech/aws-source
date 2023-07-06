@@ -335,17 +335,21 @@ var rootCmd = &cobra.Command{
 		}()
 
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err,
+			log.WithError(err).WithFields(log.Fields{
+				"port": healthCheckPort,
+				"path": healthCheckPath,
 			}).Error("Could not start HTTP server for /healthz health checks")
+
+			os.Exit(1)
 		}
 
 		err = e.Start()
-
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
 			}).Error("Could not start engine")
+
+			os.Exit(1)
 		}
 
 		sigs := make(chan os.Signal, 1)
