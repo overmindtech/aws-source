@@ -5,6 +5,11 @@
 	"listDescription": "List all security groups",
 	"searchDescription": "Search for security groups by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_security_group.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-vpc"
 	]

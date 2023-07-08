@@ -5,6 +5,11 @@
 	"listDescription": "List all volumes",
 	"searchDescription": "Search volumes by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_ebs_volume.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-availability-zone",
 		"ec2-instance"

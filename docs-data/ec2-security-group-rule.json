@@ -5,6 +5,11 @@
 	"listDescription": "List all security group rules",
 	"searchDescription": "Search security group rules by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_security_group_rule.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-security-group"
 	]

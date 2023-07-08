@@ -39,6 +39,7 @@ func optionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, out
 // +overmind:list List all RDS option groups
 // +overmind:search Search for an option group by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_db_option_group.name
 
 func NewOptionGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options]{

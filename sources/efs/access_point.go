@@ -62,6 +62,7 @@ func AccessPointOutputMapper(scope string, input *efs.DescribeAccessPointsInput,
 // +overmind:list List all access points
 // +overmind:search Search for an access point by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_efs_access_point.id
 
 func NewAccessPointSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{

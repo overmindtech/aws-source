@@ -348,6 +348,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 // +overmind:list List all clusters
 // +overmind:search Search for clusters by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_rds_cluster.cluster_identifier
 
 func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options]{

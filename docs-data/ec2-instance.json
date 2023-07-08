@@ -5,6 +5,11 @@
 	"listDescription": "List all EC2 instances",
 	"searchDescription": "Search EC2 instances by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_instance.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-availability-zone",

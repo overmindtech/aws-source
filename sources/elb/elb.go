@@ -150,6 +150,8 @@ func loadBalancerOutputMapper(scope string, _ *elb.DescribeLoadBalancersInput, o
 // +overmind:list List all classic load balancers
 // +overmind:search Search for classic load balancers by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_elb.name
+// +overmind:terraform:queryMap aws_elb_attachment.elb
 
 func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options]{

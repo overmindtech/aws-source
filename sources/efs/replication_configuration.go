@@ -130,6 +130,7 @@ func ReplicationConfigurationOutputMapper(scope string, input *efs.DescribeRepli
 // +overmind:list List all replication configurations
 // +overmind:search Search for a replication configuration by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_efs_replication_configuration.source_file_system_id
 
 func NewReplicationConfigurationSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{

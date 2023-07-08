@@ -246,6 +246,10 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 // +overmind:list List all IAM policies
 // +overmind:search Search for IAM policies by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_iam_policy.arn
+// +overmind:terraform:queryMap aws_iam_user_policy_attachment.policy_arn
+// +overmind:terraform:queryMap aws_iam_role_policy_attachment.policy_arn
+// +overmind:terraform:method SEARCH
 
 // NewPolicySource Note that this policy source only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"

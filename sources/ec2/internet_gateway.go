@@ -78,6 +78,7 @@ func internetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysIn
 // +overmind:list List all internet gateways
 // +overmind:search Search internet gateways by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_internet_gateway.id
 
 func NewInternetGatewaySource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

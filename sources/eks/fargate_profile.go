@@ -89,6 +89,8 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 // +overmind:list List all fargate profiles
 // +overmind:search Search for fargate profiles by cluster name
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_eks_fargate_profile.arn
+// +overmind:terraform:method SEARCH
 
 func NewFargateProfileSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{

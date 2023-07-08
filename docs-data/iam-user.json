@@ -5,6 +5,14 @@
 	"listDescription": "List all users",
 	"searchDescription": "Search for users by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_iam_user.name",
+		"aws_iam_user_group_membership.user",
+		"aws_iam_user_policy.user",
+		"aws_iam_user_policy_attachment.user"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"iam-group"
 	]

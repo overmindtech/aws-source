@@ -5,6 +5,12 @@
 	"listDescription": "List all classic load balancers",
 	"searchDescription": "Search for classic load balancers by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_elb.name",
+		"aws_elb_attachment.elb"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"dns",
 		"ec2-availability-zone",

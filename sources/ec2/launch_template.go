@@ -57,6 +57,7 @@ func launchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInpu
 // +overmind:list List all launch templates
 // +overmind:search Search for launch templates by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_launch_template.id
 
 func NewLaunchTemplateSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{

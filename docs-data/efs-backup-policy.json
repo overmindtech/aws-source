@@ -4,5 +4,10 @@
 	"getDescription": "Get an Backup Policy by file system ID",
 	"searchDescription": "Search for an Backup Policy by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_efs_backup_policy.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

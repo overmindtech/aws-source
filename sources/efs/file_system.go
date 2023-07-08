@@ -116,6 +116,7 @@ func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, o
 // +overmind:list List all file systems
 // +overmind:search Search for an file system by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_efs_file_system.id
 
 func NewFileSystemSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{

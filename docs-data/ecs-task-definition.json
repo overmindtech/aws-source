@@ -5,6 +5,11 @@
 	"listDescription": "List all task definitions",
 	"searchDescription": "Search for task definitions by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_ecs_task_definition.revision"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"iam-role",
 		"secretsmanager-secret",

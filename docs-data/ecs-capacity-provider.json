@@ -5,6 +5,11 @@
 	"listDescription": "List all capacity providers",
 	"searchDescription": "Search capacity providers by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_ecs_capacity_provider.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"autoscaling-auto-scaling-group"
 	]

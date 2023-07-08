@@ -180,6 +180,8 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 // +overmind:list List all node groups
 // +overmind:search Search for node groups by cluster name
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_eks_node_group.arn
+// +overmind:terraform:method SEARCH
 
 func NewNodegroupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{

@@ -4,5 +4,11 @@
 	"getDescription": "Get a rule by ARN",
 	"searchDescription": "Search for rules by listener ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_alb_listener_rule.arn",
+		"aws_lb_listener_rule.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": []
 }

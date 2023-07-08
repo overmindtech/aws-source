@@ -5,5 +5,10 @@
 	"listDescription": "List all RDS parameter groups",
 	"searchDescription": "Search for a parameter group by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_rds_cluster_parameter_group.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": []
 }

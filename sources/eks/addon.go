@@ -51,6 +51,8 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 // +overmind:list List all addons
 // +overmind:search Search addons by cluster name
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_eks_addon.arn
+// +overmind:terraform:method SEARCH
 
 func NewAddonSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{

@@ -5,6 +5,11 @@
 	"listDescription": "List Autoscaling Groups",
 	"searchDescription": "Search for Autoscaling Groups by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_autoscaling_group.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"autoscaling-launch-configuration",
 		"ec2-availability-zone",

@@ -184,6 +184,10 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 // +overmind:list List all users
 // +overmind:search Search for users by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_iam_user.name
+// +overmind:terraform:queryMap aws_iam_user_group_membership.user
+// +overmind:terraform:queryMap aws_iam_user_policy.user
+// +overmind:terraform:queryMap aws_iam_user_policy_attachment.user
 
 func NewUserSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{

@@ -68,6 +68,7 @@ func imageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.Des
 // +overmind:list List all AMIs
 // +overmind:search Search AMIs by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_ami.id
 
 func NewImageSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{

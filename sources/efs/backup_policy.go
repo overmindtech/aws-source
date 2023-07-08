@@ -57,6 +57,7 @@ func BackupPolicyOutputMapper(scope string, input *efs.DescribeBackupPolicyInput
 // +overmind:get Get an Backup Policy by file system ID
 // +overmind:search Search for an Backup Policy by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_efs_backup_policy.id
 
 func NewBackupPolicySource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{

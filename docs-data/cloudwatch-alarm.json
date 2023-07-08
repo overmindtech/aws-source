@@ -5,6 +5,11 @@
 	"listDescription": "List all alarms",
 	"searchDescription": "Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudwatch_metric_alarm.alarm_name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"acm-certificate",
 		"autoscaling-auto-scaling-group",

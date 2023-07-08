@@ -267,6 +267,8 @@ func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, outpu
 // +overmind:list List all route tables
 // +overmind:search Search route tables by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_route_table.id
+// +overmind:terraform:queryMap aws_route_table_association.route_table_id
 
 func NewRouteTableSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
