@@ -331,17 +331,13 @@ var rootCmd = &cobra.Command{
 		go func() {
 			defer sentry.Recover()
 
-			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", healthCheckPort), nil))
-		}()
+			err := http.ListenAndServe(fmt.Sprintf(":%v", healthCheckPort), nil)
 
-		if err != nil {
 			log.WithError(err).WithFields(log.Fields{
 				"port": healthCheckPort,
 				"path": healthCheckPath,
 			}).Error("Could not start HTTP server for /healthz health checks")
-
-			os.Exit(1)
-		}
+		}()
 
 		err = e.Start()
 		if err != nil {
