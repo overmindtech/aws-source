@@ -27,7 +27,6 @@ func NewS3Source(config aws.Config, accountID string) *S3Source {
 // +overmind:list List all S3 buckets
 // +overmind:search Search for S3 buckets by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_s3_bucket.id
 // +overmind:terraform:queryMap aws_s3_bucket_acl.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_analytics_configuration.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_cors_configuration.bucket
@@ -37,21 +36,19 @@ func NewS3Source(config aws.Config, accountID string) *S3Source {
 // +overmind:terraform:queryMap aws_s3_bucket_logging.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_metric.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_notification.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_object.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_object_lock_configuration.bucket
+// +overmind:terraform:queryMap aws_s3_bucket_object.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_ownership_controls.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_policy.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_public_access_block.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_replication_configuration.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_request_payment_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_replication_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_request_payment_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_notification.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_server_side_encryption_configuration.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_versioning.bucket
 // +overmind:terraform:queryMap aws_s3_bucket_website_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_object.bucket
+// +overmind:terraform:queryMap aws_s3_bucket.id
 // +overmind:terraform:queryMap aws_s3_object_copy.bucket
+// +overmind:terraform:queryMap aws_s3_object.bucket
 
 type S3Source struct {
 	// AWS Config including region and credentials
