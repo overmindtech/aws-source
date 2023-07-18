@@ -94,11 +94,12 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 
 func NewFargateProfileSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
-		ItemType:    "eks-fargate-profile",
-		Client:      eks.NewFromConfig(config),
-		AccountID:   accountID,
-		Region:      region,
-		DisableList: true,
+		ItemType:         "eks-fargate-profile",
+		Client:           eks.NewFromConfig(config),
+		AccountID:        accountID,
+		Region:           region,
+		DisableList:      true,
+		AlwaysSearchARNs: true,
 		SearchInputMapper: func(scope, query string) (*eks.ListFargateProfilesInput, error) {
 			return &eks.ListFargateProfilesInput{
 				ClusterName: &query,
