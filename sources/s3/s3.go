@@ -592,7 +592,7 @@ func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*s
 		}
 	}
 
-	return searchImpl(ctx, s.client, scope, query)
+	return searchImpl(ctx, s.Client(), scope, query)
 }
 
 func searchImpl(ctx context.Context, client S3Client, scope string, query string) ([]*sdp.Item, error) {
