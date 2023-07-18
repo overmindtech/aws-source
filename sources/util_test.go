@@ -81,6 +81,28 @@ func TestParseARN(t *testing.T) {
 		}
 	})
 
+	t.Run("arn:aws:eks:eu-west-2:944651592624:nodegroup/dogfood/intel-20230616142016591700000005/6ec4624a-05ef-bdad-e69a-fe9832885421", func(t *testing.T) {
+		arn := "arn:aws:eks:eu-west-2:944651592624:nodegroup/dogfood/intel-20230616142016591700000005/6ec4624a-05ef-bdad-e69a-fe9832885421"
+
+		a, err := ParseARN(arn)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if a.AccountID != "944651592624" {
+			t.Errorf("expected account ID to be 944651592624, got %v", a.AccountID)
+		}
+
+		if a.Region != "eu-west-2" {
+			t.Errorf("expected account ID to be eu-west-2, got %v", a.Region)
+		}
+
+		if a.ResourceID() != "dogfood/intel-20230616142016591700000005/6ec4624a-05ef-bdad-e69a-fe9832885421" {
+			t.Errorf("expected account ID to be dogfood/intel-20230616142016591700000005/6ec4624a-05ef-bdad-e69a-fe9832885421, got %v", a.ResourceID())
+		}
+	})
+
 	t.Run("arn:aws:iam::942836531449:policy/OvermindReadonly", func(t *testing.T) {
 		arn := "arn:aws:iam::942836531449:policy/OvermindReadonly"
 

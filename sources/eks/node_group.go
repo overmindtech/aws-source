@@ -204,7 +204,7 @@ func NewNodegroupSource(config aws.Config, accountID string, region string) *sou
 			var clusterName string
 			var nodegroupName string
 
-			if len(fields) == 2 {
+			if len(fields) >= 2 {
 				clusterName = fields[0]
 				nodegroupName = fields[1]
 			}
