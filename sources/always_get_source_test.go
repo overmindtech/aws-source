@@ -271,6 +271,63 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 		})
 	})
 
+	t.Run("with Custom & ARN search", func(t *testing.T) {
+		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+			ItemType:         "test",
+			AccountID:        "foo",
+			Region:           "bar",
+			Client:           struct{}{},
+			MaxParallel:      MaxParallel(1),
+			ListInput:        "",
+			AlwaysSearchARNs: true,
+			SearchInputMapper: func(scope, query string) (string, error) {
+				return query, nil
+			},
+			ListFuncPaginatorBuilder: func(client struct{}, input string) Paginator[string, struct{}] {
+				// Returns 3 pages
+				return &TestPaginator{}
+			},
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
+				// Returns 2 gets per page
+				return []string{"", ""}, nil
+			},
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
+				if input == "foo.bar.id" {
+					return &sdp.Item{}, nil
+				} else {
+					return nil, sdp.NewQueryError(errors.New("bad query details"))
+				}
+			},
+			GetInputMapper: func(scope, query string) string {
+				return scope + "." + query
+			},
+		}
+
+		t.Run("ARN", func(t *testing.T) {
+			items, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id")
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if len(items) != 1 {
+				t.Errorf("expected 1 item, got %v", len(items))
+			}
+		})
+
+		t.Run("other search", func(t *testing.T) {
+			items, err := lgs.Search(context.Background(), "foo.bar", "id")
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if len(items) != 0 {
+				t.Errorf("expected 0 item, got %v", len(items))
+			}
+		})
+	})
+
 	t.Run("with custom search logic", func(t *testing.T) {
 		var searchMapperCalled bool
 

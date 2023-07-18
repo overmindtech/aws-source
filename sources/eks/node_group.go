@@ -185,11 +185,12 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 func NewNodegroupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
-		ItemType:    "eks-nodegroup",
-		Client:      eks.NewFromConfig(config),
-		AccountID:   accountID,
-		Region:      region,
-		DisableList: true,
+		ItemType:         "eks-nodegroup",
+		Client:           eks.NewFromConfig(config),
+		AccountID:        accountID,
+		Region:           region,
+		DisableList:      true,
+		AlwaysSearchARNs: true,
 		SearchInputMapper: func(scope, query string) (*eks.ListNodegroupsInput, error) {
 			return &eks.ListNodegroupsInput{
 				ClusterName: &query,

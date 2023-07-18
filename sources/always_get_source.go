@@ -50,6 +50,11 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 	// the GetFunc
 	GetInputMapper func(scope, query string) GetInput
 
+	// If this is set, Search queries will always use the automatic ARN resolver
+	// if the input is an ARN, falling back to the `SearchInputMapper` if it
+	// isn't
+	AlwaysSearchARNs bool
+
 	// Maps search terms from an SDP Search request into the relevant input for
 	// the ListFunc. If this is not set, Search() will handle ARNs like most AWS
 	// sources
@@ -254,6 +259,13 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	if s.SearchInputMapper == nil {
 		return s.SearchARN(ctx, scope, query)
 	} else {
+		// If we should always look for ARNs first, do that
+		if s.AlwaysSearchARNs {
+			if _, err := ParseARN(query); err == nil {
+				return s.SearchARN(ctx, scope, query)
+			}
+		}
+
 		return s.SearchCustom(ctx, scope, query)
 	}
 }
