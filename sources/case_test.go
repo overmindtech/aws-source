@@ -6,12 +6,15 @@ import (
 )
 
 func TestCamelCase(t *testing.T) {
+	t.Parallel()
+
 	exampleMap := make(map[string]interface{})
 
 	exampleMap["Name"] = "Dylan"
 	exampleMap["Nested"] = map[string]interface{}{
-		"NestedKeyName":    "Value",
-		"NestedAWSAcronym": "Wow",
+		"NestedKeyName":               "Value",
+		"NestedAWSAcronym":            "Wow",
+		"DBClusterParameterGroupName": "foo",
 		"NestedArray": []map[string]string{
 			{
 				"FooBar": "Baz",
@@ -25,7 +28,7 @@ func TestCamelCase(t *testing.T) {
 
 	b, _ := json.Marshal(camel)
 
-	expected := `{"name":"Dylan","nested":{"nestedAWSAcronym":"Wow","nestedArray":[{"fooBar":"Baz"}],"nestedKeyName":"Value"}}`
+	expected := `{"name":"Dylan","nested":{"dBClusterParameterGroupName":"foo","nestedAWSAcronym":"Wow","nestedArray":[{"fooBar":"Baz"}],"nestedKeyName":"Value"}}`
 
 	if string(b) != expected {
 		t.Fatalf("expected %v got %v", expected, string(b))
@@ -33,6 +36,8 @@ func TestCamelCase(t *testing.T) {
 }
 
 func TestToAttributesCase(t *testing.T) {
+	t.Parallel()
+
 	exampleMap := make(map[string]interface{})
 
 	exampleMap["Name"] = "Dylan"
