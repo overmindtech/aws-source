@@ -35,8 +35,8 @@ import (
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
-	"github.com/overmindtech/connect"
 	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/sdp-go/auth"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -91,7 +91,7 @@ var rootCmd = &cobra.Command{
 		healthCheckPort := viper.GetInt("health-check-port")
 
 		var natsNKeySeedLog string
-		var tokenClient connect.TokenClient
+		var tokenClient auth.TokenClient
 
 		if natsNKeySeed != "" {
 			natsNKeySeedLog = "[REDACTED]"
@@ -132,7 +132,7 @@ var rootCmd = &cobra.Command{
 			}).Fatal("Error initializing Engine")
 		}
 		e.Name = "aws-source"
-		e.NATSOptions = &connect.NATSOptions{
+		e.NATSOptions = &auth.NATSOptions{
 			NumRetries:        -1,
 			RetryDelay:        5 * time.Second,
 			Servers:           natsServers,
@@ -555,7 +555,7 @@ func getStaticAWSConfig(region string, accessKeyID string, secretAccessKey strin
 
 // createTokenClient Creates a basic token client that will authenticate to NATS
 // using the given values
-func createTokenClient(natsJWT string, natsNKeySeed string) (connect.TokenClient, error) {
+func createTokenClient(natsJWT string, natsNKeySeed string) (auth.TokenClient, error) {
 	var kp nkeys.KeyPair
 	var err error
 
@@ -575,7 +575,7 @@ func createTokenClient(natsJWT string, natsNKeySeed string) (connect.TokenClient
 		return nil, fmt.Errorf("could not parse nats-nkey-seed: %v", err)
 	}
 
-	return connect.NewBasicTokenClient(natsJWT, kp), nil
+	return auth.NewBasicTokenClient(natsJWT, kp), nil
 }
 
 // TerminationLogHook A hook that logs fatal errors to the termination log
