@@ -6,12 +6,11 @@
 	"searchDescription": "Search for lambda functions by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_lambda_function.name",
-		"aws_lambda_function_event_invoke_config.function_name",
-		"aws_lambda_function_url.function_name",
-		"aws_lambda_invocation.function_name"
+		"aws_lambda_function.arn",
+		"aws_lambda_function_event_invoke_config.id",
+		"aws_lambda_function_url.function_arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"ec2-security-group",

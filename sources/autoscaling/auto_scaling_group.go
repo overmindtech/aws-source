@@ -224,7 +224,8 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 // +overmind:list List Autoscaling Groups
 // +overmind:search Search for Autoscaling Groups by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_autoscaling_group.name
+// +overmind:terraform:queryMap aws_autoscaling_group.arn
+// +overmind:terraform:method SEARCH
 //
 //go:generate docgen ../../docs-data
 func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {

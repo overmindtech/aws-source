@@ -6,9 +6,9 @@
 	"searchDescription": "Search for a cluster by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_ecs_cluster.name"
+		"aws_ecs_cluster.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"ecs-capacity-provider",

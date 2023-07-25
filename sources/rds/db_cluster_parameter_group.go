@@ -41,7 +41,8 @@ func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 // +overmind:list List all RDS parameter groups
 // +overmind:search Search for a parameter group by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_rds_cluster_parameter_group.name
+// +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
+// +overmind:terraform:method SEARCH
 
 func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options] {
 	return &sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options]{

@@ -6,9 +6,9 @@
 	"searchDescription": "Search for a parameter group by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_db_parameter_group.name"
+		"aws_db_parameter_group.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": []
 }

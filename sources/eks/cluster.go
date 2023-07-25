@@ -268,7 +268,8 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 // +overmind:list List all clusters
 // +overmind:search Search for clusters by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_eks_cluster.name
+// +overmind:terraform:queryMap aws_eks_cluster.arn
+// +overmind:terraform:method SEARCH
 
 func NewClusterSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{

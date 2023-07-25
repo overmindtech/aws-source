@@ -270,7 +270,8 @@ func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 // +overmind:list List all ELBs
 // +overmind:search Search for ELBs by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_lb.name
+// +overmind:terraform:queryMap aws_lb.arn
+// +overmind:terraform:method SEARCH
 
 func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, *elbv2.Client, *elbv2.Options]{

@@ -6,9 +6,9 @@
 	"searchDescription": "Search for subnet groups by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_db_subnet_group.name"
+		"aws_db_subnet_group.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"ec2-availability-zone",
