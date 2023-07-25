@@ -6,9 +6,9 @@
 	"searchDescription": "Search for DynamoDB tables by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_dynamodb_table.name"
+		"aws_dynamodb_table.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"backup-recovery-point",

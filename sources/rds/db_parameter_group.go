@@ -41,7 +41,8 @@ func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Ite
 // +overmind:list List all parameter groups
 // +overmind:search Search for a parameter group by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_db_parameter_group.name
+// +overmind:terraform:queryMap aws_db_parameter_group.arn
+// +overmind:terraform:method SEARCH
 
 func NewDBParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options] {
 	return &sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options]{

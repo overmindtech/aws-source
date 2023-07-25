@@ -6,10 +6,9 @@
 	"searchDescription": "Search for classic load balancers by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_elb.name",
-		"aws_elb_attachment.elb"
+		"aws_elb.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"dns",

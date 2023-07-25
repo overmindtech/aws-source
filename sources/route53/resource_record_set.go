@@ -78,7 +78,8 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 // +overmind:list List all record sets
 // +overmind:search Search for a record set by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_route53_record.name
+// +overmind:terraform:queryMap aws_route53_record.arn
+// +overmind:terraform:method SEARCH
 
 func NewResourceRecordSetSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options]{

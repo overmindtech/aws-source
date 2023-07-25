@@ -6,9 +6,9 @@
 	"searchDescription": "Search for ELBs by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_lb.name"
+		"aws_lb.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"dns",

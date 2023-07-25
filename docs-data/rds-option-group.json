@@ -6,9 +6,9 @@
 	"searchDescription": "Search for an option group by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_db_option_group.name"
+		"aws_db_option_group.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": []
 }

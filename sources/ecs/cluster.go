@@ -211,7 +211,8 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 // +overmind:list List all clusters
 // +overmind:search Search for a cluster by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_ecs_cluster.name
+// +overmind:terraform:queryMap aws_ecs_cluster.arn
+// +overmind:terraform:method SEARCH
 
 func NewClusterSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{

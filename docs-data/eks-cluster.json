@@ -6,9 +6,9 @@
 	"searchDescription": "Search for clusters by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_eks_cluster.name"
+		"aws_eks_cluster.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"ec2-security-group",

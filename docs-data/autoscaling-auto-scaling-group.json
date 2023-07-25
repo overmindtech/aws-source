@@ -6,9 +6,9 @@
 	"searchDescription": "Search for Autoscaling Groups by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_autoscaling_group.name"
+		"aws_autoscaling_group.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"autoscaling-launch-configuration",

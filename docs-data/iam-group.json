@@ -6,11 +6,9 @@
 	"searchDescription": "Search for a group by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_iam_group.name",
-		"aws_iam_group_membership.group",
-		"aws_iam_user_group_membership.group"
+		"aws_iam_group.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": []
 }

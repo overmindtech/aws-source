@@ -6,9 +6,9 @@
 	"searchDescription": "Search for a record set by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_route53_record.name"
+		"aws_route53_record.arn"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"dns"

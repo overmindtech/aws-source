@@ -165,7 +165,8 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 // +overmind:list List all DynamoDB tables
 // +overmind:search Search for DynamoDB tables by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_dynamodb_table.name
+// +overmind:terraform:queryMap aws_dynamodb_table.arn
+// +overmind:terraform:method SEARCH
 
 func NewTableSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
 	return &sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{

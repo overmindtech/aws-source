@@ -66,7 +66,8 @@ func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProviders
 // +overmind:list List all capacity providers
 // +overmind:search Search capacity providers by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_ecs_capacity_provider.name
+// +overmind:terraform:queryMap aws_ecs_capacity_provider.arn
+// +overmind:terraform:method SEARCH
 
 func NewCapacityProviderSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &sources.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
