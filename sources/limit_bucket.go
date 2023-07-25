@@ -58,6 +58,14 @@ func (b *LimitBucket) Start(ctx context.Context) {
 	}(ctx, b)
 }
 
+// Waits for a token and returns the duration waited
+func (b *LimitBucket) TimeWait() time.Duration {
+	start := time.Now()
+
+	<-b.C
+	return time.Since(start)
+}
+
 // refill refills the bucket the specified amount
 func (b *LimitBucket) refill() {
 	var newTokens int
