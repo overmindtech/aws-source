@@ -215,8 +215,133 @@ func TestNewPolicySource(t *testing.T) {
 	test := sources.E2ETest{
 		Source:  source,
 		Timeout: 30 * time.Second,
-		SkipGet: true,
 	}
 
 	test.Run(t)
+
+	// Test "aws" scoped resources
+	t.Run("aws scoped resources in a specific scope", func(t *testing.T) {
+		t.Parallel()
+		// This item shouldn't be found since it lives globally
+		_, err := source.Get(context.Background(), sources.FormatScope(account, ""), "ReadOnlyAccess")
+
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+	})
+
+	t.Run("aws scoped resources in the aws scope", func(t *testing.T) {
+		t.Parallel()
+		// This item shouldn't be found since it lives globally
+		item, err := source.Get(context.Background(), "aws", "ReadOnlyAccess")
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if item.UniqueAttributeValue() != "ReadOnlyAccess" {
+			t.Errorf("expected globally unique name to be ReadOnlyAccess, got %v", item.GloballyUniqueName())
+		}
+	})
+
+	t.Run("listing resources in a specific scope", func(t *testing.T) {
+		items, err := source.List(context.Background(), sources.FormatScope(account, ""))
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		for _, item := range items {
+			arnString, err := item.Attributes.Get("arn")
+
+			if err != nil {
+				t.Errorf("expected item to have an arn attribute, got %v", err)
+			}
+
+			arn, err := sources.ParseARN(arnString.(string))
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if arn.AccountID != account {
+				t.Errorf("expected item account to be %v, got %v", account, arn.AccountID)
+			}
+		}
+
+		t.Run("searching via ARN for a resource in a specific scope", func(t *testing.T) {
+			t.Parallel()
+
+			arn, _ := items[0].Attributes.Get("arn")
+
+			_, err := source.Search(context.Background(), sources.FormatScope(account, ""), arn.(string))
+
+			if err != nil {
+				t.Error(err)
+			}
+		})
+
+		t.Run("searching via ARN for a resource in the aws scope", func(t *testing.T) {
+			t.Parallel()
+
+			arn, _ := items[0].Attributes.Get("arn")
+
+			_, err := source.Search(context.Background(), "aws", arn.(string))
+
+			if err == nil {
+				t.Error("expected error, got nil")
+			}
+		})
+	})
+
+	t.Run("listing resources in the AWS scope", func(t *testing.T) {
+		items, err := source.List(context.Background(), "aws")
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		for _, item := range items {
+			arnString, err := item.Attributes.Get("arn")
+
+			if err != nil {
+				t.Errorf("expected item to have an arn attribute, got %v", err)
+			}
+
+			arn, err := sources.ParseARN(arnString.(string))
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			if arn.AccountID != "aws" {
+				t.Errorf("expected item account to be aws, got %v", arn.AccountID)
+			}
+		}
+
+		t.Run("searching via ARN for a resource in a specific scope", func(t *testing.T) {
+			t.Parallel()
+
+			arn, _ := items[0].Attributes.Get("arn")
+
+			_, err := source.Search(context.Background(), sources.FormatScope(account, ""), arn.(string))
+
+			if err == nil {
+				t.Error("expected error, got nil")
+			}
+		})
+
+		t.Run("searching via ARN for a resource in the aws scope", func(t *testing.T) {
+			t.Parallel()
+
+			arn, _ := items[0].Attributes.Get("arn")
+
+			_, err := source.Search(context.Background(), "aws", arn.(string))
+
+			if err != nil {
+				t.Error(err)
+			}
+		})
+	})
+
 }

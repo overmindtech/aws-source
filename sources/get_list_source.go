@@ -189,7 +189,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 		return nil, WrapAWSError(err)
 	}
 
-	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
+	if arnScope := FormatScope(a.AccountID, a.Region); !s.hasScope(arnScope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
