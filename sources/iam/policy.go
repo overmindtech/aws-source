@@ -120,8 +120,17 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*PolicyDetails, error) {
 	policies := make([]types.Policy, 0)
 
+	var iamScope types.PolicyScopeType
+
+	if scope == "aws" {
+		iamScope = types.PolicyScopeTypeAws
+	} else {
+		iamScope = types.PolicyScopeTypeLocal
+	}
+
 	paginator := iam.NewListPoliciesPaginator(client, &iam.ListPoliciesInput{
 		OnlyAttached: true,
+		Scope:        iamScope,
 	})
 
 	for paginator.HasMorePages() {
