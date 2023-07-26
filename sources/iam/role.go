@@ -3,12 +3,14 @@ package iam
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/url"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -79,11 +81,14 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 	policiesPaginator := iam.NewListRolePoliciesPaginator(client, &iam.ListRolePoliciesInput{
 		RoleName: &roleName,
 	})
+	ctx, span := tracer.Start(ctx, "getEmbeddedPolicies")
+	defer span.End()
 
 	policies := make([]embeddedPolicy, 0)
+	var waitTime time.Duration
 
 	for policiesPaginator.HasMorePages() {
-		<-limit.C
+		waitTime += limit.TimeWait()
 		out, err := policiesPaginator.NextPage(ctx)
 
 		if err != nil {
@@ -91,42 +96,63 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 		}
 
 		for _, policyName := range out.PolicyNames {
-			<-limit.C
-			policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
-				RoleName:   &roleName,
-				PolicyName: &policyName,
-			})
+			embeddedPolicy, err := getRolePolicyDetails(ctx, client, roleName, policyName, limit)
 
 			if err != nil {
-				return nil, err
+				// Ignore these errors
+				continue
 			}
 
-			if policy != nil && policy.PolicyDocument != nil {
-				// URL Decode the policy document
-				unescaped, err := url.QueryUnescape(*policy.PolicyDocument)
-
-				if err != nil {
-					return nil, err
-				}
-
-				// Parse the policy into a map[string]interface{} from JSON
-				var policyDoc map[string]interface{}
-
-				err = json.Unmarshal([]byte(unescaped), &policyDoc)
-
-				if err != nil {
-					return nil, err
-				}
-
-				policies = append(policies, embeddedPolicy{
-					Name:     policyName,
-					Document: policyDoc,
-				})
-			}
+			policies = append(policies, *embeddedPolicy)
 		}
 	}
 
 	return policies, nil
+}
+
+func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string, policyName string, limit *sources.LimitBucket) (*embeddedPolicy, error) {
+	ctx, span := tracer.Start(ctx, "getRolePolicyDetails")
+	defer span.End()
+
+	wait := limit.TimeWait()
+
+	span.SetAttributes(
+		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", wait.Milliseconds()),
+	)
+
+	policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
+		RoleName:   &roleName,
+		PolicyName: &policyName,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if policy == nil || policy.PolicyDocument == nil {
+		return nil, errors.New("policy document not found")
+	}
+
+	// URL Decode the policy document
+	unescaped, err := url.QueryUnescape(*policy.PolicyDocument)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse the policy into a map[string]interface{} from JSON
+	var policyDoc map[string]interface{}
+
+	err = json.Unmarshal([]byte(unescaped), &policyDoc)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &embeddedPolicy{
+		Name:     policyName,
+		Document: policyDoc,
+	}, nil
 }
 
 // getAttachedPolicies Gets the attached policies for a role, these are actual
@@ -168,9 +194,13 @@ func getRoleTags(ctx context.Context, client IAMClient, roleName string, limit *
 func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
+	ctx, span := tracer.Start(ctx, "roleListFunc")
+	defer span.End()
+
+	var waitTime time.Duration
 
 	for paginator.HasMorePages() {
-		<-limit.C
+		wait := limit.TimeWait()
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -196,7 +226,13 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 		}
 
 		roles = append(roles, newRoles...)
+		waitTime += wait
 	}
+
+	span.SetAttributes(
+		attribute.Int("om.aws.numRoles", len(roles)),
+		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
+	)
 
 	return roles, nil
 }

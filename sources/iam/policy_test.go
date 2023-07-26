@@ -221,9 +221,13 @@ func TestNewPolicySource(t *testing.T) {
 
 	// Test "aws" scoped resources
 	t.Run("aws scoped resources in a specific scope", func(t *testing.T) {
+		ctx, span := tracer.Start(context.Background(), t.Name())
+
+		defer span.End()
+
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		_, err := source.Get(context.Background(), sources.FormatScope(account, ""), "ReadOnlyAccess")
+		_, err := source.Get(ctx, sources.FormatScope(account, ""), "ReadOnlyAccess")
 
 		if err == nil {
 			t.Error("expected error, got nil")
@@ -231,9 +235,12 @@ func TestNewPolicySource(t *testing.T) {
 	})
 
 	t.Run("aws scoped resources in the aws scope", func(t *testing.T) {
+		ctx, span := tracer.Start(context.Background(), t.Name())
+		defer span.End()
+
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		item, err := source.Get(context.Background(), "aws", "ReadOnlyAccess")
+		item, err := source.Get(ctx, "aws", "ReadOnlyAccess")
 
 		if err != nil {
 			t.Error(err)
@@ -245,7 +252,10 @@ func TestNewPolicySource(t *testing.T) {
 	})
 
 	t.Run("listing resources in a specific scope", func(t *testing.T) {
-		items, err := source.List(context.Background(), sources.FormatScope(account, ""))
+		ctx, span := tracer.Start(context.Background(), t.Name())
+		defer span.End()
+
+		items, err := source.List(ctx, sources.FormatScope(account, ""))
 
 		if err != nil {
 			t.Error(err)
@@ -270,11 +280,14 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		t.Run("searching via ARN for a resource in a specific scope", func(t *testing.T) {
+			ctx, span := tracer.Start(context.Background(), t.Name())
+			defer span.End()
+
 			t.Parallel()
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(context.Background(), sources.FormatScope(account, ""), arn.(string))
+			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string))
 
 			if err != nil {
 				t.Error(err)
@@ -282,11 +295,14 @@ func TestNewPolicySource(t *testing.T) {
 		})
 
 		t.Run("searching via ARN for a resource in the aws scope", func(t *testing.T) {
+			ctx, span := tracer.Start(context.Background(), t.Name())
+			defer span.End()
+
 			t.Parallel()
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(context.Background(), "aws", arn.(string))
+			_, err := source.Search(ctx, "aws", arn.(string))
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -295,7 +311,10 @@ func TestNewPolicySource(t *testing.T) {
 	})
 
 	t.Run("listing resources in the AWS scope", func(t *testing.T) {
-		items, err := source.List(context.Background(), "aws")
+		ctx, span := tracer.Start(context.Background(), t.Name())
+		defer span.End()
+
+		items, err := source.List(ctx, "aws")
 
 		if err != nil {
 			t.Error(err)
@@ -320,11 +339,14 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		t.Run("searching via ARN for a resource in a specific scope", func(t *testing.T) {
+			ctx, span := tracer.Start(context.Background(), t.Name())
+			defer span.End()
+
 			t.Parallel()
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(context.Background(), sources.FormatScope(account, ""), arn.(string))
+			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string))
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -332,11 +354,14 @@ func TestNewPolicySource(t *testing.T) {
 		})
 
 		t.Run("searching via ARN for a resource in the aws scope", func(t *testing.T) {
+			ctx, span := tracer.Start(context.Background(), t.Name())
+			defer span.End()
+
 			t.Parallel()
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(context.Background(), "aws", arn.(string))
+			_, err := source.Search(ctx, "aws", arn.(string))
 
 			if err != nil {
 				t.Error(err)

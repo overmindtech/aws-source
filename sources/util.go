@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -12,9 +13,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/aws/smithy-go/transport/http"
+	awshttp "github.com/aws/smithy-go/transport/http"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // FormatScope Formats an account ID and region into the corresponding Overmind
@@ -79,7 +81,7 @@ func ParseARN(arnString string) (*ARN, error) {
 
 // WrapAWSError Wraps an AWS error in the appropriate SDP error
 func WrapAWSError(err error) error {
-	var responseErr *http.ResponseError
+	var responseErr *awshttp.ResponseError
 
 	if errors.As(err, &responseErr) {
 		// If the input is bad or the thing wasn't found then it's definitely
@@ -258,6 +260,11 @@ func GetAutoConfig(t *testing.T) (aws.Config, string, string) {
 
 	if err != nil {
 		t.Skip(err.Error())
+	}
+
+	// Add OTel instrumentation
+	config.HTTPClient = &http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 
 	stsClient := sts.NewFromConfig(config)

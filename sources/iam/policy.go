@@ -10,9 +10,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
-
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
+	log "github.com/sirupsen/logrus"
+	"github.com/sourcegraph/conc/iter"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type PolicyDetails struct {
@@ -67,11 +70,24 @@ func enrichPolicy(ctx context.Context, client IAMClient, details *PolicyDetails,
 
 	err = addPolicyEntities(ctx, client, details, limit)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
-	<-limit.C
+	var span trace.Span
+	if log.GetLevel() == log.TraceLevel {
+		// Only create new spans on trace level logging
+		ctx, span = tracer.Start(ctx, "addTags")
+		defer span.End()
+	} else {
+		span = trace.SpanFromContext(ctx)
+	}
+
+	wait := limit.TimeWait()
 	out, err := client.ListPolicyTags(ctx, &iam.ListPolicyTagsInput{
 		PolicyArn: details.Policy.Arn,
 	})
@@ -80,12 +96,25 @@ func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limi
 		return err
 	}
 
+	span.SetAttributes(
+		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", wait.Milliseconds()),
+	)
+
 	details.Policy.Tags = out.Tags
 
 	return nil
 }
 
 func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
+	var span trace.Span
+	if log.GetLevel() == log.TraceLevel {
+		// Only create new spans on trace level logging
+		ctx, span = tracer.Start(ctx, "addPolicyEntities")
+		defer span.End()
+	} else {
+		span = trace.SpanFromContext(ctx)
+	}
+
 	if details == nil {
 		return errors.New("details is nil")
 	}
@@ -98,8 +127,10 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 		PolicyArn: details.Policy.Arn,
 	})
 
+	var waitTime time.Duration
+
 	for paginator.HasMorePages() {
-		<-limit.C
+		waitTime += limit.TimeWait()
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -111,6 +142,10 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 		details.PolicyUsers = append(details.PolicyUsers, out.PolicyUsers...)
 	}
 
+	span.SetAttributes(
+		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
+	)
+
 	return nil
 }
 
@@ -118,6 +153,15 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 // unattached policies since I don't think it will be very valuable, there are
 // hundreds by default and if you aren't using them they aren't very interesting
 func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*PolicyDetails, error) {
+	var span trace.Span
+	if log.GetLevel() == log.TraceLevel {
+		// Only create new spans on trace level logging
+		ctx, span = tracer.Start(ctx, "policyListFunc")
+		defer span.End()
+	} else {
+		span = trace.SpanFromContext(ctx)
+	}
+
 	policies := make([]types.Policy, 0)
 
 	var iamScope types.PolicyScopeType
@@ -133,8 +177,10 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 		Scope:        iamScope,
 	})
 
+	var waitTime time.Duration
+
 	for paginator.HasMorePages() {
-		<-limit.C
+		waitTime += limit.TimeWait()
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -144,20 +190,23 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 		policies = append(policies, out.Policies...)
 	}
 
-	policyDetails := make([]*PolicyDetails, len(policies))
+	span.SetAttributes(
+		attribute.Int("om.aws.numPolicies", len(policies)),
+		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
+	)
 
-	for i := range policies {
+	policyDetails, err := iter.MapErr[types.Policy, *PolicyDetails](policies, func(p *types.Policy) (*PolicyDetails, error) {
 		details := PolicyDetails{
-			Policy: &policies[i],
+			Policy: p,
 		}
 
 		err := enrichPolicy(ctx, client, &details, limit)
 
-		if err != nil {
-			return nil, err
-		}
+		return &details, err
+	})
 
-		policyDetails[i] = &details
+	if err != nil {
+		return nil, err
 	}
 
 	return policyDetails, nil
