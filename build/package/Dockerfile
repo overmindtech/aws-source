@@ -17,6 +17,7 @@ RUN go mod download
 COPY main.go main.go
 COPY cmd/ cmd/
 COPY sources/ sources/
+COPY tracing/ tracing/
 
 # Build
 RUN --mount=type=cache,target=/root/.cache/go-build \
