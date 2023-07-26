@@ -41,6 +41,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 )
 
@@ -160,6 +161,11 @@ var rootCmd = &cobra.Command{
 				log.WithFields(log.Fields{
 					"error": err,
 				}).Fatal("Error loading config")
+			}
+
+			// Add OTel instrumentation
+			cfg.HTTPClient = &http.Client{
+				Transport: otelhttp.NewTransport(http.DefaultTransport),
 			}
 
 			// Work out what account we're using. This will be used in item scopes
