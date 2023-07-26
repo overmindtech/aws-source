@@ -63,6 +63,7 @@ func (b *LimitBucket) TimeWait() time.Duration {
 	start := time.Now()
 
 	<-b.C
+
 	return time.Since(start)
 }
 

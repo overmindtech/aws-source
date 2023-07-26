@@ -1,4 +1,4 @@
-package cmd
+package tracing
 
 import (
 	"context"
@@ -71,7 +71,7 @@ func tracingResource() *resource.Resource {
 
 var tp *sdktrace.TracerProvider
 
-func initTracing(opts ...otlptracehttp.Option) error {
+func InitTracing(opts ...otlptracehttp.Option) error {
 	if sentry_dsn := viper.GetString("sentry-dsn"); sentry_dsn != "" {
 		var environment string
 		if viper.GetString("run-mode") == "release" {
@@ -123,7 +123,7 @@ func initTracing(opts ...otlptracehttp.Option) error {
 	return nil
 }
 
-func shutdownTracing() {
+func ShutdownTracing() {
 	// Flush buffered events before the program terminates.
 	defer sentry.Flush(2 * time.Second)
 

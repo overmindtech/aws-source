@@ -35,6 +35,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
+	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go/auth"
 	log "github.com/sirupsen/logrus"
@@ -163,9 +164,11 @@ var rootCmd = &cobra.Command{
 				}).Fatal("Error loading config")
 			}
 
-			// Add OTel instrumentation
-			cfg.HTTPClient = &http.Client{
-				Transport: otelhttp.NewTransport(http.DefaultTransport),
+			if log.GetLevel() == log.TraceLevel {
+				// Add OTel instrumentation
+				cfg.HTTPClient = &http.Client{
+					Transport: otelhttp.NewTransport(http.DefaultTransport),
+				}
 			}
 
 			// Work out what account we're using. This will be used in item scopes
@@ -454,13 +457,13 @@ func init() {
 				otlptracehttp.WithHeaders(map[string]string{"x-honeycomb-team": honeycomb_api_key}),
 			}
 		}
-		if err := initTracing(tracingOpts...); err != nil {
+		if err := tracing.InitTracing(tracingOpts...); err != nil {
 			log.Fatal(err)
 		}
 	}
 	// shut down tracing at the end of the process
 	rootCmd.PersistentPostRun = func(cmd *cobra.Command, args []string) {
-		shutdownTracing()
+		tracing.ShutdownTracing()
 	}
 }
 
