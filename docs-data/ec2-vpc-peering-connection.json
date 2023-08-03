@@ -1,0 +1,19 @@
+{
+	"type": "ec2-vpc-peering-connection",
+	"descriptiveType": "VPC Peering Connection",
+	"getDescription": "Get VPC Peering Connection by ID",
+	"listDescription": "List VPC Peering Connections",
+	"searchDescription": "Search VPC Peering Connections by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_vpc_peering_connection.id",
+		"aws_vpc_peering_connection_accepter.id",
+		"aws_vpc_peering_connection_options.vpc_peering_connection_id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"ec2-region",
+		"ec2-vpc"
+	]
+}
