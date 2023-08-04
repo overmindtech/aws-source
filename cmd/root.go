@@ -246,6 +246,8 @@ var rootCmd = &cobra.Command{
 				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewVpcPeeringConnectionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewCapacityReservationFleetSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
