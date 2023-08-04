@@ -248,6 +248,7 @@ var rootCmd = &cobra.Command{
 				ec2.NewVpcPeeringConnectionSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationFleetSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewIamInstanceProfileAssociationSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),
