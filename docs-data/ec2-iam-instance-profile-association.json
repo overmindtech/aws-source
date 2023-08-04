@@ -1,0 +1,17 @@
+{
+	"type": "ec2-iam-instance-profile-association",
+	"descriptiveType": "IAM Instance Profile Association",
+	"getDescription": "Get an IAM Instance Profile Association",
+	"listDescription": "List IAM Instance Profile Associations",
+	"searchDescription": "Search IAM Instance Profile Associations by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_instance.iam_instance_profile"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"ec2-instance",
+		"iam-instance-profile"
+	]
+}
