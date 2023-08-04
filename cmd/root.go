@@ -278,6 +278,7 @@ var rootCmd = &cobra.Command{
 				iam.NewUserSource(cfg, *callerID.Account, region, &iamRateLimit),
 				iam.NewRoleSource(cfg, *callerID.Account, region, &iamRateLimit),
 				iam.NewPolicySource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewInstanceProfileSource(cfg, *callerID.Account, region, &iamRateLimit),
 
 				// Lambda
 				lambda.NewFunctionSource(cfg, *callerID.Account, region),
