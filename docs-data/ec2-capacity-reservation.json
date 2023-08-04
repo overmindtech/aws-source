@@ -1,0 +1,19 @@
+{
+	"type": "ec2-capacity-reservation",
+	"descriptiveType": "Capacity Reservation",
+	"getDescription": "Get a capacity reservation by ID",
+	"listDescription": "List all capacity reservations",
+	"searchDescription": "Search capacity reservations by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_ec2_capacity_reservation.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"ec2-availability-zone",
+		"ec2-capacity-reservation-fleet",
+		"ec2-placement-group",
+		"outposts-outpost"
+	]
+}

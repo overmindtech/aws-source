@@ -1,0 +1,17 @@
+{
+	"type": "iam-instance-profile",
+	"descriptiveType": "IAM instance profile",
+	"getDescription": "Get an IAM instance profile",
+	"listDescription": "List IAM instance profiles",
+	"searchDescription": "Search IAM instance profiles by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_iam_instance_profile.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": [
+		"iam-policy",
+		"iam-role"
+	]
+}
