@@ -145,6 +145,8 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 // +overmind:list List EC2 addresses
 // +overmind:search Search for EC2 addresses by ARN
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_eip.public_ip
+// +overmind:terraform:queryMap aws_eip_association.public_ip
 
 // NewAddressSource Creates a new source for aws-Address resources
 func NewAddressSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {

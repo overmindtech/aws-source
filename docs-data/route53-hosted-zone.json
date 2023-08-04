@@ -6,7 +6,9 @@
 	"searchDescription": "Search for a hosted zone by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_route53_hosted_zone_dnssec.id"
+		"aws_route53_hosted_zone_dnssec.id",
+		"aws_route53_zone.zone_id",
+		"aws_route53_zone_association.zone_id"
 	],
 	"terraformMethod": "GET",
 	"terraformScope": "*",

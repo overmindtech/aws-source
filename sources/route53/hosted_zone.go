@@ -80,6 +80,8 @@ func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 // +overmind:search Search for a hosted zone by ARN
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_hosted_zone_dnssec.id
+// +overmind:terraform:queryMap aws_route53_zone.zone_id
+// +overmind:terraform:queryMap aws_route53_zone_association.zone_id
 
 func NewHostedZoneSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options]{

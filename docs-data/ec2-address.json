@@ -5,6 +5,12 @@
 	"listDescription": "List EC2 addresses",
 	"searchDescription": "Search for EC2 addresses by ARN",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_eip.public_ip",
+		"aws_eip_association.public_ip"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
 	"links": [
 		"ec2-instance",
 		"ec2-network-interface",
