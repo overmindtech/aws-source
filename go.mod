@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.32
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.31
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.30.2
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.28.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.27.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.21.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.110.0
@@ -108,5 +109,3 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/aws/aws-sdk-go-v2/service/cloudfront v1.28.1
