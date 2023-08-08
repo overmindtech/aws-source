@@ -328,6 +328,7 @@ var rootCmd = &cobra.Command{
 				cloudfront.NewFunctionSource(cfg, *callerID.Account, region),
 				cloudfront.NewKeyGroupSource(cfg, *callerID.Account, region),
 				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account, region),
+				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
