@@ -36,8 +36,7 @@
 	"features": {
 		"ghcr.io/devcontainers/features/aws-cli:1": {},
 		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers-contrib/features/localstack:2": {}
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 
 	// Set up environment variables in the remote container.
