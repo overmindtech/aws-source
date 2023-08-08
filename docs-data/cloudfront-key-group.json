@@ -1,0 +1,14 @@
+{
+	"type": "cloudfront-key-group",
+	"descriptiveType": "CloudFront Key Group",
+	"getDescription": "Get a CloudFront Key Group by ID",
+	"listDescription": "List CloudFront Key Groups",
+	"searchDescription": "Search CloudFront Key Groups by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_key_group.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
