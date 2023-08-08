@@ -1,0 +1,28 @@
+{
+	"type": "cloudfront-distribution",
+	"descriptiveType": "CloudFront Distribution",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_distribution.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": [
+		"acm-certificate",
+		"cloudfront-cache-policy",
+		"cloudfront-cloud-front-origin-access-identity",
+		"cloudfront-continuous-deployment-policy",
+		"cloudfront-field-level-encryption",
+		"cloudfront-function",
+		"cloudfront-key-group",
+		"cloudfront-origin-access-control",
+		"cloudfront-origin-request-policy",
+		"cloudfront-realtime-log-config",
+		"cloudfront-response-headers-policy",
+		"dns",
+		"iam-server-certificate",
+		"lambda-function",
+		"waf-web-acl",
+		"wafv2-web-acl"
+	]
+}

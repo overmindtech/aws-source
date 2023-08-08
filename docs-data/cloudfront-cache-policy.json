@@ -1,0 +1,14 @@
+{
+	"type": "cloudfront-cache-policy",
+	"descriptiveType": "CloudFront Cache Policy",
+	"getDescription": "Get a CloudFront Cache Policy",
+	"listDescription": "List CloudFront Cache Policies",
+	"searchDescription": "Search CloudFront Cache Policies by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_cache_policy.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
