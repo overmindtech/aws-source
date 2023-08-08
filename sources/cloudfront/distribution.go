@@ -633,6 +633,11 @@ func NewDistributionSource(config aws.Config, accountID string, region string) *
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListDistributionsInput) sources.Paginator[*cloudfront.ListDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListDistributionsPaginator(client, input)
 		},
+		GetInputMapper: func(scope, query string) *cloudfront.GetDistributionInput {
+			return &cloudfront.GetDistributionInput{
+				Id: &query,
+			}
+		},
 		ListFuncOutputMapper: func(output *cloudfront.ListDistributionsOutput, input *cloudfront.ListDistributionsInput) ([]*cloudfront.GetDistributionInput, error) {
 			var inputs []*cloudfront.GetDistributionInput
 

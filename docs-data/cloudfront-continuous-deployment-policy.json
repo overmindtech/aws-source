@@ -5,5 +5,7 @@
 	"listDescription": "List CloudFront Continuous Deployment Policies",
 	"searchDescription": "Search CloudFront Continuous Deployment Policies by ARN",
 	"group": "AWS",
-	"links": []
+	"links": [
+		"dns"
+	]
 }

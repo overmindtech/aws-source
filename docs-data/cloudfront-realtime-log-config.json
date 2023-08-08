@@ -10,5 +10,8 @@
 	],
 	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
-	"links": []
+	"links": [
+		"iam-role",
+		"kinesis-stream"
+	]
 }

@@ -28,6 +28,7 @@ func realtimeLogConfigsItemMapper(scope string, awsItem *types.RealtimeLogConfig
 		if endpoint.KinesisStreamConfig != nil {
 			if endpoint.KinesisStreamConfig.RoleARN != nil {
 				if arn, err := sources.ParseARN(*endpoint.KinesisStreamConfig.RoleARN); err == nil {
+					// +overmind:link iam-role
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
@@ -47,6 +48,7 @@ func realtimeLogConfigsItemMapper(scope string, awsItem *types.RealtimeLogConfig
 
 			if endpoint.KinesisStreamConfig.StreamARN != nil {
 				if arn, err := sources.ParseARN(*endpoint.KinesisStreamConfig.StreamARN); err == nil {
+					// +overmind:link kinesis-stream
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kinesis-stream",
