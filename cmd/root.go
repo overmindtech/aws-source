@@ -22,6 +22,7 @@ import (
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/aws-source/sources/autoscaling"
+	"github.com/overmindtech/aws-source/sources/cloudfront"
 	"github.com/overmindtech/aws-source/sources/cloudwatch"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
@@ -319,6 +320,18 @@ var rootCmd = &cobra.Command{
 				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
 				elbv2.NewRuleSource(cfg, *callerID.Account),
+
+				// Cloudfront
+				cloudfront.NewCachePolicySource(cfg, *callerID.Account, region),
+				cloudfront.NewContinuousDeploymentPolicySource(cfg, *callerID.Account, region),
+				cloudfront.NewDistributionSource(cfg, *callerID.Account, region),
+				cloudfront.NewFunctionSource(cfg, *callerID.Account, region),
+				cloudfront.NewKeyGroupSource(cfg, *callerID.Account, region),
+				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account, region),
+				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account, region),
+				cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account, region),
+				cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account, region),
+				cloudfront.NewStreamingDistributionSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

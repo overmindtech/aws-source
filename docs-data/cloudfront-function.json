@@ -1,0 +1,14 @@
+{
+	"type": "cloudfront-function",
+	"descriptiveType": "CloudFront Function",
+	"getDescription": "Get a CloudFront Function by name",
+	"listDescription": "List CloudFront Functions",
+	"searchDescription": "Search CloudFront Functions by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_function.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
