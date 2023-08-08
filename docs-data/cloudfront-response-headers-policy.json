@@ -1,0 +1,14 @@
+{
+	"type": "cloudfront-response-headers-policy",
+	"descriptiveType": "CloudFront Response Headers Policy",
+	"getDescription": "Get Response Headers Policy by ID",
+	"listDescription": "List Response Headers Policies",
+	"searchDescription": "Response Headers Policy by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_response_headers_policy.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
