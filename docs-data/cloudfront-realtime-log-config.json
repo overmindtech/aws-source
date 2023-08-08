@@ -1,0 +1,14 @@
+{
+	"type": "cloudfront-realtime-log-config",
+	"descriptiveType": "CloudFront Realtime Log Config",
+	"getDescription": "Get Realtime Log Config by Name",
+	"listDescription": "List Realtime Log Configs",
+	"searchDescription": "Search Realtime Log Configs by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_cloudfront_realtime_log_config.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": []
+}

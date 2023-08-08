@@ -330,6 +330,7 @@ var rootCmd = &cobra.Command{
 				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account, region),
 				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account, region),
 				cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account, region),
+				cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
