@@ -17,11 +17,16 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+
+    env:
+      GOEXPERIMENT: loopvar
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
         with:
           go-version: 1.x
+          check-latest: true
 
       - name: Get dependencies
         run: |
@@ -58,7 +63,6 @@ jobs:
       - test
     permissions:
       contents: read # required for checkout
-      id-token: write # mint AWS credentials through OIDC
       packages: write
 
     strategy:
