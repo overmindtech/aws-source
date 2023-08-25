@@ -23,7 +23,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.29.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.38.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.3
-	github.com/aws/smithy-go v1.14.1
+	github.com/aws/smithy-go v1.14.2
 	github.com/getsentry/sentry-go v0.23.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.4.1
