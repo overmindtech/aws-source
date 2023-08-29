@@ -54,7 +54,9 @@ func NewFunctionSource(config aws.Config, accountID string, region string) *sour
 			return out.FunctionSummary, nil
 		},
 		ListFunc: func(ctx context.Context, client *cloudfront.Client, scope string) ([]*types.FunctionSummary, error) {
-			out, err := client.ListFunctions(ctx, &cloudfront.ListFunctionsInput{})
+			out, err := client.ListFunctions(ctx, &cloudfront.ListFunctionsInput{
+				Stage: types.FunctionStageLive,
+			})
 
 			if err != nil {
 				return nil, err
