@@ -63,6 +63,7 @@ jobs:
       - test
     permissions:
       contents: read # required for checkout
+      id-token: write # mint credentials through OIDC
       packages: write
 
     strategy:
