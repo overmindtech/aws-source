@@ -45,7 +45,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "dns",
-				Method: sdp.QueryMethod_GET,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *d.DomainName,
 				Scope:  "global",
 			},
@@ -85,7 +85,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
-					Method: sdp.QueryMethod_GET,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *record.CNAME,
 					Scope:  "global",
 				},
@@ -105,7 +105,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
-						Method: sdp.QueryMethod_GET,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  alias,
 						Scope:  "global",
 					},
@@ -304,7 +304,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "dns",
-							Method: sdp.QueryMethod_GET,
+							Method: sdp.QueryMethod_SEARCH,
 							Query:  *origin.DomainName,
 							Scope:  "global",
 						},
@@ -521,7 +521,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
-					Method: sdp.QueryMethod_GET,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *dc.Logging.Bucket,
 					Scope:  "global",
 				},

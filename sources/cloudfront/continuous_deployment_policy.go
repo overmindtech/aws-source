@@ -30,7 +30,7 @@ func continuousDeploymentPolicyItemMapper(scope string, awsItem *types.Continuou
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
-					Method: sdp.QueryMethod_GET,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  name,
 					Scope:  "global",
 				},

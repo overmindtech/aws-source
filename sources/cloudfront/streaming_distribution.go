@@ -45,7 +45,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "dns",
-				Method: sdp.QueryMethod_GET,
+				Method: sdp.QueryMethod_SEARCH,
 				Query:  *d.DomainName,
 				Scope:  "global",
 			},
@@ -64,7 +64,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
-						Method: sdp.QueryMethod_GET,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  *dc.S3Origin.DomainName,
 						Scope:  "global",
 					},
@@ -101,7 +101,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
-						Method: sdp.QueryMethod_GET,
+						Method: sdp.QueryMethod_SEARCH,
 						Query:  alias,
 						Scope:  "global",
 					},
@@ -119,7 +119,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
-					Method: sdp.QueryMethod_GET,
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *dc.Logging.Bucket,
 					Scope:  "global",
 				},
