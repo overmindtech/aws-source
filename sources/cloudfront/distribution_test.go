@@ -371,7 +371,7 @@ func TestDistributionGetFunc(t *testing.T) {
 	tests := sources.QueryTests{
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "d111111abcdef8.cloudfront.net",
 			ExpectedScope:  "global",
 		},
@@ -383,7 +383,7 @@ func TestDistributionGetFunc(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "something.foo.bar.com",
 			ExpectedScope:  "global",
 		},
@@ -443,7 +443,7 @@ func TestDistributionGetFunc(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "DOC-EXAMPLE-BUCKET.s3-website.us-west-2.amazonaws.com",
 			ExpectedScope:  "global",
 		},
@@ -461,7 +461,7 @@ func TestDistributionGetFunc(t *testing.T) {
 		},
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "aws-cf-access-logs.s3.amazonaws.com",
 			ExpectedScope:  "global",
 		},

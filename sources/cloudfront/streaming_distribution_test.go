@@ -98,7 +98,7 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 	tests := sources.QueryTests{
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "d111111abcdef8.cloudfront.net",
 			ExpectedScope:  "global",
 		},

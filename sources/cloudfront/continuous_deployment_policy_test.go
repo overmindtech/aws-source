@@ -49,7 +49,7 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 	tests := sources.QueryTests{
 		{
 			ExpectedType:   "dns",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "staging.test.com",
 			ExpectedScope:  "global",
 		},
