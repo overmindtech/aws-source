@@ -623,12 +623,12 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:terraform:queryMap aws_cloudfront_distribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewDistributionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+func NewDistributionSource(config aws.Config, accountID string) *sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:  "cloudfront-distribution",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    region,
+		Region:    "global",
 		ListInput: &cloudfront.ListDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListDistributionsInput) sources.Paginator[*cloudfront.ListDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListDistributionsPaginator(client, input)

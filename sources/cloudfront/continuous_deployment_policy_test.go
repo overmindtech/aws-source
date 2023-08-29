@@ -59,9 +59,9 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 }
 
 func TestNewContinuousDeploymentPolicySource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	config, account, _ := sources.GetAutoConfig(t)
 
-	source := NewContinuousDeploymentPolicySource(config, account, region)
+	source := NewContinuousDeploymentPolicySource(config, account)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -36,12 +36,12 @@ func KeyGroupItemMapper(scope string, awsItem *types.KeyGroup) (*sdp.Item, error
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_key_group.id
 
-func NewKeyGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
+func NewKeyGroupSource(config aws.Config, accountID string) *sources.GetListSource[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-key-group",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    region,
+		Region:    "global",
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.KeyGroup, error) {
 			out, err := client.GetKeyGroup(ctx, &cloudfront.GetKeyGroupInput{
 				Id: &query,

@@ -152,6 +152,8 @@ var rootCmd = &cobra.Command{
 			log.Fatal("No regions specified")
 		}
 
+		var globalDone bool
+
 		for _, region := range regions {
 			region = strings.Trim(region, " ")
 
@@ -320,21 +322,31 @@ var rootCmd = &cobra.Command{
 				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
 				elbv2.NewRuleSource(cfg, *callerID.Account),
-
-				// Cloudfront
-				cloudfront.NewCachePolicySource(cfg, *callerID.Account, region),
-				cloudfront.NewContinuousDeploymentPolicySource(cfg, *callerID.Account, region),
-				cloudfront.NewDistributionSource(cfg, *callerID.Account, region),
-				cloudfront.NewFunctionSource(cfg, *callerID.Account, region),
-				cloudfront.NewKeyGroupSource(cfg, *callerID.Account, region),
-				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account, region),
-				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account, region),
-				cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account, region),
-				cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account, region),
-				cloudfront.NewStreamingDistributionSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
+
+			// Add "global" sources (those that aren't tied to a region, like
+			// cloudfront). but only do this once for the first region. For
+			// these APIs it doesn't matter which region we call them from, we
+			// get global results
+			if !globalDone {
+				e.AddSources(
+					// Cloudfront
+					cloudfront.NewCachePolicySource(cfg, *callerID.Account),
+					cloudfront.NewContinuousDeploymentPolicySource(cfg, *callerID.Account),
+					cloudfront.NewDistributionSource(cfg, *callerID.Account),
+					cloudfront.NewFunctionSource(cfg, *callerID.Account),
+					cloudfront.NewKeyGroupSource(cfg, *callerID.Account),
+					cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account),
+					cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account),
+					cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account),
+					cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account),
+					cloudfront.NewStreamingDistributionSource(cfg, *callerID.Account),
+				)
+				globalDone = true
+			}
+
 		}
 
 		// Start HTTP server for status

@@ -56,12 +56,12 @@ func continuousDeploymentPolicyItemMapper(scope string, awsItem *types.Continuou
 
 // Terraform is not yet supported for this: https://github.com/hashicorp/terraform-provider-aws/issues/28920
 
-func NewContinuousDeploymentPolicySource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options] {
+func NewContinuousDeploymentPolicySource(config aws.Config, accountID string) *sources.GetListSource[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:               "cloudfront-continuous-deployment-policy",
 		Client:                 cloudfront.NewFromConfig(config),
 		AccountID:              accountID,
-		Region:                 region,
+		Region:                 "global",
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ContinuousDeploymentPolicy, error) {
 			out, err := client.GetContinuousDeploymentPolicy(ctx, &cloudfront.GetContinuousDeploymentPolicyInput{

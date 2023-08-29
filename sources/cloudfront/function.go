@@ -36,12 +36,12 @@ func functionItemMapper(scope string, awsItem *types.FunctionSummary) (*sdp.Item
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_function.name
 
-func NewFunctionSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
+func NewFunctionSource(config aws.Config, accountID string) *sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-function",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    region,
+		Region:    "global",
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.FunctionSummary, error) {
 			out, err := client.DescribeFunction(ctx, &cloudfront.DescribeFunctionInput{
 				Name: &query,

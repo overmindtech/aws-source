@@ -81,12 +81,12 @@ func realtimeLogConfigsItemMapper(scope string, awsItem *types.RealtimeLogConfig
 // +overmind:terraform:queryMap aws_cloudfront_realtime_log_config.arn
 // +overmind:terraform:method SEARCH
 
-func NewRealtimeLogConfigsSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
+func NewRealtimeLogConfigsSource(config aws.Config, accountID string) *sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-realtime-log-config",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    region,
+		Region:    "global",
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.RealtimeLogConfig, error) {
 			out, err := client.GetRealtimeLogConfig(ctx, &cloudfront.GetRealtimeLogConfigInput{
 				Name: &query,

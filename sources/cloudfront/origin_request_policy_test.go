@@ -51,9 +51,9 @@ func TestOriginRequestPolicyItemMapper(t *testing.T) {
 }
 
 func TestNewOriginRequestPolicySource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	config, account, _ := sources.GetAutoConfig(t)
 
-	source := NewOriginRequestPolicySource(config, account, region)
+	source := NewOriginRequestPolicySource(config, account)
 
 	test := sources.E2ETest{
 		Source:  source,
