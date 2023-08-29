@@ -46,12 +46,12 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_cache_policy.id
 
-func NewCachePolicySource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
+func NewCachePolicySource(config aws.Config, accountID string) *sources.GetListSource[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
 	return &sources.GetListSource[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
 		ItemType:               "cloudfront-cache-policy",
 		Client:                 cloudfront.NewFromConfig(config),
 		AccountID:              accountID,
-		Region:                 region,
+		Region:                 "global",
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client CloudFrontClient, scope, query string) (*types.CachePolicy, error) {
 			out, err := client.GetCachePolicy(ctx, &cloudfront.GetCachePolicyInput{

@@ -489,9 +489,9 @@ func TestDistributionGetFunc(t *testing.T) {
 }
 
 func TestNewDistributionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	config, account, _ := sources.GetAutoConfig(t)
 
-	source := NewDistributionSource(config, account, region)
+	source := NewDistributionSource(config, account)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -145,12 +145,12 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 // +overmind:terraform:queryMap aws_cloudfront_Streamingdistribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewStreamingDistributionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+func NewStreamingDistributionSource(config aws.Config, accountID string) *sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:  "cloudfront-streaming-distribution",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    region,
+		Region:    "global",
 		ListInput: &cloudfront.ListStreamingDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListStreamingDistributionsInput) sources.Paginator[*cloudfront.ListStreamingDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListStreamingDistributionsPaginator(client, input)

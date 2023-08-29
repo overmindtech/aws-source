@@ -108,9 +108,9 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 }
 
 func TestNewStreamingDistributionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	config, account, _ := sources.GetAutoConfig(t)
 
-	source := NewStreamingDistributionSource(config, account, region)
+	source := NewStreamingDistributionSource(config, account)
 
 	test := sources.E2ETest{
 		Source:  source,
