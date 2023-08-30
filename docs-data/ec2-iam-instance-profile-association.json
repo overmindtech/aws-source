@@ -5,11 +5,6 @@
 	"listDescription": "List IAM Instance Profile Associations",
 	"searchDescription": "Search IAM Instance Profile Associations by ARN",
 	"group": "AWS",
-	"terraformQuery": [
-		"aws_instance.iam_instance_profile"
-	],
-	"terraformMethod": "GET",
-	"terraformScope": "*",
 	"links": [
 		"ec2-instance",
 		"iam-instance-profile"
