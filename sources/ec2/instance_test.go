@@ -307,7 +307,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedScope:  "052392120703.us-east-1",
 		},
 		{
-			ExpectedType:   "ecs-spot-instance-request",
+			ExpectedType:   "ec2-spot-instance-request",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sir-0a1b2c3d4e5f6g7h8",
 			ExpectedScope:  item.Scope,
