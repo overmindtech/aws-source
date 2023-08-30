@@ -61,6 +61,165 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 				},
 			}
 
+			if instance.IamInstanceProfile != nil {
+				// Prefer the ARN
+				if instance.IamInstanceProfile.Arn != nil {
+					if arn, err := sources.ParseARN(*instance.IamInstanceProfile.Arn); err == nil {
+						// +overmind:link iam-instance-profile
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "iam-instance-profile",
+								Method: sdp.QueryMethod_SEARCH,
+								Query:  *instance.IamInstanceProfile.Arn,
+								Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changes to the profile will affect this instance
+								In: true,
+								// We can't affect the profile
+								Out: false,
+							},
+						})
+					}
+				} else if instance.IamInstanceProfile.Id != nil {
+					// +overmind:link iam-instance-profile
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "iam-instance-profile",
+							Method: sdp.QueryMethod_GET,
+							Query:  *instance.IamInstanceProfile.Id,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changes to the profile will affect this instance
+							In: true,
+							// We can't affect the profile
+							Out: false,
+						},
+					})
+				}
+			}
+
+			if instance.CapacityReservationId != nil {
+				// +overmind:link ec2-capacity-reservation
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-capacity-reservation",
+						Method: sdp.QueryMethod_GET,
+						Query:  *instance.CapacityReservationId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the reservation will affect the instance
+						In: true,
+						// Changing the instance won't affect the reservation
+						Out: false,
+					},
+				})
+			}
+
+			for _, assoc := range instance.ElasticGpuAssociations {
+				if assoc.ElasticGpuId != nil {
+					// +overmind:link ec2-elastic-gpu
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "ec2-elastic-gpu",
+							Method: sdp.QueryMethod_GET,
+							Query:  *assoc.ElasticGpuId,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the GPU will affect the instance
+							In: true,
+							// Changing the instance won't affect the GPU
+							Out: false,
+						},
+					})
+				}
+			}
+
+			for _, assoc := range instance.ElasticInferenceAcceleratorAssociations {
+				if assoc.ElasticInferenceAcceleratorArn != nil {
+					if arn, err := sources.ParseARN(*assoc.ElasticInferenceAcceleratorArn); err == nil {
+						// +overmind:link elastic-inference-accelerator
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "elastic-inference-accelerator",
+								Method: sdp.QueryMethod_SEARCH,
+								Query:  *assoc.ElasticInferenceAcceleratorArn,
+								Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changing the accelerator will affect the instance
+								In: true,
+								// Changing the instance won't affect the accelerator
+								Out: false,
+							},
+						})
+					}
+				}
+			}
+
+			for _, license := range instance.Licenses {
+				if license.LicenseConfigurationArn != nil {
+					if arn, err := sources.ParseARN(*license.LicenseConfigurationArn); err == nil {
+						// +overmind:link license-manager-license-configuration
+						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+							Query: &sdp.Query{
+								Type:   "license-manager-license-configuration",
+								Method: sdp.QueryMethod_SEARCH,
+								Query:  *license.LicenseConfigurationArn,
+								Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+							},
+							BlastPropagation: &sdp.BlastPropagation{
+								// Changing the license will affect the instance
+								In: true,
+								// Changing the instance won't affect the license
+								Out: false,
+							},
+						})
+					}
+				}
+			}
+
+			if instance.OutpostArn != nil {
+				if arn, err := sources.ParseARN(*instance.OutpostArn); err == nil {
+					// +overmind:link outposts-outpost
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "outposts-outpost",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  *instance.OutpostArn,
+							Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Changing the outpost will affect the instance
+							In: true,
+							// Changing the instance won't affect the outpost
+							Out: false,
+						},
+					})
+				}
+			}
+
+			if instance.SpotInstanceRequestId != nil {
+				// +overmind:link ec2-spot-instance-request
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-spot-instance-request",
+						Method: sdp.QueryMethod_GET,
+						Query:  *instance.SpotInstanceRequestId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the spot request will affect the instance
+						In: true,
+						// Changing the instance won't affect the spot request
+						Out: false,
+					},
+				})
+			}
+
 			if instance.ImageId != nil {
 				// +overmind:link ec2-image
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -133,6 +292,23 @@ func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *e
 						},
 					})
 				}
+			}
+
+			if instance.Ipv6Address != nil {
+				// +overmind:link ip
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ip",
+						Method: sdp.QueryMethod_GET,
+						Query:  *instance.Ipv6Address,
+						Scope:  "global",
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// IPs are always linked
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 
 			for _, nic := range instance.NetworkInterfaces {

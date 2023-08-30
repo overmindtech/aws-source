@@ -77,7 +77,6 @@ func iamInstanceProfileAssociationOutputMapper(scope string, _ *ec2.DescribeIamI
 // +overmind:list List IAM Instance Profile Associations
 // +overmind:search Search IAM Instance Profile Associations by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_instance.iam_instance_profile
 
 // NewIamInstanceProfileAssociationSource Creates a new source for aws-IamInstanceProfileAssociation resources
 func NewIamInstanceProfileAssociationSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
