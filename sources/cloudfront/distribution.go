@@ -118,7 +118,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			}
 		}
 
-		if dc.ContinuousDeploymentPolicyId != nil {
+		if dc.ContinuousDeploymentPolicyId != nil && *dc.ContinuousDeploymentPolicyId != "" {
 			// +overmind:link cloudfront-continuous-deployment-policy
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
