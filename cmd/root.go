@@ -183,7 +183,10 @@ var rootCmd = &cobra.Command{
 
 			if err != nil {
 				log.WithFields(log.Fields{
-					"error": err,
+					"error":         err,
+					"region":        region,
+					"targetRoleARN": targetRoleARN,
+					"externalID":    externalID,
 				}).Fatal("Error retrieving account information")
 			}
 
