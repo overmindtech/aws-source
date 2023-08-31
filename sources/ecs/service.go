@@ -358,14 +358,14 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 
 		sections := strings.Split(a.Resource, "/")
 
-		if len(sections) != 2 {
-			return nil, fmt.Errorf("could not split into 2 sections on '/': %v", a.Resource)
+		if len(sections) != 3 {
+			return nil, fmt.Errorf("could not split into 3 sections on '/': %v", a.Resource)
 		}
 
 		inputs = append(inputs, &ecs.DescribeServicesInput{
-			Cluster: &sections[0],
+			Cluster: &sections[1],
 			Services: []string{
-				sections[1],
+				sections[2],
 			},
 			Include: ServiceIncludeFields,
 		})
@@ -381,8 +381,7 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 // +overmind:list List all ECS services
 // +overmind:search Search for ECS services by cluster
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_ecs_service.arn
-// +overmind:terraform:method SEARCH
+// +overmind:terraform:queryMap ${aws_ecs_service.cluster}/${aws_ecs_service.name}
 
 func NewServiceSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{
