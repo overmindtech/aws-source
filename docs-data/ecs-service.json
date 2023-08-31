@@ -6,9 +6,9 @@
 	"searchDescription": "Search for ECS services by cluster",
 	"group": "AWS",
 	"terraformQuery": [
-		"${aws_ecs_service.cluster}/${aws_ecs_service.name}"
+		"aws_ecs_service.cluster_name"
 	],
-	"terraformMethod": "GET",
+	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
 		"dns",
