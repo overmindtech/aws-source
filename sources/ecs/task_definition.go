@@ -3,7 +3,6 @@ package ecs
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
@@ -42,11 +41,9 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		return nil, errors.New("task definition family was nil")
 	}
 
-	attributes.Set("revisionName", fmt.Sprintf("%v:%v", *td.Family, td.Revision))
-
 	item := sdp.Item{
 		Type:            "ecs-task-definition",
-		UniqueAttribute: "revisionName",
+		UniqueAttribute: "family",
 		Attributes:      attributes,
 		Scope:           scope,
 	}
@@ -182,7 +179,7 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 // +overmind:list List all task definitions
 // +overmind:search Search for task definitions by ARN
 // +overmind:group AWS
-// +overmind:terraform:queryMap ${aws_ecs_task_definition.family}:${aws_ecs_task_definition.revision}
+// +overmind:terraform:queryMap aws_ecs_task_definition.family
 
 func NewTaskDefinitionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
