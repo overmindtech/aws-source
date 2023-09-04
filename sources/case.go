@@ -116,7 +116,8 @@ func init() {
 
 // ToAttributesCase Converts any interface to SDP attributes and also fixes case
 // to be the correct `camelCase`. Excluded fields can also be provided, the
-// field names should be provided in the final camelCase format
+// field names should be provided in the final camelCase format. Arrays are also
+// sorted to ensure consistency.
 func ToAttributesCase(i interface{}, exclusions ...string) (*sdp.ItemAttributes, error) {
 	var m map[string]interface{}
 
@@ -140,7 +141,7 @@ func ToAttributesCase(i interface{}, exclusions ...string) (*sdp.ItemAttributes,
 			// Exclude some things
 			delete(camelMap, exclusion)
 		}
-		return sdp.ToAttributes(camelMap)
+		return sdp.ToAttributesSorted(camelMap)
 	} else {
 		return &sdp.ItemAttributes{}, errors.New("could not convert camel cased data to map[string]interface{}")
 	}
