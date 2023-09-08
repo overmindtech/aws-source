@@ -24,7 +24,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.38.5
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.5
 	github.com/aws/smithy-go v1.14.2
-	github.com/getsentry/sentry-go v0.23.0
+	github.com/getsentry/sentry-go v0.24.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.5.0
 	github.com/nats-io/nkeys v0.4.4
