@@ -29,7 +29,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.0
 	github.com/nats-io/nkeys v0.4.4
 	github.com/overmindtech/discovery v0.23.2
-	github.com/overmindtech/sdp-go v0.47.0
+	github.com/overmindtech/sdp-go v0.47.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/cobra v1.7.0
