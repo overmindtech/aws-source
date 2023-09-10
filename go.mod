@@ -36,7 +36,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.16.0
 	go.opentelemetry.io/contrib/detectors/aws/ec2 v1.16.1
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.43.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.16.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.16.0
@@ -115,11 +115,12 @@ require (
 exclude (
 	go.opentelemetry.io/contrib/detectors/aws/ec2 v1.17.0
 	go.opentelemetry.io/contrib/detectors/aws/ec2 v1.18.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.43.0
 	go.opentelemetry.io/otel v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.17.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.17.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.17.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.17.0
 	go.opentelemetry.io/otel/metric v1.17.0
 	go.opentelemetry.io/otel/sdk v1.17.0
 	go.opentelemetry.io/otel/trace v1.17.0
