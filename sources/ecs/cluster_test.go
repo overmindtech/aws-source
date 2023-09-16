@@ -92,7 +92,8 @@ func (t *TestClient) ListClusters(context.Context, *ecs.ListClustersInput, ...fu
 }
 
 func TestClusterGetFunc(t *testing.T) {
-	item, err := clusterGetFunc(context.Background(), &TestClient{}, "foo", &ecs.DescribeClustersInput{})
+	scope := "123456789012.eu-west-2"
+	item, err := clusterGetFunc(context.Background(), &TestClient{}, scope, &ecs.DescribeClustersInput{})
 
 	if err != nil {
 		t.Error(err)
@@ -107,37 +108,37 @@ func TestClusterGetFunc(t *testing.T) {
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "logs-log-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "cloud-watch-name",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "s3-bucket",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "s3-name",
-			ExpectedScope:  "foo",
+			ExpectedScope:  "123456789012",
 		},
 		{
 			ExpectedType:   "ecs-capacity-provider",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "ecs-container-instance",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "ecs-service",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 	}
 

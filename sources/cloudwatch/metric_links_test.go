@@ -189,7 +189,8 @@ func TestSuggestedQuery(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 
-			query, err := SuggestedQuery(c.Namespace, "", c.Dimensions)
+			scope := "123456789012.eu-west-2"
+			query, err := SuggestedQuery(c.Namespace, scope, c.Dimensions)
 
 			if err != nil {
 				t.Fatal(err)

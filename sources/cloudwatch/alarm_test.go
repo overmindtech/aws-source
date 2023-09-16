@@ -80,7 +80,8 @@ func TestAlarmOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := alarmOutputMapper("foo", &cloudwatch.DescribeAlarmsInput{}, output)
+	scope := "123456789012.eu-west-2"
+	items, err := alarmOutputMapper(scope, &cloudwatch.DescribeAlarmsInput{}, output)
 
 	if err != nil {
 		t.Error(err)
@@ -118,7 +119,7 @@ func TestAlarmOutputMapper(t *testing.T) {
 			ExpectedType:   "dynamodb-table",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "dylan-tfstate",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 	}
 

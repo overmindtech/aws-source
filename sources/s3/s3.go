@@ -92,10 +92,10 @@ func (s *S3Source) Name() string {
 }
 
 // List of scopes that this source is capable of find items for. This will be
-// in the format {accountID}.{region}
+// in the format {accountID} since S3 endpoint is global
 func (s *S3Source) Scopes() []string {
 	return []string{
-		sources.FormatScope(s.accountID, s.config.Region),
+		sources.FormatScope(s.accountID, ""),
 	}
 }
 

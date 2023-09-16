@@ -2,12 +2,15 @@ package cloudfront
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
+
+var s3DnsRegex = regexp.MustCompile(`([^\.]+)\.s3\.([^\.]+).amazonaws.com`)
 
 func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope string, input *cloudfront.GetDistributionInput) (*sdp.Item, error) {
 	out, err := client.GetDistribution(ctx, input)
@@ -29,6 +32,12 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
+	}
+
+	accountID, _, err := sources.ParseScope(scope)
+
+	if err != nil {
+		return nil, err
 	}
 
 	if d.Status != nil {
@@ -335,6 +344,30 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 
 				if origin.S3OriginConfig != nil {
+					// If this is set then the origin is an S3 bucket, so we can
+					// try to get the bucket name from the domain name
+					if origin.DomainName != nil {
+						matches := s3DnsRegex.FindStringSubmatch(*origin.DomainName)
+
+						if len(matches) == 3 {
+							// +overmind:link s3-bucket
+							item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+								Query: &sdp.Query{
+									Type:   "s3-bucket",
+									Method: sdp.QueryMethod_GET,
+									Query:  matches[1],
+									Scope:  sources.FormatScope(accountID, ""), // S3 buckets are global
+								},
+								BlastPropagation: &sdp.BlastPropagation{
+									// Changing the bucket could affect the distribution
+									In: true,
+									// The distribution could affect the bucket
+									Out: true,
+								},
+							})
+						}
+					}
+
 					if origin.S3OriginConfig.OriginAccessIdentity != nil {
 						// +overmind:link cloudfront-cloud-front-origin-access-identity
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

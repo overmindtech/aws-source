@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -29,6 +30,12 @@ func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension
 		// blast radius. But an alarm on its own doesn't affect these things
 		In:  false,
 		Out: true,
+	}
+
+	accountID, _, err := sources.ParseScope(scope)
+
+	if err != nil {
+		return nil, err
 	}
 
 	switch namespace {
@@ -199,7 +206,7 @@ func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension
 				Type:   "s3-bucket",
 				Method: sdp.QueryMethod_GET,
 				Query:  *d.Value,
-				Scope:  scope,
+				Scope:  sources.FormatScope(accountID, ""),
 			}
 		}
 	case "AWS/NATGateway":
