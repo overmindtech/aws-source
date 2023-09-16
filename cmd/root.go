@@ -256,9 +256,6 @@ var rootCmd = &cobra.Command{
 				ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewIamInstanceProfileAssociationSource(cfg, *callerID.Account, &ec2RateLimit),
 
-				// S3
-				s3.NewS3Source(cfg, *callerID.Account),
-
 				// EFS (I'm assuming it shares its rate limit with EC2))
 				efs.NewAccessPointSource(cfg, *callerID.Account, &ec2RateLimit),
 				efs.NewBackupPolicySource(cfg, *callerID.Account, &ec2RateLimit),
@@ -346,6 +343,9 @@ var rootCmd = &cobra.Command{
 					cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account),
 					cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account),
 					cloudfront.NewStreamingDistributionSource(cfg, *callerID.Account),
+
+					// S3
+					s3.NewS3Source(cfg, *callerID.Account),
 				)
 				globalDone = true
 			}
