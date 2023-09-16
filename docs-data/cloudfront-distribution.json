@@ -22,6 +22,7 @@
 		"dns",
 		"iam-server-certificate",
 		"lambda-function",
+		"s3-bucket",
 		"waf-web-acl",
 		"wafv2-web-acl"
 	]

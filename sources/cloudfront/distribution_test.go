@@ -153,7 +153,7 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 				Origins: &types.Origins{
 					Items: []types.Origin{
 						{
-							DomainName:         sources.PtrString("DOC-EXAMPLE-BUCKET.s3-website.us-west-2.amazonaws.com"), // link
+							DomainName:         sources.PtrString("DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com"), // link
 							Id:                 sources.PtrString("CustomOriginConfig"),
 							ConnectionAttempts: sources.PtrInt32(3),
 							ConnectionTimeout:  sources.PtrInt32(10),
@@ -354,7 +354,8 @@ func (t TestCloudFrontClient) ListDistributions(ctx context.Context, params *clo
 }
 
 func TestDistributionGetFunc(t *testing.T) {
-	item, err := distributionGetFunc(context.Background(), TestCloudFrontClient{}, "foo", &cloudfront.GetDistributionInput{})
+	scope := "123456789012.us-east-1"
+	item, err := distributionGetFunc(context.Background(), TestCloudFrontClient{}, scope, &cloudfront.GetDistributionInput{})
 
 	if err != nil {
 		t.Fatal(err)
@@ -379,7 +380,7 @@ func TestDistributionGetFunc(t *testing.T) {
 			ExpectedType:   "cloudfront-key-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "key-group-1",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "dns",
@@ -391,25 +392,25 @@ func TestDistributionGetFunc(t *testing.T) {
 			ExpectedType:   "cloudfront-continuous-deployment-policy",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-continuous-deployment-policy-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-cache-policy",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-cache-policy-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-field-level-encryption",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-field-level-encryption-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-origin-request-policy",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-origin-request-policy-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-realtime-log-config",
@@ -421,13 +422,13 @@ func TestDistributionGetFunc(t *testing.T) {
 			ExpectedType:   "cloudfront-response-headers-policy",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-response-headers-policy-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-key-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "key-group-1",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-function",
@@ -444,20 +445,20 @@ func TestDistributionGetFunc(t *testing.T) {
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "DOC-EXAMPLE-BUCKET.s3-website.us-west-2.amazonaws.com",
+			ExpectedQuery:  "DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com",
 			ExpectedScope:  "global",
 		},
 		{
 			ExpectedType:   "cloudfront-origin-access-control",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-origin-access-control-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "cloudfront-cloud-front-origin-access-identity",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-origin-access-identity",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "dns",
@@ -475,13 +476,19 @@ func TestDistributionGetFunc(t *testing.T) {
 			ExpectedType:   "iam-server-certificate",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test-iam-certificate-id",
-			ExpectedScope:  "foo",
+			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "wafv2-web-acl",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a",
 			ExpectedScope:  "123456789012.us-east-1",
+		},
+		{
+			ExpectedType:   "s3-bucket",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "DOC-EXAMPLE-BUCKET",
+			ExpectedScope:  "123456789012",
 		},
 	}
 

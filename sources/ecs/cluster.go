@@ -27,6 +27,12 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		return nil, err
 	}
 
+	accountID, _, err := sources.ParseScope(scope)
+
+	if err != nil {
+		return nil, err
+	}
+
 	if len(out.Failures) != 0 {
 		failure := out.Failures[0]
 
@@ -171,7 +177,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 							Type:   "s3-bucket",
 							Method: sdp.QueryMethod_GET,
 							Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
-							Scope:  scope,
+							Scope:  sources.FormatScope(accountID, ""),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// These are tightly linked
