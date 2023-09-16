@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-var s3DnsRegex = regexp.MustCompile(`([^\.]+)\.s3\.([^\.]+).amazonaws.com`)
+var s3DnsRegex = regexp.MustCompile(`([^\.]+)\.s3\.([^\.]+)\.amazonaws\.com`)
 
 func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope string, input *cloudfront.GetDistributionInput) (*sdp.Item, error) {
 	out, err := client.GetDistribution(ctx, input)
