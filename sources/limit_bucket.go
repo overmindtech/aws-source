@@ -25,8 +25,7 @@ type LimitBucket struct {
 	RefillDuration time.Duration
 
 	// Channel tokens are stored in
-	C <-chan struct{}
-	c chan struct{} // Internal version of `C`
+	c chan struct{}
 
 	// Channel that sends whether or not the bucket is full each time the
 	// bucket is refilled
@@ -40,7 +39,6 @@ func (b *LimitBucket) Start(ctx context.Context) {
 
 	tokenChan := make(chan struct{}, b.MaxCapacity)
 	b.c = tokenChan
-	b.C = tokenChan
 
 	go func(ctx context.Context, bucket *LimitBucket) {
 		defer sentry.Recover()
@@ -68,7 +66,7 @@ func (b *LimitBucket) Wait(ctx context.Context) {
 	select {
 	case <-ctx.Done():
 		return
-	case <-b.C:
+	case <-b.c:
 		waitTime := time.Since(start)
 
 		if waitTime > 300*time.Millisecond {

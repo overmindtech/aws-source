@@ -72,7 +72,7 @@ func NewAccessPointSource(config aws.Config, accountID string, limit *sources.Li
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeAccessPointsInput) (*efs.DescribeAccessPointsOutput, error) {
 			// Wait for rate limiting
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeAccessPoints(ctx, input)
 		},
 		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeAccessPointsInput) sources.Paginator[*efs.DescribeAccessPointsOutput, *efs.Options] {

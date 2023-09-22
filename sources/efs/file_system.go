@@ -126,7 +126,7 @@ func NewFileSystemSource(config aws.Config, accountID string, limit *sources.Lim
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeFileSystemsInput) (*efs.DescribeFileSystemsOutput, error) {
 			// Wait for rate limiting
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeFileSystems(ctx, input)
 		},
 		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeFileSystemsInput) sources.Paginator[*efs.DescribeFileSystemsOutput, *efs.Options] {

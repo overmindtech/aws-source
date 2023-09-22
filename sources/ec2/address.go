@@ -156,7 +156,7 @@ func NewAddressSource(config aws.Config, accountID string, limit *sources.LimitB
 		AccountID: accountID,
 		ItemType:  "ec2-address",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeAddresses(ctx, input)
 		},
 		InputMapperGet:  addressInputMapperGet,

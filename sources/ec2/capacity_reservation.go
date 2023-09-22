@@ -124,7 +124,7 @@ func NewCapacityReservationSource(config aws.Config, accountID string, limit *so
 		AccountID: accountID,
 		ItemType:  "ec2-capacity-reservation",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationsInput) (*ec2.DescribeCapacityReservationsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeCapacityReservations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeCapacityReservationsInput, error) {

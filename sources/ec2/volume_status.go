@@ -112,7 +112,7 @@ func NewVolumeStatusSource(config aws.Config, accountID string, limit *sources.L
 		AccountID: accountID,
 		ItemType:  "ec2-volume-status",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumeStatusInput) (*ec2.DescribeVolumeStatusOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVolumeStatus(ctx, input)
 		},
 		InputMapperGet:  volumeStatusInputMapperGet,

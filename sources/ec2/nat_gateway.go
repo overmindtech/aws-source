@@ -157,7 +157,7 @@ func NewNatGatewaySource(config aws.Config, accountID string, limit *sources.Lim
 		AccountID: accountID,
 		ItemType:  "ec2-nat-gateway",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNatGatewaysInput) (*ec2.DescribeNatGatewaysOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNatGateways(ctx, input)
 		},
 		InputMapperGet:  natGatewayInputMapperGet,

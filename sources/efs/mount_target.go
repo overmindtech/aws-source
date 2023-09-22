@@ -155,7 +155,7 @@ func NewMountTargetSource(config aws.Config, accountID string, limit *sources.Li
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeMountTargetsInput) (*efs.DescribeMountTargetsOutput, error) {
 			// Wait for rate limiting
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeMountTargets(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeMountTargetsInput, error) {

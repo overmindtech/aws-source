@@ -66,7 +66,7 @@ func NewLaunchTemplateSource(config aws.Config, accountID string, limit *sources
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
 		InputMapperGet:  launchTemplateInputMapperGet,

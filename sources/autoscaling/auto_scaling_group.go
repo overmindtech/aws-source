@@ -246,7 +246,7 @@ func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *sourc
 			return autoscaling.NewDescribeAutoScalingGroupsPaginator(client, params)
 		},
 		DescribeFunc: func(ctx context.Context, client *autoscaling.Client, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
-			<-limit.C // Wait for rate limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for rate limiting
 			return client.DescribeAutoScalingGroups(ctx, input)
 		},
 		OutputMapper: autoScalingGroupOutputMapper,

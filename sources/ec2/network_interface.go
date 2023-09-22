@@ -285,7 +285,7 @@ func NewNetworkInterfaceSource(config aws.Config, accountID string, limit *sourc
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
 		InputMapperGet:  networkInterfaceInputMapperGet,

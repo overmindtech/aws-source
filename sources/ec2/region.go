@@ -64,7 +64,7 @@ func NewRegionSource(config aws.Config, accountID string, limit *sources.LimitBu
 		AccountID: accountID,
 		ItemType:  "ec2-region",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeRegions(ctx, input)
 		},
 		InputMapperGet:  regionInputMapperGet,

@@ -114,11 +114,11 @@ func NewInstanceProfileSource(config aws.Config, accountID string, region string
 		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return instanceProfileGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.InstanceProfile, error) {
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return instanceProfileListFunc(ctx, client, scope)
 		},
 		ItemMapper: instanceProfileItemMapper,

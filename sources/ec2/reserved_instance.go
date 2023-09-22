@@ -80,7 +80,7 @@ func NewReservedInstanceSource(config aws.Config, accountID string, limit *sourc
 		AccountID: accountID,
 		ItemType:  "ec2-reserved-instance",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeReservedInstancesInput) (*ec2.DescribeReservedInstancesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeReservedInstances(ctx, input)
 		},
 		InputMapperGet:  reservedInstanceInputMapperGet,

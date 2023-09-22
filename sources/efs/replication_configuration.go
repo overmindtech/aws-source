@@ -140,7 +140,7 @@ func NewReplicationConfigurationSource(config aws.Config, accountID string, limi
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeReplicationConfigurationsInput) (*efs.DescribeReplicationConfigurationsOutput, error) {
 			// Wait for rate limiting
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeReplicationConfigurations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeReplicationConfigurationsInput, error) {

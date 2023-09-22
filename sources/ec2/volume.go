@@ -100,7 +100,7 @@ func NewVolumeSource(config aws.Config, accountID string, limit *sources.LimitBu
 		AccountID: accountID,
 		ItemType:  "ec2-volume",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVolumes(ctx, input)
 		},
 		InputMapperGet:  volumeInputMapperGet,

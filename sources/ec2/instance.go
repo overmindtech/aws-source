@@ -489,7 +489,7 @@ func NewInstanceSource(config aws.Config, accountID string, limit *sources.Limit
 		AccountID: accountID,
 		ItemType:  "ec2-instance",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInstances(ctx, input)
 		},
 		InputMapperGet:  instanceInputMapperGet,

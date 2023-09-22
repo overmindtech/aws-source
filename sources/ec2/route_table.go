@@ -279,7 +279,7 @@ func NewRouteTableSource(config aws.Config, accountID string, limit *sources.Lim
 		AccountID: accountID,
 		ItemType:  "ec2-route-table",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeRouteTables(ctx, input)
 		},
 		InputMapperGet:  routeTableInputMapperGet,

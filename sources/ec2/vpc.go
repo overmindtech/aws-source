@@ -65,7 +65,7 @@ func NewVpcSource(config aws.Config, accountID string, limit *sources.LimitBucke
 		AccountID: accountID,
 		ItemType:  "ec2-vpc",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVpcs(ctx, input)
 		},
 		InputMapperGet:  vpcInputMapperGet,

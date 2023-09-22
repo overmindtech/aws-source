@@ -101,7 +101,7 @@ func NewInstanceEventWindowSource(config aws.Config, accountID string, limit *so
 		AccountID: accountID,
 		ItemType:  "ec2-instance-event-window",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput) (*ec2.DescribeInstanceEventWindowsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
 		InputMapperGet:  instanceEventWindowInputMapperGet,

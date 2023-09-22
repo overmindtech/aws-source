@@ -67,7 +67,7 @@ func NewBackupPolicySource(config aws.Config, accountID string, limit *sources.L
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeBackupPolicyInput) (*efs.DescribeBackupPolicyOutput, error) {
 			// Wait for rate limiting
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeBackupPolicy(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeBackupPolicyInput, error) {

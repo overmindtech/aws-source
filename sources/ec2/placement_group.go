@@ -66,7 +66,7 @@ func NewPlacementGroupSource(config aws.Config, accountID string, limit *sources
 		AccountID: accountID,
 		ItemType:  "ec2-placement-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput) (*ec2.DescribePlacementGroupsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribePlacementGroups(ctx, input)
 		},
 		InputMapperGet:  placementGroupInputMapperGet,
