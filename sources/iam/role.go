@@ -24,7 +24,8 @@ type RoleDetails struct {
 }
 
 func roleGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*RoleDetails, error) {
-	<-limit.C
+	limit.Wait(ctx)
+
 	out, err := client.GetRole(ctx, &iam.GetRoleInput{
 		RoleName: &query,
 	})
@@ -85,10 +86,10 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 	defer span.End()
 
 	policies := make([]embeddedPolicy, 0)
-	var waitTime time.Duration
 
 	for policiesPaginator.HasMorePages() {
-		waitTime += limit.TimeWait()
+		limit.Wait(ctx)
+
 		out, err := policiesPaginator.NextPage(ctx)
 
 		if err != nil {
@@ -114,11 +115,7 @@ func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string
 	ctx, span := tracer.Start(ctx, "getRolePolicyDetails")
 	defer span.End()
 
-	wait := limit.TimeWait()
-
-	span.SetAttributes(
-		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", wait.Milliseconds()),
-	)
+	limit.Wait(ctx)
 
 	policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
 		RoleName:   &roleName,
@@ -165,7 +162,8 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string,
 	attachedPolicies := make([]types.AttachedPolicy, 0)
 
 	for paginator.HasMorePages() {
-		<-limit.C
+		limit.Wait(ctx)
+
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -179,7 +177,8 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string,
 }
 
 func getRoleTags(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]types.Tag, error) {
-	<-limit.C
+	limit.Wait(ctx)
+
 	out, err := client.ListRoleTags(ctx, &iam.ListRoleTagsInput{
 		RoleName: &roleName,
 	})
@@ -197,17 +196,20 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 	ctx, span := tracer.Start(ctx, "roleListFunc")
 	defer span.End()
 
-	var waitTime time.Duration
+	mapper := iter.Mapper[types.Role, *RoleDetails]{
+		MaxGoroutines: 100,
+	}
 
 	for paginator.HasMorePages() {
-		wait := limit.TimeWait()
+		limit.Wait(ctx)
+
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newRoles, err := iter.MapErr(out.Roles, func(role *types.Role) (*RoleDetails, error) {
+		newRoles, err := mapper.MapErr(out.Roles, func(role *types.Role) (*RoleDetails, error) {
 			details := RoleDetails{
 				Role: role,
 			}
@@ -226,12 +228,10 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 		}
 
 		roles = append(roles, newRoles...)
-		waitTime += wait
 	}
 
 	span.SetAttributes(
 		attribute.Int("om.aws.numRoles", len(roles)),
-		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
 	)
 
 	return roles, nil

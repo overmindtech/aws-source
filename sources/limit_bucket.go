@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // DefaultRefillDuration How often LimitBuckets are refilled by default
@@ -58,13 +60,26 @@ func (b *LimitBucket) Start(ctx context.Context) {
 	}(ctx, b)
 }
 
-// Waits for a token and returns the duration waited
-func (b *LimitBucket) TimeWait() time.Duration {
+// Waits for a token. Passing a context allows allows this to add a span event
+// if there is a long wait, and also allows this to be cancelled
+func (b *LimitBucket) Wait(ctx context.Context) {
 	start := time.Now()
 
-	<-b.C
+	select {
+	case <-ctx.Done():
+		return
+	case <-b.C:
+		waitTime := time.Since(start)
 
-	return time.Since(start)
+		if waitTime > 300*time.Millisecond {
+			span := trace.SpanFromContext(ctx)
+			span.AddEvent("waited for late limit", trace.WithAttributes(
+				attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
+			))
+		}
+
+		return
+	}
 }
 
 // refill refills the bucket the specified amount
