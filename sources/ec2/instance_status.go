@@ -103,7 +103,7 @@ func NewInstanceStatusSource(config aws.Config, accountID string, limit *sources
 		AccountID: accountID,
 		ItemType:  "ec2-instance-status",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput) (*ec2.DescribeInstanceStatusOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInstanceStatus(ctx, input)
 		},
 		InputMapperGet:  instanceStatusInputMapperGet,

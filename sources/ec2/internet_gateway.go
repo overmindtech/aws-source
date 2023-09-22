@@ -87,7 +87,7 @@ func NewInternetGatewaySource(config aws.Config, accountID string, limit *source
 		AccountID: accountID,
 		ItemType:  "ec2-internet-gateway",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInternetGatewaysInput) (*ec2.DescribeInternetGatewaysOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInternetGateways(ctx, input)
 		},
 		InputMapperGet:  internetGatewayInputMapperGet,

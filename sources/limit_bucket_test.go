@@ -58,7 +58,7 @@ func TestWaiting(t *testing.T) {
 	// Execute 100 actions
 	for i := 0; i < 100; i++ {
 		// Get permission
-		<-b.C
+		<-b.c
 	}
 
 	timeTaken := time.Since(start)

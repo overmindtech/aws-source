@@ -94,7 +94,7 @@ func NewSnapshotSource(config aws.Config, accountID string, limit *sources.Limit
 		AccountID: accountID,
 		ItemType:  "ec2-snapshot",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSnapshots(ctx, input)
 		},
 		InputMapperGet:  snapshotInputMapperGet,

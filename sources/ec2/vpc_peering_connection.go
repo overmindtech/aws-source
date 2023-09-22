@@ -155,7 +155,7 @@ func NewVpcPeeringConnectionSource(config aws.Config, accountID string, limit *s
 		AccountID: accountID,
 		ItemType:  "ec2-vpc-peering-connection",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVpcPeeringConnections(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeVpcPeeringConnectionsInput, error) {

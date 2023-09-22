@@ -104,7 +104,7 @@ func NewNetworkAclSource(config aws.Config, accountID string, limit *sources.Lim
 		AccountID: accountID,
 		ItemType:  "ec2-network-acl",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkAclsInput) (*ec2.DescribeNetworkAclsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNetworkAcls(ctx, input)
 		},
 		InputMapperGet:  networkAclInputMapperGet,

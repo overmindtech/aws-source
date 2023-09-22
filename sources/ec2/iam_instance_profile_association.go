@@ -86,7 +86,7 @@ func NewIamInstanceProfileAssociationSource(config aws.Config, accountID string,
 		AccountID: accountID,
 		ItemType:  "ec2-iam-instance-profile-association",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeIamInstanceProfileAssociationsInput) (*ec2.DescribeIamInstanceProfileAssociationsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeIamInstanceProfileAssociations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeIamInstanceProfileAssociationsInput, error) {

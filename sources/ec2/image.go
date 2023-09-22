@@ -77,7 +77,7 @@ func NewImageSource(config aws.Config, accountID string, limit *sources.LimitBuc
 		AccountID: accountID,
 		ItemType:  "ec2-image",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeImages(ctx, input)
 		},
 		InputMapperGet:  imageInputMapperGet,

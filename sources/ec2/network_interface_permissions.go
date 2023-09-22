@@ -82,7 +82,7 @@ func NewNetworkInterfacePermissionSource(config aws.Config, accountID string, li
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface-permission",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
 		InputMapperGet:  networkInterfacePermissionInputMapperGet,

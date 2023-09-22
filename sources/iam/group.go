@@ -74,11 +74,11 @@ func NewGroupSource(config aws.Config, accountID string, region string, limit *s
 		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return groupGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.Group, error) {
-			<-limit.C
+			limit.Wait(ctx) // Wait for rate limiting
 			return groupListFunc(ctx, client, scope)
 		},
 		ItemMapper: groupItemMapper,

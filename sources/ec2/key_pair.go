@@ -66,7 +66,7 @@ func NewKeyPairSource(config aws.Config, accountID string, limit *sources.LimitB
 		AccountID: accountID,
 		ItemType:  "ec2-key-pair",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeKeyPairs(ctx, input)
 		},
 		InputMapperGet:  keyPairInputMapperGet,

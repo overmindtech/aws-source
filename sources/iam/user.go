@@ -18,7 +18,7 @@ type UserDetails struct {
 }
 
 func userGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*UserDetails, error) {
-	<-limit.C
+	limit.Wait(ctx) // Wait for rate limiting
 	out, err := client.GetUser(ctx, &iam.GetUserInput{
 		UserName: &query,
 	})
@@ -68,7 +68,7 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string, limi
 	})
 
 	for paginator.HasMorePages() {
-		<-limit.C
+		limit.Wait(ctx) // Wait for rate limiting
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -96,7 +96,7 @@ func getUserTags(ctx context.Context, client IAMClient, userName *string, limit 
 	tags := make([]types.Tag, 0)
 
 	for paginator.HasMorePages() {
-		<-limit.C
+		limit.Wait(ctx) // Wait for rate limiting
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -117,7 +117,7 @@ func userListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 	paginator := iam.NewListUsersPaginator(client, &iam.ListUsersInput{})
 
 	for paginator.HasMorePages() {
-		<-limit.C
+		limit.Wait(ctx) // Wait for rate limiting
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {

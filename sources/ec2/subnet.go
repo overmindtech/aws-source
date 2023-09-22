@@ -102,7 +102,7 @@ func NewSubnetSource(config aws.Config, accountID string, limit *sources.LimitBu
 		AccountID: accountID,
 		ItemType:  "ec2-subnet",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSubnets(ctx, input)
 		},
 		InputMapperGet:  subnetInputMapperGet,

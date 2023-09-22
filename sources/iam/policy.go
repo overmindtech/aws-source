@@ -37,7 +37,8 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 		},
 	}
 
-	<-limit.C
+	limit.Wait(ctx)
+
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
 		PolicyArn: sources.PtrString(a.String()),
 	})
@@ -83,11 +84,10 @@ func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limi
 		// Only create new spans on trace level logging
 		ctx, span = tracer.Start(ctx, "addTags")
 		defer span.End()
-	} else {
-		span = trace.SpanFromContext(ctx)
 	}
 
-	wait := limit.TimeWait()
+	limit.Wait(ctx)
+
 	out, err := client.ListPolicyTags(ctx, &iam.ListPolicyTagsInput{
 		PolicyArn: details.Policy.Arn,
 	})
@@ -95,10 +95,6 @@ func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limi
 	if err != nil {
 		return err
 	}
-
-	span.SetAttributes(
-		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", wait.Milliseconds()),
-	)
 
 	details.Policy.Tags = out.Tags
 
@@ -111,8 +107,6 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 		// Only create new spans on trace level logging
 		ctx, span = tracer.Start(ctx, "addPolicyEntities")
 		defer span.End()
-	} else {
-		span = trace.SpanFromContext(ctx)
 	}
 
 	if details == nil {
@@ -127,10 +121,9 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 		PolicyArn: details.Policy.Arn,
 	})
 
-	var waitTime time.Duration
-
 	for paginator.HasMorePages() {
-		waitTime += limit.TimeWait()
+		limit.Wait(ctx)
+
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -141,10 +134,6 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 		details.PolicyRoles = append(details.PolicyRoles, out.PolicyRoles...)
 		details.PolicyUsers = append(details.PolicyUsers, out.PolicyUsers...)
 	}
-
-	span.SetAttributes(
-		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
-	)
 
 	return nil
 }
@@ -177,10 +166,9 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 		Scope:        iamScope,
 	})
 
-	var waitTime time.Duration
-
 	for paginator.HasMorePages() {
-		waitTime += limit.TimeWait()
+		limit.Wait(ctx)
+
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -192,7 +180,6 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 
 	span.SetAttributes(
 		attribute.Int("om.aws.numPolicies", len(policies)),
-		attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
 	)
 
 	policyDetails, err := iter.MapErr[types.Policy, *PolicyDetails](policies, func(p *types.Policy) (*PolicyDetails, error) {

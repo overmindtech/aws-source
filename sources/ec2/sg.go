@@ -90,7 +90,7 @@ func NewSecurityGroupSource(config aws.Config, accountID string, limit *sources.
 		AccountID: accountID,
 		ItemType:  "ec2-security-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSecurityGroups(ctx, input)
 		},
 		InputMapperGet:  securityGroupInputMapperGet,

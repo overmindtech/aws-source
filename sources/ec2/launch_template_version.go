@@ -343,7 +343,7 @@ func NewLaunchTemplateVersionSource(config aws.Config, accountID string, limit *
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template-version",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
-			<-limit.C // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
 		InputMapperGet:  launchTemplateVersionInputMapperGet,
