@@ -26,8 +26,8 @@ require (
 	github.com/aws/smithy-go v1.14.2
 	github.com/getsentry/sentry-go v0.23.0
 	github.com/iancoleman/strcase v0.2.0
-	github.com/nats-io/jwt/v2 v2.5.0
-	github.com/nats-io/nkeys v0.4.4
+	github.com/nats-io/jwt/v2 v2.5.2
+	github.com/nats-io/nkeys v0.4.5
 	github.com/overmindtech/discovery v0.24.0
 	github.com/overmindtech/sdp-go v0.49.0
 	github.com/sirupsen/logrus v1.9.3
