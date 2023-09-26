@@ -354,7 +354,7 @@ func (t TestCloudFrontClient) ListDistributions(ctx context.Context, params *clo
 }
 
 func TestDistributionGetFunc(t *testing.T) {
-	scope := "123456789012.us-east-1"
+	scope := "123456789012"
 	item, err := distributionGetFunc(context.Background(), TestCloudFrontClient{}, scope, &cloudfront.GetDistributionInput{})
 
 	if err != nil {
