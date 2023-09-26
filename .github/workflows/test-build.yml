@@ -48,7 +48,7 @@ jobs:
         run: go vet
 
       - name: Run tests
-        run: go test ./...
+        run: go test -race -v ./...
         env:
           # Environment variables so that AWS resources can be created
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

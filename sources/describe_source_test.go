@@ -3,13 +3,21 @@ package sources
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"regexp"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/sdp-go"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/structpb"
 )
+
+func TestMain(m *testing.M) {
+	logrus.SetLevel(logrus.TraceLevel)
+	os.Exit(m.Run())
+}
 
 func TestType(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
@@ -81,7 +89,7 @@ func TestGet(t *testing.T) {
 			},
 		}
 
-		item, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		item, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err != nil {
 			t.Error(err)
@@ -128,7 +136,7 @@ func TestGet(t *testing.T) {
 			},
 		}
 
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error")
@@ -155,7 +163,7 @@ func TestGet(t *testing.T) {
 			},
 		}
 
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error")
@@ -185,7 +193,7 @@ func TestSearchARN(t *testing.T) {
 		},
 	}
 
-	items, err := s.Search(context.Background(), "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id")
+	items, err := s.Search(context.Background(), "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id", false)
 
 	if err != nil {
 		t.Error(err)
@@ -231,7 +239,7 @@ func TestSearchCustom(t *testing.T) {
 		},
 	}
 
-	items, err := s.Search(context.Background(), "account-id.region", "foo")
+	items, err := s.Search(context.Background(), "account-id.region", "foo", false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -263,7 +271,7 @@ func TestNoInputMapper(t *testing.T) {
 	}
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -271,7 +279,7 @@ func TestNoInputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -297,7 +305,7 @@ func TestNoOutputMapper(t *testing.T) {
 	}
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -305,7 +313,7 @@ func TestNoOutputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -333,7 +341,7 @@ func TestNoDescribeFunc(t *testing.T) {
 	}
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -341,7 +349,7 @@ func TestNoDescribeFunc(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -374,7 +382,7 @@ func TestFailingInputMapper(t *testing.T) {
 	fooBar := regexp.MustCompile("foobar")
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -386,7 +394,7 @@ func TestFailingInputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -421,7 +429,7 @@ func TestFailingOutputMapper(t *testing.T) {
 	fooBar := regexp.MustCompile("foobar")
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -433,7 +441,7 @@ func TestFailingOutputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -470,7 +478,7 @@ func TestFailingDescribeFunc(t *testing.T) {
 	fooBar := regexp.MustCompile("foobar")
 
 	t.Run("Get", func(t *testing.T) {
-		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar")
+		_, err := s.Get(context.Background(), "foo.eu-west-2", "bar", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -482,7 +490,7 @@ func TestFailingDescribeFunc(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2")
+		_, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err == nil {
 			t.Error("expected error but got nil")
@@ -495,17 +503,24 @@ func TestFailingDescribeFunc(t *testing.T) {
 }
 
 type TestPaginator struct {
+	DataFunc func() string
+
+	MaxPages int
+
 	page int
 }
 
 func (t *TestPaginator) HasMorePages() bool {
-	return t.page < 3
+	if t.MaxPages == 0 {
+		t.MaxPages = 3
+	}
+	return t.page < t.MaxPages
 }
 
 func (t *TestPaginator) NextPage(context.Context, ...func(struct{})) (string, error) {
+	data := t.DataFunc()
 	t.page++
-
-	return "", nil
+	return data, nil
 }
 
 func TestPaginated(t *testing.T) {
@@ -527,7 +542,9 @@ func TestPaginated(t *testing.T) {
 			}, nil
 		},
 		PaginatorBuilder: func(client struct{}, params string) Paginator[string, struct{}] {
-			return &TestPaginator{}
+			return &TestPaginator{DataFunc: func() string {
+				return "foo"
+			}}
 		},
 		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
 			return "", nil
@@ -544,8 +561,8 @@ func TestPaginated(t *testing.T) {
 		}
 	})
 
-	t.Run("paginsting a List query", func(t *testing.T) {
-		items, err := s.List(context.Background(), "foo.eu-west-2")
+	t.Run("paginating a List query", func(t *testing.T) {
+		items, err := s.List(context.Background(), "foo.eu-west-2", false)
 
 		if err != nil {
 			t.Error(err)
@@ -553,6 +570,173 @@ func TestPaginated(t *testing.T) {
 
 		if len(items) != 3 {
 			t.Errorf("expected 3 items, got %v", len(items))
+		}
+	})
+}
+
+func TestDescribeOnlySourceCaching(t *testing.T) {
+	ctx := context.Background()
+	generation := 0
+	s := DescribeOnlySource[string, string, struct{}, struct{}]{
+		ItemType:          "test-type",
+		MaxResultsPerPage: 1,
+		Config: aws.Config{
+			Region: "eu-west-2",
+		},
+		AccountID: "foo",
+		InputMapperGet: func(scope, query string) (string, error) {
+			return "input", nil
+		},
+		InputMapperList: func(scope string) (string, error) {
+			return "input", nil
+		},
+		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+			return []*sdp.Item{
+				{
+					Scope:           "foo.eu-west-2",
+					Type:            "test-type",
+					UniqueAttribute: "name",
+					Attributes: &sdp.ItemAttributes{
+						AttrStruct: &structpb.Struct{
+							Fields: map[string]*structpb.Value{
+								"name":       structpb.NewStringValue("test-item"),
+								"generation": structpb.NewStringValue(output),
+							},
+						},
+					},
+				},
+			}, nil
+		},
+		PaginatorBuilder: func(client struct{}, params string) Paginator[string, struct{}] {
+			return &TestPaginator{
+				DataFunc: func() string {
+					generation += 1
+					return fmt.Sprintf("%v", generation)
+				},
+				MaxPages: 1,
+			}
+		},
+		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
+			generation += 1
+			return fmt.Sprintf("%v", generation), nil
+		},
+	}
+
+	t.Run("get", func(t *testing.T) {
+		// get
+		first, err := s.Get(ctx, "foo.eu-west-2", "test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// get again
+		withCache, err := s.Get(ctx, "foo.eu-west-2", "test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// get ignore cache
+		withoutCache, err := s.Get(ctx, "foo.eu-west-2", "test-item", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		}
+	})
+
+	t.Run("list", func(t *testing.T) {
+		// list
+		first, err := s.List(ctx, "foo.eu-west-2", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// list again
+		withCache, err := s.List(ctx, "foo.eu-west-2", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// list ignore cache
+		withoutCache, err := s.List(ctx, "foo.eu-west-2", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		}
+	})
+
+	t.Run("search", func(t *testing.T) {
+		// search
+		first, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// search again
+		withCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// search ignore cache
+		withoutCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
 		}
 	})
 }

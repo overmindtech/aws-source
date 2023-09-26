@@ -3,9 +3,11 @@ package sources
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/overmindtech/sdp-go"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestGetListSourceType(t *testing.T) {
@@ -56,7 +58,7 @@ func TestGetListSourceGet(t *testing.T) {
 			},
 		}
 
-		if _, err := s.Get(context.Background(), "12345.eu-west-2", ""); err != nil {
+		if _, err := s.Get(context.Background(), "12345.eu-west-2", "", false); err != nil {
 			t.Error(err)
 		}
 	})
@@ -77,7 +79,7 @@ func TestGetListSourceGet(t *testing.T) {
 			},
 		}
 
-		if _, err := s.Get(context.Background(), "12345.eu-west-2", ""); err == nil {
+		if _, err := s.Get(context.Background(), "12345.eu-west-2", "", false); err == nil {
 			t.Error("expected error got nil")
 		}
 	})
@@ -98,7 +100,7 @@ func TestGetListSourceGet(t *testing.T) {
 			},
 		}
 
-		if _, err := s.Get(context.Background(), "12345.eu-west-2", ""); err == nil {
+		if _, err := s.Get(context.Background(), "12345.eu-west-2", "", false); err == nil {
 			t.Error("expected error got nil")
 		}
 	})
@@ -121,7 +123,7 @@ func TestGetListSourceList(t *testing.T) {
 			},
 		}
 
-		if items, err := s.List(context.Background(), "12345.eu-west-2"); err != nil {
+		if items, err := s.List(context.Background(), "12345.eu-west-2", false); err != nil {
 			t.Error(err)
 		} else {
 			if len(items) != 2 {
@@ -146,7 +148,7 @@ func TestGetListSourceList(t *testing.T) {
 			},
 		}
 
-		if _, err := s.List(context.Background(), "12345.eu-west-2"); err == nil {
+		if _, err := s.List(context.Background(), "12345.eu-west-2", false); err == nil {
 			t.Error("expected error got nil")
 		}
 	})
@@ -167,7 +169,7 @@ func TestGetListSourceList(t *testing.T) {
 			},
 		}
 
-		if items, err := s.List(context.Background(), "12345.eu-west-2"); err != nil {
+		if items, err := s.List(context.Background(), "12345.eu-west-2", false); err != nil {
 			t.Error(err)
 		} else {
 			if len(items) != 0 {
@@ -195,7 +197,7 @@ func TestGetListSourceSearch(t *testing.T) {
 		}
 
 		t.Run("bad ARN", func(t *testing.T) {
-			_, err := s.Search(context.Background(), "12345.eu-west-2", "query")
+			_, err := s.Search(context.Background(), "12345.eu-west-2", "query", false)
 
 			if err == nil {
 				t.Error("expected error because the ARN was bad")
@@ -203,7 +205,7 @@ func TestGetListSourceSearch(t *testing.T) {
 		})
 
 		t.Run("good ARN but bad scope", func(t *testing.T) {
-			_, err := s.Search(context.Background(), "12345.eu-west-2", "arn:aws:service:region:account:type/id")
+			_, err := s.Search(context.Background(), "12345.eu-west-2", "arn:aws:service:region:account:type/id", false)
 
 			if err == nil {
 				t.Error("expected error because the ARN had a bad scope")
@@ -211,11 +213,162 @@ func TestGetListSourceSearch(t *testing.T) {
 		})
 
 		t.Run("good ARN", func(t *testing.T) {
-			_, err := s.Search(context.Background(), "12345.eu-west-2", "arn:aws:service:eu-west-2:12345:type/id")
+			_, err := s.Search(context.Background(), "12345.eu-west-2", "arn:aws:service:eu-west-2:12345:type/id", false)
 
 			if err != nil {
 				t.Error(err)
 			}
 		})
+	})
+}
+
+func TestGetListSourceCaching(t *testing.T) {
+	ctx := context.Background()
+	generation := 0
+	s := GetListSource[string, struct{}, struct{}]{
+		ItemType:  "test-type",
+		Region:    "eu-west-2",
+		AccountID: "foo",
+		GetFunc: func(ctx context.Context, client struct{}, scope, query string) (string, error) {
+			generation += 1
+			return fmt.Sprintf("%v", generation), nil
+		},
+		ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
+			generation += 1
+			return []string{fmt.Sprintf("%v", generation)}, nil
+		},
+		ItemMapper: func(scope string, output string) (*sdp.Item, error) {
+			return &sdp.Item{
+				Scope:           "foo.eu-west-2",
+				Type:            "test-type",
+				UniqueAttribute: "name",
+				Attributes: &sdp.ItemAttributes{
+					AttrStruct: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"name":       structpb.NewStringValue("test-item"),
+							"generation": structpb.NewStringValue(output),
+						},
+					},
+				},
+			}, nil
+		},
+	}
+
+	t.Run("get", func(t *testing.T) {
+		// get
+		first, err := s.Get(ctx, "foo.eu-west-2", "test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// get again
+		withCache, err := s.Get(ctx, "foo.eu-west-2", "test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// get ignore cache
+		withoutCache, err := s.Get(ctx, "foo.eu-west-2", "test-item", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache.Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		}
+	})
+
+	t.Run("list", func(t *testing.T) {
+		// list
+		first, err := s.List(ctx, "foo.eu-west-2", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// list again
+		withCache, err := s.List(ctx, "foo.eu-west-2", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// list ignore cache
+		withoutCache, err := s.List(ctx, "foo.eu-west-2", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		}
+	})
+
+	t.Run("search", func(t *testing.T) {
+		// search
+		first, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		firstGen, err := first[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// search again
+		withCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if firstGen != withCacheGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
+		}
+
+		// search ignore cache
+		withoutCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true)
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if withoutCacheGen == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		}
 	})
 }

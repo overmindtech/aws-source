@@ -4,20 +4,25 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/overmindtech/sdp-go"
+	"github.com/overmindtech/sdpcache"
 )
 
 // GetListSource A source for AWS APIs where the Get and List functions both
 // return the full item, such as many of the IAM APIs
 type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
-	ItemType               string        // The type of items that will be returned
-	Client                 ClientStruct  // The AWS API client
-	AccountID              string        // The AWS account ID
-	Region                 string        // The AWS region this is related to
-	SupportGlobalResources bool          // If true, this will also support resources in the "aws" scope which are global
-	CacheDuration          time.Duration // How long to cache items for
+	ItemType               string       // The type of items that will be returned
+	Client                 ClientStruct // The AWS API client
+	AccountID              string       // The AWS account ID
+	Region                 string       // The AWS region this is related to
+	SupportGlobalResources bool         // If true, this will also support resources in the "aws" scope which are global
+
+	CacheDuration time.Duration   // How long to cache items for
+	cache         *sdpcache.Cache // The sdpcache of this source
+	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 
 	// Disables List(), meaning all calls will return empty results. This does
 	// not affect Search()
@@ -36,6 +41,20 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 
 	// ItemMapper Maps an AWS representation of an item to the SDP version
 	ItemMapper func(scope string, awsItem AWSItem) (*sdp.Item, error)
+}
+
+func (s *GetListSource[AWSItem, ClientStruct, Options]) ensureCache() {
+	s.cacheInitMu.Lock()
+	defer s.cacheInitMu.Unlock()
+
+	if s.cache == nil {
+		s.cache = sdpcache.NewCache()
+	}
+}
+
+func (s *GetListSource[AWSItem, ClientStruct, Options]) Cache() *sdpcache.Cache {
+	s.ensureCache()
+	return s.cache
 }
 
 // Validate Checks that the source has been set up correctly
@@ -105,7 +124,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) hasScope(scope string) b
 	return false
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -113,24 +132,39 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 		}
 	}
 
-	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_GET, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		if len(cachedItems) == 0 {
+			return nil, nil
+		} else {
+			return cachedItems[0], nil
+		}
+	}
 
+	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
 	if err != nil {
+		s.cache.StoreError(err, s.CacheDuration, ck)
 		return nil, WrapAWSError(err)
 	}
 
 	item, err := s.ItemMapper(scope, awsItem)
-
 	if err != nil {
+		s.cache.StoreError(err, s.CacheDuration, ck)
 		return nil, WrapAWSError(err)
 	}
+
+	s.cache.StoreItem(item, s.CacheDuration, ck)
 
 	return item, nil
 }
 
 // List Lists all available items. This is done by running the ListFunc, then
 // passing these results to GetFunc in order to get the details
-func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -142,31 +176,37 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 		return []*sdp.Item{}, nil
 	}
 
-	awsItems, err := s.ListFunc(ctx, s.Client, scope)
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_LIST, scope, s.ItemType, "", ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
+	}
 
+	awsItems, err := s.ListFunc(ctx, s.Client, scope)
 	if err != nil {
 		return nil, WrapAWSError(err)
 	}
 
 	items := make([]*sdp.Item, 0)
-
-	var item *sdp.Item
-
 	for _, awsItem := range awsItems {
-		item, err = s.ItemMapper(scope, awsItem)
+		item, err := s.ItemMapper(scope, awsItem)
 
 		if err != nil {
 			continue
 		}
 
 		items = append(items, item)
+		s.cache.StoreItem(item, s.CacheDuration, ck)
 	}
 
 	return items, nil
 }
 
 // Search Searches for AWS resources by ARN
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -175,13 +215,13 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Conte
 	}
 
 	if s.SearchFunc != nil {
-		return s.SearchCustom(ctx, scope, query)
+		return s.SearchCustom(ctx, scope, query, ignoreCache)
 	} else {
-		return s.SearchARN(ctx, scope, query)
+		return s.SearchARN(ctx, scope, query, ignoreCache)
 	}
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -197,7 +237,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID())
+	item, err := s.Get(ctx, scope, a.ResourceID(), ignoreCache)
 
 	if err != nil {
 		return nil, WrapAWSError(err)
@@ -206,7 +246,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 	return []*sdp.Item{item}, nil
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	awsItems, err := s.SearchFunc(ctx, s.Client, scope, query)
 
 	if err != nil {

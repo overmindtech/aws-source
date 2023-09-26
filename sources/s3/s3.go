@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -11,7 +12,10 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
+	"github.com/overmindtech/sdpcache"
 )
+
+const CacheDuration = 10 * time.Minute
 
 // NewS3Source Creates a new S3 source
 func NewS3Source(config aws.Config, accountID string) *S3Source {
@@ -62,6 +66,24 @@ type S3Source struct {
 	client        *s3.Client
 	clientCreated bool
 	clientMutex   sync.Mutex
+
+	CacheDuration time.Duration   // How long to cache items for
+	cache         *sdpcache.Cache // The sdpcache of this source
+	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
+}
+
+func (s *S3Source) ensureCache() {
+	s.cacheInitMu.Lock()
+	defer s.cacheInitMu.Unlock()
+
+	if s.cache == nil {
+		s.cache = sdpcache.NewCache()
+	}
+}
+
+func (s *S3Source) Cache() *sdpcache.Cache {
+	s.ensureCache()
+	return s.cache
 }
 
 func (s *S3Source) Client() *s3.Client {
@@ -155,7 +177,7 @@ type Bucket struct {
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *S3Source) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *S3Source) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -164,10 +186,23 @@ func (s *S3Source) Get(ctx context.Context, scope string, query string) (*sdp.It
 		}
 	}
 
-	return getImpl(ctx, s.Client(), scope, query)
+	s.ensureCache()
+	return getImpl(ctx, s.cache, s.Client(), scope, query, ignoreCache)
 }
 
-func getImpl(ctx context.Context, client S3Client, scope string, query string) (*sdp.Item, error) {
+func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
+	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-source", sdp.QueryMethod_GET, scope, "s3-bucket", query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		if len(cachedItems) > 0 {
+			return cachedItems[0], nil
+		} else {
+			return nil, nil
+		}
+	}
+
 	var location *s3.GetBucketLocationOutput
 	var wg sync.WaitGroup
 	var err error
@@ -179,7 +214,9 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	})
 
 	if err != nil {
-		return nil, sources.WrapAWSError(err)
+		err = sources.WrapAWSError(err)
+		cache.StoreError(err, CacheDuration, ck)
+		return nil, err
 	}
 
 	bucket := Bucket{
@@ -344,11 +381,13 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 	attributes, err := sources.ToAttributesCase(bucket)
 
 	if err != nil {
-		return nil, &sdp.QueryError{
+		err = &sdp.QueryError{
 			ErrorType:   sdp.QueryError_OTHER,
 			ErrorString: err.Error(),
 			Scope:       scope,
 		}
+		cache.StoreError(err, CacheDuration, ck)
+		return nil, err
 	}
 
 	item := sdp.Item{
@@ -544,11 +583,13 @@ func getImpl(ctx context.Context, client S3Client, scope string, query string) (
 		}
 	}
 
+	cache.StoreItem(&item, CacheDuration, ck)
+
 	return &item, nil
 }
 
 // List Lists all items in a given scope
-func (s *S3Source) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *S3Source) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -557,20 +598,35 @@ func (s *S3Source) List(ctx context.Context, scope string) ([]*sdp.Item, error) 
 		}
 	}
 
-	return listImpl(ctx, s.Client(), scope)
+	s.ensureCache()
+	return listImpl(ctx, s.cache, s.Client(), scope, ignoreCache)
 }
 
-func listImpl(ctx context.Context, client S3Client, scope string) ([]*sdp.Item, error) {
+func listImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-source", sdp.QueryMethod_LIST, scope, "s3-bucket", "", ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		if len(cachedItems) > 0 {
+			return cachedItems, nil
+		} else {
+			return nil, nil
+		}
+	}
+
 	items := make([]*sdp.Item, 0)
 
 	buckets, err := client.ListBuckets(ctx, &s3.ListBucketsInput{})
 
 	if err != nil {
-		return nil, sdp.NewQueryError(err)
+		err = sdp.NewQueryError(err)
+		cache.StoreError(err, CacheDuration, ck)
+		return nil, err
 	}
 
 	for _, bucket := range buckets.Buckets {
-		item, err := getImpl(ctx, client, scope, *bucket.Name)
+		item, err := getImpl(ctx, cache, client, scope, *bucket.Name, ignoreCache)
 
 		if err != nil {
 			continue
@@ -579,11 +635,14 @@ func listImpl(ctx context.Context, client S3Client, scope string) ([]*sdp.Item, 
 		items = append(items, item)
 	}
 
+	for _, item := range items {
+		cache.StoreItem(item, CacheDuration, ck)
+	}
 	return items, nil
 }
 
 // Search Searches for an S3 bucket by ARN rather than name
-func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *S3Source) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -592,10 +651,11 @@ func (s *S3Source) Search(ctx context.Context, scope string, query string) ([]*s
 		}
 	}
 
-	return searchImpl(ctx, s.Client(), scope, query)
+	s.ensureCache()
+	return searchImpl(ctx, s.cache, s.Client(), scope, query, ignoreCache)
 }
 
-func searchImpl(ctx context.Context, client S3Client, scope string, query string) ([]*sdp.Item, error) {
+func searchImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := sources.ParseARN(query)
 
@@ -612,10 +672,9 @@ func searchImpl(ctx context.Context, client S3Client, scope string, query string
 	}
 
 	// If the ARN was parsed we can just ask Get for the item
-	item, err := getImpl(ctx, client, scope, a.ResourceID())
-
+	item, err := getImpl(ctx, cache, client, scope, a.ResourceID(), ignoreCache)
 	if err != nil {
-		return nil, sdp.NewQueryError(err)
+		return nil, err
 	}
 
 	return []*sdp.Item{item}, nil

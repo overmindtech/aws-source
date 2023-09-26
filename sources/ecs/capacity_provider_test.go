@@ -127,7 +127,7 @@ func TestCapacityProviderSource(t *testing.T) {
 	// Override the client
 	src.Client = &TestClient{}
 
-	items, err := src.List(context.Background(), "")
+	items, err := src.List(context.Background(), "", false)
 
 	if err != nil {
 		t.Error(err)
