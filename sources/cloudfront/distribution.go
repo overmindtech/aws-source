@@ -34,8 +34,6 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		Scope:           scope,
 	}
 
-	accountID, _, err := sources.ParseScope(scope)
-
 	if err != nil {
 		return nil, err
 	}
@@ -356,7 +354,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 									Type:   "s3-bucket",
 									Method: sdp.QueryMethod_GET,
 									Query:  matches[1],
-									Scope:  sources.FormatScope(accountID, ""), // S3 buckets are global
+									Scope:  sources.FormatScope(scope, ""), // S3 buckets are global
 								},
 								BlastPropagation: &sdp.BlastPropagation{
 									// Changing the bucket could affect the distribution
