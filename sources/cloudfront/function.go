@@ -41,7 +41,7 @@ func NewFunctionSource(config aws.Config, accountID string) *sources.GetListSour
 		ItemType:  "cloudfront-function",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.FunctionSummary, error) {
 			out, err := client.DescribeFunction(ctx, &cloudfront.DescribeFunctionInput{
 				Name: &query,

@@ -661,7 +661,7 @@ func NewDistributionSource(config aws.Config, accountID string) *sources.AlwaysG
 		ItemType:  "cloudfront-distribution",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		ListInput: &cloudfront.ListDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListDistributionsInput) sources.Paginator[*cloudfront.ListDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListDistributionsPaginator(client, input)

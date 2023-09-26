@@ -150,7 +150,7 @@ func NewStreamingDistributionSource(config aws.Config, accountID string) *source
 		ItemType:  "cloudfront-streaming-distribution",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		ListInput: &cloudfront.ListStreamingDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListStreamingDistributionsInput) sources.Paginator[*cloudfront.ListStreamingDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListStreamingDistributionsPaginator(client, input)

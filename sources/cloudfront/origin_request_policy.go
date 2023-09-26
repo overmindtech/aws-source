@@ -41,7 +41,7 @@ func NewOriginRequestPolicySource(config aws.Config, accountID string) *sources.
 		ItemType:  "cloudfront-origin-request-policy",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginRequestPolicy, error) {
 			out, err := client.GetOriginRequestPolicy(ctx, &cloudfront.GetOriginRequestPolicyInput{
 				Id: &query,
