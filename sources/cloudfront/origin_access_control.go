@@ -69,7 +69,7 @@ func NewOriginAccessControlSource(config aws.Config, accountID string) *sources.
 		ItemType:  "cloudfront-origin-access-control",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginAccessControl, error) {
 			out, err := client.GetOriginAccessControl(ctx, &cloudfront.GetOriginAccessControlInput{
 				Id: &query,

@@ -86,7 +86,7 @@ func NewRealtimeLogConfigsSource(config aws.Config, accountID string) *sources.G
 		ItemType:  "cloudfront-realtime-log-config",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.RealtimeLogConfig, error) {
 			out, err := client.GetRealtimeLogConfig(ctx, &cloudfront.GetRealtimeLogConfigInput{
 				Name: &query,

@@ -51,7 +51,7 @@ func NewCachePolicySource(config aws.Config, accountID string) *sources.GetListS
 		ItemType:               "cloudfront-cache-policy",
 		Client:                 cloudfront.NewFromConfig(config),
 		AccountID:              accountID,
-		Region:                 "global",
+		Region:                 "",   // Cloudfront resources aren't tied to a region
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client CloudFrontClient, scope, query string) (*types.CachePolicy, error) {
 			out, err := client.GetCachePolicy(ctx, &cloudfront.GetCachePolicyInput{

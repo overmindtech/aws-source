@@ -61,7 +61,7 @@ func NewContinuousDeploymentPolicySource(config aws.Config, accountID string) *s
 		ItemType:               "cloudfront-continuous-deployment-policy",
 		Client:                 cloudfront.NewFromConfig(config),
 		AccountID:              accountID,
-		Region:                 "global",
+		Region:                 "",   // Cloudfront resources aren't tied to a region
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ContinuousDeploymentPolicy, error) {
 			out, err := client.GetContinuousDeploymentPolicy(ctx, &cloudfront.GetContinuousDeploymentPolicyInput{

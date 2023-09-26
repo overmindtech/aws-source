@@ -41,7 +41,7 @@ func NewKeyGroupSource(config aws.Config, accountID string) *sources.GetListSour
 		ItemType:  "cloudfront-key-group",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.KeyGroup, error) {
 			out, err := client.GetKeyGroup(ctx, &cloudfront.GetKeyGroupInput{
 				Id: &query,

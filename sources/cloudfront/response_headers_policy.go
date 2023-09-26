@@ -41,7 +41,7 @@ func NewResponseHeadersPolicySource(config aws.Config, accountID string) *source
 		ItemType:  "cloudfront-response-headers-policy",
 		Client:    cloudfront.NewFromConfig(config),
 		AccountID: accountID,
-		Region:    "global",
+		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ResponseHeadersPolicy, error) {
 			out, err := client.GetResponseHeadersPolicy(ctx, &cloudfront.GetResponseHeadersPolicyInput{
 				Id: &query,
