@@ -214,7 +214,7 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 				Role: role,
 			}
 
-			err = enrichRole(ctx, client, &details, limit)
+			err := enrichRole(ctx, client, &details, limit)
 
 			if err != nil {
 				return nil, err
