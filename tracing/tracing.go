@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/MrAlias/otel-schema-utils/schema"
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,7 +17,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 )
 
 // for stdout debugging of traces
@@ -38,23 +39,42 @@ import (
 
 func tracingResource() *resource.Resource {
 	// Identify your application using resource detection
-	detectors := []resource.Detector{}
+	resources := []*resource.Resource{}
 
 	// the EC2 detector takes ~10s to time out outside EC2
 	// disable it if we're running from a git checkout
 	_, err := os.Stat(".git")
 	if os.IsNotExist(err) {
-		detectors = append(detectors, ec2.NewResourceDetector())
+		ec2Res, err := resource.New(context.Background(), resource.WithDetectors(ec2.NewResourceDetector()))
+		if err != nil {
+			log.WithError(err).Error("error initialising EC2 resource detector")
+			return nil
+		}
+		resources = append(resources, ec2Res)
 	}
 
-	res, err := resource.New(context.Background(),
-		resource.WithDetectors(detectors...),
-		// Keep the default detectors
+	// Needs https://github.com/open-telemetry/opentelemetry-go-contrib/issues/1856 fixed first
+	// // the EKS detector is temperamental and doesn't like running outside of kube
+	// // hence we need to keep it from running when we know there's no kube
+	// if !viper.GetBool("disable-kube") {
+	// 	// Use the AWS resource detector to detect information about the runtime environment
+	// 	detectors = append(detectors, eks.NewResourceDetector())
+	// }
+
+	hostRes, err := resource.New(context.Background(),
 		resource.WithHost(),
 		resource.WithOS(),
 		resource.WithProcess(),
 		resource.WithContainer(),
 		resource.WithTelemetrySDK(),
+	)
+	if err != nil {
+		log.WithError(err).Error("error initialising host resource")
+		return nil
+	}
+	resources = append(resources, hostRes)
+
+	localRes, err := resource.New(context.Background(),
 		resource.WithSchemaURL(semconv.SchemaURL),
 		// Add your own custom attributes to identify your application
 		resource.WithAttributes(
@@ -63,7 +83,16 @@ func tracingResource() *resource.Resource {
 		),
 	)
 	if err != nil {
-		log.Errorf("resource.New: %v", err)
+		log.WithError(err).Error("error initialising local resource")
+		return nil
+	}
+	resources = append(resources, localRes)
+
+	conv := schema.NewConverter(schema.NewLocalClient())
+	res, err := conv.MergeResources(context.Background(), semconv.SchemaURL, resources...)
+
+	if err != nil {
+		log.WithError(err).Error("error merging resource")
 		return nil
 	}
 	return res

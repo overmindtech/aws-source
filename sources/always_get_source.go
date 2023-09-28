@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/overmindtech/sdp-go"
+	"github.com/overmindtech/sdpcache"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -67,6 +69,33 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 	// of inputs to pass to the GetFunc. The input used for the ListFunc is also
 	// included in case it is required
 	ListFuncOutputMapper func(output ListOutput, input ListInput) ([]GetInput, error)
+
+	CacheDuration time.Duration   // How long to cache items for
+	cache         *sdpcache.Cache // The sdpcache of this source
+	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
+}
+
+// DefaultCacheDuration Returns the default cache duration for this source
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
+	if s.CacheDuration == 0 {
+		return 10 * time.Minute
+	}
+
+	return s.CacheDuration
+}
+
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) ensureCache() {
+	s.cacheInitMu.Lock()
+	defer s.cacheInitMu.Unlock()
+
+	if s.cache == nil {
+		s.cache = sdpcache.NewCache()
+	}
+}
+
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Cache() *sdpcache.Cache {
+	s.ensureCache()
+	return s.cache
 }
 
 // Validate Checks that the source has been set up correctly
@@ -106,7 +135,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	}
 }
 
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -121,21 +150,37 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		return nil, WrapAWSError(err)
 	}
 
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_GET, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		if len(cachedItems) > 0 {
+			return cachedItems[0], nil
+		} else {
+			return nil, nil
+		}
+	}
+
 	input := s.GetInputMapper(scope, query)
 
 	item, err = s.GetFunc(ctx, s.Client, scope, input)
 
 	if err != nil {
 		// TODO: How can we handle NOTFOUND?
-		return nil, WrapAWSError(err)
+		qErr := WrapAWSError(err)
+		s.cache.StoreError(qErr, s.CacheDuration, ck)
+		return nil, qErr
 	}
 
+	s.cache.StoreItem(item, s.CacheDuration, ck)
 	return item, nil
 }
 
 // List Lists all available items. This is done by running the ListFunc, then
 // passing these results to GetFunc in order to get the details
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -149,7 +194,27 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		return []*sdp.Item{}, nil
 	}
 
-	return s.listInternal(ctx, scope, s.ListInput)
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_LIST, scope, s.ItemType, "", ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
+	}
+
+	items, err := s.listInternal(ctx, scope, s.ListInput)
+	if err != nil {
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
+	}
+
+	for _, item := range items {
+		s.cache.StoreItem(item, s.CacheDuration, ck)
+	}
+
+	return items, nil
 }
 
 // listInternal Accepts a ListInput and runs the List logic against it
@@ -248,7 +313,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 }
 
 // Search Searches for AWS resources by ARN
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -256,18 +321,37 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		}
 	}
 
+	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
+
+	var items []*sdp.Item
+	var err error
+
 	if s.SearchInputMapper == nil {
-		return s.SearchARN(ctx, scope, query)
+		items, err = s.SearchARN(ctx, scope, query, ignoreCache)
 	} else {
 		// If we should always look for ARNs first, do that
 		if s.AlwaysSearchARNs {
-			if _, err := ParseARN(query); err == nil {
-				return s.SearchARN(ctx, scope, query)
+			if _, err = ParseARN(query); err == nil {
+				items, err = s.SearchARN(ctx, scope, query, ignoreCache)
+			} else {
+				items, err = s.SearchCustom(ctx, scope, query)
 			}
+		} else {
+			items, err = s.SearchCustom(ctx, scope, query)
 		}
-
-		return s.SearchCustom(ctx, scope, query)
 	}
+
+	if err != nil {
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
+	}
+
+	for _, item := range items {
+		s.cache.StoreItem(item, s.CacheDuration, ck)
+	}
+
+	return items, nil
 }
 
 // SearchCustom Searches using custom mapping logic. The SearchInputMapper is
@@ -279,10 +363,23 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		return nil, WrapAWSError(err)
 	}
 
-	return s.listInternal(ctx, scope, input)
+	items, err := s.listInternal(ctx, scope, input)
+
+	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
+
+	if err != nil {
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
+	}
+
+	for _, item := range items {
+		s.cache.StoreItem(item, s.CacheDuration, ck)
+	}
+	return items, nil
 }
 
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -298,8 +395,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID())
-
+	item, err := s.Get(ctx, scope, a.ResourceID(), ignoreCache)
 	if err != nil {
 		return nil, WrapAWSError(err)
 	}

@@ -143,7 +143,7 @@ func (e E2ETest) Run(t *testing.T) {
 				ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 				defer cancel()
 
-				items, err := searchSrc.Search(ctx, scope, *e.GoodSearchQuery)
+				items, err := searchSrc.Search(ctx, scope, *e.GoodSearchQuery, false)
 
 				if err != nil {
 					t.Error(err)
@@ -169,7 +169,7 @@ func (e E2ETest) Run(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
-			items, err := e.Source.List(ctx, scope)
+			items, err := e.Source.List(ctx, scope, false)
 
 			if err != nil {
 				t.Error(err)
@@ -205,7 +205,7 @@ func (e E2ETest) Run(t *testing.T) {
 					ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 					defer cancel()
 
-					item, err := e.Source.Get(ctx, scope, query)
+					item, err := e.Source.Get(ctx, scope, query, false)
 
 					if err != nil {
 						t.Fatal(err)
@@ -230,7 +230,7 @@ func (e E2ETest) Run(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
-			_, err := e.Source.Get(ctx, scope, "this is a known bad get query")
+			_, err := e.Source.Get(ctx, scope, "this is a known bad get query", false)
 
 			if err == nil {
 				t.Error("expected error, got nil")

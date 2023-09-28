@@ -227,7 +227,7 @@ func TestNewPolicySource(t *testing.T) {
 
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		_, err := source.Get(ctx, sources.FormatScope(account, ""), "ReadOnlyAccess")
+		_, err := source.Get(ctx, sources.FormatScope(account, ""), "ReadOnlyAccess", false)
 
 		if err == nil {
 			t.Error("expected error, got nil")
@@ -240,7 +240,7 @@ func TestNewPolicySource(t *testing.T) {
 
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		item, err := source.Get(ctx, "aws", "ReadOnlyAccess")
+		item, err := source.Get(ctx, "aws", "ReadOnlyAccess", false)
 
 		if err != nil {
 			t.Error(err)
@@ -255,7 +255,7 @@ func TestNewPolicySource(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := source.List(ctx, sources.FormatScope(account, ""))
+		items, err := source.List(ctx, sources.FormatScope(account, ""), false)
 
 		if err != nil {
 			t.Error(err)
@@ -287,7 +287,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string))
+			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
 			if err != nil {
 				t.Error(err)
@@ -302,7 +302,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(ctx, "aws", arn.(string))
+			_, err := source.Search(ctx, "aws", arn.(string), false)
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -314,7 +314,7 @@ func TestNewPolicySource(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := source.List(ctx, "aws")
+		items, err := source.List(ctx, "aws", false)
 
 		if err != nil {
 			t.Error(err)
@@ -346,7 +346,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string))
+			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -361,7 +361,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].Attributes.Get("arn")
 
-			_, err := source.Search(ctx, "aws", arn.(string))
+			_, err := source.Search(ctx, "aws", arn.(string), false)
 
 			if err != nil {
 				t.Error(err)

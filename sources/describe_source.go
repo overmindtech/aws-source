@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/sdp-go"
+	"github.com/overmindtech/sdpcache"
 )
 
 // DescribeOnlySource Generates a source for AWS APIs that only use a `Describe`
@@ -17,6 +20,10 @@ import (
 type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
+
+	CacheDuration time.Duration   // How long to cache items for
+	cache         *sdpcache.Cache // The sdpcache of this source
+	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 
 	// The function that should be used to describe the resources that this
 	// source is related to
@@ -54,6 +61,29 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 
 	// Client The AWS client to use when making requests
 	Client ClientStruct
+}
+
+// DefaultCacheDuration Returns the default cache duration for this source
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
+	if s.CacheDuration == 0 {
+		return 10 * time.Minute
+	}
+
+	return s.CacheDuration
+}
+
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) ensureCache() {
+	s.cacheInitMu.Lock()
+	defer s.cacheInitMu.Unlock()
+
+	if s.cache == nil {
+		s.cache = sdpcache.NewCache()
+	}
+}
+
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Cache() *sdpcache.Cache {
+	s.ensureCache()
+	return s.cache
 }
 
 // Validate Checks that the source is correctly set up and returns an error if
@@ -104,7 +134,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Scopes() []st
 // ctx parameter contains a golang context object which should be used to allow
 // this source to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string) (*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -118,29 +148,44 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 	var items []*sdp.Item
 
 	err = s.Validate()
-
 	if err != nil {
 		return nil, WrapAWSError(err)
+	}
+
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_GET, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		if len(cachedItems) > 0 {
+			return cachedItems[0], nil
+		} else {
+			return nil, nil
+		}
 	}
 
 	// Get the input object
 	input, err = s.InputMapperGet(scope, query)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
 	}
 
 	// Call the API using the object
 	output, err = s.DescribeFunc(ctx, s.Client, input)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
 	}
 
 	items, err = s.OutputMapper(scope, input, output)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
 	}
 
 	numItems := len(items)
@@ -154,22 +199,28 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 			itemNames[i] = items[i].GloballyUniqueName()
 		}
 
-		return nil, &sdp.QueryError{
+		qErr := &sdp.QueryError{
 			ErrorType:   sdp.QueryError_OTHER,
 			ErrorString: fmt.Sprintf("Request returned > 1 item for a GET request. Items: %v", strings.Join(itemNames, ", ")),
 		}
+		s.cache.StoreError(qErr, s.CacheDuration, ck)
+
+		return nil, qErr
 	case numItems == 0:
-		return nil, &sdp.QueryError{
+		qErr := &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: fmt.Sprintf("%v %v not found", s.Type(), query),
 		}
+		s.cache.StoreError(qErr, s.CacheDuration, ck)
+		return nil, qErr
 	}
 
+	s.cache.StoreItem(items[0], s.CacheDuration, ck)
 	return items[0], nil
 }
 
 // List Lists all items in a given scope
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -185,30 +236,44 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 	}
 
 	err := s.Validate()
-
 	if err != nil {
 		return nil, WrapAWSError(err)
+	}
+
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_LIST, scope, s.ItemType, "", ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
 	}
 
 	var items []*sdp.Item
 
 	input, err := s.InputMapperList(scope)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
 	}
 
 	items, err = s.describe(ctx, input, scope)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
+	}
+
+	for _, item := range items {
+		s.cache.StoreItem(item, s.CacheDuration, ck)
 	}
 
 	return items, nil
 }
 
 // Search Searches for AWS resources by ARN
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
@@ -216,14 +281,16 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 		}
 	}
 
+	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
+
 	if s.InputMapperSearch == nil {
-		return s.searchARN(ctx, scope, query)
+		return s.searchARN(ctx, scope, query, ignoreCache)
 	} else {
-		return s.searchCustom(ctx, scope, query)
+		return s.searchCustom(ctx, scope, query, ck)
 	}
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -239,8 +306,8 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx
 		}
 	}
 
-	item, err := s.Get(ctx, scope, a.ResourceID())
-
+	// this already uses the cache, so needs no extra handling
+	item, err := s.Get(ctx, scope, a.ResourceID(), ignoreCache)
 	if err != nil {
 		return nil, WrapAWSError(err)
 	}
@@ -249,17 +316,21 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx
 }
 
 // searchCustom Runs custom search logic using the `InputMapperSearch` function
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ck sdpcache.CacheKey) ([]*sdp.Item, error) {
 	input, err := s.InputMapperSearch(ctx, s.Client, scope, query)
-
 	if err != nil {
 		return nil, WrapAWSError(err)
 	}
 
 	items, err := s.describe(ctx, input, scope)
-
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.CacheDuration, ck)
+		return nil, err
+	}
+
+	for _, item := range items {
+		s.cache.StoreItem(item, s.CacheDuration, ck)
 	}
 
 	return items, nil
@@ -279,13 +350,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 
 		for paginator.HasMorePages() {
 			output, err = paginator.NextPage(ctx)
-
 			if err != nil {
 				return nil, err
 			}
 
 			newItems, err = s.OutputMapper(scope, input, output)
-
 			if err != nil {
 				return nil, err
 			}
@@ -294,13 +363,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 		}
 	} else {
 		output, err = s.DescribeFunc(ctx, s.Client, input)
-
 		if err != nil {
 			return nil, err
 		}
 
 		items, err = s.OutputMapper(scope, input, output)
-
 		if err != nil {
 			return nil, err
 		}

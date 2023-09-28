@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -9,11 +10,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
+	"github.com/overmindtech/sdpcache"
 )
 
 func TestS3SearchImpl(t *testing.T) {
+	cache := sdpcache.NewCache()
 	t.Run("with a good ARN", func(t *testing.T) {
-		items, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id")
+		items, err := searchImpl(context.Background(), cache, TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id", false)
 
 		if err != nil {
 			t.Error(err)
@@ -24,7 +27,7 @@ func TestS3SearchImpl(t *testing.T) {
 	})
 
 	t.Run("with a bad ARN", func(t *testing.T) {
-		_, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "foo")
+		_, err := searchImpl(context.Background(), cache, TestS3Client{}, "account-id.region", "foo", false)
 
 		if err == nil {
 			t.Error("expected error")
@@ -40,7 +43,7 @@ func TestS3SearchImpl(t *testing.T) {
 	})
 
 	t.Run("with an ARN in another scope", func(t *testing.T) {
-		_, err := searchImpl(context.Background(), TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id-2:resource-type:resource-id")
+		_, err := searchImpl(context.Background(), cache, TestS3Client{}, "account-id.region", "arn:partition:service:region:account-id-2:resource-type:resource-id", false)
 
 		if err == nil {
 			t.Error("expected error")
@@ -57,7 +60,8 @@ func TestS3SearchImpl(t *testing.T) {
 }
 
 func TestS3ListImpl(t *testing.T) {
-	items, err := listImpl(context.Background(), TestS3Client{}, "foo")
+	cache := sdpcache.NewCache()
+	items, err := listImpl(context.Background(), cache, TestS3Client{}, "foo", false)
 
 	if err != nil {
 		t.Error(err)
@@ -68,7 +72,8 @@ func TestS3ListImpl(t *testing.T) {
 }
 
 func TestS3GetImpl(t *testing.T) {
-	item, err := getImpl(context.Background(), TestS3Client{}, "foo", "bar")
+	cache := sdpcache.NewCache()
+	item, err := getImpl(context.Background(), cache, TestS3Client{}, "foo", "bar", false)
 
 	if err != nil {
 		t.Fatal(err)
@@ -126,6 +131,37 @@ func TestS3GetImpl(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+}
+
+func TestS3SourceCaching(t *testing.T) {
+	cache := sdpcache.NewCache()
+	first, err := getImpl(context.Background(), cache, TestS3Client{}, "foo", "bar", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first == nil {
+		t.Fatal("expected first item")
+	}
+
+	second, err := getImpl(context.Background(), cache, TestS3FailClient{}, "foo", "bar", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second == nil {
+		t.Fatal("expected second item")
+	}
+
+	third, err := getImpl(context.Background(), cache, TestS3Client{}, "foo", "bar", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if third == nil {
+		t.Fatal("expected third item")
+	}
+
+	if third == second {
+		t.Errorf("expected third item (%v) to be different to second item (%v)", third, second)
+	}
 }
 
 var owner = types.Owner{
@@ -487,6 +523,147 @@ func (t TestS3Client) GetBucketWebsite(ctx context.Context, params *s3.GetBucket
 			},
 		},
 	}, nil
+}
+
+type TestS3FailClient struct{}
+
+func (t TestS3FailClient) ListBuckets(ctx context.Context, params *s3.ListBucketsInput, optFns ...func(*s3.Options)) (*s3.ListBucketsOutput, error) {
+	return nil, errors.New("failed to list buckets")
+}
+
+func (t TestS3FailClient) GetBucketAcl(ctx context.Context, params *s3.GetBucketAclInput, optFns ...func(*s3.Options)) (*s3.GetBucketAclOutput, error) {
+	return nil, errors.New("failed to get bucket ACL")
+}
+func (t TestS3FailClient) GetBucketAnalyticsConfiguration(ctx context.Context, params *s3.GetBucketAnalyticsConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketAnalyticsConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket ACL")
+}
+
+func (t TestS3FailClient) GetBucketCors(ctx context.Context, params *s3.GetBucketCorsInput, optFns ...func(*s3.Options)) (*s3.GetBucketCorsOutput, error) {
+	return nil, errors.New("failed to get bucket CORS")
+}
+
+func (t TestS3FailClient) GetBucketEncryption(ctx context.Context, params *s3.GetBucketEncryptionInput, optFns ...func(*s3.Options)) (*s3.GetBucketEncryptionOutput, error) {
+	return nil, errors.New("failed to get bucket CORS")
+}
+
+func (t TestS3FailClient) GetBucketIntelligentTieringConfiguration(ctx context.Context, params *s3.GetBucketIntelligentTieringConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketIntelligentTieringConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket CORS")
+}
+
+func (t TestS3FailClient) GetBucketInventoryConfiguration(ctx context.Context, params *s3.GetBucketInventoryConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketInventoryConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket CORS")
+}
+
+func (t TestS3FailClient) GetBucketLifecycleConfiguration(ctx context.Context, params *s3.GetBucketLifecycleConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketLifecycleConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket lifecycle configuration")
+}
+
+func (t TestS3FailClient) GetBucketLocation(ctx context.Context, params *s3.GetBucketLocationInput, optFns ...func(*s3.Options)) (*s3.GetBucketLocationOutput, error) {
+	return nil, errors.New("failed to get bucket location")
+}
+
+func (t TestS3FailClient) GetBucketLogging(ctx context.Context, params *s3.GetBucketLoggingInput, optFns ...func(*s3.Options)) (*s3.GetBucketLoggingOutput, error) {
+	return nil, errors.New("failed to get bucket logging")
+}
+
+func (t TestS3FailClient) GetBucketMetricsConfiguration(ctx context.Context, params *s3.GetBucketMetricsConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketMetricsConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket logging")
+}
+
+func (t TestS3FailClient) GetBucketNotificationConfiguration(ctx context.Context, params *s3.GetBucketNotificationConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketNotificationConfigurationOutput, error) {
+	return nil, errors.New("failed to get bucket notification configuration")
+}
+
+func (t TestS3FailClient) GetBucketOwnershipControls(ctx context.Context, params *s3.GetBucketOwnershipControlsInput, optFns ...func(*s3.Options)) (*s3.GetBucketOwnershipControlsOutput, error) {
+	return nil, errors.New("failed to get bucket policy")
+}
+
+func (t TestS3FailClient) GetBucketPolicy(ctx context.Context, params *s3.GetBucketPolicyInput, optFns ...func(*s3.Options)) (*s3.GetBucketPolicyOutput, error) {
+	return nil, errors.New("failed to get bucket policy")
+}
+
+func (t TestS3FailClient) GetBucketPolicyStatus(ctx context.Context, params *s3.GetBucketPolicyStatusInput, optFns ...func(*s3.Options)) (*s3.GetBucketPolicyStatusOutput, error) {
+	return nil, errors.New("failed to get bucket policy")
+}
+
+func (t TestS3FailClient) GetBucketReplication(ctx context.Context, params *s3.GetBucketReplicationInput, optFns ...func(*s3.Options)) (*s3.GetBucketReplicationOutput, error) {
+	return nil, errors.New("failed to get bucket replication")
+}
+
+func (t TestS3FailClient) GetBucketRequestPayment(ctx context.Context, params *s3.GetBucketRequestPaymentInput, optFns ...func(*s3.Options)) (*s3.GetBucketRequestPaymentOutput, error) {
+	return nil, errors.New("failed to get bucket request payment")
+}
+
+func (t TestS3FailClient) GetBucketTagging(ctx context.Context, params *s3.GetBucketTaggingInput, optFns ...func(*s3.Options)) (*s3.GetBucketTaggingOutput, error) {
+	return nil, errors.New("failed to get bucket tagging")
+}
+
+func (t TestS3FailClient) GetBucketVersioning(ctx context.Context, params *s3.GetBucketVersioningInput, optFns ...func(*s3.Options)) (*s3.GetBucketVersioningOutput, error) {
+	return nil, errors.New("failed to get bucket versioning")
+}
+
+func (t TestS3FailClient) GetBucketWebsite(ctx context.Context, params *s3.GetBucketWebsiteInput, optFns ...func(*s3.Options)) (*s3.GetBucketWebsiteOutput, error) {
+	return nil, errors.New("failed to get bucket website")
+}
+
+func (t TestS3FailClient) GetObject(ctx context.Context, params *s3.GetObjectInput, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
+	return nil, errors.New("failed to get object")
+}
+
+func (t TestS3FailClient) HeadBucket(ctx context.Context, params *s3.HeadBucketInput, optFns ...func(*s3.Options)) (*s3.HeadBucketOutput, error) {
+	return nil, errors.New("failed to head bucket")
+}
+
+func (t TestS3FailClient) HeadObject(ctx context.Context, params *s3.HeadObjectInput, optFns ...func(*s3.Options)) (*s3.HeadObjectOutput, error) {
+	return nil, errors.New("failed to head object")
+}
+
+func (t TestS3FailClient) PutBucketAcl(ctx context.Context, params *s3.PutBucketAclInput, optFns ...func(*s3.Options)) (*s3.PutBucketAclOutput, error) {
+	return nil, errors.New("failed to put bucket ACL")
+}
+
+func (t TestS3FailClient) PutBucketCors(ctx context.Context, params *s3.PutBucketCorsInput, optFns ...func(*s3.Options)) (*s3.PutBucketCorsOutput, error) {
+	return nil, errors.New("failed to put bucket CORS")
+}
+
+func (t TestS3FailClient) PutBucketLifecycleConfiguration(ctx context.Context, params *s3.PutBucketLifecycleConfigurationInput, optFns ...func(*s3.Options)) (*s3.PutBucketLifecycleConfigurationOutput, error) {
+	return nil, errors.New("failed to put bucket lifecycle configuration")
+}
+
+func (t TestS3FailClient) PutBucketLogging(ctx context.Context, params *s3.PutBucketLoggingInput, optFns ...func(*s3.Options)) (*s3.PutBucketLoggingOutput, error) {
+	return nil, errors.New("failed to put bucket logging")
+}
+
+func (t TestS3FailClient) PutBucketNotificationConfiguration(ctx context.Context, params *s3.PutBucketNotificationConfigurationInput, optFns ...func(*s3.Options)) (*s3.PutBucketNotificationConfigurationOutput, error) {
+	return nil, errors.New("failed to put bucket notification configuration")
+}
+
+func (t TestS3FailClient) PutBucketPolicy(ctx context.Context, params *s3.PutBucketPolicyInput, optFns ...func(*s3.Options)) (*s3.PutBucketPolicyOutput, error) {
+	return nil, errors.New("failed to put bucket policy")
+}
+
+func (t TestS3FailClient) PutBucketReplication(ctx context.Context, params *s3.PutBucketReplicationInput, optFns ...func(*s3.Options)) (*s3.PutBucketReplicationOutput, error) {
+	return nil, errors.New("failed to put bucket replication")
+}
+
+func (t TestS3FailClient) PutBucketRequestPayment(ctx context.Context, params *s3.PutBucketRequestPaymentInput, optFns ...func(*s3.Options)) (*s3.PutBucketRequestPaymentOutput, error) {
+	return nil, errors.New("failed to put bucket request payment")
+}
+
+func (t TestS3FailClient) PutBucketTagging(ctx context.Context, params *s3.PutBucketTaggingInput, optFns ...func(*s3.Options)) (*s3.PutBucketTaggingOutput, error) {
+	return nil, errors.New("failed to put bucket tagging")
+}
+
+func (t TestS3FailClient) PutBucketVersioning(ctx context.Context, params *s3.PutBucketVersioningInput, optFns ...func(*s3.Options)) (*s3.PutBucketVersioningOutput, error) {
+	return nil, errors.New("failed to put bucket versioning")
+}
+
+func (t TestS3FailClient) PutBucketWebsite(ctx context.Context, params *s3.PutBucketWebsiteInput, optFns ...func(*s3.Options)) (*s3.PutBucketWebsiteOutput, error) {
+	return nil, errors.New("failed to put bucket website")
+}
+
+func (t TestS3FailClient) PutObject(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+	return nil, errors.New("failed to put object")
 }
 
 func TestNewS3Source(t *testing.T) {
