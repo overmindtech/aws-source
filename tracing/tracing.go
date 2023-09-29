@@ -29,13 +29,11 @@ import (
 // 	instrumentationName    = "github.com/overmindtech/gateway/cmd"
 // 	instrumentationVersion = "0.0.1"
 // )
-// var (
-// 	tracer = otel.GetTracerProvider().Tracer(
+// var tracer = otel.GetTracerProvider().Tracer(
 // 		instrumentationName,
 // 		trace.WithInstrumentationVersion(instrumentationVersion),
 // 		trace.WithSchemaURL(semconv.SchemaURL),
 // 	)
-// )
 
 func tracingResource() *resource.Resource {
 	// Identify your application using resource detection
