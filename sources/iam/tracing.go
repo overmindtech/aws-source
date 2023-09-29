@@ -11,10 +11,8 @@ const (
 	instrumentationVersion = "0.0.1"
 )
 
-var (
-	tracer = otel.GetTracerProvider().Tracer(
-		instrumentationName,
-		trace.WithInstrumentationVersion(instrumentationVersion),
-		trace.WithSchemaURL(semconv.SchemaURL),
-	)
+var tracer = otel.GetTracerProvider().Tracer(
+	instrumentationName,
+	trace.WithInstrumentationVersion(instrumentationVersion),
+	trace.WithSchemaURL(semconv.SchemaURL),
 )
