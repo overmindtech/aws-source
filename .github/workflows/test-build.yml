@@ -101,7 +101,7 @@ jobs:
         id: push
         uses: depot/build-push-action@v1
         with:
-          project: x54wnggmpr
+          project: xnsnw3m20t
           file: build/package/${{ matrix.dockerfile }}
           context: .
           platforms: linux/amd64,linux/arm64
