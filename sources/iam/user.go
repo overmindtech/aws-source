@@ -192,7 +192,7 @@ func NewUserSource(config aws.Config, accountID string, region string, limit *so
 		ItemType:      "iam-user",
 		Client:        iam.NewFromConfig(config),
 		AccountID:     accountID,
-		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		Region:        region,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 			return userGetFunc(ctx, client, scope, query, limit)

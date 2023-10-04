@@ -75,10 +75,9 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 }
 
-// DefaultCacheDuration Returns the default cache duration for this source
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) cacheDuration() time.Duration {
 	if s.CacheDuration == 0 {
-		return 10 * time.Minute
+		return DefaultCacheDuration
 	}
 
 	return s.CacheDuration
@@ -170,11 +169,11 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	if err != nil {
 		// TODO: How can we handle NOTFOUND?
 		qErr := WrapAWSError(err)
-		s.cache.StoreError(qErr, s.CacheDuration, ck)
+		s.cache.StoreError(qErr, s.cacheDuration(), ck)
 		return nil, qErr
 	}
 
-	s.cache.StoreItem(item, s.CacheDuration, ck)
+	s.cache.StoreItem(item, s.cacheDuration(), ck)
 	return item, nil
 }
 
@@ -206,12 +205,12 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	items, err := s.listInternal(ctx, scope, s.ListInput)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	for _, item := range items {
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil
@@ -343,12 +342,12 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	for _, item := range items {
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil
@@ -369,12 +368,12 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	for _, item := range items {
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 	return items, nil
 }

@@ -306,7 +306,7 @@ func NewPolicySource(config aws.Config, accountID string, _ string, limit *sourc
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-policy",
 		Client:        iam.NewFromConfig(config),
-		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		Region:        "", // IAM policies aren't tied to a region
 

@@ -43,6 +43,14 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 	ItemMapper func(scope string, awsItem AWSItem) (*sdp.Item, error)
 }
 
+func (s *GetListSource[AWSItem, ClientStruct, Options]) cacheDuration() time.Duration {
+	if s.CacheDuration == 0 {
+		return DefaultCacheDuration
+	}
+
+	return s.CacheDuration
+}
+
 func (s *GetListSource[AWSItem, ClientStruct, Options]) ensureCache() {
 	s.cacheInitMu.Lock()
 	defer s.cacheInitMu.Unlock()
@@ -82,15 +90,6 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Type() string {
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
-}
-
-// DefaultCacheDuration Returns the default cache duration for this source
-func (s *GetListSource[AWSItem, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
-	if s.CacheDuration == 0 {
-		return 10 * time.Minute
-	}
-
-	return s.CacheDuration
 }
 
 // List of scopes that this source is capable of find items for. This will be
@@ -147,17 +146,17 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 
 	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
 	if err != nil {
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, WrapAWSError(err)
 	}
 
 	item, err := s.ItemMapper(scope, awsItem)
 	if err != nil {
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, WrapAWSError(err)
 	}
 
-	s.cache.StoreItem(item, s.CacheDuration, ck)
+	s.cache.StoreItem(item, s.cacheDuration(), ck)
 
 	return item, nil
 }
@@ -199,7 +198,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 		}
 
 		items = append(items, item)
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil

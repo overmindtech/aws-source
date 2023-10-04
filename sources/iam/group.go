@@ -71,7 +71,7 @@ func NewGroupSource(config aws.Config, accountID string, region string, limit *s
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:      "iam-group",
 		Client:        iam.NewFromConfig(config),
-		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
 			limit.Wait(ctx) // Wait for rate limiting
