@@ -13,6 +13,8 @@ import (
 	"github.com/overmindtech/sdpcache"
 )
 
+const DefaultCacheDuration = 1 * time.Hour
+
 // DescribeOnlySource Generates a source for AWS APIs that only use a `Describe`
 // function for both List and Get operations. EC2 is a good example of this,
 // where running Describe with no params returns everything, but params can be
@@ -63,10 +65,12 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	Client ClientStruct
 }
 
-// DefaultCacheDuration Returns the default cache duration for this source
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) DefaultCacheDuration() time.Duration {
+// Returns the duration that items should be cached for. This will use the
+// `CacheDuration` for this source if set, otherwise it will use the default
+// duration of 1 hour
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) cacheDuration() time.Duration {
 	if s.CacheDuration == 0 {
-		return 10 * time.Minute
+		return DefaultCacheDuration
 	}
 
 	return s.CacheDuration
@@ -169,7 +173,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 	input, err = s.InputMapperGet(scope, query)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
@@ -177,14 +181,14 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 	output, err = s.DescribeFunc(ctx, s.Client, input)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	items, err = s.OutputMapper(scope, input, output)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
@@ -203,7 +207,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 			ErrorType:   sdp.QueryError_OTHER,
 			ErrorString: fmt.Sprintf("Request returned > 1 item for a GET request. Items: %v", strings.Join(itemNames, ", ")),
 		}
-		s.cache.StoreError(qErr, s.CacheDuration, ck)
+		s.cache.StoreError(qErr, s.cacheDuration(), ck)
 
 		return nil, qErr
 	case numItems == 0:
@@ -211,11 +215,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: fmt.Sprintf("%v %v not found", s.Type(), query),
 		}
-		s.cache.StoreError(qErr, s.CacheDuration, ck)
+		s.cache.StoreError(qErr, s.cacheDuration(), ck)
 		return nil, qErr
 	}
 
-	s.cache.StoreItem(items[0], s.CacheDuration, ck)
+	s.cache.StoreItem(items[0], s.cacheDuration(), ck)
 	return items[0], nil
 }
 
@@ -254,19 +258,19 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 	input, err := s.InputMapperList(scope)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	items, err = s.describe(ctx, input, scope)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	for _, item := range items {
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil
@@ -325,12 +329,12 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(
 	items, err := s.describe(ctx, input, scope)
 	if err != nil {
 		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.CacheDuration, ck)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
 	}
 
 	for _, item := range items {
-		s.cache.StoreItem(item, s.CacheDuration, ck)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil

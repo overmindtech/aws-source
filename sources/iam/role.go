@@ -298,7 +298,7 @@ func NewRoleSource(config aws.Config, accountID string, region string, limit *so
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-role",
 		Client:        iam.NewFromConfig(config),
-		CacheDuration: 1 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
 			return roleGetFunc(ctx, client, scope, query, limit)
