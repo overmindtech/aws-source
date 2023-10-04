@@ -224,36 +224,35 @@ var rootCmd = &cobra.Command{
 
 			sources := []discovery.Source{
 				// EC2
-				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewVpcSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewVolumeSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewImageSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewAddressSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewKeyPairSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewNatGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewRegionSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewSubnetSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewInstanceStatusSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewLaunchTemplateSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewNetworkAclSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewPlacementGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewVpcPeeringConnectionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationFleetSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewIamInstanceProfileAssociationSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewImageSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceEventWindowSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInstanceStatusSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewKeyPairSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewLaunchTemplateSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNatGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkAclSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewPlacementGroupSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewRegionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewSubnetSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVolumeSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVpcPeeringConnectionSource(cfg, *callerID.Account, &ec2RateLimit),
+				ec2.NewVpcSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// EFS (I'm assuming it shares its rate limit with EC2))
 				efs.NewAccessPointSource(cfg, *callerID.Account, &ec2RateLimit),
@@ -263,25 +262,25 @@ var rootCmd = &cobra.Command{
 				efs.NewReplicationConfigurationSource(cfg, *callerID.Account, &ec2RateLimit),
 
 				// EKS
-				eks.NewClusterSource(cfg, *callerID.Account, region),
 				eks.NewAddonSource(cfg, *callerID.Account, region),
+				eks.NewClusterSource(cfg, *callerID.Account, region),
 				eks.NewFargateProfileSource(cfg, *callerID.Account, region),
 				eks.NewNodegroupSource(cfg, *callerID.Account, region),
 
 				// Route 53
+				route53.NewHealthCheckSource(cfg, *callerID.Account, region),
 				route53.NewHostedZoneSource(cfg, *callerID.Account, region),
 				route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
-				route53.NewHealthCheckSource(cfg, *callerID.Account, region),
 
 				// Cloudwatch
 				cloudwatch.NewAlarmSource(cfg, *callerID.Account),
 
 				// IAM
 				iam.NewGroupSource(cfg, *callerID.Account, region, &iamRateLimit),
-				iam.NewUserSource(cfg, *callerID.Account, region, &iamRateLimit),
-				iam.NewRoleSource(cfg, *callerID.Account, region, &iamRateLimit),
-				iam.NewPolicySource(cfg, *callerID.Account, region, &iamRateLimit),
 				iam.NewInstanceProfileSource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewPolicySource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewRoleSource(cfg, *callerID.Account, region, &iamRateLimit),
+				iam.NewUserSource(cfg, *callerID.Account, region, &iamRateLimit),
 
 				// Lambda
 				lambda.NewFunctionSource(cfg, *callerID.Account, region),
@@ -289,22 +288,22 @@ var rootCmd = &cobra.Command{
 				lambda.NewLayerVersionSource(cfg, *callerID.Account, region),
 
 				// ECS
-				ecs.NewClusterSource(cfg, *callerID.Account, region),
 				ecs.NewCapacityProviderSource(cfg, *callerID.Account),
+				ecs.NewClusterSource(cfg, *callerID.Account, region),
 				ecs.NewContainerInstanceSource(cfg, *callerID.Account, region),
 				ecs.NewServiceSource(cfg, *callerID.Account, region),
 				ecs.NewTaskDefinitionSource(cfg, *callerID.Account, region),
 				ecs.NewTaskSource(cfg, *callerID.Account, region),
 
 				// DynamoDB
-				dynamodb.NewTableSource(cfg, *callerID.Account, region),
 				dynamodb.NewBackupSource(cfg, *callerID.Account, region),
+				dynamodb.NewTableSource(cfg, *callerID.Account, region),
 
 				// RDS
-				rds.NewDBInstanceSource(cfg, *callerID.Account),
-				rds.NewDBClusterSource(cfg, *callerID.Account),
-				rds.NewDBParameterGroupSource(cfg, *callerID.Account, region),
 				rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
+				rds.NewDBClusterSource(cfg, *callerID.Account),
+				rds.NewDBInstanceSource(cfg, *callerID.Account),
+				rds.NewDBParameterGroupSource(cfg, *callerID.Account, region),
 				rds.NewDBSubnetGroupSource(cfg, *callerID.Account),
 				rds.NewOptionGroupSource(cfg, *callerID.Account),
 
@@ -316,11 +315,11 @@ var rootCmd = &cobra.Command{
 				elb.NewLoadBalancerSource(cfg, *callerID.Account),
 
 				// ELBv2
-				elbv2.NewLoadBalancerSource(cfg, *callerID.Account),
 				elbv2.NewListenerSource(cfg, *callerID.Account),
+				elbv2.NewLoadBalancerSource(cfg, *callerID.Account),
+				elbv2.NewRuleSource(cfg, *callerID.Account),
 				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
-				elbv2.NewRuleSource(cfg, *callerID.Account),
 			}
 
 			e.AddSources(sources...)
