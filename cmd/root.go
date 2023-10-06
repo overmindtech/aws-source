@@ -71,6 +71,8 @@ var rootCmd = &cobra.Command{
 		natsJWT := viper.GetString("nats-jwt")
 		natsNKeySeed := viper.GetString("nats-nkey-seed")
 		maxParallel := viper.GetInt("max-parallel")
+		apiKey := viper.GetString("api-key")
+		apiPath := viper.GetString("api-path")
 		hostname, err := os.Hostname()
 
 		if err != nil {
@@ -115,7 +117,15 @@ var rootCmd = &cobra.Command{
 
 		// Validate the auth params and create a token client if we are using
 		// auth
-		if natsJWT != "" || natsNKeySeed != "" {
+		if apiKey != "" {
+			tokenClient, err = auth.NewAPIKeyClient(apiPath, apiKey)
+
+			if err != nil {
+				sentry.CaptureException(err)
+
+				log.WithError(err).Fatal("Could not create API key client")
+			}
+		} else if natsJWT != "" || natsNKeySeed != "" {
 			var err error
 
 			tokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
@@ -439,6 +449,8 @@ func init() {
 	rootCmd.PersistentFlags().String("nats-name-prefix", "", "A name label prefix. Sources should append a dot and their hostname .{hostname} to this, then set this is the NATS connection name which will be sent to the server on CONNECT to identify the client")
 	rootCmd.PersistentFlags().String("nats-jwt", "", "The JWT token that should be used to authenticate to NATS, provided in raw format e.g. eyJ0eXAiOiJKV1Q...")
 	rootCmd.PersistentFlags().String("nats-nkey-seed", "", "The NKey seed which corresponds to the NATS JWT e.g. SUAFK6QUC...")
+	rootCmd.PersistentFlags().String("api-key", "", "The API key to use to authenticate to the Overmind API")
+	rootCmd.PersistentFlags().String("api-path", "https://api.prod.overmind.tech", "The URL of the Overmind API")
 	rootCmd.PersistentFlags().Int("max-parallel", 2_000, "Max number of requests to run in parallel")
 
 	// Custom flags for this source
