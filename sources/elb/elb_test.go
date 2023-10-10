@@ -11,6 +11,28 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+type mockElbClient struct{}
+
+func (m mockElbClient) DescribeTags(ctx context.Context, params *elb.DescribeTagsInput, optFns ...func(*elb.Options)) (*elb.DescribeTagsOutput, error) {
+	return &elb.DescribeTagsOutput{
+		TagDescriptions: []types.TagDescription{
+			{
+				LoadBalancerName: sources.PtrString("a8c3c8851f0df43fda89797c8e941a91"),
+				Tags: []types.Tag{
+					{
+						Key:   sources.PtrString("foo"),
+						Value: sources.PtrString("bar"),
+					},
+				},
+			},
+		},
+	}, nil
+}
+
+func (m mockElbClient) DescribeLoadBalancers(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error) {
+	return nil, nil
+}
+
 func TestLoadBalancerOutputMapper(t *testing.T) {
 	output := &elb.DescribeLoadBalancersOutput{
 		LoadBalancerDescriptions: []types.LoadBalancerDescription{
@@ -105,7 +127,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := loadBalancerOutputMapper(context.Background(), nil, "foo", nil, output)
+	items, err := loadBalancerOutputMapper(context.Background(), mockElbClient{}, "foo", nil, output)
 
 	if err != nil {
 		t.Error(err)
@@ -122,6 +144,10 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 	}
 
 	item := items[0]
+
+	if item.Tags["foo"] != "bar" {
+		t.Errorf("expected tag foo to be bar, got %v", item.Tags["foo"])
+	}
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically

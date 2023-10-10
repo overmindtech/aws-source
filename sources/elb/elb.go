@@ -5,12 +5,56 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
-func loadBalancerOutputMapper(_ context.Context, _ *elb.Client, scope string, _ *elb.DescribeLoadBalancersInput, output *elb.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
+type elbClient interface {
+	DescribeTags(ctx context.Context, params *elb.DescribeTagsInput, optFns ...func(*elb.Options)) (*elb.DescribeTagsOutput, error)
+	DescribeLoadBalancers(ctx context.Context, params *elb.DescribeLoadBalancersInput, optFns ...func(*elb.Options)) (*elb.DescribeLoadBalancersOutput, error)
+}
+
+func tagsToMap(tags []types.Tag) map[string]string {
+	m := make(map[string]string)
+
+	for _, tag := range tags {
+		if tag.Key != nil && tag.Value != nil {
+			m[*tag.Key] = *tag.Value
+		}
+	}
+
+	return m
+}
+
+func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope string, _ *elb.DescribeLoadBalancersInput, output *elb.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+
+	loadBalancerNames := make([]string, 0)
+
+	for _, desc := range output.LoadBalancerDescriptions {
+		if desc.LoadBalancerName != nil {
+			loadBalancerNames = append(loadBalancerNames, *desc.LoadBalancerName)
+		}
+	}
+
+	// Get all tags for all load balancers in this output
+	tagsOut, err := client.DescribeTags(ctx, &elb.DescribeTagsInput{
+		LoadBalancerNames: loadBalancerNames,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Map of load balancer name to tags
+	tagsMap := make(map[string][]types.Tag)
+
+	for _, tagDesc := range tagsOut.TagDescriptions {
+		if tagDesc.LoadBalancerName != nil {
+			tagsMap[*tagDesc.LoadBalancerName] = tagDesc.Tags
+		}
+	}
 
 	for _, desc := range output.LoadBalancerDescriptions {
 		attrs, err := sources.ToAttributesCase(desc)
@@ -19,11 +63,18 @@ func loadBalancerOutputMapper(_ context.Context, _ *elb.Client, scope string, _ 
 			return nil, err
 		}
 
+		var tags map[string]string
+
+		if desc.LoadBalancerName != nil {
+			tags = tagsToMap(tagsMap[*desc.LoadBalancerName])
+		}
+
 		item := sdp.Item{
 			Type:            "elb-load-balancer",
 			UniqueAttribute: "loadBalancerName",
 			Attributes:      attrs,
 			Scope:           scope,
+			Tags:            tags,
 		}
 
 		if desc.DNSName != nil {
@@ -153,13 +204,13 @@ func loadBalancerOutputMapper(_ context.Context, _ *elb.Client, scope string, _ 
 // +overmind:terraform:queryMap aws_elb.arn
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options] {
-	return &sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, *elb.Client, *elb.Options]{
+func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
+	return &sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
 		Config:    config,
 		Client:    elb.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "elb-load-balancer",
-		DescribeFunc: func(ctx context.Context, client *elb.Client, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error) {
+		DescribeFunc: func(ctx context.Context, client elbClient, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*elb.DescribeLoadBalancersInput, error) {
@@ -170,7 +221,7 @@ func NewLoadBalancerSource(config aws.Config, accountID string) *sources.Describ
 		InputMapperList: func(scope string) (*elb.DescribeLoadBalancersInput, error) {
 			return &elb.DescribeLoadBalancersInput{}, nil
 		},
-		PaginatorBuilder: func(client *elb.Client, params *elb.DescribeLoadBalancersInput) sources.Paginator[*elb.DescribeLoadBalancersOutput, *elb.Options] {
+		PaginatorBuilder: func(client elbClient, params *elb.DescribeLoadBalancersInput) sources.Paginator[*elb.DescribeLoadBalancersOutput, *elb.Options] {
 			return elb.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,
