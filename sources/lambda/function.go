@@ -99,6 +99,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            out.Tags,
 	}
 
 	if function.Code != nil {
