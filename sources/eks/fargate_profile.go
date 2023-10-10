@@ -39,6 +39,7 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 		UniqueAttribute: "uniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            out.FargateProfile.Tags,
 	}
 
 	if out.FargateProfile.PodExecutionRoleArn != nil {

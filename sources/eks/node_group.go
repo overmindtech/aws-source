@@ -41,6 +41,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		UniqueAttribute: "uniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            out.Nodegroup.Tags,
 	}
 
 	if ng.Health != nil {
