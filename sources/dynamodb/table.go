@@ -3,6 +3,7 @@ package dynamodb
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -23,6 +24,34 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 	table := out.Table
 
+	var nextToken *string
+	tagsMap := make(map[string]string)
+
+	// Get the tags for this table, keep looping until we run out of pages
+	for {
+		tagsOut, err := client.ListTagsOfResource(ctx, &dynamodb.ListTagsOfResourceInput{
+			ResourceArn: table.TableArn,
+			NextToken:   nextToken,
+		})
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to get tags for table: %w", err)
+		}
+
+		// Add tags to map
+		for _, tag := range tagsOut.Tags {
+			if tag.Key != nil && tag.Value != nil {
+				tagsMap[*tag.Key] = *tag.Value
+			}
+		}
+
+		nextToken = tagsOut.NextToken
+
+		if nextToken == nil {
+			break
+		}
+	}
+
 	attributes, err := sources.ToAttributesCase(table)
 
 	if err != nil {
@@ -34,6 +63,7 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		UniqueAttribute: "tableName",
 		Scope:           scope,
 		Attributes:      attributes,
+		Tags:            tagsMap,
 	}
 
 	var a *sources.ARN

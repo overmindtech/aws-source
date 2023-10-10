@@ -163,11 +163,27 @@ func (t *TestClient) DescribeKinesisStreamingDestination(ctx context.Context, pa
 	}, nil
 }
 
+func (t *TestClient) ListTagsOfResource(context.Context, *dynamodb.ListTagsOfResourceInput, ...func(*dynamodb.Options)) (*dynamodb.ListTagsOfResourceOutput, error) {
+	return &dynamodb.ListTagsOfResourceOutput{
+		Tags: []types.Tag{
+			{
+				Key:   sources.PtrString("key"),
+				Value: sources.PtrString("value"),
+			},
+		},
+		NextToken: nil,
+	}, nil
+}
+
 func TestTableGetFunc(t *testing.T) {
 	item, err := tableGetFunc(context.Background(), &TestClient{}, "foo", &dynamodb.DescribeTableInput{})
 
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if item.Tags["key"] != "value" {
+		t.Errorf("expected tag key to be 'value', got '%s'", item.Tags["key"])
 	}
 
 	if err = item.Validate(); err != nil {
