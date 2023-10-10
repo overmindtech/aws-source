@@ -72,10 +72,19 @@ func statusToHealth(status string) *sdp.Health {
 	return nil
 }
 
-func dBInstanceOutputMapper(_ context.Context, _ *rds.Client, scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
+func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instance := range output.DBInstances {
+		// Get the tags for the instance
+		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+			ResourceName: instance.DBInstanceArn,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
 		var dbSubnetGroup *string
 
 		if instance.DBSubnetGroup != nil && instance.DBSubnetGroup.DBSubnetGroupName != nil {
@@ -97,6 +106,7 @@ func dBInstanceOutputMapper(_ context.Context, _ *rds.Client, scope string, _ *r
 			UniqueAttribute: "dBInstanceIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(tagsOut.TagList),
 		}
 
 		if instance.DBInstanceStatus != nil {
@@ -527,16 +537,16 @@ func dBInstanceOutputMapper(_ context.Context, _ *rds.Client, scope string, _ *r
 // +overmind:terraform:queryMap aws_db_instance.identifier
 // +overmind:terraform:queryMap aws_db_instance_role_association.db_instance_identifier
 
-func NewDBInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, *rds.Client, *rds.Options] {
-	return &sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, *rds.Client, *rds.Options]{
+func NewDBInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
+	return &sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-instance",
 		Config:    config,
 		AccountID: accountID,
 		Client:    rds.NewFromConfig(config),
-		PaginatorBuilder: func(client *rds.Client, params *rds.DescribeDBInstancesInput) sources.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {
+		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBInstancesInput) sources.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {
 			return rds.NewDescribeDBInstancesPaginator(client, params)
 		},
-		DescribeFunc: func(ctx context.Context, client *rds.Client, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client rdsClient, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error) {
 			return client.DescribeDBInstances(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*rds.DescribeDBInstancesInput, error) {

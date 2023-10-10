@@ -44,13 +44,13 @@ func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Ite
 // +overmind:terraform:queryMap aws_db_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options] {
-	return &sources.GetListSource[*ParameterGroup, *rds.Client, *rds.Options]{
+func NewDBParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ParameterGroup, rdsClient, *rds.Options] {
+	return &sources.GetListSource[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-parameter-group",
 		Client:    rds.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc: func(ctx context.Context, client *rds.Client, scope, query string) (*ParameterGroup, error) {
+		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ParameterGroup, error) {
 			out, err := client.DescribeDBParameterGroups(ctx, &rds.DescribeDBParameterGroupsInput{
 				DBParameterGroupName: &query,
 			})
@@ -76,7 +76,7 @@ func NewDBParameterGroupSource(config aws.Config, accountID string, region strin
 				DBParameterGroup: out.DBParameterGroups[0],
 			}, nil
 		},
-		ListFunc: func(ctx context.Context, client *rds.Client, scope string) ([]*ParameterGroup, error) {
+		ListFunc: func(ctx context.Context, client rdsClient, scope string) ([]*ParameterGroup, error) {
 			out, err := client.DescribeDBParameterGroups(ctx, &rds.DescribeDBParameterGroupsInput{})
 
 			if err != nil {
@@ -101,6 +101,17 @@ func NewDBParameterGroupSource(config aws.Config, accountID string, region strin
 			}
 
 			return groups, nil
+		},
+		ListTagsFunc: func(ctx context.Context, pg *ParameterGroup, c rdsClient) (map[string]string, error) {
+			out, err := c.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+				ResourceName: pg.DBParameterGroupArn,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			return tagsToMap(out.TagList), nil
 		},
 		ItemMapper: dBParameterGroupItemMapper,
 	}
