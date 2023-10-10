@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -63,7 +64,7 @@ func TestRegionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := regionOutputMapper("foo", nil, output)
+	items, err := regionOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

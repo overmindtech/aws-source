@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
@@ -23,7 +24,7 @@ func TestOptionGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := optionGroupOutputMapper("foo", nil, &output)
+	items, err := optionGroupOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

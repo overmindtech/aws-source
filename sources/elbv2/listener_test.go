@@ -1,6 +1,7 @@
 package elbv2
 
 import (
+	"context"
 	"testing"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -34,7 +35,7 @@ func TestListenerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := listenerOutputMapper("foo", nil, &output)
+	items, err := listenerOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -38,7 +39,7 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBSubnetGroupOutputMapper("foo", nil, &output)
+	items, err := dBSubnetGroupOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

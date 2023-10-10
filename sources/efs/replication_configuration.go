@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ReplicationConfigurationOutputMapper(scope string, input *efs.DescribeReplicationConfigurationsInput, output *efs.DescribeReplicationConfigurationsOutput) ([]*sdp.Item, error) {
+func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scope string, input *efs.DescribeReplicationConfigurationsInput, output *efs.DescribeReplicationConfigurationsOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("nil output from AWS")
 	}

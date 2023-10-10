@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -128,7 +129,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBClusterOutputMapper("foo", nil, &output)
+	items, err := dBClusterOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)

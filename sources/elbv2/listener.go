@@ -13,7 +13,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func listenerOutputMapper(scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
+func listenerOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, listener := range output.Listeners {

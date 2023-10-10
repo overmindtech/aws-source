@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -68,7 +69,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := reservedInstanceOutputMapper("foo", nil, output)
+	items, err := reservedInstanceOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

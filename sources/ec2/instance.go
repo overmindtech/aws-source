@@ -21,7 +21,7 @@ func instanceInputMapperList(scope string) (*ec2.DescribeInstancesInput, error) 
 	return &ec2.DescribeInstancesInput{}, nil
 }
 
-func instanceOutputMapper(scope string, _ *ec2.DescribeInstancesInput, output *ec2.DescribeInstancesOutput) ([]*sdp.Item, error) {
+func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeInstancesInput, output *ec2.DescribeInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, reservation := range output.Reservations {

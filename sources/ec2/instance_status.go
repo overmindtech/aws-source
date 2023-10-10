@@ -22,7 +22,7 @@ func instanceStatusInputMapperList(scope string) (*ec2.DescribeInstanceStatusInp
 	return &ec2.DescribeInstanceStatusInput{}, nil
 }
 
-func instanceStatusOutputMapper(scope string, _ *ec2.DescribeInstanceStatusInput, output *ec2.DescribeInstanceStatusOutput) ([]*sdp.Item, error) {
+func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeInstanceStatusInput, output *ec2.DescribeInstanceStatusOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instanceStatus := range output.InstanceStatuses {

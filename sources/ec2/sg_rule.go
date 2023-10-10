@@ -21,7 +21,7 @@ func securityGroupRuleInputMapperList(scope string) (*ec2.DescribeSecurityGroupR
 	return &ec2.DescribeSecurityGroupRulesInput{}, nil
 }
 
-func securityGroupRuleOutputMapper(scope string, _ *ec2.DescribeSecurityGroupRulesInput, output *ec2.DescribeSecurityGroupRulesOutput) ([]*sdp.Item, error) {
+func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeSecurityGroupRulesInput, output *ec2.DescribeSecurityGroupRulesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, securityGroupRule := range output.SecurityGroupRules {

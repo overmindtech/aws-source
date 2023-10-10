@@ -1,6 +1,7 @@
 package elbv2
 
 import (
+	"context"
 	"testing"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -40,7 +41,7 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := targetGroupOutputMapper("foo", nil, &output)
+	items, err := targetGroupOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

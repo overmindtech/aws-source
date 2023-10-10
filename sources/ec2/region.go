@@ -21,7 +21,7 @@ func regionInputMapperList(scope string) (*ec2.DescribeRegionsInput, error) {
 	return &ec2.DescribeRegionsInput{}, nil
 }
 
-func regionOutputMapper(scope string, _ *ec2.DescribeRegionsInput, output *ec2.DescribeRegionsOutput) ([]*sdp.Item, error) {
+func regionOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeRegionsInput, output *ec2.DescribeRegionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ni := range output.Regions {

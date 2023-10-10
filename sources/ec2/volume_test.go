@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -66,7 +67,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := volumeOutputMapper("foo", nil, output)
+	items, err := volumeOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

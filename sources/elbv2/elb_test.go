@@ -1,6 +1,7 @@
 package elbv2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -50,7 +51,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := loadBalancerOutputMapper("foo", nil, &output)
+	items, err := loadBalancerOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

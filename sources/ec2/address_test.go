@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -56,7 +57,7 @@ func TestAddressOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := addressOutputMapper("foo", nil, &output)
+	items, err := addressOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

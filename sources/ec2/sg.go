@@ -22,7 +22,7 @@ func securityGroupInputMapperList(scope string) (*ec2.DescribeSecurityGroupsInpu
 	return &ec2.DescribeSecurityGroupsInput{}, nil
 }
 
-func securityGroupOutputMapper(scope string, _ *ec2.DescribeSecurityGroupsInput, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
+func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeSecurityGroupsInput, output *ec2.DescribeSecurityGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, securityGroup := range output.SecurityGroups {

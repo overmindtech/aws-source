@@ -22,7 +22,7 @@ func volumeStatusInputMapperList(scope string) (*ec2.DescribeVolumeStatusInput, 
 	return &ec2.DescribeVolumeStatusInput{}, nil
 }
 
-func volumeStatusOutputMapper(scope string, _ *ec2.DescribeVolumeStatusInput, output *ec2.DescribeVolumeStatusOutput) ([]*sdp.Item, error) {
+func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeVolumeStatusInput, output *ec2.DescribeVolumeStatusOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, volume := range output.VolumeStatuses {

@@ -72,7 +72,7 @@ func statusToHealth(status string) *sdp.Health {
 	return nil
 }
 
-func dBInstanceOutputMapper(scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
+func dBInstanceOutputMapper(_ context.Context, _ *rds.Client, scope string, _ *rds.DescribeDBInstancesInput, output *rds.DescribeDBInstancesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, instance := range output.DBInstances {

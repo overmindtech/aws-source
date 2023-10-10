@@ -38,7 +38,7 @@ func ParseInstanceName(name string) (InstanceHealthName, error) {
 	}, nil
 }
 
-func instanceHealthOutputMapper(scope string, _ *elb.DescribeInstanceHealthInput, output *elb.DescribeInstanceHealthOutput) ([]*sdp.Item, error) {
+func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, _ *elb.DescribeInstanceHealthInput, output *elb.DescribeInstanceHealthOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, is := range output.InstanceStates {

@@ -22,7 +22,7 @@ func routeTableInputMapperList(scope string) (*ec2.DescribeRouteTablesInput, err
 	return &ec2.DescribeRouteTablesInput{}, nil
 }
 
-func routeTableOutputMapper(scope string, _ *ec2.DescribeRouteTablesInput, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
+func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeRouteTablesInput, output *ec2.DescribeRouteTablesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, rt := range output.RouteTables {

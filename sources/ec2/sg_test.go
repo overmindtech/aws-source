@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -78,7 +79,7 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := securityGroupOutputMapper("052392120703.eu-west-2", nil, output)
+	items, err := securityGroupOutputMapper(context.Background(), nil, "052392120703.eu-west-2", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

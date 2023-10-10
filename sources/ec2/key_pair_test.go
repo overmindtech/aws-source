@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -52,7 +53,7 @@ func TestKeyPairOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := keyPairOutputMapper("foo", nil, output)
+	items, err := keyPairOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

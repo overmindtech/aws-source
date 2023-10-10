@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -77,7 +78,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := subnetOutputMapper("foo", nil, output)
+	items, err := subnetOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

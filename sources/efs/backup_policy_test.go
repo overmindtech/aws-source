@@ -1,6 +1,7 @@
 package efs
 
 import (
+	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
@@ -15,7 +16,7 @@ func TestBackupPolicyOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := BackupPolicyOutputMapper("foo", &efs.DescribeBackupPolicyInput{
+	items, err := BackupPolicyOutputMapper(context.Background(), nil, "foo", &efs.DescribeBackupPolicyInput{
 		FileSystemId: sources.PtrString("fs-1234"),
 	}, output)
 

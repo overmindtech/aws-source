@@ -1,6 +1,7 @@
 package efs
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -46,7 +47,7 @@ func TestAccessPointOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := AccessPointOutputMapper("foo", nil, output)
+	items, err := AccessPointOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

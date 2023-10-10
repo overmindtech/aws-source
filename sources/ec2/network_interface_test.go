@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -103,7 +104,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := networkInterfaceOutputMapper("foo", nil, output)
+	items, err := networkInterfaceOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -70,7 +71,7 @@ func TestAvailabilityZoneOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := availabilityZoneOutputMapper("foo", nil, &output)
+	items, err := availabilityZoneOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

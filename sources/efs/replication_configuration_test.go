@@ -1,6 +1,7 @@
 package efs
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -38,7 +39,7 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 	}
 
 	accountID := "1234"
-	items, err := ReplicationConfigurationOutputMapper(sources.FormatScope(accountID, "eu-west-1"), nil, output)
+	items, err := ReplicationConfigurationOutputMapper(context.Background(), nil, sources.FormatScope(accountID, "eu-west-1"), nil, output)
 
 	if err != nil {
 		t.Fatal(err)

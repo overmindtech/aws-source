@@ -75,7 +75,7 @@ func ToTargetHealthUniqueID(id string) (TargetHealthUniqueID, error) {
 	return healthId, nil
 }
 
-func targetHealthOutputMapper(scope string, input *elbv2.DescribeTargetHealthInput, output *elbv2.DescribeTargetHealthOutput) ([]*sdp.Item, error) {
+func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, input *elbv2.DescribeTargetHealthInput, output *elbv2.DescribeTargetHealthOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, desc := range output.TargetHealthDescriptions {

@@ -18,6 +18,17 @@ type CloudwatchClient interface {
 	DescribeAlarmsForMetric(ctx context.Context, params *cloudwatch.DescribeAlarmsForMetricInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsForMetricOutput, error)
 }
 
+// ToQueryString Converts an alarm query input to the correct for search string
+func ToQueryString(input *cloudwatch.DescribeAlarmsForMetricInput) (string, error) {
+	b, err := json.Marshal(input)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
+
 // fromQueryString Converts a search string to an alarm query input
 func fromQueryString(query string) (*cloudwatch.DescribeAlarmsForMetricInput, error) {
 	input := &cloudwatch.DescribeAlarmsForMetricInput{}

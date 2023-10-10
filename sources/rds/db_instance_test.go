@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -168,7 +169,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBInstanceOutputMapper("foo", nil, output)
+	items, err := dBInstanceOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

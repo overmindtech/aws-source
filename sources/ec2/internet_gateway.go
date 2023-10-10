@@ -21,7 +21,7 @@ func internetGatewayInputMapperList(scope string) (*ec2.DescribeInternetGateways
 	return &ec2.DescribeInternetGatewaysInput{}, nil
 }
 
-func internetGatewayOutputMapper(scope string, _ *ec2.DescribeInternetGatewaysInput, output *ec2.DescribeInternetGatewaysOutput) ([]*sdp.Item, error) {
+func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeInternetGatewaysInput, output *ec2.DescribeInternetGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.InternetGateways {

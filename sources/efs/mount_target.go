@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func MountTargetOutputMapper(scope string, input *efs.DescribeMountTargetsInput, output *efs.DescribeMountTargetsOutput) ([]*sdp.Item, error) {
+func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, input *efs.DescribeMountTargetsInput, output *efs.DescribeMountTargetsOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("nil output from AWS")
 	}

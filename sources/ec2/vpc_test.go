@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -79,7 +80,7 @@ func TestVpcOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := vpcOutputMapper("foo", nil, output)
+	items, err := vpcOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

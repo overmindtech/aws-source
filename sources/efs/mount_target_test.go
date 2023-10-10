@@ -1,6 +1,7 @@
 package efs
 
 import (
+	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
@@ -27,7 +28,7 @@ func TestMountTargetOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := MountTargetOutputMapper("foo", nil, output)
+	items, err := MountTargetOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)
