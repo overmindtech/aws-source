@@ -12,19 +12,14 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// ToQueryString Converts an alarm query input to the correct for search string
-func ToQueryString(input *cloudwatch.DescribeAlarmsForMetricInput) (string, error) {
-	b, err := json.Marshal(input)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(b), nil
+type CloudwatchClient interface {
+	ListTagsForResource(ctx context.Context, params *cloudwatch.ListTagsForResourceInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.ListTagsForResourceOutput, error)
+	DescribeAlarms(ctx context.Context, params *cloudwatch.DescribeAlarmsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsOutput, error)
+	DescribeAlarmsForMetric(ctx context.Context, params *cloudwatch.DescribeAlarmsForMetricInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsForMetricOutput, error)
 }
 
-// FromQueryString Converts a search string to an alarm query input
-func FromQueryString(query string) (*cloudwatch.DescribeAlarmsForMetricInput, error) {
+// fromQueryString Converts a search string to an alarm query input
+func fromQueryString(query string) (*cloudwatch.DescribeAlarmsForMetricInput, error) {
 	input := &cloudwatch.DescribeAlarmsForMetricInput{}
 
 	if err := json.Unmarshal([]byte(query), input); err != nil {
@@ -34,12 +29,23 @@ func FromQueryString(query string) (*cloudwatch.DescribeAlarmsForMetricInput, er
 	return input, nil
 }
 
+// Converts cloudwatch tags to a map
+func tagsToMap(tags []types.Tag) map[string]string {
+	out := make(map[string]string)
+
+	for _, tag := range tags {
+		out[*tag.Key] = *tag.Value
+	}
+
+	return out
+}
+
 type Alarm struct {
 	Metric    *types.MetricAlarm
 	Composite *types.CompositeAlarm
 }
 
-func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, output *cloudwatch.DescribeAlarmsOutput) ([]*sdp.Item, error) {
+func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope string, input *cloudwatch.DescribeAlarmsInput, output *cloudwatch.DescribeAlarmsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	allAlarms := make([]Alarm, 0)
@@ -54,13 +60,25 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 	for _, alarm := range allAlarms {
 		var attrs *sdp.ItemAttributes
 		var err error
+		var arn *string
 
 		if alarm.Metric != nil {
 			attrs, err = sources.ToAttributesCase(alarm.Metric)
+			arn = alarm.Metric.AlarmArn
 		}
 		if alarm.Composite != nil {
 			attrs, err = sources.ToAttributesCase(alarm.Composite)
+			arn = alarm.Composite.AlarmArn
 		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Get the tags
+		tagsOut, err := client.ListTagsForResource(ctx, &cloudwatch.ListTagsForResourceInput{
+			ResourceARN: arn,
+		})
 
 		if err != nil {
 			return nil, err
@@ -71,6 +89,7 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 			UniqueAttribute: "alarmName",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(tagsOut.Tags),
 		}
 
 		// Combine all actions so that we can link the targeted item
@@ -178,16 +197,16 @@ func alarmOutputMapper(scope string, input *cloudwatch.DescribeAlarmsInput, outp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudwatch_metric_alarm.alarm_name
 
-func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, *cloudwatch.Client, *cloudwatch.Options] {
-	return &sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, *cloudwatch.Client, *cloudwatch.Options]{
+func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
+	return &sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
 		ItemType:  "cloudwatch-alarm",
 		Client:    cloudwatch.NewFromConfig(config),
 		AccountID: accountID,
 		Config:    config,
-		PaginatorBuilder: func(client *cloudwatch.Client, params *cloudwatch.DescribeAlarmsInput) sources.Paginator[*cloudwatch.DescribeAlarmsOutput, *cloudwatch.Options] {
+		PaginatorBuilder: func(client CloudwatchClient, params *cloudwatch.DescribeAlarmsInput) sources.Paginator[*cloudwatch.DescribeAlarmsOutput, *cloudwatch.Options] {
 			return cloudwatch.NewDescribeAlarmsPaginator(client, params)
 		},
-		DescribeFunc: func(ctx context.Context, client *cloudwatch.Client, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client CloudwatchClient, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error) {
 			return client.DescribeAlarms(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*cloudwatch.DescribeAlarmsInput, error) {
@@ -198,10 +217,10 @@ func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySo
 		InputMapperList: func(scope string) (*cloudwatch.DescribeAlarmsInput, error) {
 			return &cloudwatch.DescribeAlarmsInput{}, nil
 		},
-		InputMapperSearch: func(ctx context.Context, client *cloudwatch.Client, scope, query string) (*cloudwatch.DescribeAlarmsInput, error) {
+		InputMapperSearch: func(ctx context.Context, client CloudwatchClient, scope, query string) (*cloudwatch.DescribeAlarmsInput, error) {
 			// Search uses the DescribeAlarmsForMetric API call to find alarms
 			// based on a JSON input
-			input, err := FromQueryString(query)
+			input, err := fromQueryString(query)
 
 			if err != nil {
 				return nil, err
@@ -225,7 +244,6 @@ func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySo
 				AlarmNames: name,
 			}, nil
 		},
-
 		OutputMapper: alarmOutputMapper,
 	}
 }

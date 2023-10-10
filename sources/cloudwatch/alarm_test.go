@@ -1,6 +1,7 @@
 package cloudwatch
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,6 +10,27 @@ import (
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
+
+type testCloudwatchClient struct{}
+
+func (c testCloudwatchClient) ListTagsForResource(ctx context.Context, params *cloudwatch.ListTagsForResourceInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.ListTagsForResourceOutput, error) {
+	return &cloudwatch.ListTagsForResourceOutput{
+		Tags: []types.Tag{
+			{
+				Key:   sources.PtrString("Name"),
+				Value: sources.PtrString("example"),
+			},
+		},
+	}, nil
+}
+
+func (c testCloudwatchClient) DescribeAlarms(ctx context.Context, params *cloudwatch.DescribeAlarmsInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsOutput, error) {
+	return nil, nil
+}
+
+func (c testCloudwatchClient) DescribeAlarmsForMetric(ctx context.Context, params *cloudwatch.DescribeAlarmsForMetricInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.DescribeAlarmsForMetricOutput, error) {
+	return nil, nil
+}
 
 func TestAlarmOutputMapper(t *testing.T) {
 	output := &cloudwatch.DescribeAlarmsOutput{
@@ -81,7 +103,7 @@ func TestAlarmOutputMapper(t *testing.T) {
 	}
 
 	scope := "123456789012.eu-west-2"
-	items, err := alarmOutputMapper(scope, &cloudwatch.DescribeAlarmsInput{}, output)
+	items, err := alarmOutputMapper(context.Background(), testCloudwatchClient{}, scope, &cloudwatch.DescribeAlarmsInput{}, output)
 
 	if err != nil {
 		t.Error(err)
@@ -95,6 +117,10 @@ func TestAlarmOutputMapper(t *testing.T) {
 
 	if err = item.Validate(); err != nil {
 		t.Error(err)
+	}
+
+	if item.Tags["Name"] != "example" {
+		t.Errorf("Expected tag Name to be example, got %s", item.Tags["Name"])
 	}
 
 	tests := sources.QueryTests{

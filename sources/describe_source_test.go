@@ -77,7 +77,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 				outputMapperCalled = true
 				return []*sdp.Item{
 					{},
@@ -124,7 +124,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 				return []*sdp.Item{
 					{},
 					{},
@@ -155,7 +155,7 @@ func TestGet(t *testing.T) {
 			InputMapperList: func(scope string) (string, error) {
 				return "input", nil
 			},
-			OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+			OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 				return []*sdp.Item{}, nil
 			},
 			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
@@ -183,7 +183,7 @@ func TestSearchARN(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -216,7 +216,7 @@ func TestSearchCustom(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{
 					Type:            "test-item",
@@ -260,7 +260,7 @@ func TestNoInputMapper(t *testing.T) {
 			Region: "eu-west-2",
 		},
 		AccountID: "foo",
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -333,7 +333,7 @@ func TestNoDescribeFunc(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -369,7 +369,7 @@ func TestFailingInputMapper(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", errors.New("foobar")
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -418,7 +418,7 @@ func TestFailingOutputMapper(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return nil, errors.New("foobar")
 		},
 		DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
@@ -465,7 +465,7 @@ func TestFailingDescribeFunc(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -536,7 +536,7 @@ func TestPaginated(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{},
 			}, nil
@@ -590,7 +590,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		InputMapperList: func(scope string) (string, error) {
 			return "input", nil
 		},
-		OutputMapper: func(scope, input, output string) ([]*sdp.Item, error) {
+		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
 				{
 					Scope:           "foo.eu-west-2",

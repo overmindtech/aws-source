@@ -52,7 +52,7 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// and input are passed in on order to assist in creating the items if
 	// needed, but primarily this function should iterate over the output and
 	// create new items for each result
-	OutputMapper func(scope string, input Input, output Output) ([]*sdp.Item, error)
+	OutputMapper func(ctx context.Context, client ClientStruct, scope string, input Input, output Output) ([]*sdp.Item, error)
 
 	// Config AWS Config including region and credentials
 	Config aws.Config
@@ -185,7 +185,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 		return nil, err
 	}
 
-	items, err = s.OutputMapper(scope, input, output)
+	items, err = s.OutputMapper(ctx, s.Client, scope, input, output)
 	if err != nil {
 		err = WrapAWSError(err)
 		s.cache.StoreError(err, s.cacheDuration(), ck)
@@ -358,7 +358,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 				return nil, err
 			}
 
-			newItems, err = s.OutputMapper(scope, input, output)
+			newItems, err = s.OutputMapper(ctx, s.Client, scope, input, output)
 			if err != nil {
 				return nil, err
 			}
@@ -371,7 +371,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 			return nil, err
 		}
 
-		items, err = s.OutputMapper(scope, input, output)
+		items, err = s.OutputMapper(ctx, s.Client, scope, input, output)
 		if err != nil {
 			return nil, err
 		}
