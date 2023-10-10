@@ -151,13 +151,25 @@ func TestUserListFunc(t *testing.T) {
 	}
 
 	for _, user := range users {
-		if len(user.User.Tags) != 1 {
-			t.Errorf("expected 1 tag, got %v", len(user.User.Tags))
-		}
-
 		if len(user.UserGroups) != 3 {
 			t.Errorf("expected 3 groups, got %v", len(user.UserGroups))
 		}
+	}
+}
+
+func TestUserListTagsFunc(t *testing.T) {
+	tags, err := userListTagsFunc(context.Background(), &UserDetails{
+		User: &types.User{
+			UserName: sources.PtrString("foo"),
+		},
+	}, &TestIAMClient{})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(tags) != 1 {
+		t.Errorf("expected 1 tag, got %v", len(tags))
 	}
 }
 

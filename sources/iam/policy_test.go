@@ -115,10 +115,6 @@ func TestPolicyGetFunc(t *testing.T) {
 	if len(policy.PolicyUsers) != 1 {
 		t.Errorf("expected 1 User, got %v", len(policy.PolicyUsers))
 	}
-
-	if len(policy.Policy.Tags) == 0 {
-		t.Error("empty tags")
-	}
 }
 
 func TestPolicyListFunc(t *testing.T) {
@@ -131,9 +127,21 @@ func TestPolicyListFunc(t *testing.T) {
 	if len(policies) != 2 {
 		t.Errorf("expected 2 policies, got %v", len(policies))
 	}
+}
 
-	if len(policies[0].Policy.Tags) == 0 {
-		t.Error("empty tags")
+func TestPolicyListTagsFunc(t *testing.T) {
+	tags, err := policyListTagsFunc(context.Background(), &PolicyDetails{
+		Policy: &types.Policy{
+			Arn: sources.PtrString("arn:aws:iam::801795385023:policy/service-role/AWSControlTowerAdminPolicy"),
+		},
+	}, &TestIAMClient{})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(tags) != 1 {
+		t.Errorf("expected 1 tag, got %v", len(tags))
 	}
 }
 
