@@ -9,8 +9,22 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ruleOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *elbv2.DescribeRulesInput, output *elbv2.DescribeRulesOutput) ([]*sdp.Item, error) {
+func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *elbv2.DescribeRulesInput, output *elbv2.DescribeRulesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+
+	ruleArns := make([]string, 0)
+
+	for _, rule := range output.Rules {
+		if rule.RuleArn != nil {
+			ruleArns = append(ruleArns, *rule.RuleArn)
+		}
+	}
+
+	tagsMap, err := getTagsMap(ctx, client, ruleArns)
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, rule := range output.Rules {
 		attrs, err := sources.ToAttributesCase(rule)
@@ -19,11 +33,18 @@ func ruleOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *elbv2
 			return nil, err
 		}
 
+		var tags map[string]string
+
+		if rule.RuleArn != nil {
+			tags = tagsMap[*rule.RuleArn]
+		}
+
 		item := sdp.Item{
 			Type:            "elbv2-rule",
 			UniqueAttribute: "ruleArn",
 			Attributes:      attrs,
 			Scope:           scope,
+			Tags:            tags,
 		}
 
 		var requests []*sdp.LinkedItemQuery
@@ -49,13 +70,13 @@ func ruleOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *elbv2
 // +overmind:terraform:queryMap aws_lb_listener_rule.arn
 // +overmind:terraform:method SEARCH
 
-func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, *elbv2.Client, *elbv2.Options] {
-	return &sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, *elbv2.Client, *elbv2.Options]{
+func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
+	return &sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
 		Config:    config,
 		Client:    elbv2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "elbv2-rule",
-		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {
+		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {
 			return client.DescribeRules(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*elbv2.DescribeRulesInput, error) {
@@ -69,7 +90,7 @@ func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySou
 				ErrorString: "list not supported for elbv2-rule, use search",
 			}
 		},
-		InputMapperSearch: func(ctx context.Context, client *elbv2.Client, scope, query string) (*elbv2.DescribeRulesInput, error) {
+		InputMapperSearch: func(ctx context.Context, client elbClient, scope, query string) (*elbv2.DescribeRulesInput, error) {
 			// Search by listener ARN
 			return &elbv2.DescribeRulesInput{
 				ListenerArn: &query,

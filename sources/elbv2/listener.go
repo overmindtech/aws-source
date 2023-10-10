@@ -13,8 +13,23 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func listenerOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
+func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _ *elbv2.DescribeListenersInput, output *elbv2.DescribeListenersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+
+	// Get the ARNs so that we can get the tags
+	arns := make([]string, 0)
+
+	for _, listener := range output.Listeners {
+		if listener.ListenerArn != nil {
+			arns = append(arns, *listener.ListenerArn)
+		}
+	}
+
+	tagsMap, err := getTagsMap(ctx, client, arns)
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, listener := range output.Listeners {
 		// Redact the client secret and replace with the first 12 characters of
@@ -41,11 +56,18 @@ func listenerOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *e
 			return nil, err
 		}
 
+		var tags map[string]string
+
+		if listener.ListenerArn != nil {
+			tags = tagsMap[*listener.ListenerArn]
+		}
+
 		item := sdp.Item{
 			Type:            "elbv2-listener",
 			UniqueAttribute: "listenerArn",
 			Attributes:      attrs,
 			Scope:           scope,
+			Tags:            tags,
 		}
 
 		if listener.LoadBalancerArn != nil {
@@ -117,13 +139,13 @@ func listenerOutputMapper(_ context.Context, _ *elbv2.Client, scope string, _ *e
 // +overmind:terraform:queryMap aws_lb_listener.arn
 // +overmind:terraform:method SEARCH
 
-func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options] {
-	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, *elbv2.Client, *elbv2.Options]{
+func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
+	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options]{
 		Config:    config,
 		Client:    elbv2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "elbv2-listener",
-		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
+		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
 			return client.DescribeListeners(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*elbv2.DescribeListenersInput, error) {
@@ -137,13 +159,13 @@ func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnl
 				ErrorString: "list not supported for elbv2-listener, use search",
 			}
 		},
-		InputMapperSearch: func(ctx context.Context, client *elbv2.Client, scope, query string) (*elbv2.DescribeListenersInput, error) {
+		InputMapperSearch: func(ctx context.Context, client elbClient, scope, query string) (*elbv2.DescribeListenersInput, error) {
 			// Search by LB ARN
 			return &elbv2.DescribeListenersInput{
 				LoadBalancerArn: &query,
 			}, nil
 		},
-		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeListenersInput) sources.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
+		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeListenersInput) sources.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeListenersPaginator(client, params)
 		},
 		OutputMapper: listenerOutputMapper,
