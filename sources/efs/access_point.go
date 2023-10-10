@@ -31,6 +31,7 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(ap.LifeCycleState),
+			Tags:            tagsToMap(ap.Tags),
 		}
 
 		if ap.FileSystemId != nil {

@@ -35,6 +35,7 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(fs.LifeCycleState),
+			Tags:            tagsToMap(fs.Tags),
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
