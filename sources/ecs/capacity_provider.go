@@ -30,6 +30,7 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 			UniqueAttribute: "name",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(provider.Tags),
 		}
 
 		if provider.AutoScalingGroupProvider != nil {

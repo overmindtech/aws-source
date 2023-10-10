@@ -49,6 +49,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 		UniqueAttribute: "id",
 		Scope:           scope,
 		Attributes:      attributes,
+		Tags:            tagsToMap(containerInstance.Tags),
 	}
 
 	if containerInstance.HealthStatus != nil {

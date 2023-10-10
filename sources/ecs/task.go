@@ -56,6 +56,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(task.Tags),
 	}
 
 	switch task.HealthStatus {
