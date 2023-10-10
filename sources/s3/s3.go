@@ -167,7 +167,6 @@ type Bucket struct {
 	s3.GetBucketPolicyStatusOutput
 	s3.GetBucketReplicationOutput
 	s3.GetBucketRequestPaymentOutput
-	s3.GetBucketTaggingOutput
 	s3.GetBucketVersioningOutput
 	s3.GetBucketWebsiteOutput
 }
@@ -229,6 +228,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	// We want to execute all of these requests in parallel so we're not
 	// crippled by latency. This API is really stupid but there's not much I can
 	// do about it
+	var tagging *s3.GetBucketTaggingOutput
 
 	wg.Add(1)
 	go func() {
@@ -354,8 +354,8 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	go func() {
 		defer sentry.Recover()
 		defer wg.Done()
-		if tagging, err := client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucketName}); err == nil {
-			bucket.GetBucketTaggingOutput = *tagging
+		if out, err := client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: bucketName}); err == nil {
+			tagging = out
 		}
 	}()
 	wg.Add(1)
@@ -390,11 +390,23 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 		return nil, err
 	}
 
+	// Convert tags
+	tags := make(map[string]string)
+
+	if tagging != nil {
+		for _, tag := range tagging.TagSet {
+			if tag.Key != nil && tag.Value != nil {
+				tags[*tag.Key] = *tag.Value
+			}
+		}
+	}
+
 	item := sdp.Item{
 		Type:            "s3-bucket",
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tags,
 	}
 
 	if bucket.RedirectAllRequestsTo != nil {
