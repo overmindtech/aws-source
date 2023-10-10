@@ -42,6 +42,7 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 			UniqueAttribute: "internetGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(gw.Tags),
 		}
 
 		// VPCs

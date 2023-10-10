@@ -42,6 +42,7 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 			UniqueAttribute: "launchTemplateId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(LaunchTemplate.Tags),
 		}
 
 		items = append(items, &item)

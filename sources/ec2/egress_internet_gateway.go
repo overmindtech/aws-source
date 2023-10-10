@@ -42,6 +42,7 @@ func egressOnlyInternetGatewayOutputMapper(_ context.Context, _ *ec2.Client, sco
 			UniqueAttribute: "egressOnlyInternetGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(gw.Tags),
 		}
 
 		for _, attachment := range gw.Attachments {

@@ -42,6 +42,7 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 			UniqueAttribute: "networkInterfaceId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ni.TagSet),
 		}
 
 		if ni.Attachment != nil {

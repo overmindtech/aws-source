@@ -42,6 +42,7 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 			UniqueAttribute: "securityGroupRuleId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(securityGroupRule.Tags),
 		}
 
 		if securityGroupRule.GroupId != nil {

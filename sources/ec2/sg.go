@@ -43,6 +43,7 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 			UniqueAttribute: "groupId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(securityGroup.Tags),
 		}
 
 		// VPC

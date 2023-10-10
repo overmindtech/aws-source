@@ -24,6 +24,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 			UniqueAttribute: "capacityReservationId",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(cr.Tags),
 		}
 
 		if cr.AvailabilityZone != nil {

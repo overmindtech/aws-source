@@ -42,6 +42,7 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 			UniqueAttribute: "vpcId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(vpc.Tags),
 		}
 
 		items = append(items, &item)

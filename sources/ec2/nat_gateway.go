@@ -42,6 +42,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 			UniqueAttribute: "natGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ng.Tags),
 		}
 
 		for _, address := range ng.NatGatewayAddresses {

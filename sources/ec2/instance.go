@@ -41,6 +41,7 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 				UniqueAttribute: "instanceId",
 				Scope:           scope,
 				Attributes:      attrs,
+				Tags:            tagsToMap(instance.Tags),
 				LinkedItemQueries: []*sdp.LinkedItemQuery{
 					{
 						Query: &sdp.Query{

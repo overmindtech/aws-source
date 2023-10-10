@@ -42,6 +42,7 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 			UniqueAttribute: "keyName",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(gw.Tags),
 		}
 
 		items = append(items, &item)

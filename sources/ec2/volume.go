@@ -42,6 +42,7 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 			UniqueAttribute: "volumeId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(volume.Tags),
 		}
 
 		for _, attachment := range volume.Attachments {

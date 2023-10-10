@@ -25,6 +25,7 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 			UniqueAttribute: "capacityReservationFleetId",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(cr.Tags),
 		}
 
 		for _, spec := range cr.InstanceTypeSpecifications {

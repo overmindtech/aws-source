@@ -40,6 +40,7 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 			UniqueAttribute: "reservedInstancesId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(reservation.Tags),
 		}
 
 		if reservation.AvailabilityZone != nil {

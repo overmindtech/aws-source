@@ -43,6 +43,7 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 			UniqueAttribute: "routeTableId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(rt.Tags),
 		}
 
 		for _, assoc := range rt.Associations {

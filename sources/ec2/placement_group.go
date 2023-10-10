@@ -42,6 +42,7 @@ func placementGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 			UniqueAttribute: "groupId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ng.Tags),
 		}
 
 		items = append(items, &item)

@@ -48,6 +48,7 @@ func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 			UniqueAttribute: "snapshotId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(snapshot.Tags),
 		}
 
 		if snapshot.VolumeId != nil {

@@ -53,6 +53,7 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 			UniqueAttribute: "imageId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(image.Tags),
 		}
 
 		items = append(items, &item)

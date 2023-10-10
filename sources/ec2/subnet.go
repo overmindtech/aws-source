@@ -42,6 +42,7 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 			UniqueAttribute: "subnetId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(subnet.Tags),
 		}
 
 		if subnet.AvailabilityZone != nil {

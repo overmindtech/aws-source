@@ -25,6 +25,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 			UniqueAttribute: "vpcPeeringConnectionId",
 			Scope:           scope,
 			Attributes:      attributes,
+			Tags:            tagsToMap(connection.Tags),
 		}
 
 		if connection.Status != nil {

@@ -65,6 +65,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 					BlastPropagation: bp,
 				},
 			},
+			Tags: tagsToMap(address.Tags),
 		}
 
 		if address.InstanceId != nil {

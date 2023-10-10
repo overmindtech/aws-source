@@ -42,6 +42,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 			UniqueAttribute: "networkAclId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(networkAcl.Tags),
 		}
 
 		for _, assoc := range networkAcl.Associations {

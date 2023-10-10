@@ -40,6 +40,7 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 			UniqueAttribute: "instanceEventWindowId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ew.Tags),
 		}
 
 		if at := ew.AssociationTarget; at != nil {
