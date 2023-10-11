@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -61,7 +62,7 @@ func TestVpcPeeringConnectionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := vpcPeeringConnectionOutputMapper("foo", nil, output)
+	items, err := vpcPeeringConnectionOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScalingGroupsInput, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
+func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scope string, _ *autoscaling.DescribeAutoScalingGroupsInput, output *autoscaling.DescribeAutoScalingGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	var item sdp.Item
@@ -29,6 +29,16 @@ func autoScalingGroupOutputMapper(scope string, _ *autoscaling.DescribeAutoScali
 			Scope:           scope,
 			Attributes:      attributes,
 		}
+
+		tags := make(map[string]string)
+
+		for _, tag := range asg.Tags {
+			if tag.Key != nil && tag.Value != nil {
+				tags[*tag.Key] = *tag.Value
+			}
+		}
+
+		item.Tags = tags
 
 		if asg.MixedInstancesPolicy != nil {
 			if asg.MixedInstancesPolicy.LaunchTemplate != nil {

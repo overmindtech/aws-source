@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -90,7 +91,7 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := natGatewayOutputMapper("foo", nil, output)
+	items, err := natGatewayOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

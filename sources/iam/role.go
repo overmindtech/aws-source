@@ -67,9 +67,7 @@ func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails,
 		return err
 	}
 
-	roleDetails.Role.Tags, err = getRoleTags(ctx, client, *roleDetails.Role.RoleName, limit)
-
-	return err
+	return nil
 }
 
 type embeddedPolicy struct {
@@ -176,20 +174,6 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string,
 	return attachedPolicies, nil
 }
 
-func getRoleTags(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]types.Tag, error) {
-	limit.Wait(ctx)
-
-	out, err := client.ListRoleTags(ctx, &iam.ListRoleTagsInput{
-		RoleName: &roleName,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return out.Tags, nil
-}
-
 func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
@@ -284,6 +268,30 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	return &item, nil
 }
 
+func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (map[string]string, error) {
+	tags := make(map[string]string)
+
+	paginator := iam.NewListRoleTagsPaginator(client, &iam.ListRoleTagsInput{
+		RoleName: r.Role.RoleName,
+	})
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, tag := range out.Tags {
+			if tag.Key != nil && tag.Value != nil {
+				tags[*tag.Key] = *tag.Value
+			}
+		}
+	}
+
+	return tags, nil
+}
+
 //go:generate docgen ../../docs-data
 // +overmind:type iam-role
 // +overmind:descriptiveType IAM Role
@@ -306,6 +314,7 @@ func NewRoleSource(config aws.Config, accountID string, region string, limit *so
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
 			return roleListFunc(ctx, client, scope, limit)
 		},
-		ItemMapper: roleItemMapper,
+		ListTagsFunc: roleListTagsFunc,
+		ItemMapper:   roleItemMapper,
 	}
 }

@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -38,7 +39,7 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBSubnetGroupOutputMapper("foo", nil, &output)
+	items, err := dBSubnetGroupOutputMapper(context.Background(), mockRdsClient{}, "foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -52,6 +53,10 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 
 	if err = item.Validate(); err != nil {
 		t.Error(err)
+	}
+
+	if item.Tags["key"] != "value" {
+		t.Errorf("expected key to be value, got %v", item.Tags["key"])
 	}
 
 	tests := sources.QueryTests{

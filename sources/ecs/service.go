@@ -60,6 +60,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		UniqueAttribute: "serviceFullName",
 		Scope:           scope,
 		Attributes:      attributes,
+		Tags:            tagsToMap(service.Tags),
 	}
 
 	if service.Status != nil {

@@ -15,7 +15,7 @@ var CapacityProviderIncludeFields = []types.CapacityProviderField{
 	types.CapacityProviderFieldTags,
 }
 
-func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
+func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, _ *ecs.DescribeCapacityProvidersInput, output *ecs.DescribeCapacityProvidersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, provider := range output.CapacityProviders {
@@ -30,6 +30,7 @@ func capacityProviderOutputMapper(scope string, _ *ecs.DescribeCapacityProviders
 			UniqueAttribute: "name",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(provider.Tags),
 		}
 
 		if provider.AutoScalingGroupProvider != nil {

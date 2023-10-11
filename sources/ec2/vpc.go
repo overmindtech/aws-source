@@ -21,7 +21,7 @@ func vpcInputMapperList(scope string) (*ec2.DescribeVpcsInput, error) {
 	return &ec2.DescribeVpcsInput{}, nil
 }
 
-func vpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
+func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeVpcsInput, output *ec2.DescribeVpcsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, vpc := range output.Vpcs {
@@ -42,6 +42,7 @@ func vpcOutputMapper(scope string, _ *ec2.DescribeVpcsInput, output *ec2.Describ
 			UniqueAttribute: "vpcId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(vpc.Tags),
 		}
 
 		items = append(items, &item)

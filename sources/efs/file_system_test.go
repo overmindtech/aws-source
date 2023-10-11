@@ -1,6 +1,7 @@
 package efs
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -45,7 +46,7 @@ func TestFileSystemOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := FileSystemOutputMapper("foo", nil, output)
+	items, err := FileSystemOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

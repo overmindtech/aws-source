@@ -149,5 +149,24 @@ func NewHealthCheckSource(config aws.Config, accountID string, region string) *s
 		GetFunc:    healthCheckGetFunc,
 		ListFunc:   healthCheckListFunc,
 		ItemMapper: healthCheckItemMapper,
+		ListTagsFunc: func(ctx context.Context, hc *HealthCheck, c *route53.Client) (map[string]string, error) {
+			if hc.Id == nil {
+				return nil, nil
+			}
+
+			// Strip the prefix
+			id := strings.TrimPrefix(*hc.Id, "/healthcheck/")
+
+			out, err := c.ListTagsForResource(ctx, &route53.ListTagsForResourceInput{
+				ResourceId:   &id,
+				ResourceType: types.TagResourceTypeHealthcheck,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			return tagsToMap(out.ResourceTagSet.Tags), nil
+		},
 	}
 }

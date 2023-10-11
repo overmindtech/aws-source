@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -128,7 +129,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBClusterOutputMapper("foo", nil, &output)
+	items, err := dBClusterOutputMapper(context.Background(), mockRdsClient{}, "foo", nil, &output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -142,6 +143,10 @@ func TestDBClusterOutputMapper(t *testing.T) {
 
 	if err = item.Validate(); err != nil {
 		t.Error(err)
+	}
+
+	if item.Tags["key"] != "value" {
+		t.Errorf("expected tag key to be value, got %v", item.Tags["key"])
 	}
 
 	tests := sources.QueryTests{

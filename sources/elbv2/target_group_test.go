@@ -1,6 +1,7 @@
 package elbv2
 
 import (
+	"context"
 	"testing"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -40,13 +41,17 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := targetGroupOutputMapper("foo", nil, &output)
+	items, err := targetGroupOutputMapper(context.Background(), mockElbClient{}, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)
 	}
 
 	for _, item := range items {
+		if item.Tags["foo"] != "bar" {
+			t.Errorf("expected tag foo to be bar, got %v", item.Tags["foo"])
+		}
+
 		if err := item.Validate(); err != nil {
 			t.Error(err)
 		}

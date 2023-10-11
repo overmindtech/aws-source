@@ -48,12 +48,6 @@ func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails,
 		return err
 	}
 
-	userDetails.User.Tags, err = getUserTags(ctx, client, userDetails.User.UserName, limit)
-
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -80,33 +74,6 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string, limi
 	}
 
 	return groups, nil
-}
-
-// GetUserTags Gets the tags for a user since the API doesn't actually return
-// this, even though it says it does see:
-// https://github.com/boto/boto3/issues/1855
-func getUserTags(ctx context.Context, client IAMClient, userName *string, limit *sources.LimitBucket) ([]types.Tag, error) {
-	paginator := iam.NewListUserTagsPaginator(client, &iam.ListUserTagsInput{
-		UserName: userName,
-	})
-
-	var out *iam.ListUserTagsOutput
-	var err error
-
-	tags := make([]types.Tag, 0)
-
-	for paginator.HasMorePages() {
-		limit.Wait(ctx) // Wait for rate limiting
-		out, err = paginator.NextPage(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		tags = append(tags, out.Tags...)
-	}
-
-	return tags, err
 }
 
 func userListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*UserDetails, error) {
@@ -177,6 +144,30 @@ func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	return &item, nil
 }
 
+func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (map[string]string, error) {
+	tags := make(map[string]string)
+
+	paginator := iam.NewListUserTagsPaginator(client, &iam.ListUserTagsInput{
+		UserName: u.User.UserName,
+	})
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, tag := range out.Tags {
+			if tag.Key != nil && tag.Value != nil {
+				tags[*tag.Key] = *tag.Value
+			}
+		}
+	}
+
+	return tags, nil
+}
+
 //go:generate docgen ../../docs-data
 // +overmind:type iam-user
 // +overmind:descriptiveType IAM User
@@ -200,6 +191,7 @@ func NewUserSource(config aws.Config, accountID string, region string, limit *so
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
 			return userListFunc(ctx, client, scope, limit)
 		},
-		ItemMapper: userItemMapper,
+		ListTagsFunc: userListTagsFunc,
+		ItemMapper:   userItemMapper,
 	}
 }

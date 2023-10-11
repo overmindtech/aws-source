@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -26,7 +27,7 @@ func TestIamInstanceProfileAssociationOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := iamInstanceProfileAssociationOutputMapper("foo", nil, &output)
+	items, err := iamInstanceProfileAssociationOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

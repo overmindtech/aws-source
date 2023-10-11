@@ -112,10 +112,6 @@ func TestRoleGetFunc(t *testing.T) {
 	if len(role.AttachedPolicies) != 2 {
 		t.Errorf("expected 2 attached policies, got %v", len(role.AttachedPolicies))
 	}
-
-	if len(role.Role.Tags) == 0 {
-		t.Error("got no role tags")
-	}
 }
 
 func TestRoleListFunc(t *testing.T) {
@@ -128,9 +124,21 @@ func TestRoleListFunc(t *testing.T) {
 	if len(roles) != 1 {
 		t.Errorf("expected 1 role, got %b", len(roles))
 	}
+}
 
-	if len(roles[0].Role.Tags) == 0 {
-		t.Error("got no role tags")
+func TestRoleListTagsFunc(t *testing.T) {
+	tags, err := roleListTagsFunc(context.Background(), &RoleDetails{
+		Role: &types.Role{
+			Arn: sources.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
+		},
+	}, &TestIAMClient{})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(tags) != 1 {
+		t.Errorf("expected 1 tag, got %v", len(tags))
 	}
 }
 

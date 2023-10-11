@@ -27,7 +27,7 @@ func snapshotInputMapperList(scope string) (*ec2.DescribeSnapshotsInput, error) 
 	}, nil
 }
 
-func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
+func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeSnapshotsInput, output *ec2.DescribeSnapshotsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, snapshot := range output.Snapshots {
@@ -48,6 +48,7 @@ func snapshotOutputMapper(scope string, _ *ec2.DescribeSnapshotsInput, output *e
 			UniqueAttribute: "snapshotId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(snapshot.Tags),
 		}
 
 		if snapshot.VolumeId != nil {

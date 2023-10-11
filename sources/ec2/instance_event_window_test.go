@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -67,7 +68,7 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := instanceEventWindowOutputMapper("foo", nil, output)
+	items, err := instanceEventWindowOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

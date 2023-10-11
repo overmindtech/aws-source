@@ -9,10 +9,19 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
+func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, _ *rds.DescribeDBClustersInput, output *rds.DescribeDBClustersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, cluster := range output.DBClusters {
+		// Get tags for the cluster
+		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+			ResourceName: cluster.DBClusterArn,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
 		attributes, err := sources.ToAttributesCase(cluster)
 
 		if err != nil {
@@ -24,6 +33,7 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 			UniqueAttribute: "dBClusterIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(tagsOut.TagList),
 		}
 
 		var a *sources.ARN
@@ -350,16 +360,16 @@ func dBClusterOutputMapper(scope string, _ *rds.DescribeDBClustersInput, output 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_rds_cluster.cluster_identifier
 
-func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options] {
-	return &sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, *rds.Client, *rds.Options]{
+func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
+	return &sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-cluster",
 		Config:    config,
 		AccountID: accountID,
 		Client:    rds.NewFromConfig(config),
-		PaginatorBuilder: func(client *rds.Client, params *rds.DescribeDBClustersInput) sources.Paginator[*rds.DescribeDBClustersOutput, *rds.Options] {
+		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBClustersInput) sources.Paginator[*rds.DescribeDBClustersOutput, *rds.Options] {
 			return rds.NewDescribeDBClustersPaginator(client, params)
 		},
-		DescribeFunc: func(ctx context.Context, client *rds.Client, input *rds.DescribeDBClustersInput) (*rds.DescribeDBClustersOutput, error) {
+		DescribeFunc: func(ctx context.Context, client rdsClient, input *rds.DescribeDBClustersInput) (*rds.DescribeDBClustersOutput, error) {
 			return client.DescribeDBClusters(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*rds.DescribeDBClustersInput, error) {

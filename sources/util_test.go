@@ -1,6 +1,8 @@
 package sources
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseARN(t *testing.T) {
 	t.Run("arn:partition:service:region:account-id:resource-type:resource-id", func(t *testing.T) {

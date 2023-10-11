@@ -21,7 +21,7 @@ func launchTemplateInputMapperList(scope string) (*ec2.DescribeLaunchTemplatesIn
 	return &ec2.DescribeLaunchTemplatesInput{}, nil
 }
 
-func launchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInput, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
+func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeLaunchTemplatesInput, output *ec2.DescribeLaunchTemplatesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, LaunchTemplate := range output.LaunchTemplates {
@@ -42,6 +42,7 @@ func launchTemplateOutputMapper(scope string, _ *ec2.DescribeLaunchTemplatesInpu
 			UniqueAttribute: "launchTemplateId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(LaunchTemplate.Tags),
 		}
 
 		items = append(items, &item)

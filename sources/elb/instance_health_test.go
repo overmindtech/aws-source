@@ -1,6 +1,7 @@
 package elb
 
 import (
+	"context"
 	"testing"
 
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
@@ -22,7 +23,7 @@ func TestInstanceHealthOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := instanceHealthOutputMapper("foo", nil, &output)
+	items, err := instanceHealthOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

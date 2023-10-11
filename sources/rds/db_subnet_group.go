@@ -9,10 +9,19 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
+func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope string, _ *rds.DescribeDBSubnetGroupsInput, output *rds.DescribeDBSubnetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, sg := range output.DBSubnetGroups {
+		// Get tags
+		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+			ResourceName: sg.DBSubnetGroupArn,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
 		attributes, err := sources.ToAttributesCase(sg)
 
 		if err != nil {
@@ -24,6 +33,7 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 			UniqueAttribute: "dBSubnetGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(tagsOut.TagList),
 		}
 
 		var a *sources.ARN
@@ -124,16 +134,16 @@ func dBSubnetGroupOutputMapper(scope string, _ *rds.DescribeDBSubnetGroupsInput,
 // +overmind:terraform:queryMap aws_db_subnet_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options] {
-	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, *rds.Client, *rds.Options]{
+func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
+	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-subnet-group",
 		Config:    config,
 		AccountID: accountID,
 		Client:    rds.NewFromConfig(config),
-		PaginatorBuilder: func(client *rds.Client, params *rds.DescribeDBSubnetGroupsInput) sources.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {
+		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBSubnetGroupsInput) sources.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {
 			return rds.NewDescribeDBSubnetGroupsPaginator(client, params)
 		},
-		DescribeFunc: func(ctx context.Context, client *rds.Client, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client rdsClient, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error) {
 			return client.DescribeDBSubnetGroups(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*rds.DescribeDBSubnetGroupsInput, error) {

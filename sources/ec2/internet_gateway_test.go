@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -60,7 +61,7 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := internetGatewayOutputMapper("foo", nil, output)
+	items, err := internetGatewayOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

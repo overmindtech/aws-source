@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, output *efs.DescribeFileSystemsOutput) ([]*sdp.Item, error) {
+func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, input *efs.DescribeFileSystemsInput, output *efs.DescribeFileSystemsOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("nil output from AWS")
 	}
@@ -35,6 +35,7 @@ func FileSystemOutputMapper(scope string, input *efs.DescribeFileSystemsInput, o
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(fs.LifeCycleState),
+			Tags:            tagsToMap(fs.Tags),
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{

@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -84,7 +85,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := networkAclOutputMapper("foo", nil, output)
+	items, err := networkAclOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

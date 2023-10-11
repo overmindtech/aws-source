@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func capacityReservationOutputMapper(scope string, _ *ec2.DescribeCapacityReservationsInput, output *ec2.DescribeCapacityReservationsOutput) ([]*sdp.Item, error) {
+func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeCapacityReservationsInput, output *ec2.DescribeCapacityReservationsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, cr := range output.CapacityReservations {
@@ -24,6 +24,7 @@ func capacityReservationOutputMapper(scope string, _ *ec2.DescribeCapacityReserv
 			UniqueAttribute: "capacityReservationId",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(cr.Tags),
 		}
 
 		if cr.AvailabilityZone != nil {

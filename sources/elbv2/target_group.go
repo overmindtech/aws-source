@@ -9,8 +9,22 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
+func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string, _ *elbv2.DescribeTargetGroupsInput, output *elbv2.DescribeTargetGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+
+	tgArns := make([]string, 0)
+
+	for _, tg := range output.TargetGroups {
+		if tg.TargetGroupArn != nil {
+			tgArns = append(tgArns, *tg.TargetGroupArn)
+		}
+	}
+
+	tagsMap, err := getTagsMap(ctx, client, tgArns)
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, tg := range output.TargetGroups {
 		attrs, err := sources.ToAttributesCase(tg)
@@ -19,11 +33,18 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 			return nil, err
 		}
 
+		var tags map[string]string
+
+		if tg.TargetGroupArn != nil {
+			tags = tagsMap[*tg.TargetGroupArn]
+		}
+
 		item := sdp.Item{
 			Type:            "elbv2-target-group",
 			UniqueAttribute: "targetGroupName",
 			Attributes:      attrs,
 			Scope:           scope,
+			Tags:            tags,
 		}
 
 		if tg.TargetGroupArn != nil {
@@ -97,13 +118,13 @@ func targetGroupOutputMapper(scope string, _ *elbv2.DescribeTargetGroupsInput, o
 // +overmind:terraform:queryMap aws_lb_target_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewTargetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options] {
-	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, *elbv2.Client, *elbv2.Options]{
+func NewTargetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
+	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options]{
 		Config:    config,
 		Client:    elbv2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "elbv2-target-group",
-		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
 			return client.DescribeTargetGroups(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*elbv2.DescribeTargetGroupsInput, error) {
@@ -114,13 +135,13 @@ func NewTargetGroupSource(config aws.Config, accountID string) *sources.Describe
 		InputMapperList: func(scope string) (*elbv2.DescribeTargetGroupsInput, error) {
 			return &elbv2.DescribeTargetGroupsInput{}, nil
 		},
-		InputMapperSearch: func(ctx context.Context, client *elbv2.Client, scope, query string) (*elbv2.DescribeTargetGroupsInput, error) {
+		InputMapperSearch: func(ctx context.Context, client elbClient, scope, query string) (*elbv2.DescribeTargetGroupsInput, error) {
 			// Search by load balancer
 			return &elbv2.DescribeTargetGroupsInput{
 				LoadBalancerArn: &query,
 			}, nil
 		},
-		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeTargetGroupsInput) sources.Paginator[*elbv2.DescribeTargetGroupsOutput, *elbv2.Options] {
+		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeTargetGroupsInput) sources.Paginator[*elbv2.DescribeTargetGroupsOutput, *elbv2.Options] {
 			return elbv2.NewDescribeTargetGroupsPaginator(client, params)
 		},
 		OutputMapper: targetGroupOutputMapper,

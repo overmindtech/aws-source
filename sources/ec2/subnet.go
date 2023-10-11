@@ -21,7 +21,7 @@ func subnetInputMapperList(scope string) (*ec2.DescribeSubnetsInput, error) {
 	return &ec2.DescribeSubnetsInput{}, nil
 }
 
-func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
+func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeSubnetsInput, output *ec2.DescribeSubnetsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, subnet := range output.Subnets {
@@ -42,6 +42,7 @@ func subnetOutputMapper(scope string, _ *ec2.DescribeSubnetsInput, output *ec2.D
 			UniqueAttribute: "subnetId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(subnet.Tags),
 		}
 
 		if subnet.AvailabilityZone != nil {

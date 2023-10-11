@@ -10,8 +10,23 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
+func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope string, _ *elbv2.DescribeLoadBalancersInput, output *elbv2.DescribeLoadBalancersOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
+
+	// Get the ARNs so that we can get the tags
+	arns := make([]string, 0)
+
+	for _, lb := range output.LoadBalancers {
+		if lb.LoadBalancerArn != nil {
+			arns = append(arns, *lb.LoadBalancerArn)
+		}
+	}
+
+	tagsMap, err := getTagsMap(ctx, client, arns)
+
+	if err != nil {
+		return nil, err
+	}
 
 	for _, lb := range output.LoadBalancers {
 		attrs, err := sources.ToAttributesCase(lb)
@@ -20,11 +35,18 @@ func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 			return nil, err
 		}
 
+		var tags map[string]string
+
+		if lb.LoadBalancerArn != nil {
+			tags = tagsMap[*lb.LoadBalancerArn]
+		}
+
 		item := sdp.Item{
 			Type:            "elbv2-load-balancer",
 			UniqueAttribute: "loadBalancerName",
 			Attributes:      attrs,
 			Scope:           scope,
+			Tags:            tags,
 		}
 
 		if lb.LoadBalancerArn != nil {
@@ -273,13 +295,13 @@ func loadBalancerOutputMapper(scope string, _ *elbv2.DescribeLoadBalancersInput,
 // +overmind:terraform:queryMap aws_lb.arn
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, *elbv2.Client, *elbv2.Options] {
-	return &sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, *elbv2.Client, *elbv2.Options]{
+func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
+	return &sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
 		Config:    config,
 		Client:    elbv2.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "elbv2-load-balancer",
-		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
+		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*elbv2.DescribeLoadBalancersInput, error) {
@@ -290,7 +312,7 @@ func NewLoadBalancerSource(config aws.Config, accountID string) *sources.Describ
 		InputMapperList: func(scope string) (*elbv2.DescribeLoadBalancersInput, error) {
 			return &elbv2.DescribeLoadBalancersInput{}, nil
 		},
-		PaginatorBuilder: func(client *elbv2.Client, params *elbv2.DescribeLoadBalancersInput) sources.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
+		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeLoadBalancersInput) sources.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,

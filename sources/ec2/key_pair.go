@@ -21,7 +21,7 @@ func keyPairInputMapperList(scope string) (*ec2.DescribeKeyPairsInput, error) {
 	return &ec2.DescribeKeyPairsInput{}, nil
 }
 
-func keyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2.DescribeKeyPairsOutput) ([]*sdp.Item, error) {
+func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeKeyPairsInput, output *ec2.DescribeKeyPairsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gw := range output.KeyPairs {
@@ -42,6 +42,7 @@ func keyPairOutputMapper(scope string, _ *ec2.DescribeKeyPairsInput, output *ec2
 			UniqueAttribute: "keyName",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(gw.Tags),
 		}
 
 		items = append(items, &item)

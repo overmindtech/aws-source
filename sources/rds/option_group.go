@@ -9,10 +9,19 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func optionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, output *rds.DescribeOptionGroupsOutput) ([]*sdp.Item, error) {
+func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string, _ *rds.DescribeOptionGroupsInput, output *rds.DescribeOptionGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, group := range output.OptionGroupsList {
+		// Get tags
+		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+			ResourceName: group.OptionGroupArn,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
 		attributes, err := sources.ToAttributesCase(group)
 
 		if err != nil {
@@ -24,6 +33,7 @@ func optionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, out
 			UniqueAttribute: "optionGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(tagsOut.TagList),
 		}
 
 		items = append(items, &item)
@@ -42,16 +52,16 @@ func optionGroupOutputMapper(scope string, _ *rds.DescribeOptionGroupsInput, out
 // +overmind:terraform:queryMap aws_db_option_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewOptionGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options] {
-	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, *rds.Client, *rds.Options]{
+func NewOptionGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
+	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-option-group",
 		Config:    config,
 		AccountID: accountID,
 		Client:    rds.NewFromConfig(config),
-		PaginatorBuilder: func(client *rds.Client, params *rds.DescribeOptionGroupsInput) sources.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {
+		PaginatorBuilder: func(client rdsClient, params *rds.DescribeOptionGroupsInput) sources.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {
 			return rds.NewDescribeOptionGroupsPaginator(client, params)
 		},
-		DescribeFunc: func(ctx context.Context, client *rds.Client, input *rds.DescribeOptionGroupsInput) (*rds.DescribeOptionGroupsOutput, error) {
+		DescribeFunc: func(ctx context.Context, client rdsClient, input *rds.DescribeOptionGroupsInput) (*rds.DescribeOptionGroupsOutput, error) {
 			return client.DescribeOptionGroups(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*rds.DescribeOptionGroupsInput, error) {

@@ -42,7 +42,8 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 	// not affect Search()
 	DisableList bool
 
-	// A function that gets the details of a given item
+	// A function that gets the details of a given item. This should include the
+	// tags if relevant
 	GetFunc func(ctx context.Context, client ClientStruct, scope string, input GetInput) (*sdp.Item, error)
 
 	// The input to the ListFunc. This is static

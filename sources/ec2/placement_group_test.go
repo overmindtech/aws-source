@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -53,7 +54,7 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := placementGroupOutputMapper("foo", nil, output)
+	items, err := placementGroupOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

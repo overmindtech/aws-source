@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func iamInstanceProfileAssociationOutputMapper(scope string, _ *ec2.DescribeIamInstanceProfileAssociationsInput, output *ec2.DescribeIamInstanceProfileAssociationsOutput) ([]*sdp.Item, error) {
+func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeIamInstanceProfileAssociationsInput, output *ec2.DescribeIamInstanceProfileAssociationsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, assoc := range output.IamInstanceProfileAssociations {

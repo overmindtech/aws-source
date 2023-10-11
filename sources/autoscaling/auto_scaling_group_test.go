@@ -1,6 +1,7 @@
 package autoscaling
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -149,7 +150,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := autoScalingGroupOutputMapper("foo", nil, &output)
+	items, err := autoScalingGroupOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

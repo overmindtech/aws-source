@@ -37,7 +37,7 @@ func launchTemplateVersionInputMapperList(scope string) (*ec2.DescribeLaunchTemp
 	}, nil
 }
 
-func launchTemplateVersionOutputMapper(scope string, _ *ec2.DescribeLaunchTemplateVersionsInput, output *ec2.DescribeLaunchTemplateVersionsOutput) ([]*sdp.Item, error) {
+func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeLaunchTemplateVersionsInput, output *ec2.DescribeLaunchTemplateVersionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ltv := range output.LaunchTemplateVersions {

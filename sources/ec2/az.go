@@ -25,7 +25,7 @@ func availabilityZoneInputMapperList(scope string) (*ec2.DescribeAvailabilityZon
 }
 
 // AvailabilityZoneOutputMapper Maps API output to items
-func availabilityZoneOutputMapper(scope string, _ *ec2.DescribeAvailabilityZonesInput, output *ec2.DescribeAvailabilityZonesOutput) ([]*sdp.Item, error) {
+func availabilityZoneOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeAvailabilityZonesInput, output *ec2.DescribeAvailabilityZonesOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("empty output")
 	}

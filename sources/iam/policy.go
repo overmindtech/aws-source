@@ -52,7 +52,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 	}
 
 	if out.Policy != nil {
-		err := enrichPolicy(ctx, client, &details, limit)
+		err := addPolicyEntities(ctx, client, &details, limit)
 
 		if err != nil {
 			return nil, err
@@ -60,45 +60,6 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 	}
 
 	return &details, nil
-}
-
-func enrichPolicy(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
-	err := addTags(ctx, client, details, limit)
-
-	if err != nil {
-		return err
-	}
-
-	err = addPolicyEntities(ctx, client, details, limit)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func addTags(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
-	var span trace.Span
-	if log.GetLevel() == log.TraceLevel {
-		// Only create new spans on trace level logging
-		ctx, span = tracer.Start(ctx, "addTags")
-		defer span.End()
-	}
-
-	limit.Wait(ctx)
-
-	out, err := client.ListPolicyTags(ctx, &iam.ListPolicyTagsInput{
-		PolicyArn: details.Policy.Arn,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	details.Policy.Tags = out.Tags
-
-	return nil
 }
 
 func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
@@ -187,7 +148,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 			Policy: p,
 		}
 
-		err := enrichPolicy(ctx, client, &details, limit)
+		err := addPolicyEntities(ctx, client, &details, limit)
 
 		return &details, err
 	})
@@ -284,6 +245,30 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	return &item, nil
 }
 
+func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient) (map[string]string, error) {
+	tags := make(map[string]string)
+
+	paginator := iam.NewListPolicyTagsPaginator(client, &iam.ListPolicyTagsInput{
+		PolicyArn: p.Policy.Arn,
+	})
+
+	for paginator.HasMorePages() {
+		out, err := paginator.NextPage(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, tag := range out.Tags {
+			if tag.Key != nil && tag.Value != nil {
+				tags[*tag.Key] = *tag.Value
+			}
+		}
+	}
+
+	return tags, nil
+}
+
 //go:generate docgen ../../docs-data
 // +overmind:type iam-policy
 // +overmind:descriptiveType IAM Policy
@@ -320,6 +305,7 @@ func NewPolicySource(config aws.Config, accountID string, _ string, limit *sourc
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
 			return policyListFunc(ctx, client, scope, limit)
 		},
-		ItemMapper: policyItemMapper,
+		ListTagsFunc: policyListTagsFunc,
+		ItemMapper:   policyItemMapper,
 	}
 }

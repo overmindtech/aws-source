@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -219,7 +220,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := instanceOutputMapper("foo", nil, output)
+	items, err := instanceOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

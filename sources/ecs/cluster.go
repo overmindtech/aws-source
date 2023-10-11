@@ -65,6 +65,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		UniqueAttribute: "clusterName",
 		Scope:           scope,
 		Attributes:      attributes,
+		Tags:            tagsToMap(cluster.Tags),
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{

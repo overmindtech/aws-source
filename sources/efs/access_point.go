@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func AccessPointOutputMapper(scope string, input *efs.DescribeAccessPointsInput, output *efs.DescribeAccessPointsOutput) ([]*sdp.Item, error) {
+func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, input *efs.DescribeAccessPointsInput, output *efs.DescribeAccessPointsOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("nil output from AWS")
 	}
@@ -31,6 +31,7 @@ func AccessPointOutputMapper(scope string, input *efs.DescribeAccessPointsInput,
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(ap.LifeCycleState),
+			Tags:            tagsToMap(ap.Tags),
 		}
 
 		if ap.FileSystemId != nil {

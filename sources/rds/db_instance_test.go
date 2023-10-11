@@ -1,6 +1,7 @@
 package rds
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -168,7 +169,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := dBInstanceOutputMapper("foo", nil, output)
+	items, err := dBInstanceOutputMapper(context.Background(), mockRdsClient{}, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -182,6 +183,10 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 
 	if err = item.Validate(); err != nil {
 		t.Error(err)
+	}
+
+	if item.Tags["key"] != "value" {
+		t.Errorf("got %v, expected %v", item.Tags["key"], "value")
 	}
 
 	tests := sources.QueryTests{

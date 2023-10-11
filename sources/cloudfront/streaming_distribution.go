@@ -2,6 +2,7 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -18,6 +19,22 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 
 	d := out.StreamingDistribution
 
+	if d == nil {
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: "streaming distribution was nil",
+		}
+	}
+
+	// Get the tags
+	tagsOut, err := client.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
+		Resource: d.ARN,
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags for streaming distribution %v: %w", *d.Id, err)
+	}
+
 	attributes, err := sources.ToAttributesCase(d)
 
 	if err != nil {
@@ -29,6 +46,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(tagsOut.Tags),
 	}
 
 	if d.Status != nil {

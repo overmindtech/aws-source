@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -75,7 +76,7 @@ func TestImageOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := imageOutputMapper("foo", nil, &output)
+	items, err := imageOutputMapper(context.Background(), nil, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)

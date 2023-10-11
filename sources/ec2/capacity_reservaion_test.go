@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -44,7 +45,7 @@ func TestCapacityReservationOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := capacityReservationOutputMapper("foo", nil, output)
+	items, err := capacityReservationOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

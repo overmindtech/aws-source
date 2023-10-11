@@ -21,7 +21,7 @@ func networkAclInputMapperList(scope string) (*ec2.DescribeNetworkAclsInput, err
 	return &ec2.DescribeNetworkAclsInput{}, nil
 }
 
-func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, output *ec2.DescribeNetworkAclsOutput) ([]*sdp.Item, error) {
+func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeNetworkAclsInput, output *ec2.DescribeNetworkAclsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, networkAcl := range output.NetworkAcls {
@@ -42,6 +42,7 @@ func networkAclOutputMapper(scope string, _ *ec2.DescribeNetworkAclsInput, outpu
 			UniqueAttribute: "networkAclId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(networkAcl.Tags),
 		}
 
 		for _, assoc := range networkAcl.Associations {

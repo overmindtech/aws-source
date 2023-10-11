@@ -25,7 +25,7 @@ func addressInputMapperList(scope string) (*ec2.DescribeAddressesInput, error) {
 }
 
 // AddressOutputMapper Maps API output to items
-func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
+func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeAddressesInput, output *ec2.DescribeAddressesOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("empty output")
 	}
@@ -65,6 +65,7 @@ func addressOutputMapper(scope string, _ *ec2.DescribeAddressesInput, output *ec
 					BlastPropagation: bp,
 				},
 			},
+			Tags: tagsToMap(address.Tags),
 		}
 
 		if address.InstanceId != nil {

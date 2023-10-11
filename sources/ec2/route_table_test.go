@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -89,7 +90,7 @@ func TestRouteTableOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := routeTableOutputMapper("foo", nil, output)
+	items, err := routeTableOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

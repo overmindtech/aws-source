@@ -44,13 +44,13 @@ func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 // +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options] {
-	return &sources.GetListSource[*ClusterParameterGroup, *rds.Client, *rds.Options]{
+func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, rdsClient, *rds.Options] {
+	return &sources.GetListSource[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-cluster-parameter-group",
 		Client:    rds.NewFromConfig(config),
 		AccountID: accountID,
 		Region:    region,
-		GetFunc: func(ctx context.Context, client *rds.Client, scope, query string) (*ClusterParameterGroup, error) {
+		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ClusterParameterGroup, error) {
 			out, err := client.DescribeDBClusterParameterGroups(ctx, &rds.DescribeDBClusterParameterGroupsInput{
 				DBClusterParameterGroupName: &query,
 			})
@@ -76,7 +76,7 @@ func NewDBClusterParameterGroupSource(config aws.Config, accountID string, regio
 				DBClusterParameterGroup: out.DBClusterParameterGroups[0],
 			}, nil
 		},
-		ListFunc: func(ctx context.Context, client *rds.Client, scope string) ([]*ClusterParameterGroup, error) {
+		ListFunc: func(ctx context.Context, client rdsClient, scope string) ([]*ClusterParameterGroup, error) {
 			out, err := client.DescribeDBClusterParameterGroups(ctx, &rds.DescribeDBClusterParameterGroupsInput{})
 
 			if err != nil {
@@ -101,6 +101,17 @@ func NewDBClusterParameterGroupSource(config aws.Config, accountID string, regio
 			}
 
 			return groups, nil
+		},
+		ListTagsFunc: func(ctx context.Context, cpg *ClusterParameterGroup, c rdsClient) (map[string]string, error) {
+			out, err := c.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
+				ResourceName: cpg.DBClusterParameterGroupArn,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			return tagsToMap(out.TagList), nil
 		},
 		ItemMapper: dBClusterParameterGroupItemMapper,
 	}

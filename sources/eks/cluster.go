@@ -37,6 +37,7 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		UniqueAttribute: "name",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            cluster.Tags,
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{

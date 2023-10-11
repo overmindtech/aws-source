@@ -21,7 +21,7 @@ func placementGroupInputMapperList(scope string) (*ec2.DescribePlacementGroupsIn
 	return &ec2.DescribePlacementGroupsInput{}, nil
 }
 
-func placementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInput, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
+func placementGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribePlacementGroupsInput, output *ec2.DescribePlacementGroupsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.PlacementGroups {
@@ -42,6 +42,7 @@ func placementGroupOutputMapper(scope string, _ *ec2.DescribePlacementGroupsInpu
 			UniqueAttribute: "groupId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ng.Tags),
 		}
 
 		items = append(items, &item)

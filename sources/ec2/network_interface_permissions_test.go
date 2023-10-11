@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -53,7 +54,7 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := networkInterfacePermissionOutputMapper("foo", nil, output)
+	items, err := networkInterfacePermissionOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
 type ECSClient interface {
@@ -19,4 +20,17 @@ type ECSClient interface {
 	ecs.ListServicesAPIClient
 	ecs.ListTaskDefinitionsAPIClient
 	ecs.ListTasksAPIClient
+}
+
+// convertTags converts slice of ecs tags to a map
+func tagsToMap(tags []types.Tag) map[string]string {
+	tagsMap := make(map[string]string)
+
+	for _, tag := range tags {
+		if tag.Key != nil && tag.Value != nil {
+			tagsMap[*tag.Key] = *tag.Value
+		}
+	}
+
+	return tagsMap
 }

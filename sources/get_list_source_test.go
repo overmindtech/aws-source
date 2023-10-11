@@ -56,10 +56,21 @@ func TestGetListSourceGet(t *testing.T) {
 			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
+			ListTagsFunc: func(ctx context.Context, s1 string, s2 struct{}) (map[string]string, error) {
+				return map[string]string{
+					"foo": "bar",
+				}, nil
+			},
 		}
 
-		if _, err := s.Get(context.Background(), "12345.eu-west-2", "", false); err != nil {
+		item, err := s.Get(context.Background(), "12345.eu-west-2", "", false)
+
+		if err != nil {
 			t.Error(err)
+		}
+
+		if item.Tags["foo"] != "bar" {
+			t.Errorf("expected tag foo to be bar, got %v", item.Tags["foo"])
 		}
 	})
 
@@ -121,6 +132,11 @@ func TestGetListSourceList(t *testing.T) {
 			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
+			ListTagsFunc: func(ctx context.Context, s1 string, s2 struct{}) (map[string]string, error) {
+				return map[string]string{
+					"foo": "bar",
+				}, nil
+			},
 		}
 
 		if items, err := s.List(context.Background(), "12345.eu-west-2", false); err != nil {
@@ -128,6 +144,10 @@ func TestGetListSourceList(t *testing.T) {
 		} else {
 			if len(items) != 2 {
 				t.Errorf("expected 2 items, got %v", len(items))
+			}
+
+			if items[0].Tags["foo"] != "bar" {
+				t.Errorf("expected tag foo to be bar, got %v", items[0].Tags["foo"])
 			}
 		}
 	})

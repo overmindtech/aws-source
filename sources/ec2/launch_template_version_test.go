@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -108,7 +109,7 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := launchTemplateVersionOutputMapper("foo", nil, output)
+	items, err := launchTemplateVersionOutputMapper(context.Background(), nil, "foo", nil, output)
 
 	if err != nil {
 		t.Fatal(err)

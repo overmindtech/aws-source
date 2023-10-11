@@ -2,6 +2,7 @@ package route53
 
 import (
 	"context"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
@@ -92,5 +93,24 @@ func NewHostedZoneSource(config aws.Config, accountID string, region string) *so
 		GetFunc:    hostedZoneGetFunc,
 		ListFunc:   hostedZoneListFunc,
 		ItemMapper: hostedZoneItemMapper,
+		ListTagsFunc: func(ctx context.Context, hz *types.HostedZone, c *route53.Client) (map[string]string, error) {
+			if hz.Id == nil {
+				return nil, nil
+			}
+
+			// Strip the initial prefix
+			id := strings.TrimPrefix(*hz.Id, "/hostedzone/")
+
+			out, err := c.ListTagsForResource(ctx, &route53.ListTagsForResourceInput{
+				ResourceId:   &id,
+				ResourceType: types.TagResourceTypeHostedzone,
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			return tagsToMap(out.ResourceTagSet.Tags), nil
+		},
 	}
 }

@@ -21,7 +21,7 @@ func instanceEventWindowInputMapperList(scope string) (*ec2.DescribeInstanceEven
 	return &ec2.DescribeInstanceEventWindowsInput{}, nil
 }
 
-func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventWindowsInput, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
+func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeInstanceEventWindowsInput, output *ec2.DescribeInstanceEventWindowsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {
@@ -40,6 +40,7 @@ func instanceEventWindowOutputMapper(scope string, _ *ec2.DescribeInstanceEventW
 			UniqueAttribute: "instanceEventWindowId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ew.Tags),
 		}
 
 		if at := ew.AssociationTarget; at != nil {

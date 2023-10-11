@@ -21,7 +21,7 @@ func natGatewayInputMapperList(scope string) (*ec2.DescribeNatGatewaysInput, err
 	return &ec2.DescribeNatGatewaysInput{}, nil
 }
 
-func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
+func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeNatGatewaysInput, output *ec2.DescribeNatGatewaysOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, ng := range output.NatGateways {
@@ -42,6 +42,7 @@ func natGatewayOutputMapper(scope string, _ *ec2.DescribeNatGatewaysInput, outpu
 			UniqueAttribute: "natGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(ng.Tags),
 		}
 
 		for _, address := range ng.NatGatewayAddresses {

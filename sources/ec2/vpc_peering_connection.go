@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func vpcPeeringConnectionOutputMapper(scope string, input *ec2.DescribeVpcPeeringConnectionsInput, output *ec2.DescribeVpcPeeringConnectionsOutput) ([]*sdp.Item, error) {
+func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope string, input *ec2.DescribeVpcPeeringConnectionsInput, output *ec2.DescribeVpcPeeringConnectionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, connection := range output.VpcPeeringConnections {
@@ -25,6 +25,7 @@ func vpcPeeringConnectionOutputMapper(scope string, input *ec2.DescribeVpcPeerin
 			UniqueAttribute: "vpcPeeringConnectionId",
 			Scope:           scope,
 			Attributes:      attributes,
+			Tags:            tagsToMap(connection.Tags),
 		}
 
 		if connection.Status != nil {

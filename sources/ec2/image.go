@@ -32,7 +32,7 @@ func imageInputMapperList(scope string) (*ec2.DescribeImagesInput, error) {
 	}, nil
 }
 
-func imageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
+func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.DescribeImagesInput, output *ec2.DescribeImagesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, image := range output.Images {
@@ -53,6 +53,7 @@ func imageOutputMapper(scope string, _ *ec2.DescribeImagesInput, output *ec2.Des
 			UniqueAttribute: "imageId",
 			Scope:           scope,
 			Attributes:      attrs,
+			Tags:            tagsToMap(image.Tags),
 		}
 
 		items = append(items, &item)

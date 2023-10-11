@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func BackupPolicyOutputMapper(scope string, input *efs.DescribeBackupPolicyInput, output *efs.DescribeBackupPolicyOutput) ([]*sdp.Item, error) {
+func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, input *efs.DescribeBackupPolicyInput, output *efs.DescribeBackupPolicyOutput) ([]*sdp.Item, error) {
 	if output == nil {
 		return nil, errors.New("nil output from AWS")
 	}

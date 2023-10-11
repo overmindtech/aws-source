@@ -15,8 +15,8 @@ import (
 type TestIAMClient struct{}
 
 var TestRateLimit = sources.LimitBucket{
-	MaxCapacity: 20,
-	RefillRate:  15,
+	MaxCapacity: 50,
+	RefillRate:  20,
 }
 
 func TestMain(m *testing.M) {

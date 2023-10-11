@@ -41,6 +41,10 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 
 	// ItemMapper Maps an AWS representation of an item to the SDP version
 	ItemMapper func(scope string, awsItem AWSItem) (*sdp.Item, error)
+
+	// ListTagsFunc Optional function that will be used to list tags for a
+	// resource
+	ListTagsFunc func(context.Context, AWSItem, ClientStruct) (map[string]string, error)
 }
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) cacheDuration() time.Duration {
@@ -156,7 +160,15 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 		return nil, WrapAWSError(err)
 	}
 
-	s.cache.StoreItem(item, s.cacheDuration(), ck)
+	if s.ListTagsFunc != nil {
+		item.Tags, err = s.ListTagsFunc(ctx, awsItem, s.Client)
+		if err != nil {
+			s.cache.StoreError(err, s.CacheDuration, ck)
+			return nil, WrapAWSError(err)
+		}
+	}
+
+	s.cache.StoreItem(item, s.CacheDuration, ck)
 
 	return item, nil
 }
@@ -195,6 +207,14 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 
 		if err != nil {
 			continue
+		}
+
+		if s.ListTagsFunc != nil {
+			item.Tags, err = s.ListTagsFunc(ctx, awsItem, s.Client)
+			if err != nil {
+				s.cache.StoreError(err, s.CacheDuration, ck)
+				return nil, WrapAWSError(err)
+			}
 		}
 
 		items = append(items, item)

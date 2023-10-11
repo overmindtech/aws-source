@@ -46,6 +46,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		UniqueAttribute: "family",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(out.Tags),
 	}
 
 	switch td.Status {
