@@ -6,21 +6,21 @@ go 1.21
 require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go-v2 v1.21.2
-	github.com/aws/aws-sdk-go-v2/config v1.18.45
+	github.com/aws/aws-sdk-go-v2/config v1.19.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.43
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.31.0
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.28.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.27.9
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.22.2
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.125.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.30.3
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.23.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.126.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.30.4
 	github.com/aws/aws-sdk-go-v2/service/efs v1.21.9
 	github.com/aws/aws-sdk-go-v2/service/eks v1.29.7
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.17.2
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.21.6
 	github.com/aws/aws-sdk-go-v2/service/iam v1.22.7
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.40.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.56.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.57.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.30.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.2
 	github.com/aws/aws-sdk-go-v2/service/sts v1.23.2
