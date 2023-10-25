@@ -12,7 +12,6 @@
 	"terraformScope": "*",
 	"links": [
 		"dns",
-		"ec2-availability-zone",
 		"ec2-instance",
 		"ec2-security-group",
 		"ec2-subnet",

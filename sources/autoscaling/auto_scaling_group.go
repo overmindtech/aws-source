@@ -87,23 +87,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 			}
 		}
 
-		for _, az := range asg.AvailabilityZones {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  az,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// AZs don't change or affect anything
-					In:  false,
-					Out: false,
-				},
-			})
-		}
-
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
 				// +overmind:link ec2-instance

@@ -13,7 +13,6 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"ec2-region",
 		"ec2-vpc"
 	]
 }

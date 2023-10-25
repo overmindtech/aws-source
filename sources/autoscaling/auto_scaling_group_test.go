@@ -219,24 +219,6 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 			ExpectedQuery:  "lt-0174ff2b8909d0c75",
 			ExpectedScope:  "foo",
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2a",
-			ExpectedScope:  "foo",
-		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2b",
-			ExpectedScope:  "foo",
-		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)

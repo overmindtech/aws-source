@@ -521,24 +521,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 		}
 	}
 
-	if bucket.LocationConstraint != "" {
-		// +overmind:link ec2-region
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			Query: &sdp.Query{
-				Type:   "ec2-region",
-				Method: sdp.QueryMethod_GET,
-				Query:  string(bucket.LocationConstraint),
-				Scope:  scope,
-			},
-			BlastPropagation: &sdp.BlastPropagation{
-				// Changing the region will affect the bucket
-				In: true,
-				// Changing the bucket won't affect the region
-				Out: false,
-			},
-		})
-	}
-
 	if bucket.InventoryConfiguration != nil {
 		if bucket.InventoryConfiguration.Destination != nil {
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {

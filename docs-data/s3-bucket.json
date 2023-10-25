@@ -32,7 +32,6 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"ec2-region",
 		"http",
 		"lambda-function",
 		"s3-bucket",

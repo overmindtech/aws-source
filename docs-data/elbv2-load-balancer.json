@@ -13,7 +13,6 @@
 	"links": [
 		"dns",
 		"ec2-address",
-		"ec2-availability-zone",
 		"ec2-coip-pool",
 		"ec2-security-group",
 		"ec2-subnet",

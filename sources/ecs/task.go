@@ -189,24 +189,6 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		}
 	}
 
-	if task.AvailabilityZone != nil {
-		// +overmind:link ec2-availability-zone
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			Query: &sdp.Query{
-				Type:   "ec2-availability-zone",
-				Method: sdp.QueryMethod_GET,
-				Query:  *task.AvailabilityZone,
-				Scope:  scope,
-			},
-			BlastPropagation: &sdp.BlastPropagation{
-				// The availability zone can affect the task
-				In: true,
-				// The task can't affect the availability zone
-				Out: false,
-			},
-		})
-	}
-
 	return &item, nil
 }
 

@@ -215,12 +215,6 @@ func TestTableGetFunc(t *testing.T) {
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",
 			ExpectedScope:  "account.region",
 		},
-		{
-			ExpectedType:   "ec2-region",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)

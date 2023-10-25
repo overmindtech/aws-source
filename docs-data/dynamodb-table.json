@@ -13,7 +13,6 @@
 	"links": [
 		"backup-recovery-point",
 		"dynamodb-table",
-		"ec2-region",
 		"kinesis-stream",
 		"kms-key"
 	]

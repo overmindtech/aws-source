@@ -128,23 +128,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			continue
 		}
 
-		if desc.Target.AvailabilityZone != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *desc.Target.AvailabilityZone,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changing the availability zone can affect the target health
-					In: true,
-					// The target health won't affect the availability zone
-					Out: false,
-				},
-			})
-		}
-
 		id := TargetHealthUniqueID{
 			TargetGroupArn:   *input.TargetGroupArn,
 			Id:               *desc.Target.Id,

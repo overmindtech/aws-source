@@ -132,12 +132,6 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2b",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "group-123",

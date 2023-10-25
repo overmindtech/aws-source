@@ -53,22 +53,6 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 
 		if connection.AccepterVpcInfo != nil {
 			if connection.AccepterVpcInfo.Region != nil {
-				// +overmind:link ec2-region
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   "ec2-region",
-						Method: sdp.QueryMethod_GET,
-						Query:  *connection.AccepterVpcInfo.Region,
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						// The region will affect everything in it
-						In: true,
-						// We can't affect the region
-						Out: false,
-					},
-				})
-
 				if connection.AccepterVpcInfo.VpcId != nil && connection.AccepterVpcInfo.OwnerId != nil {
 					pairedScope := sources.FormatScope(*connection.AccepterVpcInfo.OwnerId, *connection.AccepterVpcInfo.Region)
 
@@ -94,22 +78,6 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 
 		if connection.RequesterVpcInfo != nil {
 			if connection.RequesterVpcInfo.Region != nil {
-				// +overmind:link ec2-region
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   "ec2-region",
-						Method: sdp.QueryMethod_GET,
-						Query:  *connection.RequesterVpcInfo.Region,
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						// The region will affect everything in it
-						In: true,
-						// We can't affect the region
-						Out: false,
-					},
-				})
-
 				if connection.RequesterVpcInfo.VpcId != nil && connection.RequesterVpcInfo.OwnerId != nil {
 					pairedScope := sources.FormatScope(*connection.RequesterVpcInfo.OwnerId, *connection.RequesterVpcInfo.Region)
 

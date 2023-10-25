@@ -12,7 +12,6 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"ec2-availability-zone",
 		"ec2-vpc"
 	]
 }

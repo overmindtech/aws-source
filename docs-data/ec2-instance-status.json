@@ -5,7 +5,5 @@
 	"listDescription": "List all EC2 instance statuses",
 	"searchDescription": "Search EC2 instance statuses by ARN",
 	"group": "AWS",
-	"links": [
-		"ec2-availability-zone"
-	]
+	"links": []
 }

@@ -192,24 +192,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			}
 		}
 
-		if instance.AvailabilityZone != nil {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *instance.AvailabilityZone,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changing the availability zone can affect the instance
-					In: true,
-					// The instance won't affect the availability zone
-					Out: false,
-				},
-			})
-		}
-
 		if dbSubnetGroup != nil {
 			// +overmind:link rds-db-subnet-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -501,24 +483,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 					})
 				}
 			}
-		}
-
-		if instance.SecondaryAvailabilityZone != nil {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *instance.SecondaryAvailabilityZone,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changing the availability zone can affect the instance
-					In: true,
-					// The instance won't affect the availability zone
-					Out: false,
-				},
-			})
 		}
 
 		items = append(items, &item)

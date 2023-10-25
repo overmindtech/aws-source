@@ -166,25 +166,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		}
 	}
 
-	for _, replica := range table.Replicas {
-		if replica.RegionName != nil {
-			// +overmind:link ec2-region
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-region",
-					Method: sdp.QueryMethod_GET,
-					Query:  *replica.RegionName,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Regions don't change
-					In:  false,
-					Out: false,
-				},
-			})
-		}
-	}
-
 	return &item, nil
 }
 

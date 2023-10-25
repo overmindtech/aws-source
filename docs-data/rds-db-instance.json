@@ -14,7 +14,6 @@
 	"links": [
 		"backup-recovery-point",
 		"dns",
-		"ec2-availability-zone",
 		"ec2-security-group",
 		"iam-instance-profile",
 		"iam-role",

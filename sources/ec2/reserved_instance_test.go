@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
-	"github.com/overmindtech/sdp-go"
 )
 
 func TestReservedInstanceInputMapperGet(t *testing.T) {
@@ -89,14 +88,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := sources.QueryTests{
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "az",
-			ExpectedScope:  item.Scope,
-		},
-	}
+	tests := sources.QueryTests{}
 
 	tests.Execute(t, item)
 

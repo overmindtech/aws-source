@@ -111,12 +111,6 @@ func TestS3GetImpl(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-region",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  string(types.BucketLocationConstraintAfSouth1),
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "s3-bucket",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",

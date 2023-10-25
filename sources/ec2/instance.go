@@ -259,23 +259,6 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 			}
 
 			if instance.Placement != nil {
-				if instance.Placement.AvailabilityZone != nil {
-					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-						Query: &sdp.Query{
-							Type:   "ec2-availability-zone",
-							Method: sdp.QueryMethod_GET,
-							Query:  *instance.Placement.AvailabilityZone,
-							Scope:  scope,
-						},
-						BlastPropagation: &sdp.BlastPropagation{
-							// AZs don't change
-							In:  false,
-							Out: false,
-						},
-					})
-				}
-
 				if instance.Placement.GroupId != nil {
 					// +overmind:link ec2-placement-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

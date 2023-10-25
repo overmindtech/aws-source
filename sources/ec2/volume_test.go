@@ -94,12 +94,6 @@ func TestVolumeOutputMapper(t *testing.T) {
 			ExpectedQuery:  "i-0667d3ca802741e30",
 			ExpectedScope:  item.Scope,
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  item.Scope,
-		},
 	}
 
 	tests.Execute(t, item)

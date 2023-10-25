@@ -246,12 +246,6 @@ func TestDBClusterOutputMapper(t *testing.T) {
 			ExpectedQuery:  "arn:aws:rds:eu-west-2:052392120703:cluster:database-1",
 			ExpectedScope:  "052392120703.eu-west-2",
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)
