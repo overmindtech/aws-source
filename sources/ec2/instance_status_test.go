@@ -93,12 +93,6 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 	// since the attributes are converted automatically
 	tests := sources.QueryTests{
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  item.Scope,
-		},
-		{
 			ExpectedType:   "ec2-instance",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-022bdccde30270570",

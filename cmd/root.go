@@ -235,7 +235,6 @@ var rootCmd = &cobra.Command{
 			sources := []discovery.Source{
 				// EC2
 				ec2.NewAddressSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewAvailabilityZoneSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationFleetSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),

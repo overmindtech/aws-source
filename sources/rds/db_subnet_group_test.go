@@ -73,12 +73,6 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "outposts-outpost",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:service:region:account:type/id",

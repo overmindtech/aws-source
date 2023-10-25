@@ -135,24 +135,6 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 		}
 
 		for _, az := range lb.AvailabilityZones {
-			if az.ZoneName != nil {
-				// +overmind:link ec2-availability-zone
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   "ec2-availability-zone",
-						Method: sdp.QueryMethod_GET,
-						Query:  *az.ZoneName,
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						// Changing the availability zone could affect the LB
-						In: true,
-						// The LB won't affect the availability zone
-						Out: false,
-					},
-				})
-			}
-
 			if az.SubnetId != nil {
 				// +overmind:link ec2-subnet
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

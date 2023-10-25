@@ -84,18 +84,6 @@ func TestVpcPeeringConnectionOutputMapper(t *testing.T) {
 	// since the attributes are converted automatically
 	tests := sources.QueryTests{
 		{
-			ExpectedType:   "ec2-region",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2",
-			ExpectedScope:  item.Scope,
-		},
-		{
-			ExpectedType:   "ec2-region",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-5",
-			ExpectedScope:  item.Scope,
-		},
-		{
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-1234567890",

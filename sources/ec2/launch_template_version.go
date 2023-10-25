@@ -246,23 +246,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			if lt.Placement != nil {
-				if lt.Placement.AvailabilityZone != nil {
-					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-						Query: &sdp.Query{
-							Type:   "ec2-availability-zone",
-							Method: sdp.QueryMethod_GET,
-							Query:  *lt.Placement.AvailabilityZone,
-							Scope:  scope,
-						},
-						BlastPropagation: &sdp.BlastPropagation{
-							// AZs don't change
-							In:  false,
-							Out: false,
-						},
-					})
-				}
-
 				if lt.Placement.GroupId != nil {
 					// +overmind:link ec2-placement-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

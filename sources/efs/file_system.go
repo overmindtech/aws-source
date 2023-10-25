@@ -68,22 +68,6 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 			},
 		}
 
-		if fs.AvailabilityZoneName != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *fs.AvailabilityZoneName,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changes to the AZ will affect us but not vice-versa
-					In:  true,
-					Out: false,
-				},
-			})
-		}
-
 		if fs.KmsKeyId != nil {
 			// KMS key ID is an ARN
 			if arn, err := sources.ParseARN(*fs.KmsKeyId); err == nil {

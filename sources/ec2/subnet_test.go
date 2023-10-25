@@ -105,12 +105,6 @@ func TestSubnetOutputMapper(t *testing.T) {
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
 			ExpectedScope:  "foo",
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)

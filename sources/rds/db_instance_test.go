@@ -215,12 +215,6 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2a",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "rds-db-subnet-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "default-vpc-0d7892e00e573e701",

@@ -95,12 +95,6 @@ func TestTargetHealthOutputMapper(t *testing.T) {
 			ExpectedQuery:  "10.0.6.64",
 			ExpectedScope:  "global",
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)

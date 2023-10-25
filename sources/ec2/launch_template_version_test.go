@@ -179,12 +179,6 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "foo",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "ec2-placement-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "placement",

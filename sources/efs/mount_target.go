@@ -68,22 +68,6 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 			})
 		}
 
-		if mt.AvailabilityZoneName != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *mt.AvailabilityZoneName,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changes to the AZ will affect us but not vice-versa
-					In:  true,
-					Out: false,
-				},
-			})
-		}
-
 		if mt.IpAddress != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{

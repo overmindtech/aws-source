@@ -72,16 +72,6 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		}
 
-		if instanceStatus.AvailabilityZone != nil {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
-				Type:   "ec2-availability-zone",
-				Method: sdp.QueryMethod_GET,
-				Query:  *instanceStatus.AvailabilityZone,
-				Scope:  scope,
-			}})
-		}
-
 		items = append(items, &item)
 	}
 

@@ -67,12 +67,6 @@ func TestCapacityReservationOutputMapper(t *testing.T) {
 	// since the attributes are converted automatically
 	tests := sources.QueryTests{
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "us-east-1a",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "ec2-capacity-reservation-fleet",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "crf-1234567890abcdef0",

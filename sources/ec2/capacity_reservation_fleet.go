@@ -29,24 +29,6 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 		}
 
 		for _, spec := range cr.InstanceTypeSpecifications {
-			if spec.AvailabilityZone != nil {
-				// +overmind:link ec2-availability-zone
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   "ec2-availability-zone",
-						Method: sdp.QueryMethod_GET,
-						Query:  *spec.AvailabilityZone,
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						// Changes to the AZ will affect this
-						In: true,
-						// We can't affect the AZ
-						Out: false,
-					},
-				})
-			}
-
 			if spec.CapacityReservationId != nil {
 				// +overmind:link ec2-capacity-reservation
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

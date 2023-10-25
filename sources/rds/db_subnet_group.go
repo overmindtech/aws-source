@@ -75,26 +75,6 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 				})
 			}
 
-			if subnet.SubnetAvailabilityZone != nil {
-				if subnet.SubnetAvailabilityZone.Name != nil {
-					// +overmind:link ec2-availability-zone
-					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-						Query: &sdp.Query{
-							Type:   "ec2-availability-zone",
-							Method: sdp.QueryMethod_GET,
-							Query:  *subnet.SubnetAvailabilityZone.Name,
-							Scope:  scope,
-						},
-						BlastPropagation: &sdp.BlastPropagation{
-							// Changing the availability zone can affect the subnet group
-							In: true,
-							// The subnet group won't affect the availability zone
-							Out: false,
-						},
-					})
-				}
-			}
-
 			if subnet.SubnetOutpost != nil {
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = sources.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {

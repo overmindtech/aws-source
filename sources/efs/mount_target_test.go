@@ -62,12 +62,6 @@ func TestMountTargetOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "us-east-1",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "10.230.43.1",

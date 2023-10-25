@@ -343,12 +343,6 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedQuery:  "groupId",
 			ExpectedScope:  "foo",
 		},
-		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2c",
-			ExpectedScope:  "foo",
-		},
 	}
 
 	tests.Execute(t, item)

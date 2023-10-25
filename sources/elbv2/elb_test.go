@@ -107,12 +107,6 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "ec2-availability-zone",
-			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  "eu-west-2b",
-			ExpectedScope:  "foo",
-		},
-		{
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet-0960234bbc4edca03",

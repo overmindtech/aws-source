@@ -93,24 +93,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 			}
 		}
 
-		for _, az := range cluster.AvailabilityZones {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  az,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// Changes to the AZ can affect the cluster
-					In: true,
-					// The cluster won't affect the AZ
-					Out: false,
-				},
-			})
-		}
-
 		for _, member := range cluster.DBClusterMembers {
 			if member.DBInstanceIdentifier != nil {
 				// +overmind:link rds-db-instance

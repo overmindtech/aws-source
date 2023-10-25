@@ -45,23 +45,6 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 			Tags:            tagsToMap(subnet.Tags),
 		}
 
-		if subnet.AvailabilityZone != nil {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *subnet.AvailabilityZone,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// AZs don't change
-					In:  false,
-					Out: false,
-				},
-			})
-		}
-
 		if subnet.VpcId != nil {
 			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

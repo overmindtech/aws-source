@@ -65,23 +65,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 			}
 		}
 
-		if ni.AvailabilityZone != nil {
-			// +overmind:link ec2-availability-zone
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "ec2-availability-zone",
-					Method: sdp.QueryMethod_GET,
-					Query:  *ni.AvailabilityZone,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// AZs don't change
-					In:  false,
-					Out: false,
-				},
-			})
-		}
-
 		for _, sg := range ni.Groups {
 			if sg.GroupId != nil {
 				// +overmind:link ec2-security-group
