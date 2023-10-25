@@ -11,7 +11,6 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"ec2-availability-zone",
 		"ec2-capacity-reservation-fleet",
 		"ec2-placement-group",
 		"outposts-outpost"

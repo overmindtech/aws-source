@@ -6,7 +6,6 @@
 	"searchDescription": "Search capacity reservation fleets by ARN",
 	"group": "AWS",
 	"links": [
-		"ec2-availability-zone",
 		"ec2-capacity-reservation"
 	]
 }

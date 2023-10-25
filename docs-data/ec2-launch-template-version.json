@@ -6,7 +6,6 @@
 	"searchDescription": "Search launch template versions by ARN",
 	"group": "AWS",
 	"links": [
-		"ec2-availability-zone",
 		"ec2-capacity-reservation",
 		"ec2-host",
 		"ec2-image",

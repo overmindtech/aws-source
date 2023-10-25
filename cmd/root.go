@@ -252,7 +252,6 @@ var rootCmd = &cobra.Command{
 				ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewPlacementGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-				ec2.NewRegionSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
 				ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
