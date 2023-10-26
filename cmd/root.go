@@ -525,7 +525,7 @@ func initConfig() {
 
 func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, roleARN string, autoConfig bool) (aws.Config, error) {
 	if autoConfig {
-		return config.LoadDefaultConfig(context.Background())
+		return config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
 	}
 	// Validate inputs
 	if region == "" {
