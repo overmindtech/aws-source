@@ -31,7 +31,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	task := out.Tasks[0]
 
-	attributes, err := sources.ToAttributesCase(task)
+	attributes, err := sources.ToAttributesCase(task, "tags")
 
 	if err != nil {
 		return nil, err

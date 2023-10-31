@@ -31,7 +31,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 
 	containerInstance := out.ContainerInstances[0]
 
-	attributes, err := sources.ToAttributesCase(containerInstance)
+	attributes, err := sources.ToAttributesCase(containerInstance, "tags")
 
 	if err != nil {
 		return nil, err

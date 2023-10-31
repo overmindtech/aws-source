@@ -27,7 +27,7 @@ func placementGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	for _, ng := range output.PlacementGroups {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ng)
+		attrs, err = sources.ToAttributesCase(ng, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

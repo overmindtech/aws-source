@@ -27,7 +27,7 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	for _, LaunchTemplate := range output.LaunchTemplates {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(LaunchTemplate)
+		attrs, err = sources.ToAttributesCase(LaunchTemplate, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

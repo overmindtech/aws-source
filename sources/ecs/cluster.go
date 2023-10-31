@@ -54,7 +54,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	cluster := out.Clusters[0]
 
-	attributes, err := sources.ToAttributesCase(cluster)
+	attributes, err := sources.ToAttributesCase(cluster, "tags")
 
 	if err != nil {
 		return nil, err

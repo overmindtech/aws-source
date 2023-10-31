@@ -27,7 +27,7 @@ func egressOnlyInternetGatewayOutputMapper(_ context.Context, _ *ec2.Client, sco
 	for _, gw := range output.EgressOnlyInternetGateways {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(gw)
+		attrs, err = sources.ToAttributesCase(gw, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

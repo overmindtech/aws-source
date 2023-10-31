@@ -72,6 +72,12 @@ func TestImageOutputMapper(t *testing.T) {
 				RootDeviceType:     types.DeviceTypeEbs,
 				SriovNetSupport:    sources.PtrString("simple"),
 				VirtualizationType: types.VirtualizationTypeHvm,
+				Tags: []types.Tag{
+					{
+						Key:   sources.PtrString("Name"),
+						Value: sources.PtrString("test"),
+					},
+				},
 			},
 		},
 	}

@@ -27,7 +27,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, networkAcl := range output.NetworkAcls {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(networkAcl)
+		attrs, err = sources.ToAttributesCase(networkAcl, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

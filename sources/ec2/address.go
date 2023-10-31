@@ -43,7 +43,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	}
 
 	for _, address := range output.Addresses {
-		attrs, err = sources.ToAttributesCase(address)
+		attrs, err = sources.ToAttributesCase(address, "tags")
 
 		if err != nil {
 			return nil, err

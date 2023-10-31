@@ -27,7 +27,7 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 	for _, securityGroupRule := range output.SecurityGroupRules {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(securityGroupRule)
+		attrs, err = sources.ToAttributesCase(securityGroupRule, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

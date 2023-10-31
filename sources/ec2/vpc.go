@@ -27,7 +27,7 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 	for _, vpc := range output.Vpcs {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(vpc)
+		attrs, err = sources.ToAttributesCase(vpc, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

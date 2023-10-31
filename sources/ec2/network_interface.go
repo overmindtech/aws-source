@@ -27,7 +27,7 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 	for _, ni := range output.NetworkInterfaces {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ni)
+		attrs, err = sources.ToAttributesCase(ni, "tagSet")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
