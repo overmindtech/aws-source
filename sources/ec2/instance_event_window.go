@@ -25,7 +25,7 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {
-		attrs, err := sources.ToAttributesCase(ew)
+		attrs, err := sources.ToAttributesCase(ew, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

@@ -28,7 +28,7 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, rt := range output.RouteTables {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(rt)
+		attrs, err = sources.ToAttributesCase(rt, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

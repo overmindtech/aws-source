@@ -19,7 +19,7 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 	items := make([]*sdp.Item, 0)
 
 	for _, fs := range output.FileSystems {
-		attrs, err := sources.ToAttributesCase(fs)
+		attrs, err := sources.ToAttributesCase(fs, "tags")
 
 		if err != nil {
 			return nil, err

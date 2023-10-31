@@ -27,7 +27,7 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 	for _, volume := range output.Volumes {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(volume)
+		attrs, err = sources.ToAttributesCase(volume, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

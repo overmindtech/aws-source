@@ -27,7 +27,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, ng := range output.NatGateways {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ng)
+		attrs, err = sources.ToAttributesCase(ng, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{

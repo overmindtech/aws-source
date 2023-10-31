@@ -43,7 +43,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	service.TaskSets = []types.TaskSet{}
 
-	attributes, err := sources.ToAttributesCase(service)
+	attributes, err := sources.ToAttributesCase(service, "tags")
 
 	if err != nil {
 		return nil, err

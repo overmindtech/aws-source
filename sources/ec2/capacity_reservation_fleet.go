@@ -14,7 +14,7 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 	items := make([]*sdp.Item, 0)
 
 	for _, cr := range output.CapacityReservationFleets {
-		attributes, err := sources.ToAttributesCase(cr)
+		attributes, err := sources.ToAttributesCase(cr, "tags")
 
 		if err != nil {
 			return nil, err

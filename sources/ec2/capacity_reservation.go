@@ -13,7 +13,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 	items := make([]*sdp.Item, 0)
 
 	for _, cr := range output.CapacityReservations {
-		attributes, err := sources.ToAttributesCase(cr)
+		attributes, err := sources.ToAttributesCase(cr, "tags")
 
 		if err != nil {
 			return nil, err

@@ -27,7 +27,7 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	for _, gw := range output.KeyPairs {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(gw)
+		attrs, err = sources.ToAttributesCase(gw, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
