@@ -32,6 +32,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/elbv2"
 	"github.com/overmindtech/aws-source/sources/iam"
 	"github.com/overmindtech/aws-source/sources/lambda"
+	"github.com/overmindtech/aws-source/sources/networkfirewall"
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
@@ -328,6 +329,9 @@ var rootCmd = &cobra.Command{
 				elbv2.NewRuleSource(cfg, *callerID.Account),
 				elbv2.NewTargetGroupSource(cfg, *callerID.Account),
 				elbv2.NewTargetHealthSource(cfg, *callerID.Account),
+
+				// Network Firewall
+				networkfirewall.NewFirewallSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

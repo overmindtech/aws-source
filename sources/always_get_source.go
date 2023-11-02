@@ -60,8 +60,13 @@ type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputT
 
 	// Maps search terms from an SDP Search request into the relevant input for
 	// the ListFunc. If this is not set, Search() will handle ARNs like most AWS
-	// sources
+	// sources. Note that this and `SearchGetInputMapper` are mutually exclusive
 	SearchInputMapper func(scope, query string) (ListInput, error)
+
+	// Maps search terms from an SDP Search request into the relevant input for
+	// the GetFunc. If this is not set, Search() will handle ARNs like most AWS
+	// sources. Note that this and `SearchInputMapper` are mutually exclusive
+	SearchGetInputMapper func(scope, query string) (GetInput, error)
 
 	// A function that returns a paginator for the ListFunc
 	ListFuncPaginatorBuilder func(client ClientStruct, input ListInput) Paginator[ListOutput, Options]
@@ -114,6 +119,10 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	if s.GetInputMapper == nil {
 		return errors.New("GetInputMapper is nil")
+	}
+
+	if s.SearchGetInputMapper != nil && s.SearchInputMapper != nil {
+		return errors.New("SearchGetInputMapper and SearchInputMapper are mutually exclusive")
 	}
 
 	return nil
@@ -326,7 +335,7 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	var items []*sdp.Item
 	var err error
 
-	if s.SearchInputMapper == nil {
+	if s.SearchInputMapper == nil && s.SearchGetInputMapper == nil {
 		items, err = s.SearchARN(ctx, scope, query, ignoreCache)
 	} else {
 		// If we should always look for ARNs first, do that
@@ -357,15 +366,44 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 // SearchCustom Searches using custom mapping logic. The SearchInputMapper is
 // used to create an input for ListFunc, at which point the usual logic is used
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
-	input, err := s.SearchInputMapper(scope, query)
-
-	if err != nil {
-		return nil, WrapAWSError(err)
-	}
-
-	items, err := s.listInternal(ctx, scope, input)
+	var items []*sdp.Item
+	var err error
 
 	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
+
+	if s.SearchInputMapper != nil {
+		input, err := s.SearchInputMapper(scope, query)
+
+		if err != nil {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+			return nil, WrapAWSError(err)
+		}
+
+		items, err = s.listInternal(ctx, scope, input)
+
+		if err != nil {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+			return nil, WrapAWSError(err)
+		}
+	} else if s.SearchGetInputMapper != nil {
+		input, err := s.SearchGetInputMapper(scope, query)
+
+		if err != nil {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+			return nil, WrapAWSError(err)
+		}
+
+		item, err := s.GetFunc(ctx, s.Client, scope, input)
+
+		if err != nil {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+			return nil, WrapAWSError(err)
+		}
+
+		items = []*sdp.Item{item}
+	} else {
+		return nil, errors.New("SearchCustom called without SearchInputMapper or SearchGetInputMapper")
+	}
 
 	if err != nil {
 		err = WrapAWSError(err)
