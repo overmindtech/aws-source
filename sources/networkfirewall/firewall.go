@@ -183,6 +183,15 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+// +overmind:type network-firewall-firewall
+// +overmind:descriptiveType Network Firewall
+// +overmind:get Get a Network Firewall by name
+// +overmind:list List Network Firewalls
+// +overmind:search Search for Network Firewalls by ARN
+// +overmind:group AWS
+// +overmind:terraform:queryMap aws_networkfirewall_firewall.name
+
 func NewFirewallSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &sources.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-firewall",

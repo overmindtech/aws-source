@@ -1,0 +1,18 @@
+{
+	"type": "network-firewall-firewall-policy",
+	"descriptiveType": "Network Firewall Policy",
+	"getDescription": "Get a Network Firewall Policy by name",
+	"listDescription": "List Network Firewall Policies",
+	"searchDescription": "Search for Network Firewall Policies by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkfirewall_firewall_policy.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"kms-key",
+		"network-firewall-rule-group",
+		"network-firewall-tls-inspection-configuration"
+	]
+}
