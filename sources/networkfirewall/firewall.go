@@ -2,6 +2,7 @@ package networkfirewall
 
 import (
 	"context"
+	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
@@ -11,9 +12,11 @@ import (
 )
 
 type unifiedFirewall struct {
-	Name   string
-	Config *types.Firewall
-	Status *types.FirewallStatus
+	Name                 string
+	Config               *types.Firewall
+	Status               *types.FirewallStatus
+	LoggingConfiguration *types.LoggingConfiguration
+	ResourcePolicy       *string
 }
 
 func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope string, input *networkfirewall.DescribeFirewallInput) (*sdp.Item, error) {
@@ -36,6 +39,34 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 		Config: response.Firewall,
 		Status: response.FirewallStatus,
 	}
+
+	// Enrich with more info
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		resp, _ := client.DescribeLoggingConfiguration(ctx, &networkfirewall.DescribeLoggingConfigurationInput{
+			FirewallArn: response.Firewall.FirewallArn,
+		})
+
+		if resp != nil {
+			uf.LoggingConfiguration = resp.LoggingConfiguration
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		resp, _ := client.DescribeResourcePolicy(ctx, &networkfirewall.DescribeResourcePolicyInput{
+			ResourceArn: response.Firewall.FirewallArn,
+		})
+
+		if resp != nil {
+			uf.ResourcePolicy = resp.Policy
+		}
+	}()
+
+	wg.Wait()
 
 	attributes, err := sources.ToAttributesCase(uf)
 
@@ -72,6 +103,83 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 	}
 
 	config := response.Firewall
+
+	if uf.LoggingConfiguration != nil {
+		for _, config := range uf.LoggingConfiguration.LogDestinationConfigs {
+			switch config.LogDestinationType {
+			case types.LogDestinationTypeCloudwatchLogs:
+				logGroup, ok := config.LogDestination["logGroup"]
+
+				if ok {
+					// +overmind:link logs-log-group
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "logs-log-group",
+							Method: sdp.QueryMethod_GET,
+							Query:  logGroup,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							In:  false,
+							Out: true,
+						},
+					})
+				}
+			case types.LogDestinationTypeS3:
+				bucketName, ok := config.LogDestination["bucketName"]
+
+				if ok {
+					//+overmind:link s3-bucket
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "s3-bucket",
+							Method: sdp.QueryMethod_GET,
+							Query:  bucketName,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							In:  false,
+							Out: true,
+						},
+					})
+				}
+			case types.LogDestinationTypeKinesisDataFirehose:
+				deliveryStream, ok := config.LogDestination["deliveryStream"]
+
+				if ok {
+					//+overmind:link firehose-delivery-stream
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "firehose-delivery-stream",
+							Method: sdp.QueryMethod_GET,
+							Query:  deliveryStream,
+							Scope:  scope,
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							In:  false,
+							Out: true,
+						},
+					})
+				}
+			}
+		}
+	}
+
+	if uf.ResourcePolicy != nil {
+		//+overmind:link iam-policy
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "iam-policy",
+				Method: sdp.QueryMethod_GET,
+				Query:  *uf.ResourcePolicy,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				In:  true,
+				Out: false,
+			},
+		})
+	}
 
 	if config.FirewallPolicyArn != nil {
 		if a, err := sources.ParseARN(*config.FirewallPolicyArn); err == nil {

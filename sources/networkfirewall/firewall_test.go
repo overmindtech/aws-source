@@ -67,6 +67,44 @@ func (c testNetworkFirewallClient) DescribeFirewall(ctx context.Context, params 
 	}, nil
 }
 
+func (c testNetworkFirewallClient) DescribeLoggingConfiguration(ctx context.Context, params *networkfirewall.DescribeLoggingConfigurationInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeLoggingConfigurationOutput, error) {
+	return &networkfirewall.DescribeLoggingConfigurationOutput{
+		FirewallArn: sources.PtrString("arn:aws:network-firewall:us-east-1:123456789012:firewall/aws-network-firewall-DefaultFirewall-1J3Z3W2ZQXV3"),
+		LoggingConfiguration: &types.LoggingConfiguration{
+			LogDestinationConfigs: []types.LogDestinationConfig{
+				{
+					LogDestination: map[string]string{
+						"bucketName": "DOC-EXAMPLE-BUCKET", // link
+						"prefix":     "alerts",
+					},
+					LogDestinationType: types.LogDestinationTypeS3,
+					LogType:            types.LogTypeAlert,
+				},
+				{
+					LogDestinationType: types.LogDestinationTypeCloudwatchLogs,
+					LogDestination: map[string]string{
+						"logGroup": "alert-log-group", // link
+					},
+					LogType: types.LogTypeAlert,
+				},
+				{
+					LogDestinationType: types.LogDestinationTypeKinesisDataFirehose,
+					LogDestination: map[string]string{
+						"deliveryStream": "alert-delivery-stream", // link
+					},
+					LogType: types.LogTypeAlert,
+				},
+			},
+		},
+	}, nil
+}
+
+func (c testNetworkFirewallClient) DescribeResourcePolicy(ctx context.Context, params *networkfirewall.DescribeResourcePolicyInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeResourcePolicyOutput, error) {
+	return &networkfirewall.DescribeResourcePolicyOutput{
+		Policy: sources.PtrString("test"), // link
+	}, nil
+}
+
 func (c testNetworkFirewallClient) ListFirewalls(context.Context, *networkfirewall.ListFirewallsInput, ...func(*networkfirewall.Options)) (*networkfirewall.ListFirewallsOutput, error) {
 	return &networkfirewall.ListFirewallsOutput{
 		Firewalls: []types.FirewallMetadata{
@@ -117,6 +155,24 @@ func TestFirewallGetFunc(t *testing.T) {
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "test",
+			ExpectedScope:  "test",
+		},
+		{
+			ExpectedType:   "logs-log-group",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "alert-log-group",
+			ExpectedScope:  "test",
+		},
+		{
+			ExpectedType:   "s3-bucket",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "DOC-EXAMPLE-BUCKET",
+			ExpectedScope:  "test",
+		},
+		{
+			ExpectedType:   "firehose-delivery-stream",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "alert-delivery-stream",
 			ExpectedScope:  "test",
 		},
 	}
