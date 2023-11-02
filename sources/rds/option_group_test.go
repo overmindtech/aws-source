@@ -18,7 +18,7 @@ func TestOptionGroupOutputMapper(t *testing.T) {
 				EngineName:                            sources.PtrString("aurora-mysql"),
 				MajorEngineVersion:                    sources.PtrString("8.0"),
 				Options:                               []types.Option{},
-				AllowsVpcAndNonVpcInstanceMemberships: true,
+				AllowsVpcAndNonVpcInstanceMemberships: sources.PtrBool(true),
 				OptionGroupArn:                        sources.PtrString("arn:aws:rds:eu-west-2:052392120703:og:default:aurora-mysql-8-0"),
 			},
 		},

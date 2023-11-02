@@ -22,13 +22,13 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 				MasterUsername:       sources.PtrString("admin"),
 				Endpoint: &types.Endpoint{
 					Address:      sources.PtrString("database-1-instance-1.camcztjohmlj.eu-west-2.rds.amazonaws.com"), // link
-					Port:         3306,                                                                                // link
+					Port:         sources.PtrInt32(3306),                                                              // link
 					HostedZoneId: sources.PtrString("Z1TTGA775OQIYO"),                                                 // link
 				},
-				AllocatedStorage:      1,
+				AllocatedStorage:      sources.PtrInt32(1),
 				InstanceCreateTime:    sources.PtrTime(time.Now()),
 				PreferredBackupWindow: sources.PtrString("00:05-00:35"),
-				BackupRetentionPeriod: 1,
+				BackupRetentionPeriod: sources.PtrInt32(1),
 				DBSecurityGroups: []types.DBSecurityGroupMembership{
 					{
 						DBSecurityGroupName: sources.PtrString("name"), // This is EC2Classic only so we're skipping this
@@ -67,9 +67,9 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 				},
 				PreferredMaintenanceWindow: sources.PtrString("fri:04:49-fri:05:19"),
 				PendingModifiedValues:      &types.PendingModifiedValues{},
-				MultiAZ:                    false,
+				MultiAZ:                    sources.PtrBool(false),
 				EngineVersion:              sources.PtrString("8.0.mysql_aurora.3.02.0"),
-				AutoMinorVersionUpgrade:    true,
+				AutoMinorVersionUpgrade:    sources.PtrBool(true),
 				ReadReplicaDBInstanceIdentifiers: []string{
 					"read",
 				},
@@ -80,11 +80,11 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 						Status:          sources.PtrString("in-sync"),
 					},
 				},
-				PubliclyAccessible:      false,
+				PubliclyAccessible:      sources.PtrBool(false),
 				StorageType:             sources.PtrString("aurora"),
-				DbInstancePort:          0,
+				DbInstancePort:          sources.PtrInt32(0),
 				DBClusterIdentifier:     sources.PtrString("database-1"), // link
-				StorageEncrypted:        true,
+				StorageEncrypted:        sources.PtrBool(true),
 				KmsKeyId:                sources.PtrString("arn:aws:kms:eu-west-2:052392120703:key/9653cbdd-1590-464a-8456-67389cef6933"), // link
 				DbiResourceId:           sources.PtrString("db-ET7CE5D5TQTK7MXNJGJNFQD52E"),
 				CACertificateIdentifier: sources.PtrString("rds-ca-2019"),
@@ -96,17 +96,17 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 						Status:      sources.PtrString("enrolled"),
 					},
 				},
-				CopyTagsToSnapshot:                 false,
+				CopyTagsToSnapshot:                 sources.PtrBool(false),
 				MonitoringInterval:                 sources.PtrInt32(60),
 				EnhancedMonitoringResourceArn:      sources.PtrString("arn:aws:logs:eu-west-2:052392120703:log-group:RDSOSMetrics:log-stream:db-ET7CE5D5TQTK7MXNJGJNFQD52E"), // link
 				MonitoringRoleArn:                  sources.PtrString("arn:aws:iam::052392120703:role/rds-monitoring-role"),                                                  // link
 				PromotionTier:                      sources.PtrInt32(1),
 				DBInstanceArn:                      sources.PtrString("arn:aws:rds:eu-west-2:052392120703:db:database-1-instance-1"),
-				IAMDatabaseAuthenticationEnabled:   false,
+				IAMDatabaseAuthenticationEnabled:   sources.PtrBool(false),
 				PerformanceInsightsEnabled:         sources.PtrBool(true),
 				PerformanceInsightsKMSKeyId:        sources.PtrString("arn:aws:kms:eu-west-2:052392120703:key/9653cbdd-1590-464a-8456-67389cef6933"), // link
 				PerformanceInsightsRetentionPeriod: sources.PtrInt32(7),
-				DeletionProtection:                 false,
+				DeletionProtection:                 sources.PtrBool(false),
 				AssociatedRoles: []types.DBInstanceRole{
 					{
 						FeatureName: sources.PtrString("something"),
@@ -147,7 +147,7 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 				ListenerEndpoint: &types.Endpoint{
 					Address:      sources.PtrString("foo.bar.com"), // link
 					HostedZoneId: sources.PtrString("id"),          // link
-					Port:         5432,                             // link
+					Port:         sources.PtrInt32(5432),           // link
 				},
 				MasterUserSecret: &types.MasterUserSecret{
 					KmsKeyId:     sources.PtrString("id"),                                     // link

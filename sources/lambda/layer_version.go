@@ -29,7 +29,7 @@ func layerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInpu
 
 	return &lambda.GetLayerVersionInput{
 		LayerName:     &name,
-		VersionNumber: *sources.PtrInt64(int64(versionInt)),
+		VersionNumber: sources.PtrInt64(int64(versionInt)),
 	}
 }
 

@@ -73,7 +73,7 @@ func (t *TestLambdaClient) GetLayerVersion(ctx context.Context, params *lambda.G
 		LayerArn:        sources.PtrString("arn:aws:service:region:account:type/id"),
 		LayerVersionArn: sources.PtrString("arn:aws:service:region:account:type/id"),
 		LicenseInfo:     sources.PtrString("info"),
-		Version:         params.VersionNumber,
+		Version:         *params.VersionNumber,
 	}, nil
 }
 
@@ -84,7 +84,7 @@ func (t *TestLambdaClient) ListLayerVersions(context.Context, *lambda.ListLayerV
 func TestLayerVersionGetFunc(t *testing.T) {
 	item, err := layerVersionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetLayerVersionInput{
 		LayerName:     sources.PtrString("layer"),
-		VersionNumber: 999,
+		VersionNumber: sources.PtrInt64(999),
 	})
 
 	if err != nil {
