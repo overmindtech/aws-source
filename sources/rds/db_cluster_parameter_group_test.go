@@ -25,7 +25,7 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 				ApplyType:      sources.PtrString("dynamic"),
 				DataType:       sources.PtrString("boolean"),
 				AllowedValues:  sources.PtrString("0,1"),
-				IsModifiable:   true,
+				IsModifiable:   sources.PtrBool(true),
 				ApplyMethod:    types.ApplyMethodPendingReboot,
 				SupportedEngineModes: []string{
 					"provisioned",
@@ -38,7 +38,7 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 				ApplyType:     sources.PtrString("static"),
 				DataType:      sources.PtrString("boolean"),
 				AllowedValues: sources.PtrString("0,1"),
-				IsModifiable:  false,
+				IsModifiable:  sources.PtrBool(false),
 				ApplyMethod:   types.ApplyMethodPendingReboot,
 				SupportedEngineModes: []string{
 					"provisioned",
@@ -51,7 +51,7 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 				ApplyType:     sources.PtrString("dynamic"),
 				DataType:      sources.PtrString("integer"),
 				AllowedValues: sources.PtrString("0-36000"),
-				IsModifiable:  true,
+				IsModifiable:  sources.PtrBool(true),
 				ApplyMethod:   types.ApplyMethodPendingReboot,
 				SupportedEngineModes: []string{
 					"provisioned",
@@ -64,7 +64,7 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 				ApplyType:     sources.PtrString("dynamic"),
 				DataType:      sources.PtrString("boolean"),
 				AllowedValues: sources.PtrString("0,1"),
-				IsModifiable:  true,
+				IsModifiable:  sources.PtrBool(true),
 				ApplyMethod:   types.ApplyMethodImmediate,
 				SupportedEngineModes: []string{
 					"provisioned",

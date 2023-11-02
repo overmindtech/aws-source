@@ -60,7 +60,7 @@ func TestRuleOutputMapper(t *testing.T) {
 				Actions: []types.Action{
 					// Tested in actions.go
 				},
-				IsDefault: false,
+				IsDefault: sources.PtrBool(false),
 			},
 		},
 	}

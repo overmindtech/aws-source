@@ -41,7 +41,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 				DBClusterMembers: []types.DBClusterMember{
 					{
 						DBInstanceIdentifier:          sources.PtrString("database-2-instance-3"), // link
-						IsClusterWriter:               false,
+						IsClusterWriter:               sources.PtrBool(false),
 						DBClusterParameterGroupStatus: sources.PtrString("in-sync"),
 						PromotionTier:                 sources.PtrInt32(1),
 					},
@@ -53,7 +53,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 					},
 				},
 				HostedZoneId:                     sources.PtrString("Z1TTGA775OQIYO"), // link
-				StorageEncrypted:                 true,
+				StorageEncrypted:                 sources.PtrBool(true),
 				KmsKeyId:                         sources.PtrString("arn:aws:kms:eu-west-2:052392120703:key/9653cbdd-1590-464a-8456-67389cef6933"), // link
 				DbClusterResourceId:              sources.PtrString("cluster-2EW4PDVN7F7V57CUJPYOEAA74M"),
 				DBClusterArn:                     sources.PtrString("arn:aws:rds:eu-west-2:052392120703:cluster:database-2"),
@@ -71,7 +71,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 				StorageType:                      sources.PtrString("io1"),
 				Iops:                             sources.PtrInt32(1000),
 				PubliclyAccessible:               sources.PtrBool(true),
-				AutoMinorVersionUpgrade:          true,
+				AutoMinorVersionUpgrade:          sources.PtrBool(true),
 				MonitoringInterval:               sources.PtrInt32(0),
 				PerformanceInsightsEnabled:       sources.PtrBool(false),
 				NetworkType:                      sources.PtrString("IPV4"),
