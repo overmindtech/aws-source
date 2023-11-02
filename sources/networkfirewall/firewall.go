@@ -13,7 +13,7 @@ import (
 
 type unifiedFirewall struct {
 	Name                 string
-	Config               *types.Firewall
+	Properties           *types.Firewall
 	Status               *types.FirewallStatus
 	LoggingConfiguration *types.LoggingConfiguration
 	ResourcePolicy       *string
@@ -35,9 +35,9 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 	}
 
 	uf := unifiedFirewall{
-		Name:   *response.Firewall.FirewallName,
-		Config: response.Firewall,
-		Status: response.FirewallStatus,
+		Name:       *response.Firewall.FirewallName,
+		Properties: response.Firewall,
+		Status:     response.FirewallStatus,
 	}
 
 	// Enrich with more info
@@ -236,38 +236,8 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 		})
 	}
 
-	if config.EncryptionConfiguration != nil && config.EncryptionConfiguration.KeyId != nil {
-		// This can be an ARN or an ID if it's in the same account
-		if a, err := sources.ParseARN(*config.EncryptionConfiguration.KeyId); err == nil {
-			//+overmind:link kms-key
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *config.EncryptionConfiguration.KeyId,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			})
-		} else {
-			//+overmind:link kms-key
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_GET,
-					Query:  *config.EncryptionConfiguration.KeyId,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			})
-		}
-	}
+	//+overmind:link kms-key
+	item.LinkedItemQueries = append(item.LinkedItemQueries, encryptionConfigurationLink(config.EncryptionConfiguration, scope))
 
 	for _, state := range response.FirewallStatus.SyncStates {
 		if state.Attachment != nil && state.Attachment.SubnetId != nil {
@@ -309,7 +279,7 @@ func NewFirewallSource(config aws.Config, accountID string, region string) *sour
 		ListInput: &networkfirewall.ListFirewallsInput{},
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeFirewallInput {
 			return &networkfirewall.DescribeFirewallInput{
-				FirewallName: aws.String(query),
+				FirewallName: &query,
 			}
 		},
 		SearchGetInputMapper: func(scope, query string) (*networkfirewall.DescribeFirewallInput, error) {

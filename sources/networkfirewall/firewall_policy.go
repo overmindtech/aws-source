@@ -61,39 +61,8 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 		Health:          health,
 	}
 
-	if resp.FirewallPolicyResponse.EncryptionConfiguration != nil && resp.FirewallPolicyResponse.EncryptionConfiguration.KeyId != nil {
-		keyID := resp.FirewallPolicyResponse.EncryptionConfiguration.KeyId
-
-		if a, err := sources.ParseARN(*keyID); err == nil {
-			//+overmind:link kms-key
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *keyID,
-					Scope:  sources.FormatScope(a.AccountID, a.Region),
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			})
-		} else {
-			//+overmind:link kms-key
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   "kms-key",
-					Method: sdp.QueryMethod_GET,
-					Query:  *keyID,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			})
-		}
-	}
+	//+overmind:link kms-key
+	item.LinkedItemQueries = append(item.LinkedItemQueries, encryptionConfigurationLink(ufp.EncryptionConfiguration, scope))
 
 	ruleGroupArns := make([]string, 0)
 

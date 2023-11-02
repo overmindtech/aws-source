@@ -333,6 +333,7 @@ var rootCmd = &cobra.Command{
 				// Network Firewall
 				networkfirewall.NewFirewallSource(cfg, *callerID.Account, region),
 				networkfirewall.NewFirewallPolicySource(cfg, *callerID.Account, region),
+				networkfirewall.NewRuleGroupSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)

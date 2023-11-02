@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
+	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
+	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
 )
 
 type networkFirewallClient interface {
@@ -13,6 +16,40 @@ type networkFirewallClient interface {
 	DescribeFirewallPolicy(ctx context.Context, params *networkfirewall.DescribeFirewallPolicyInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeFirewallPolicyOutput, error)
 	ListFirewallPolicies(context.Context, *networkfirewall.ListFirewallPoliciesInput, ...func(*networkfirewall.Options)) (*networkfirewall.ListFirewallPoliciesOutput, error)
 
+	DescribeRuleGroup(ctx context.Context, params *networkfirewall.DescribeRuleGroupInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeRuleGroupOutput, error)
+	ListRuleGroups(ctx context.Context, params *networkfirewall.ListRuleGroupsInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.ListRuleGroupsOutput, error)
+
 	DescribeLoggingConfiguration(ctx context.Context, params *networkfirewall.DescribeLoggingConfigurationInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeLoggingConfigurationOutput, error)
 	DescribeResourcePolicy(ctx context.Context, params *networkfirewall.DescribeResourcePolicyInput, optFns ...func(*networkfirewall.Options)) (*networkfirewall.DescribeResourcePolicyOutput, error)
+}
+
+func encryptionConfigurationLink(config *types.EncryptionConfiguration, scope string) *sdp.LinkedItemQuery {
+	// This can be an ARN or an ID if it's in the same account
+	if a, err := sources.ParseARN(*config.KeyId); err == nil {
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "kms-key",
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  *config.KeyId,
+				Scope:  sources.FormatScope(a.AccountID, a.Region),
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				In:  true,
+				Out: false,
+			},
+		}
+	} else {
+		return &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "kms-key",
+				Method: sdp.QueryMethod_GET,
+				Query:  *config.KeyId,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				In:  true,
+				Out: false,
+			},
+		}
+	}
 }
