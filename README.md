@@ -14,7 +14,10 @@ This source requies the following IAM Policy
       "Effect": "Allow",
       "Action": [
         "autoscaling:Describe*",
+        "cloudfront:Get*",
+        "cloudfront:List*",
         "cloudwatch:Describe*",
+        "cloudwatch:ListTagsForResource",
         "dynamodb:Describe*",
         "dynamodb:List*",
         "ec2:Describe*",
@@ -31,10 +34,11 @@ This source requies the following IAM Policy
         "network-firewall:Describe*",
         "network-firewall:List*",
         "rds:Describe*",
+        "rds:ListTagsForResource",
         "route53:Get*",
         "route53:List*",
         "s3:GetBucket*",
-        "s3:ListAllMyBuckets"
+        "s3:ListAllMyBuckets",
       ],
       "Resource": "*"
     }
