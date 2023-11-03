@@ -28,6 +28,8 @@ This source requies the following IAM Policy
         "iam:List*",
         "lambda:Get*",
         "lambda:List*",
+        "network-firewall:Describe*",
+        "network-firewall:List*",
         "rds:Describe*",
         "route53:Get*",
         "route53:List*",
