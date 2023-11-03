@@ -38,7 +38,7 @@ This source requies the following IAM Policy
         "route53:Get*",
         "route53:List*",
         "s3:GetBucket*",
-        "s3:ListAllMyBuckets",
+        "s3:ListAllMyBuckets"
       ],
       "Resource": "*"
     }
