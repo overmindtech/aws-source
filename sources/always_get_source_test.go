@@ -390,6 +390,51 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 			t.Error("search mapper not called")
 		}
 	})
+
+	t.Run("with SearchGetInputMapper", func(t *testing.T) {
+		ags := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+			ItemType:         "test",
+			AccountID:        "foo",
+			Region:           "bar",
+			Client:           struct{}{},
+			MaxParallel:      MaxParallel(1),
+			ListInput:        "",
+			AlwaysSearchARNs: true,
+			SearchGetInputMapper: func(scope, query string) (string, error) {
+				return "foo.bar.id", nil
+			},
+			ListFuncPaginatorBuilder: func(client struct{}, input string) Paginator[string, struct{}] {
+				// Returns 3 pages
+				return &TestPaginator{DataFunc: func() string {
+					return "foo"
+				}}
+			},
+			ListFuncOutputMapper: func(output, input string) ([]string, error) {
+				// Returns 2 gets per page
+				return []string{"", ""}, nil
+			},
+			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
+				if input == "foo.bar.id" {
+					return &sdp.Item{}, nil
+				} else {
+					return nil, sdp.NewQueryError(errors.New("bad query details"))
+				}
+			},
+			GetInputMapper: func(scope, query string) string {
+				return scope + "." + query
+			},
+		}
+
+		items, err := ags.Search(context.Background(), "foo.bar", "id", false)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if len(items) != 1 {
+			t.Errorf("expected 1 item, got %v", len(items))
+		}
+	})
 }
 
 func TestAlwaysGetSourceCaching(t *testing.T) {

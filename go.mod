@@ -24,6 +24,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.33.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/sts v1.25.0
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.35.0
 	github.com/aws/smithy-go v1.16.0
 	github.com/getsentry/sentry-go v0.25.0
 	github.com/iancoleman/strcase v0.2.0
@@ -112,3 +113,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+

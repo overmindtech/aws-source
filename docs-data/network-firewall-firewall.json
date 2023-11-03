@@ -1,0 +1,23 @@
+{
+	"type": "network-firewall-firewall",
+	"descriptiveType": "Network Firewall",
+	"getDescription": "Get a Network Firewall by name",
+	"listDescription": "List Network Firewalls",
+	"searchDescription": "Search for Network Firewalls by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkfirewall_firewall.name"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"ec2-subnet",
+		"ec2-vpc",
+		"firehose-delivery-stream",
+		"iam-policy",
+		"kms-key",
+		"logs-log-group",
+		"network-firewall-firewall-policy",
+		"s3-bucket"
+	]
+}

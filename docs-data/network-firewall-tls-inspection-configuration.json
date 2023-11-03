@@ -1,0 +1,13 @@
+{
+	"type": "network-firewall-tls-inspection-configuration",
+	"descriptiveType": "Network Firewall TLS Inspection Configuration",
+	"getDescription": "Get a Network Firewall TLS Inspection Configuration by name",
+	"listDescription": "List Network Firewall TLS Inspection Configurations",
+	"searchDescription": "Search for Network Firewall TLS Inspection Configurations by ARN",
+	"group": "AWS",
+	"links": [
+		"acm-certificate",
+		"acm-pca-certificate-authority",
+		"acm-pca-certificate-authority-certificate"
+	]
+}
