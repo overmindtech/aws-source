@@ -13,7 +13,11 @@
 	"links": [
 		"ec2-subnet",
 		"ec2-vpc",
+		"firehose-delivery-stream",
+		"iam-policy",
 		"kms-key",
-		"network-firewall-firewall-policy"
+		"logs-log-group",
+		"network-firewall-firewall-policy",
+		"s3-bucket"
 	]
 }
