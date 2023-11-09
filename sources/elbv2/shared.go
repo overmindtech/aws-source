@@ -31,17 +31,18 @@ func tagsToMap(tags []types.Tag) map[string]string {
 func getTagsMap(ctx context.Context, client elbClient, arns []string) (map[string]map[string]string, error) {
 	tagsMap := make(map[string]map[string]string)
 
-	tagsOut, err := client.DescribeTags(ctx, &elbv2.DescribeTagsInput{
-		ResourceArns: arns,
-	})
+	if len(arns) > 0 {
+		tagsOut, err := client.DescribeTags(ctx, &elbv2.DescribeTagsInput{
+			ResourceArns: arns,
+		})
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
-	}
-
-	for _, tagDescription := range tagsOut.TagDescriptions {
-		if tagDescription.ResourceArn != nil {
-			tagsMap[*tagDescription.ResourceArn] = tagsToMap(tagDescription.Tags)
+		for _, tagDescription := range tagsOut.TagDescriptions {
+			if tagDescription.ResourceArn != nil {
+				tagsMap[*tagDescription.ResourceArn] = tagsToMap(tagDescription.Tags)
+			}
 		}
 	}
 

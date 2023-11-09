@@ -31,28 +31,27 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 	items := make([]*sdp.Item, 0)
 
 	loadBalancerNames := make([]string, 0)
-
 	for _, desc := range output.LoadBalancerDescriptions {
 		if desc.LoadBalancerName != nil {
 			loadBalancerNames = append(loadBalancerNames, *desc.LoadBalancerName)
 		}
 	}
 
-	// Get all tags for all load balancers in this output
-	tagsOut, err := client.DescribeTags(ctx, &elb.DescribeTagsInput{
-		LoadBalancerNames: loadBalancerNames,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
 	// Map of load balancer name to tags
 	tagsMap := make(map[string][]types.Tag)
+	if len(loadBalancerNames) > 0 {
+		// Get all tags for all load balancers in this output
+		tagsOut, err := client.DescribeTags(ctx, &elb.DescribeTagsInput{
+			LoadBalancerNames: loadBalancerNames,
+		})
+		if err != nil {
+			return nil, err
+		}
 
-	for _, tagDesc := range tagsOut.TagDescriptions {
-		if tagDesc.LoadBalancerName != nil {
-			tagsMap[*tagDesc.LoadBalancerName] = tagDesc.Tags
+		for _, tagDesc := range tagsOut.TagDescriptions {
+			if tagDesc.LoadBalancerName != nil {
+				tagsMap[*tagDesc.LoadBalancerName] = tagDesc.Tags
+			}
 		}
 	}
 
