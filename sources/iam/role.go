@@ -279,7 +279,7 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return nil, err
+			return sources.HandleTagsError(ctx, err), nil
 		}
 
 		for _, tag := range out.Tags {

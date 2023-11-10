@@ -25,11 +25,7 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 		}
 	}
 
-	tagsMap, err := getTagsMap(ctx, client, arns)
-
-	if err != nil {
-		return nil, err
-	}
+	tagsMap := getTagsMap(ctx, client, arns)
 
 	for _, listener := range output.Listeners {
 		// Redact the client secret and replace with the first 12 characters of

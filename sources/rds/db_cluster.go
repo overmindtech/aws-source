@@ -13,13 +13,17 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, cluster := range output.DBClusters {
+		var tags map[string]string
+
 		// Get tags for the cluster
 		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
 			ResourceName: cluster.DBClusterArn,
 		})
 
-		if err != nil {
-			return nil, err
+		if err == nil {
+			tags = tagsToMap(tagsOut.TagList)
+		} else {
+			tags = sources.HandleTagsError(ctx, err)
 		}
 
 		attributes, err := sources.ToAttributesCase(cluster)
@@ -33,7 +37,7 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 			UniqueAttribute: "dBClusterIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
-			Tags:            tagsToMap(tagsOut.TagList),
+			Tags:            tags,
 		}
 
 		var a *sources.ARN

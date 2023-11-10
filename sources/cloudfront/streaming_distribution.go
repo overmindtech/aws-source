@@ -26,10 +26,18 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		}
 	}
 
+	var tags map[string]string
+
 	// Get the tags
 	tagsOut, err := client.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
 		Resource: d.ARN,
 	})
+
+	if err == nil {
+		tags = tagsToMap(tagsOut.Tags)
+	} else {
+		tags = sources.HandleTagsError(ctx, err)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tags for streaming distribution %v: %w", *d.Id, err)
@@ -46,7 +54,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(tagsOut.Tags),
+		Tags:            tags,
 	}
 
 	if d.Status != nil {

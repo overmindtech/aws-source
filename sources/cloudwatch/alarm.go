@@ -86,10 +86,18 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 			return nil, err
 		}
 
+		var tags map[string]string
+
 		// Get the tags
 		tagsOut, err := client.ListTagsForResource(ctx, &cloudwatch.ListTagsForResourceInput{
 			ResourceARN: arn,
 		})
+
+		if err == nil {
+			tags = tagsToMap(tagsOut.Tags)
+		} else {
+			tags = sources.HandleTagsError(ctx, err)
+		}
 
 		if err != nil {
 			return nil, err
@@ -100,7 +108,7 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 			UniqueAttribute: "alarmName",
 			Scope:           scope,
 			Attributes:      attrs,
-			Tags:            tagsToMap(tagsOut.Tags),
+			Tags:            tags,
 		}
 
 		// Combine all actions so that we can link the targeted item

@@ -13,13 +13,17 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 	items := make([]*sdp.Item, 0)
 
 	for _, sg := range output.DBSubnetGroups {
+		var tags map[string]string
+
 		// Get tags
 		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
 			ResourceName: sg.DBSubnetGroupArn,
 		})
 
-		if err != nil {
-			return nil, err
+		if err == nil {
+			tags = tagsToMap(tagsOut.TagList)
+		} else {
+			tags = sources.HandleTagsError(ctx, err)
 		}
 
 		attributes, err := sources.ToAttributesCase(sg)
@@ -33,7 +37,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 			UniqueAttribute: "dBSubnetGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
-			Tags:            tagsToMap(tagsOut.TagList),
+			Tags:            tags,
 		}
 
 		var a *sources.ARN

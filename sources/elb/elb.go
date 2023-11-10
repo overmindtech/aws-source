@@ -44,13 +44,12 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 		tagsOut, err := client.DescribeTags(ctx, &elb.DescribeTagsInput{
 			LoadBalancerNames: loadBalancerNames,
 		})
-		if err != nil {
-			return nil, err
-		}
 
-		for _, tagDesc := range tagsOut.TagDescriptions {
-			if tagDesc.LoadBalancerName != nil {
-				tagsMap[*tagDesc.LoadBalancerName] = tagDesc.Tags
+		if err == nil {
+			for _, tagDesc := range tagsOut.TagDescriptions {
+				if tagDesc.LoadBalancerName != nil {
+					tagsMap[*tagDesc.LoadBalancerName] = tagDesc.Tags
+				}
 			}
 		}
 	}
@@ -65,7 +64,11 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 		var tags map[string]string
 
 		if desc.LoadBalancerName != nil {
-			tags = tagsToMap(tagsMap[*desc.LoadBalancerName])
+			m, ok := tagsMap[*desc.LoadBalancerName]
+
+			if ok {
+				tags = tagsToMap(m)
+			}
 		}
 
 		item := sdp.Item{

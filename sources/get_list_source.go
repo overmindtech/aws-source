@@ -163,8 +163,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 	if s.ListTagsFunc != nil {
 		item.Tags, err = s.ListTagsFunc(ctx, awsItem, s.Client)
 		if err != nil {
-			s.cache.StoreError(err, s.CacheDuration, ck)
-			return nil, WrapAWSError(err)
+			item.Tags = HandleTagsError(ctx, err)
 		}
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
+	"github.com/overmindtech/aws-source/sources"
 )
 
 type elbClient interface {
@@ -28,7 +29,7 @@ func tagsToMap(tags []types.Tag) map[string]string {
 }
 
 // Gets a map of ARN to tags (in map[string]string format) for the given ARNs
-func getTagsMap(ctx context.Context, client elbClient, arns []string) (map[string]map[string]string, error) {
+func getTagsMap(ctx context.Context, client elbClient, arns []string) map[string]map[string]string {
 	tagsMap := make(map[string]map[string]string)
 
 	if len(arns) > 0 {
@@ -36,7 +37,14 @@ func getTagsMap(ctx context.Context, client elbClient, arns []string) (map[strin
 			ResourceArns: arns,
 		})
 		if err != nil {
-			return nil, err
+			tags := sources.HandleTagsError(ctx, err)
+
+			// Set these tags for all ARNs
+			for _, arn := range arns {
+				tagsMap[arn] = tags
+			}
+
+			return tagsMap
 		}
 
 		for _, tagDescription := range tagsOut.TagDescriptions {
@@ -46,5 +54,5 @@ func getTagsMap(ctx context.Context, client elbClient, arns []string) (map[strin
 		}
 	}
 
-	return tagsMap, nil
+	return tagsMap
 }
