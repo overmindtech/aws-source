@@ -45,6 +45,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.19.0
 	go.opentelemetry.io/otel/sdk v1.19.0
 	go.opentelemetry.io/otel/trace v1.19.0
+	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/protobuf v1.31.0
 )
 
