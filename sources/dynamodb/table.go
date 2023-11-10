@@ -3,7 +3,6 @@ package dynamodb
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -35,7 +34,8 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		})
 
 		if err != nil {
-			return nil, fmt.Errorf("failed to get tags for table: %w", err)
+			tagsMap = sources.HandleTagsError(ctx, err)
+			break
 		}
 
 		// Add tags to map

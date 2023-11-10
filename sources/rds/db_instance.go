@@ -76,13 +76,17 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 	items := make([]*sdp.Item, 0)
 
 	for _, instance := range output.DBInstances {
+		var tags map[string]string
+
 		// Get the tags for the instance
 		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
 			ResourceName: instance.DBInstanceArn,
 		})
 
-		if err != nil {
-			return nil, err
+		if err == nil {
+			tags = tagsToMap(tagsOut.TagList)
+		} else {
+			tags = sources.HandleTagsError(ctx, err)
 		}
 
 		var dbSubnetGroup *string
@@ -106,7 +110,7 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			UniqueAttribute: "dBInstanceIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
-			Tags:            tagsToMap(tagsOut.TagList),
+			Tags:            tags,
 		}
 
 		if instance.DBInstanceStatus != nil {

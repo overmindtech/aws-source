@@ -20,11 +20,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 		}
 	}
 
-	tagsMap, err := getTagsMap(ctx, client, tgArns)
-
-	if err != nil {
-		return nil, err
-	}
+	tagsMap := getTagsMap(ctx, client, tgArns)
 
 	for _, tg := range output.TargetGroups {
 		attrs, err := sources.ToAttributesCase(tg)

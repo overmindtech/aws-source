@@ -2,7 +2,6 @@ package cloudfront
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -29,13 +28,17 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		}
 	}
 
+	var tags map[string]string
+
 	// get tags
 	tagsOut, err := client.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
 		Resource: d.ARN,
 	})
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to get tags for distribution %v: %w", *d.ARN, err)
+	if err == nil {
+		tags = tagsToMap(tagsOut.Tags)
+	} else {
+		tags = sources.HandleTagsError(ctx, err)
 	}
 
 	attributes, err := sources.ToAttributesCase(d)
@@ -49,7 +52,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		UniqueAttribute: "id",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(tagsOut.Tags),
+		Tags:            tags,
 	}
 
 	if err != nil {

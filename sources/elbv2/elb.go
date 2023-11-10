@@ -22,11 +22,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 		}
 	}
 
-	tagsMap, err := getTagsMap(ctx, client, arns)
-
-	if err != nil {
-		return nil, err
-	}
+	tagsMap := getTagsMap(ctx, client, arns)
 
 	for _, lb := range output.LoadBalancers {
 		attrs, err := sources.ToAttributesCase(lb)

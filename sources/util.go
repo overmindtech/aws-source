@@ -17,6 +17,8 @@ import (
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // FormatScope Formats an account ID and region into the corresponding Overmind
@@ -95,6 +97,27 @@ func WrapAWSError(err error) error {
 	}
 
 	return sdp.NewQueryError(err)
+}
+
+// Adds an event to the span to note the error, and returns a set of tags that
+// return a standardised set of tags that contains `errorGettingTags` and
+// `error`
+func HandleTagsError(ctx context.Context, err error) map[string]string {
+	if err == nil {
+		return nil
+	}
+
+	// Attach an event in the span
+	span := trace.SpanFromContext(ctx)
+
+	span.AddEvent("Error getting tags", trace.WithAttributes(
+		attribute.String("error", err.Error()),
+	))
+
+	return map[string]string{
+		"errorGettingTags": "true",
+		"error":            err.Error(),
+	}
 }
 
 // E2ETest A struct that runs end to end tests on a fully configured source.

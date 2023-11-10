@@ -256,7 +256,7 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return nil, err
+			return sources.HandleTagsError(ctx, err), nil
 		}
 
 		for _, tag := range out.Tags {

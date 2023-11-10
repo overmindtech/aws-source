@@ -20,11 +20,7 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 		}
 	}
 
-	tagsMap, err := getTagsMap(ctx, client, ruleArns)
-
-	if err != nil {
-		return nil, err
-	}
+	tagsMap := getTagsMap(ctx, client, ruleArns)
 
 	for _, rule := range output.Rules {
 		attrs, err := sources.ToAttributesCase(rule)

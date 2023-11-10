@@ -13,13 +13,17 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 	items := make([]*sdp.Item, 0)
 
 	for _, group := range output.OptionGroupsList {
+		var tags map[string]string
+
 		// Get tags
 		tagsOut, err := client.ListTagsForResource(ctx, &rds.ListTagsForResourceInput{
 			ResourceName: group.OptionGroupArn,
 		})
 
-		if err != nil {
-			return nil, err
+		if err == nil {
+			tags = tagsToMap(tagsOut.TagList)
+		} else {
+			tags = sources.HandleTagsError(ctx, err)
 		}
 
 		attributes, err := sources.ToAttributesCase(group)
@@ -33,7 +37,7 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 			UniqueAttribute: "optionGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
-			Tags:            tagsToMap(tagsOut.TagList),
+			Tags:            tags,
 		}
 
 		items = append(items, &item)

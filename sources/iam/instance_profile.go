@@ -97,7 +97,7 @@ func instanceProfileItemMapper(scope string, awsItem *types.InstanceProfile) (*s
 	return &item, nil
 }
 
-func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile, client *iam.Client) (map[string]string, error) {
+func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile, client *iam.Client) map[string]string {
 	tags := make(map[string]string)
 
 	paginator := iam.NewListInstanceProfileTagsPaginator(client, &iam.ListInstanceProfileTagsInput{
@@ -108,7 +108,7 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return nil, err
+			return sources.HandleTagsError(ctx, err)
 		}
 
 		for _, tag := range out.Tags {
@@ -118,7 +118,7 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 		}
 	}
 
-	return tags, nil
+	return tags
 }
 
 //go:generate docgen ../../docs-data
@@ -147,7 +147,7 @@ func NewInstanceProfileSource(config aws.Config, accountID string, region string
 		},
 		ListTagsFunc: func(ctx context.Context, ip *types.InstanceProfile, c *iam.Client) (map[string]string, error) {
 			limit.Wait(ctx) // Wait for rate limiting
-			return instanceProfileListTagsFunc(ctx, ip, c)
+			return instanceProfileListTagsFunc(ctx, ip, c), nil
 		},
 		ItemMapper: instanceProfileItemMapper,
 	}
