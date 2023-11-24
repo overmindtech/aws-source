@@ -233,7 +233,7 @@ func (t TestS3Client) GetBucketCors(ctx context.Context, params *s3.GetBucketCor
 					"foo",
 				},
 				ID:            sources.PtrString("id"),
-				MaxAgeSeconds: 10,
+				MaxAgeSeconds: sources.PtrInt32(10),
 			},
 		},
 	}, nil
@@ -248,7 +248,7 @@ func (t TestS3Client) GetBucketEncryption(ctx context.Context, params *s3.GetBuc
 						SSEAlgorithm:   types.ServerSideEncryptionAes256,
 						KMSMasterKeyID: sources.PtrString("id"),
 					},
-					BucketKeyEnabled: true,
+					BucketKeyEnabled: sources.PtrBool(true),
 				},
 			},
 		},
@@ -263,7 +263,7 @@ func (t TestS3Client) GetBucketIntelligentTieringConfiguration(ctx context.Conte
 			Tierings: []types.Tiering{
 				{
 					AccessTier: types.IntelligentTieringAccessTierDeepArchiveAccess,
-					Days:       100,
+					Days:       sources.PtrInt32(100),
 				},
 			},
 			Filter: &types.IntelligentTieringFilter{},
@@ -289,7 +289,7 @@ func (t TestS3Client) GetBucketInventoryConfiguration(ctx context.Context, param
 			},
 			Id:                     sources.PtrString("id"),
 			IncludedObjectVersions: types.InventoryIncludedObjectVersionsAll,
-			IsEnabled:              true,
+			IsEnabled:              sources.PtrBool(true),
 			Schedule: &types.InventorySchedule{
 				Frequency: types.InventoryFrequencyDaily,
 			},
@@ -303,22 +303,22 @@ func (t TestS3Client) GetBucketLifecycleConfiguration(ctx context.Context, param
 			{
 				Status: types.ExpirationStatusEnabled,
 				AbortIncompleteMultipartUpload: &types.AbortIncompleteMultipartUpload{
-					DaysAfterInitiation: 1,
+					DaysAfterInitiation: sources.PtrInt32(1),
 				},
 				Expiration: &types.LifecycleExpiration{
 					Date:                      sources.PtrTime(time.Now()),
-					Days:                      3,
-					ExpiredObjectDeleteMarker: true,
+					Days:                      sources.PtrInt32(3),
+					ExpiredObjectDeleteMarker: sources.PtrBool(true),
 				},
 				ID: sources.PtrString("id"),
 				NoncurrentVersionExpiration: &types.NoncurrentVersionExpiration{
-					NewerNoncurrentVersions: 3,
-					NoncurrentDays:          1,
+					NewerNoncurrentVersions: sources.PtrInt32(3),
+					NoncurrentDays:          sources.PtrInt32(1),
 				},
 				NoncurrentVersionTransitions: []types.NoncurrentVersionTransition{
 					{
-						NewerNoncurrentVersions: 1,
-						NoncurrentDays:          1,
+						NewerNoncurrentVersions: sources.PtrInt32(1),
+						NoncurrentDays:          sources.PtrInt32(1),
 						StorageClass:            types.TransitionStorageClassGlacierIr,
 					},
 				},
@@ -326,7 +326,7 @@ func (t TestS3Client) GetBucketLifecycleConfiguration(ctx context.Context, param
 				Transitions: []types.Transition{
 					{
 						Date:         sources.PtrTime(time.Now()),
-						Days:         12,
+						Days:         sources.PtrInt32(12),
 						StorageClass: types.TransitionStorageClassGlacierIr,
 					},
 				},
@@ -434,7 +434,7 @@ func (t TestS3Client) GetBucketPolicy(ctx context.Context, params *s3.GetBucketP
 func (t TestS3Client) GetBucketPolicyStatus(ctx context.Context, params *s3.GetBucketPolicyStatusInput, optFns ...func(*s3.Options)) (*s3.GetBucketPolicyStatusOutput, error) {
 	return &s3.GetBucketPolicyStatusOutput{
 		PolicyStatus: &types.PolicyStatus{
-			IsPublic: true,
+			IsPublic: sources.PtrBool(true),
 		},
 	}, nil
 }
@@ -457,13 +457,13 @@ func (t TestS3Client) GetBucketReplication(ctx context.Context, params *s3.GetBu
 						Metrics: &types.Metrics{
 							Status: types.MetricsStatusEnabled,
 							EventThreshold: &types.ReplicationTimeValue{
-								Minutes: 1,
+								Minutes: sources.PtrInt32(1),
 							},
 						},
 						ReplicationTime: &types.ReplicationTime{
 							Status: types.ReplicationTimeStatusEnabled,
 							Time: &types.ReplicationTimeValue{
-								Minutes: 1,
+								Minutes: sources.PtrInt32(1),
 							},
 						},
 						StorageClass: types.StorageClassGlacier,
