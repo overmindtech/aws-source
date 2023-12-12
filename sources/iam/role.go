@@ -215,7 +215,7 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 	}
 
 	span.SetAttributes(
-		attribute.Int("om.aws.numRoles", len(roles)),
+		attribute.Int("ovm.aws.numRoles", len(roles)),
 	)
 
 	return roles, nil
