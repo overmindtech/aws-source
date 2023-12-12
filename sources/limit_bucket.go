@@ -72,7 +72,7 @@ func (b *LimitBucket) Wait(ctx context.Context) {
 		if waitTime > 300*time.Millisecond {
 			span := trace.SpanFromContext(ctx)
 			span.AddEvent("waited for late limit", trace.WithAttributes(
-				attribute.Int64("om.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
+				attribute.Int64("ovm.aws.rateLimit.waitTimeMilliseconds", waitTime.Milliseconds()),
 			))
 		}
 

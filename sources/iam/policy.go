@@ -140,7 +140,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 	}
 
 	span.SetAttributes(
-		attribute.Int("om.aws.numPolicies", len(policies)),
+		attribute.Int("ovm.aws.numPolicies", len(policies)),
 	)
 
 	policyDetails, err := iter.MapErr[types.Policy, *PolicyDetails](policies, func(p *types.Policy) (*PolicyDetails, error) {
