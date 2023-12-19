@@ -18,6 +18,12 @@ var ServiceIncludeFields = []types.ServiceField{
 }
 
 func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs.DescribeServicesInput) (*sdp.Item, error) {
+	if input == nil {
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: "no input provided",
+		}
+	}
 	out, err := client.DescribeServices(ctx, input)
 
 	if err != nil {
