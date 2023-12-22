@@ -114,7 +114,7 @@ jobs:
           echo "ghcr.io/overmindtech/${{ matrix.image_name }}@${{ steps.push.outputs.digest }}" | tee ${{ matrix.image_name }}.imageref
 
       - name: Upload Deployment File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.image_name }}.imageref
           path: ${{ matrix.image_name }}.imageref
