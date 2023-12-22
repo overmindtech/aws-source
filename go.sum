@@ -144,6 +144,8 @@ github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/uuid v1.4.0 h1:MtMxsa51/r9yyhkyLsVeVt0B+BGQZzpQiTQ4eHZ8bc4=
 github.com/google/uuid v1.4.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.5.0 h1:1p67kYwdtXjb0gL0BPiP1Av9wiZPo5A8z2cWkTZ+eyU=
+github.com/google/uuid v1.5.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e h1:XmA6L9IPRdUr28a+SK/oMchGgQy159wvzXA5tJ7l+40=
 github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e/go.mod h1:AFIo+02s+12CEg8Gzz9kzhCbmbq6JcKNrhHffCGA9z4=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 h1:YBftPWNWd4WwGqtY2yeZL2ef8rHAxPBD8KFhJpmcqms=
@@ -186,6 +188,8 @@ github.com/overmindtech/discovery v0.26.0 h1:OzT3HOBX5v2+lqlaq2i1DlIqXoUeyOzbgDi
 github.com/overmindtech/discovery v0.26.0/go.mod h1:ED1FAib0tRsM9A0bINm5/Lsxsi0XkDMbpYNjOQ/AVjY=
 github.com/overmindtech/sdp-go v0.59.1 h1:63jd2fU34N0TIy4vnxZdjVWfq38P06Xejyiq0NAExIw=
 github.com/overmindtech/sdp-go v0.59.1/go.mod h1:wyaWA39obXx2MJrmzIk8k2unERAnI5EGbS5eWbPLf6g=
+github.com/overmindtech/sdp-go v0.60.1 h1:clxu7fm0cX8DEAl78PpAVcWQpy1xgeZ0pHqdlq8hDwM=
+github.com/overmindtech/sdp-go v0.60.1/go.mod h1:8bMmdHMjIIgr8UzbkQU1ozx0dgLbixxInnZB4tPwsXc=
 github.com/overmindtech/sdpcache v1.6.1 h1:laFibDvdUGeLBIclzM0pS3XtFdby2KnfaM3+Nn/2YuA=
 github.com/overmindtech/sdpcache v1.6.1/go.mod h1:EqpA/qHcyxKmPauMtE73qjk4Xr08QkRq3kmY5cD1zfY=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
