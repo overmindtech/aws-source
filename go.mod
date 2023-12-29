@@ -18,10 +18,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/eks v1.37.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.21.6
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.26.6
-	github.com/aws/aws-sdk-go-v2/service/iam v1.28.5
+	github.com/aws/aws-sdk-go-v2/service/iam v1.28.6
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.49.6
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.36.5
-	github.com/aws/aws-sdk-go-v2/service/rds v1.66.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.66.1
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.36.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.47.7
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.6
