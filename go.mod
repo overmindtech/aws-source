@@ -29,7 +29,7 @@ require (
 	github.com/getsentry/sentry-go v0.25.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.5.3
-	github.com/nats-io/nkeys v0.4.6
+	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.26.0
 	github.com/overmindtech/sdp-go v0.60.1
 	github.com/overmindtech/sdpcache v1.6.1
