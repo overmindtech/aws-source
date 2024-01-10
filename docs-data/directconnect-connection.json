@@ -1,0 +1,19 @@
+{
+	"type": "directconnect-connection",
+	"descriptiveType": "Connection",
+	"getDescription": "Get a connection by ID",
+	"listDescription": "List all connections",
+	"searchDescription": "Search connection by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_dx_connection.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"directconnect-lag",
+		"directconnect-loa",
+		"directconnect-location",
+		"directconnect-virtual-interface"
+	]
+}

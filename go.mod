@@ -113,6 +113,11 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/service/directconnect v1.22.7
+	github.com/overmindtech/docgen v0.3.2
+)
+
+require (
 	golang.org/x/sync v0.5.0 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.1 // indirect
 )
