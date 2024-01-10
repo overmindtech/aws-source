@@ -5,3 +5,4 @@ output
 vendor
 Gopkg.lock
 build/compiled
+.idea
