@@ -156,8 +156,6 @@ github.com/overmindtech/api-client v0.14.0 h1:zXyjJsIeawNqoWv7FqOjwcqgFpLrDYz7l9
 github.com/overmindtech/api-client v0.14.0/go.mod h1:msdkTAQFlvDGOU4tQk2adk2P8j23uaMWkJ9YRX4wGWI=
 github.com/overmindtech/discovery v0.26.0 h1:OzT3HOBX5v2+lqlaq2i1DlIqXoUeyOzbgDivuHn2/KM=
 github.com/overmindtech/discovery v0.26.0/go.mod h1:ED1FAib0tRsM9A0bINm5/Lsxsi0XkDMbpYNjOQ/AVjY=
-github.com/overmindtech/docgen v0.3.2 h1:IYs3uigoWolMtdshxTovzSlEscjZtY1Y2GFeKK+ksd0=
-github.com/overmindtech/docgen v0.3.2/go.mod h1:4CAoOiRZu23RkUCbolF9l5QJwAwdIoRsDjzHFP2WaNM=
 github.com/overmindtech/sdp-go v0.61.0 h1:u/ap/qn+/2EdtyaL53w7HIRtxlxWZG6m7FOdQN2AXaI=
 github.com/overmindtech/sdp-go v0.61.0/go.mod h1:8bMmdHMjIIgr8UzbkQU1ozx0dgLbixxInnZB4tPwsXc=
 github.com/overmindtech/sdpcache v1.6.1 h1:laFibDvdUGeLBIclzM0pS3XtFdby2KnfaM3+Nn/2YuA=
