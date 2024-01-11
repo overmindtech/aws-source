@@ -68,22 +68,22 @@ For EC2 APIs this sources uses the [same throttling methods as EC2 does](https:/
 
 All configuration options can be provided via the command line or as environment variables:
 
-| Environment Variable | CLI Flag | Automatic | Description |
-|----------------------|----------|-----------|-------------|
-| `CONFIG`| `--config` | ✅ | Config file location. Can be used instead of the CLI or environment variables if needed |
-| `LOG`| `--log` | ✅ | Set the log level. Valid values: panic, fatal, error, warn, info, debug, trace |
-| `NATS_SERVERS`| `--nats-servers` | ✅ | A list of NATS servers to connect to |
-| `NATS_NAME_PREFIX`| `--nats-name-prefix` | ✅ | A name label prefix. Sources should append a dot and their hostname .{hostname} to this, then set this is the NATS connection name which will be sent to the server on CONNECT to identify the client |
-| `NATS_JWT` | `--nats-jwt` | ✅ | The JWT token that should be used to authenticate to NATS, provided in raw format e.g. `eyJ0eXAiOiJKV1Q{...}` |
-| `NATS_NKEY_SEED` | `--nats-nkey-seed` | ✅ | The NKey seed which corresponds to the NATS JWT e.g. `SUAFK6QUC{...}` |
-| `MAX_PARALLEL`| `--max-parallel` | ✅ | Max number of requests to run in parallel |
-| `AUTO_CONFIG` | `--auto-config` | | Use the local AWS config, the same as the AWS CLI could use. This can be set up with `aws configure` |
-| `AWS_REGIONS` | `--aws-region` | | Comma-separated list of AWS regions that this source should operate in |
-| `AWS_ACCESS_STRATEGY` | `--aws-access-strategy` | | The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id'. Default: 'access-key'. |
-| `AWS_ACCESS_KEY_ID` | `--aws-access-key-id` | | The ID of the access key to use |
-| `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` | | The secret access key to use for auth |
-| `AWS_EXTERNAL_ID` | `--aws-external-id` | | The external ID to use when assuming the customer's role |
-| `AWS_TARGET_ROLE_ARN` | `--aws-target-role-arn` | | The role to assume in the customer's account |
+| Environment Variable    | CLI Flag                  | Automatic | Description                                                                                                                                                                                           |
+|-------------------------|---------------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `CONFIG`                | `--config`                | ✅         | Config file location. Can be used instead of the CLI or environment variables if needed                                                                                                               |
+| `LOG`                   | `--log`                   | ✅         | Set the log level. Valid values: panic, fatal, error, warn, info, debug, trace                                                                                                                        |
+| `NATS_SERVERS`          | `--nats-servers`          | ✅         | A list of NATS servers to connect to                                                                                                                                                                  |
+| `NATS_NAME_PREFIX`      | `--nats-name-prefix`      | ✅         | A name label prefix. Sources should append a dot and their hostname .{hostname} to this, then set this is the NATS connection name which will be sent to the server on CONNECT to identify the client |
+| `NATS_JWT`              | `--nats-jwt`              | ✅         | The JWT token that should be used to authenticate to NATS, provided in raw format e.g. `eyJ0eXAiOiJKV1Q{...}`                                                                                         |
+| `NATS_NKEY_SEED`        | `--nats-nkey-seed`        | ✅         | The NKey seed which corresponds to the NATS JWT e.g. `SUAFK6QUC{...}`                                                                                                                                 |
+| `MAX_PARALLEL`          | `--max-parallel`          | ✅         | Max number of requests to run in parallel                                                                                                                                                             |
+| `AUTO_CONFIG`           | `--auto-config`           |           | Use the local AWS config, the same as the AWS CLI could use. This can be set up with `aws configure`                                                                                                  |
+| `AWS_REGIONS`           | `--aws-region`            |           | Comma-separated list of AWS regions that this source should operate in                                                                                                                                |
+| `AWS_ACCESS_STRATEGY`   | `--aws-access-strategy`   |           | The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id'. Default: 'access-key'.                                                                          |
+| `AWS_ACCESS_KEY_ID`     | `--aws-access-key-id`     |           | The ID of the access key to use                                                                                                                                                                       |
+| `AWS_SECRET_ACCESS_KEY` | `--aws-secret-access-key` |           | The secret access key to use for auth                                                                                                                                                                 |
+| `AWS_EXTERNAL_ID`       | `--aws-external-id`       |           | The external ID to use when assuming the customer's role                                                                                                                                              |
+| `AWS_TARGET_ROLE_ARN`   | `--aws-target-role-arn`   |           | The role to assume in the customer's account                                                                                                                                                          |
 
 ### `srcman` config
 
@@ -163,6 +163,9 @@ Docker images can be created manually using `docker build`, but GitHub actions a
 
 Source data for docs is stored in `docs-data` and can be generated using:
 
-```
+Ensure that [`docgen`](https://github.com/overmindtech/docgen) is installed.
+
+From the root of the project run:
+```shell
 go generate ./...
 ```
