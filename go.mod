@@ -32,7 +32,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.3
 	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.26.0
-	github.com/overmindtech/sdp-go v0.61.0
+	github.com/overmindtech/sdp-go v0.61.4
 	github.com/overmindtech/sdpcache v1.6.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
@@ -47,12 +47,12 @@ require (
 	go.opentelemetry.io/otel/sdk v1.21.0
 	go.opentelemetry.io/otel/trace v1.21.0
 	go.uber.org/automaxprocs v1.5.3
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.32.0
 )
 
 // Transitive dependencies
 require (
-	connectrpc.com/connect v1.13.0 // indirect
+	connectrpc.com/connect v1.14.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/auth0/go-jwt-middleware/v2 v2.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.47.9 // indirect
