@@ -10,6 +10,8 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
+const connectionIDPrefix = "connection_id:"
+
 func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeConnectionsInput, output *directconnect.DescribeConnectionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
@@ -87,9 +89,8 @@ func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope st
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
 				Method: sdp.QueryMethod_SEARCH,
-				// TODO: Implement this query format on the directconnect-virtual-interface source
-				Query: fmt.Sprintf("connection_id:%v", *connection.ConnectionId),
-				Scope: scope,
+				Query:  fmt.Sprintf("%s%s", connectionIDPrefix, *connection.ConnectionId),
+				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{
 				// Changes to the virtual interface won't affect this
