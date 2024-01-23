@@ -11,7 +11,10 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-var gatewayIDVirtualInterfaceIDFmt = "gateway_id:%s&virtual_interface_id:%s"
+var (
+	gatewayIDVirtualInterfaceIDFmt = "gateway_id:%s virtual_interface_id:%s"
+	virtualInterfaceIDFmt          = "virtual_interface_id:%s"
+)
 
 func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeVirtualInterfacesInput, output *directconnect.DescribeVirtualInterfacesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
@@ -100,6 +103,7 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 			})
 		}
 
+		// Pinpoint a single attachment
 		if virtualInterface.DirectConnectGatewayId != nil && virtualInterface.VirtualInterfaceId != nil {
 			// +overmind:link directconnect-direct-connect-gateway-attachment
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -109,6 +113,27 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 					// returns a single attachment
 					// TODO: implement this format on the directconnect-direct-connect-gateway-attachment source for GET
 					Query: fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, *virtualInterface.DirectConnectGatewayId, *virtualInterface.VirtualInterfaceId),
+					Scope: scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changes to the attachment won't affect virtual interface
+					In: false,
+					// If virtual interface is deleted, the attachment state will change to detaching
+					// https://docs.aws.amazon.com/directconnect/latest/APIReference/API_DirectConnectGatewayAttachment.html#API_DirectConnectGatewayAttachment_Contents
+					Out: true,
+				},
+			})
+		}
+
+		// Find all affected attachments
+		if virtualInterface.VirtualInterfaceId != nil {
+			// +overmind:link directconnect-direct-connect-gateway-attachment
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "directconnect-direct-connect-gateway-attachment",
+					Method: sdp.QueryMethod_SEARCH,
+					// returns list of attachments for the given virtual interface id
+					Query: fmt.Sprintf(virtualInterfaceIDFmt, *virtualInterface.VirtualInterfaceId),
 					Scope: scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
