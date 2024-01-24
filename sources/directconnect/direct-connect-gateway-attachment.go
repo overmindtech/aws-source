@@ -19,9 +19,17 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 			return nil, err
 		}
 
+		// The uniqueAttributeValue for this is a custom field:
+		// {gatewayId} {virtualInterfaceId}
+		// i.e., "cf68415c-f4ae-48f2-87a7-3b52cexample dxvif-ffhhk74f"
+		err = attributes.Set("uniqueName", fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, *attachment.DirectConnectGatewayId, *attachment.VirtualInterfaceId))
+		if err != nil {
+			return nil, err
+		}
+
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway-attachment",
-			UniqueAttribute: "virtualInterfaceId", // TODO: This is not correct. Added for just passing the tests validation.
+			UniqueAttribute: "uniqueName",
 			Attributes:      attributes,
 			Scope:           scope,
 		}
