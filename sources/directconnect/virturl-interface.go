@@ -3,7 +3,6 @@ package directconnect
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
@@ -11,10 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-var (
-	gatewayIDVirtualInterfaceIDFmt = "gateway_id:%s virtual_interface_id:%s"
-	virtualInterfaceIDFmt          = "virtual_interface_id:%s"
-)
+var gatewayIDVirtualInterfaceIDFmt = "gateway_id:%s virtual_interface_id:%s"
 
 func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeVirtualInterfacesInput, output *directconnect.DescribeVirtualInterfacesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
@@ -133,7 +129,7 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 					Type:   "directconnect-direct-connect-gateway-attachment",
 					Method: sdp.QueryMethod_SEARCH,
 					// returns list of attachments for the given virtual interface id
-					Query: fmt.Sprintf(virtualInterfaceIDFmt, *virtualInterface.VirtualInterfaceId),
+					Query: *virtualInterface.VirtualInterfaceId,
 					Scope: scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -183,16 +179,9 @@ func NewVirtualInterfaceSource(config aws.Config, accountID string, limit *sourc
 		},
 		OutputMapper: virtualInterfaceOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client *directconnect.Client, scope, query string) (*directconnect.DescribeVirtualInterfacesInput, error) {
-			if strings.HasPrefix(query, connectionIDPrefix) {
-				// strip prefix and whitespaces
-				query = strings.TrimSpace(strings.TrimPrefix(query, connectionIDPrefix))
-				return &directconnect.DescribeVirtualInterfacesInput{
-					ConnectionId: &query,
-				}, nil
-
-			}
-
-			return nil, fmt.Errorf(`invalid query: %s, expected in the format of "%s<id>"`, query, connectionIDPrefix)
+			return &directconnect.DescribeVirtualInterfacesInput{
+				ConnectionId: &query,
+			}, nil
 		},
 	}
 }

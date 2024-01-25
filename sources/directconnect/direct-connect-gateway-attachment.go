@@ -106,13 +106,8 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 		},
 		OutputMapper: directConnectGatewayAttachmentOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client *directconnect.Client, scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
-			virtualInterfaceID, err := parseVirtualInterfaceID(query)
-			if err != nil {
-				return nil, fmt.Errorf(`invalid query, expected in the format of "`+virtualInterfaceIDFmt+`"`, "<some_id>")
-			}
-
 			return &directconnect.DescribeDirectConnectGatewayAttachmentsInput{
-				VirtualInterfaceId: &virtualInterfaceID,
+				VirtualInterfaceId: &query,
 			}, nil
 		},
 	}
@@ -120,10 +115,5 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 
 func parseGatewayIDVirtualInterfaceID(query string) (gatewayID, virtualInterfaceID string, err error) {
 	_, err = fmt.Sscanf(query, gatewayIDVirtualInterfaceIDFmt, &gatewayID, &virtualInterfaceID)
-	return
-}
-
-func parseVirtualInterfaceID(query string) (virtualInterfaceID string, err error) {
-	_, err = fmt.Sscanf(query, virtualInterfaceIDFmt, &virtualInterfaceID)
 	return
 }

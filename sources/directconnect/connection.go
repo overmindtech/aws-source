@@ -2,15 +2,12 @@ package directconnect
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
-
-const connectionIDPrefix = "connection_id:"
 
 func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeConnectionsInput, output *directconnect.DescribeConnectionsOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
@@ -89,7 +86,7 @@ func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope st
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
 				Method: sdp.QueryMethod_SEARCH,
-				Query:  fmt.Sprintf("%s%s", connectionIDPrefix, *connection.ConnectionId),
+				Query:  *connection.ConnectionId,
 				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{

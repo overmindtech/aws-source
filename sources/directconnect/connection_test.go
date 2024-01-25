@@ -80,7 +80,7 @@ func TestConnectionOutputMapper(t *testing.T) {
 		{
 			ExpectedType:   "directconnect-virtual-interface",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "connection_id:dxcon-fguhmqlc",
+			ExpectedQuery:  "dxcon-fguhmqlc",
 			ExpectedScope:  "foo",
 		},
 	}
