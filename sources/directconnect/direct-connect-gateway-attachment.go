@@ -97,7 +97,7 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
 			gatewayID, virtualInterfaceID, err := parseGatewayIDVirtualInterfaceID(query)
 			if err != nil {
-				return nil, fmt.Errorf(`invalid query, expected in the format of "`+gatewayIDVirtualInterfaceIDFmt, "<some_id>", "<some_id>"+`"`)
+				return nil, fmt.Errorf(`invalid query, expected in the format of "`+gatewayIDVirtualInterfaceIDFmt, "<some_id>", "<some_id>"+`", %w`, err)
 			}
 			return &directconnect.DescribeDirectConnectGatewayAttachmentsInput{
 				DirectConnectGatewayId: &gatewayID,
