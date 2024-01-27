@@ -3,6 +3,7 @@ package directconnect
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
@@ -20,9 +21,9 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		}
 
 		// The uniqueAttributeValue for this is a custom field:
-		// {gatewayId} {virtualInterfaceId}
-		// i.e., "cf68415c-f4ae-48f2-87a7-3b52cexample dxvif-ffhhk74f"
-		err = attributes.Set("uniqueName", fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, *attachment.DirectConnectGatewayId, *attachment.VirtualInterfaceId))
+		// {gatewayId}/{virtualInterfaceId}
+		// i.e., "cf68415c-f4ae-48f2-87a7-3b52cexample/dxvif-ffhhk74f"
+		err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", *attachment.DirectConnectGatewayId, *attachment.VirtualInterfaceId))
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +88,7 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 //go:generate docgen ../../docs-data
 // +overmind:type directconnect-direct-connect-gateway-attachment
 // +overmind:descriptiveType Direct Connect Gateway Attachment
-// +overmind:get Get a direct connect gateway attachment by DirectConnectGatewayId and VirtualInterfaceId
+// +overmind:get Get a direct connect gateway attachment by "DirectConnectGatewayId/VirtualInterfaceId"
 // +overmind:list **Not supported**
 // +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
 // +overmind:group AWS
@@ -105,7 +106,7 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
 			gatewayID, virtualInterfaceID, err := parseGatewayIDVirtualInterfaceID(query)
 			if err != nil {
-				return nil, fmt.Errorf(`invalid query, expected in the format of "`+gatewayIDVirtualInterfaceIDFmt, "<some_id>", "<some_id>"+`", %w`, err)
+				return nil, err
 			}
 			return &directconnect.DescribeDirectConnectGatewayAttachmentsInput{
 				DirectConnectGatewayId: &gatewayID,
@@ -121,7 +122,13 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 	}
 }
 
-func parseGatewayIDVirtualInterfaceID(query string) (gatewayID, virtualInterfaceID string, err error) {
-	_, err = fmt.Sscanf(query, gatewayIDVirtualInterfaceIDFmt, &gatewayID, &virtualInterfaceID)
-	return
+// parseGatewayIDVirtualInterfaceID expects a query in the format of "gatewayID/virtualInterfaceID"
+// First returned item is gatewayID, second is virtualInterfaceID
+func parseGatewayIDVirtualInterfaceID(query string) (string, string, error) {
+	ids := strings.Split(query, "/")
+	if len(ids) != 2 {
+		return "", "", fmt.Errorf("invalid query, expected in the format of %s, got: %s", gatewayIDVirtualInterfaceIDFormat, query)
+	}
+
+	return ids[0], ids[1], nil
 }

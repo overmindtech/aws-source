@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-var gatewayIDVirtualInterfaceIDFmt = "gateway_id:%s virtual_interface_id:%s"
+const gatewayIDVirtualInterfaceIDFormat = "gateway_id/virtual_interface_id"
 
 func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeVirtualInterfacesInput, output *directconnect.DescribeVirtualInterfacesOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
@@ -107,7 +107,7 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 					Type:   "directconnect-direct-connect-gateway-attachment",
 					Method: sdp.QueryMethod_GET,
 					// returns a single attachment
-					Query: fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, *virtualInterface.DirectConnectGatewayId, *virtualInterface.VirtualInterfaceId),
+					Query: fmt.Sprintf("%s/%s", *virtualInterface.DirectConnectGatewayId, *virtualInterface.VirtualInterfaceId),
 					Scope: scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{

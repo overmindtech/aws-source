@@ -73,7 +73,7 @@ func TestVirtualInterfaceOutputMapper(t *testing.T) {
 		{
 			ExpectedType:   "directconnect-direct-connect-gateway-attachment",
 			ExpectedMethod: sdp.QueryMethod_GET,
-			ExpectedQuery:  fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, "cf68415c-f4ae-48f2-87a7-3b52cexample", "dxvif-ffhhk74f"),
+			ExpectedQuery:  fmt.Sprintf("%s/%s", "cf68415c-f4ae-48f2-87a7-3b52cexample", "dxvif-ffhhk74f"),
 			ExpectedScope:  "foo",
 		},
 		{
