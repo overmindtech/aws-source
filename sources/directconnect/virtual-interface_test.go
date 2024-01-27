@@ -59,14 +59,14 @@ func TestVirtualInterfaceOutputMapper(t *testing.T) {
 			ExpectedScope:  "global",
 		},
 		{
-			ExpectedType:   "ip",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedType:   "rdap-ip-network",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "192.168.1.1/30",
 			ExpectedScope:  "global",
 		},
 		{
-			ExpectedType:   "ip",
-			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedType:   "rdap-ip-network",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "192.168.1.2/30",
 			ExpectedScope:  "global",
 		},

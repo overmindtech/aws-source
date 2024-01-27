@@ -69,8 +69,8 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
+					Type:   "rdap-ip-network",
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *virtualInterface.AmazonAddress,
 					Scope:  "global",
 				},
@@ -86,8 +86,8 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					Type:   "ip",
-					Method: sdp.QueryMethod_GET,
+					Type:   "rdap-ip-network",
+					Method: sdp.QueryMethod_SEARCH,
 					Query:  *virtualInterface.CustomerAddress,
 					Scope:  "global",
 				},
@@ -107,7 +107,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 					Type:   "directconnect-direct-connect-gateway-attachment",
 					Method: sdp.QueryMethod_GET,
 					// returns a single attachment
-					// TODO: implement this format on the directconnect-direct-connect-gateway-attachment source for GET
 					Query: fmt.Sprintf(gatewayIDVirtualInterfaceIDFmt, *virtualInterface.DirectConnectGatewayId, *virtualInterface.VirtualInterfaceId),
 					Scope: scope,
 				},
