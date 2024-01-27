@@ -34,6 +34,13 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 			Scope:           scope,
 		}
 
+		// stateChangeError =>The error message if the state of an object failed to advance.
+		if attachment.StateChangeError != nil {
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		} else {
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		}
+
 		if attachment.DirectConnectGatewayId != nil {
 			// +overmind:link directconnect-direct-connect-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
