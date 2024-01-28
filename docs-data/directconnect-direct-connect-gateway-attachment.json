@@ -1,7 +1,8 @@
 {
 	"type": "directconnect-direct-connect-gateway-attachment",
 	"descriptiveType": "Direct Connect Gateway Attachment",
-	"getDescription": "Get a direct connect gateway attachment by DirectConnectGatewayId and VirtualInterfaceId",
+	"getDescription": "Get a direct connect gateway attachment by \"DirectConnectGatewayId/VirtualInterfaceId\"",
+	"listDescription": "**Not supported**",
 	"searchDescription": "Search direct connect gateway attachments for given VirtualInterfaceId",
 	"group": "AWS",
 	"links": [
