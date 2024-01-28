@@ -1,0 +1,14 @@
+{
+	"type": "directconnect-direct-connect-gateway",
+	"descriptiveType": "Direct Connect Gateway",
+	"getDescription": "Get a direct connect gateway by ID",
+	"listDescription": "List all direct connect gateways",
+	"searchDescription": "Search direct connect gateway by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_dx_gateway.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
