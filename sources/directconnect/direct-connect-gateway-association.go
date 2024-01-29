@@ -106,7 +106,10 @@ func NewDirectConnectGatewayAssociationSource(config aws.Config, accountID strin
 			// - virtualGatewayID => associatedGatewayID
 			dxGatewayID, virtualGatewayID, err := parseDirectConnectGatewayAssociationGetInputQuery(query)
 			if err != nil {
-				return nil, err
+				return nil, &sdp.QueryError{
+					ErrorType:   sdp.QueryError_NOTFOUND,
+					ErrorString: err.Error(),
+				}
 			}
 
 			if dxGatewayID != "" {
@@ -118,6 +121,12 @@ func NewDirectConnectGatewayAssociationSource(config aws.Config, accountID strin
 				return &directconnect.DescribeDirectConnectGatewayAssociationsInput{
 					AssociatedGatewayId: &virtualGatewayID,
 				}, nil
+			}
+		},
+		InputMapperList: func(scope string) (*directconnect.DescribeDirectConnectGatewayAssociationsInput, error) {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
+				ErrorString: "list not supported for directconnect-direct-connect-gateway-association, use search",
 			}
 		},
 		OutputMapper: directConnectGatewayAssociationOutputMapper,

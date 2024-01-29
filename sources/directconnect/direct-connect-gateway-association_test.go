@@ -122,8 +122,9 @@ func TestNewDirectConnectGatewayAssociationSource(t *testing.T) {
 	source := NewDirectConnectGatewayAssociationSource(config, account, &TestRateLimit)
 
 	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
+		Source:   source,
+		Timeout:  10 * time.Second,
+		SkipList: true,
 	}
 
 	test.Run(t)
