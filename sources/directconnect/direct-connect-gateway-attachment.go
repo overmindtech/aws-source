@@ -106,12 +106,21 @@ func NewDirectConnectGatewayAttachmentSource(config aws.Config, accountID string
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
 			gatewayID, virtualInterfaceID, err := parseGatewayIDVirtualInterfaceID(query)
 			if err != nil {
-				return nil, err
+				return nil, &sdp.QueryError{
+					ErrorType:   sdp.QueryError_NOTFOUND,
+					ErrorString: err.Error(),
+				}
 			}
 			return &directconnect.DescribeDirectConnectGatewayAttachmentsInput{
 				DirectConnectGatewayId: &gatewayID,
 				VirtualInterfaceId:     &virtualInterfaceID,
 			}, nil
+		},
+		InputMapperList: func(scope string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
+				ErrorString: "list not supported for directconnect-direct-connect-gateway-attachment, use search",
+			}
 		},
 		OutputMapper: directConnectGatewayAttachmentOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client *directconnect.Client, scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {
