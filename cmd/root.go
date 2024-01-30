@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/overmindtech/aws-source/sources/directconnect"
 	"net/http"
 	"os"
 	"os/signal"
@@ -335,6 +336,11 @@ var rootCmd = &cobra.Command{
 				networkfirewall.NewFirewallPolicySource(cfg, *callerID.Account, region),
 				networkfirewall.NewRuleGroupSource(cfg, *callerID.Account, region),
 				networkfirewall.NewTLSInspectionConfigurationSource(cfg, *callerID.Account, region),
+
+				// Direct Connect
+				directconnect.NewDirectConnectGatewaySource(cfg, *callerID.Account, &autoScalingRateLimit),
+				directconnect.NewDirectConnectGatewayAssociationSource(cfg, *callerID.Account, &autoScalingRateLimit),
+				directconnect.NewDirectConnectGatewayAssociationProposalSource(cfg, *callerID.Account, &autoScalingRateLimit),
 			}
 
 			e.AddSources(sources...)
