@@ -1,0 +1,17 @@
+{
+	"type": "directconnect-direct-connect-gateway-association",
+	"descriptiveType": "Direct Connect Gateway Association",
+	"getDescription": "Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID",
+	"listDescription": "**Not supported**",
+	"searchDescription": "Search direct connect gateway associations by direct connect gateway ID",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_dx_gateway_association.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"directconnect-direct-connect-gateway",
+		"directconnect-virtual-gateway"
+	]
+}
