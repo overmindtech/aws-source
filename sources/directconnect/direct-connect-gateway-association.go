@@ -85,7 +85,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 // +overmind:type directconnect-direct-connect-gateway-association
 // +overmind:descriptiveType Direct Connect Gateway Association
 // +overmind:get Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID
-// +overmind:list **Not supported**
 // +overmind:search Search direct connect gateway associations by direct connect gateway ID
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association.id
