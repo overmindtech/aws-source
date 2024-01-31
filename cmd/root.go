@@ -341,6 +341,9 @@ var rootCmd = &cobra.Command{
 				directconnect.NewDirectConnectGatewaySource(cfg, *callerID.Account, &autoScalingRateLimit),
 				directconnect.NewDirectConnectGatewayAssociationSource(cfg, *callerID.Account, &autoScalingRateLimit),
 				directconnect.NewDirectConnectGatewayAssociationProposalSource(cfg, *callerID.Account, &autoScalingRateLimit),
+				directconnect.NewConnectionSource(cfg, *callerID.Account, &autoScalingRateLimit),
+				directconnect.NewDirectConnectGatewayAttachmentSource(cfg, *callerID.Account, &autoScalingRateLimit),
+				directconnect.NewVirtualInterfaceSource(cfg, *callerID.Account, &autoScalingRateLimit),
 			}
 
 			e.AddSources(sources...)

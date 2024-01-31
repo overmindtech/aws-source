@@ -2,7 +2,6 @@ package directconnect
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
@@ -87,9 +86,8 @@ func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope st
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
 				Method: sdp.QueryMethod_SEARCH,
-				// TODO: Implement this query format on the directconnect-virtual-interface source
-				Query: fmt.Sprintf("connection_id:%v", *connection.ConnectionId),
-				Scope: scope,
+				Query:  *connection.ConnectionId,
+				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{
 				// Changes to the virtual interface won't affect this
