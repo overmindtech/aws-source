@@ -134,6 +134,9 @@ type E2ETest struct {
 	// Skips get tests
 	SkipGet bool
 
+	// Skips list tests
+	SkipList bool
+
 	// Skips checking that a know bad get query returns a NOTFOUND error
 	SkipNotFoundCheck bool
 
@@ -189,6 +192,10 @@ func (e E2ETest) Run(t *testing.T) {
 		}
 
 		t.Run("List query", func(t *testing.T) {
+			if e.SkipList {
+				t.Skip("list tests deliberately skipped")
+			}
+
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
