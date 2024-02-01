@@ -19,7 +19,7 @@ func directConnectGatewayOutputMapper(_ context.Context, _ *directconnect.Client
 		}
 
 		item := sdp.Item{
-			Type:            "directconnect-virtual-gateway",
+			Type:            "directconnect-direct-connect-gateway",
 			UniqueAttribute: "directConnectGatewayId",
 			Attributes:      attributes,
 			Scope:           scope,
@@ -52,7 +52,7 @@ func NewDirectConnectGatewaySource(config aws.Config, accountID string, limit *s
 		Config:    config,
 		Client:    directconnect.NewFromConfig(config),
 		AccountID: accountID,
-		ItemType:  "directconnect-virtual-gateway",
+		ItemType:  "directconnect-direct-connect-gateway",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewaysInput) (*directconnect.DescribeDirectConnectGatewaysOutput, error) {
 			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeDirectConnectGateways(ctx, input)
