@@ -112,6 +112,81 @@ func TestGet(t *testing.T) {
 		}
 	})
 
+	t.Run("use get for list: output returns multiple sources", func(t *testing.T) {
+		uniqueAttribute := "virtualGatewayId"
+		uniqueAttributeValue := "test-id"
+
+		var inputMapperCalled bool
+		var outputMapperCalled bool
+		var describeFuncCalled bool
+
+		s := DescribeOnlySource[string, string, struct{}, struct{}]{
+			Config: aws.Config{
+				Region: "eu-west-2",
+			},
+			AccountID: "foo",
+			InputMapperGet: func(scope, query string) (string, error) {
+				inputMapperCalled = true
+				return "input", nil
+			},
+			InputMapperList: func(scope string) (string, error) {
+				return "input", nil
+			},
+			OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
+				outputMapperCalled = true
+				return []*sdp.Item{
+					{
+						UniqueAttribute: uniqueAttribute,
+						Attributes: &sdp.ItemAttributes{
+							AttrStruct: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
+									uniqueAttribute: structpb.NewStringValue(uniqueAttributeValue),
+								},
+							},
+						},
+					},
+					{
+						UniqueAttribute: uniqueAttribute,
+						Attributes: &sdp.ItemAttributes{
+							AttrStruct: &structpb.Struct{
+								Fields: map[string]*structpb.Value{
+									uniqueAttribute: structpb.NewStringValue("some-value"),
+								},
+							},
+						},
+					},
+				}, nil
+			},
+			DescribeFunc: func(ctx context.Context, client struct{}, input string) (string, error) {
+				describeFuncCalled = true
+				return "", nil
+			},
+			UseListForGet: true,
+		}
+
+		item, err := s.Get(context.Background(), "foo.eu-west-2", uniqueAttributeValue, false)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if !inputMapperCalled {
+			t.Error("input mapper not called")
+		}
+
+		if !outputMapperCalled {
+			t.Error("output mapper not called")
+		}
+
+		if !describeFuncCalled {
+			t.Error("describe func not called")
+		}
+
+		if item == nil {
+			t.Error("nil item")
+		}
+	})
+
 	t.Run("with too many results", func(t *testing.T) {
 		s := DescribeOnlySource[string, string, struct{}, struct{}]{
 			Config: aws.Config{

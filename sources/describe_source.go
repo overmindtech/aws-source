@@ -63,6 +63,16 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 
 	// Client The AWS client to use when making requests
 	Client ClientStruct
+
+	// UseListForGet If true, the source will use the List function to get items
+	// This option should be used when the Describe function does not support
+	// getting a single item by ID. The source will then filter the items
+	// itself.
+	// InputMapperGet should still be defined. It will be used to create the
+	// input for the List function. The output of the List function will be
+	// filtered by the source to find the item with the matching ID.
+	// See the directconnect-virtual-gateway source for an example of this.
+	UseListForGet bool
 }
 
 // Returns the duration that items should be cached for. This will use the
@@ -190,6 +200,18 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 		err = WrapAWSError(err)
 		s.cache.StoreError(err, s.cacheDuration(), ck)
 		return nil, err
+	}
+
+	if s.UseListForGet {
+		// If we're using List for Get, we need to filter the items ourselves
+		var filteredItems []*sdp.Item
+		for _, item := range items {
+			if item.UniqueAttributeValue() == query {
+				filteredItems = append(filteredItems, item)
+				break
+			}
+		}
+		items = filteredItems
 	}
 
 	numItems := len(items)
