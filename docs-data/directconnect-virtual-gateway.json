@@ -1,0 +1,9 @@
+{
+	"type": "directconnect-virtual-gateway",
+	"descriptiveType": "Direct Connect Virtual Gateway",
+	"getDescription": "Get a virtual gateway by ID",
+	"listDescription": "List all virtual gateways",
+	"searchDescription": "Search virtual gateways by ARN",
+	"group": "AWS",
+	"links": []
+}
