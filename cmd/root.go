@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/overmindtech/aws-source/sources/directconnect"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,6 +23,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/autoscaling"
 	"github.com/overmindtech/aws-source/sources/cloudfront"
 	"github.com/overmindtech/aws-source/sources/cloudwatch"
+	"github.com/overmindtech/aws-source/sources/directconnect"
 	"github.com/overmindtech/aws-source/sources/dynamodb"
 	"github.com/overmindtech/aws-source/sources/ec2"
 	"github.com/overmindtech/aws-source/sources/ecs"
@@ -541,9 +541,17 @@ func initConfig() {
 }
 
 func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, roleARN string, autoConfig bool) (aws.Config, error) {
-	if autoConfig {
-		return config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
+	ctx := context.Background()
+
+	options := []func(*config.LoadOptions) error{
+		config.WithRegion(region),
+		config.WithAppID("Overmind"),
 	}
+
+	if autoConfig {
+		return config.LoadDefaultConfig(ctx, options...)
+	}
+
 	// Validate inputs
 	if region == "" {
 		return aws.Config{}, errors.New("aws-region cannot be blank")
@@ -563,8 +571,11 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 			return aws.Config{}, errors.New("with access-key strategy, aws-target-role-arn must be blank")
 		}
 
-		config := getStaticAWSConfig(region, accessKeyID, secretAccessKey)
-		return config, nil
+		options = append(options, config.WithCredentialsProvider(
+			credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, ""),
+		))
+
+		return config.LoadDefaultConfig(ctx, options...)
 	} else if strategy == "external-id" {
 		if accessKeyID != "" {
 			return aws.Config{}, errors.New("with external-id strategy, aws-access-key-id must be blank")
@@ -579,44 +590,24 @@ func getAWSConfig(strategy, region, accessKeyID, secretAccessKey, externalID, ro
 			return aws.Config{}, errors.New("with external-id strategy, aws-target-role-arn cannot be blank")
 		}
 
-		return getAssumedRoleAWSConfig(region, externalID, roleARN)
-	} else {
-		return aws.Config{}, errors.New("invalid aws-access-strategy")
-	}
-}
+		assumecnf, err := config.LoadDefaultConfig(ctx)
+		if err != nil {
+			return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
+		}
 
-func getAssumedRoleAWSConfig(region, externalID, targetRoleARN string) (aws.Config, error) {
-	ctx := context.Background()
-
-	assumecnf, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
-	}
-
-	stsclient := sts.NewFromConfig(assumecnf)
-	cfg, err := config.LoadDefaultConfig(
-		ctx,
-		config.WithRegion(region),
-		config.WithCredentialsProvider(aws.NewCredentialsCache(
+		options = append(options, config.WithCredentialsProvider(aws.NewCredentialsCache(
 			stscredsv2.NewAssumeRoleProvider(
-				stsclient,
-				targetRoleARN,
+				sts.NewFromConfig(assumecnf),
+				roleARN,
 				func(aro *stscredsv2.AssumeRoleOptions) {
 					aro.ExternalID = &externalID
 				},
 			)),
-		),
-	)
-	if err != nil {
-		return aws.Config{}, fmt.Errorf("could not assume the target role: %v", err)
-	}
-	return cfg, nil
-}
+		))
 
-func getStaticAWSConfig(region string, accessKeyID string, secretAccessKey string) aws.Config {
-	return aws.Config{
-		Region:      region,
-		Credentials: credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, ""),
+		return config.LoadDefaultConfig(ctx, options...)
+	} else {
+		return aws.Config{}, errors.New("invalid aws-access-strategy")
 	}
 }
 
