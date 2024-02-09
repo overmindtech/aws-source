@@ -37,7 +37,5 @@
 		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	// Set up environment variables in the remote container.
-	"remoteEnv": {
-		"GOEXPERIMENT": "loopvar"
-	}
+	"remoteEnv": {}
 }
