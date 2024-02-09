@@ -96,7 +96,10 @@ func (s *S3Source) Client() *s3.Client {
 	}
 
 	// Otherwise create a new client from the config
-	s.client = s3.NewFromConfig(s.config)
+	s.client = s3.NewFromConfig(s.config, func(o *s3.Options) {
+		// TODO: I think we need to make this configurable as it might not be something we always want to do
+		o.UsePathStyle = true
+	})
 	s.clientCreated = true
 
 	return s.client

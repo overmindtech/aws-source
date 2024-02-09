@@ -3,15 +3,56 @@ package s3
 import (
 	"context"
 	"errors"
+	"log"
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
 )
+
+func TestLocalStack(t *testing.T) {
+	awsEndpoint := "http://localhost:4566"
+	awsRegion := "us-east-1"
+
+	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+		if awsEndpoint != "" {
+			return aws.Endpoint{
+				PartitionID:   "aws",
+				URL:           awsEndpoint,
+				SigningRegion: awsRegion,
+			}, nil
+		}
+
+		// returning EndpointNotFoundError will allow the service to fallback to its default resolution
+		return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+	})
+
+	awsCfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithRegion(awsRegion),
+		config.WithEndpointResolverWithOptions(customResolver),
+	)
+	if err != nil {
+		log.Fatalf("Cannot load the AWS configs: %s", err)
+	}
+
+	source := NewS3Source(awsCfg, "000000000000")
+
+	// forcepathsrtle will get around the problem i hzve
+
+	item, err := source.Get(context.Background(), "000000000000", "example", false)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(item)
+}
 
 func TestS3SearchImpl(t *testing.T) {
 	cache := sdpcache.NewCache()
