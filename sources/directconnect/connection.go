@@ -36,10 +36,10 @@ func connectionOutputMapper(_ context.Context, _ *directconnect.Client, scope st
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
-					// Changes to the lag will affect this
-					In: true,
-					// We can't affect the lag
-					Out: false,
+					// Connection and LAG are tightly coupled
+					// Changing one will affect the other
+					In:  true,
+					Out: true,
 				},
 			})
 		}
