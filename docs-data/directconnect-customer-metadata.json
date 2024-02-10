@@ -1,0 +1,9 @@
+{
+	"type": "directconnect-customer-metadata",
+	"descriptiveType": "Direct Connect Customer Metadata",
+	"getDescription": "Get a Customer Agreement by Name",
+	"listDescription": "List all Customer Agreements",
+	"searchDescription": "Search Customer Agreements by ARN",
+	"group": "AWS",
+	"links": []
+}
