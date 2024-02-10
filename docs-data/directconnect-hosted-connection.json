@@ -1,0 +1,19 @@
+{
+	"type": "directconnect-hosted-connection",
+	"descriptiveType": "Direct Connect Hosted Connection",
+	"getDescription": "Get a Hosted Connection by connection ID",
+	"listDescription": "List all",
+	"searchDescription": "Search Hosted Connections by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_dx_hosted_connection.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"directconnect-lag",
+		"directconnect-loa",
+		"directconnect-location",
+		"directconnect-virtual-interface"
+	]
+}
