@@ -1,6 +1,11 @@
 package directconnect
 
-import "github.com/aws/aws-sdk-go-v2/service/directconnect/types"
+import (
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/service/directconnect"
+	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
+)
 
 // Converts a slice of tags to a map
 func tagsToMap(tags []types.Tag) map[string]string {
@@ -13,4 +18,20 @@ func tagsToMap(tags []types.Tag) map[string]string {
 	}
 
 	return tagsMap
+}
+
+func arnToTags(ctx context.Context, cli *directconnect.Client, resourceARNs []string) (map[string][]types.Tag, error) {
+	tagsOutput, err := cli.DescribeTags(ctx, &directconnect.DescribeTagsInput{
+		ResourceArns: resourceARNs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	tags := make(map[string][]types.Tag, len(tagsOutput.ResourceTags))
+	for _, tag := range tagsOutput.ResourceTags {
+		tags[*tag.ResourceArn] = tag.Tags
+	}
+
+	return tags, nil
 }
