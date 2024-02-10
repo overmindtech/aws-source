@@ -90,3 +90,35 @@ func TestNewDirectConnectGatewaySource(t *testing.T) {
 
 	test.Run(t)
 }
+
+func Test_arn(t *testing.T) {
+	tests := []struct {
+		name      string
+		region    string
+		accountID string
+		gatewayID string
+		want      string
+	}{
+		{
+			name:      "us-west-2",
+			region:    "us-west-2",
+			accountID: "123456789012",
+			gatewayID: "cf68415c-f4ae-48f2-87a7-3b52cexample",
+			want:      "arn:aws:directconnect:us-west-2:123456789012:dx-gateway/cf68415c-f4ae-48f2-87a7-3b52cexample",
+		},
+		{
+			name:      "us-east-1",
+			region:    "us-east-1",
+			accountID: "123456789012",
+			gatewayID: "cf68415c-f4ae-48f2-87a7-3b52cexample",
+			want:      "arn:aws:directconnect:us-east-1:123456789012:dx-gateway/cf68415c-f4ae-48f2-87a7-3b52cexample",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := arn(tt.region, tt.accountID, tt.gatewayID); got != tt.want {
+				t.Errorf("arn() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

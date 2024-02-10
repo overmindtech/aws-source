@@ -2,6 +2,7 @@ package directconnect
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
@@ -9,9 +10,27 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func directConnectGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _ *directconnect.DescribeDirectConnectGatewaysInput, output *directconnect.DescribeDirectConnectGatewaysOutput) ([]*sdp.Item, error) {
-	items := make([]*sdp.Item, 0)
+func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Client, scope string, _ *directconnect.DescribeDirectConnectGatewaysInput, output *directconnect.DescribeDirectConnectGatewaysOutput) ([]*sdp.Item, error) {
+	// create a slice of ARNs for the resources
+	resourceARNs := make([]string, len(output.DirectConnectGateways))
+	for _, directConnectGateway := range output.DirectConnectGateways {
+		resourceARNs = append(resourceARNs, arn(
+			scope,
+			*directConnectGateway.OwnerAccount,
+			*directConnectGateway.DirectConnectGatewayId,
+		))
+	}
 
+	// get tags for the resources in a map by their ARNs
+	tags, err := arnToTags(context.Background(), cli, resourceARNs)
+	if err != nil {
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: err.Error(),
+		}
+	}
+
+	items := make([]*sdp.Item, 0)
 	for _, directConnectGateway := range output.DirectConnectGateways {
 		attributes, err := sources.ToAttributesCase(directConnectGateway, "tags")
 		if err != nil {
@@ -23,6 +42,7 @@ func directConnectGatewayOutputMapper(_ context.Context, _ *directconnect.Client
 			UniqueAttribute: "directConnectGatewayId",
 			Attributes:      attributes,
 			Scope:           scope,
+			Tags:            tagsToMap(tags[arn(scope, *directConnectGateway.OwnerAccount, *directConnectGateway.DirectConnectGatewayId)]),
 		}
 
 		// stateChangeError =>The error message if the state of an object failed to advance.
@@ -36,6 +56,14 @@ func directConnectGatewayOutputMapper(_ context.Context, _ *directconnect.Client
 	}
 
 	return items, nil
+}
+
+// arn constructs an ARN for a direct connect gateway
+// https://docs.aws.amazon.com/managedservices/latest/userguide/find-arn.html
+// https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsdirectconnect.html#awsdirectconnect-resources-for-iam-policies
+func arn(region, accountID, gatewayID string) string {
+	// arn:aws:service:region:account-id:resource-type/resource-id
+	return fmt.Sprintf("arn:aws:directconnect:%s:%s:dx-gateway/%s", region, accountID, gatewayID)
 }
 
 //go:generate docgen ../../docs-data
