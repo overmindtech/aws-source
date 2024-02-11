@@ -19,7 +19,7 @@ func TestLagHealth(t *testing.T) {
 	}{
 		{
 			state:  types.LagStateRequested,
-			health: sdp.Health_HEALTH_ERROR,
+			health: sdp.Health_HEALTH_PENDING,
 		},
 		{
 			state:  types.LagStatePending,
@@ -39,7 +39,7 @@ func TestLagHealth(t *testing.T) {
 		},
 		{
 			state:  types.LagStateDeleted,
-			health: sdp.Health_HEALTH_ERROR,
+			health: sdp.Health_HEALTH_UNKNOWN,
 		},
 		{
 			state:  types.LagStateUnknown,

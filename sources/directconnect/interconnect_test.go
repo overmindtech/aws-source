@@ -86,7 +86,7 @@ func TestInterconnectHealth(t *testing.T) {
 	}{
 		{
 			state:  types.InterconnectStateRequested,
-			health: sdp.Health_HEALTH_ERROR,
+			health: sdp.Health_HEALTH_PENDING,
 		},
 		{
 			state:  types.InterconnectStatePending,
@@ -106,7 +106,7 @@ func TestInterconnectHealth(t *testing.T) {
 		},
 		{
 			state:  types.InterconnectStateDeleted,
-			health: sdp.Health_HEALTH_ERROR,
+			health: sdp.Health_HEALTH_UNKNOWN,
 		},
 		{
 			state:  types.InterconnectStateUnknown,
