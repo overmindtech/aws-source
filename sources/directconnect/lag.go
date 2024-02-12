@@ -65,6 +65,24 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 			}
 		}
 
+		if lag.LagId != nil {
+			// +overmind:link directconnect-hosted-connection
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "directconnect-hosted-connection",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *lag.LagId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// LAG and hosted connections are tightly coupled
+					// Changing one will affect the other
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
 		if lag.Location != nil {
 			// +overmind:link directconnect-location
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

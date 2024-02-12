@@ -45,6 +45,24 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
 		}
 
+		if interconnect.InterconnectId != nil {
+			// +overmind:link directconnect-hosted-connection
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "directconnect-hosted-connection",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *interconnect.InterconnectId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Interconnect and hosted connections are tightly coupled
+					// Changing one will affect the other
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
 		if interconnect.LagId != nil {
 			// +overmind:link directconnect-lag
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{

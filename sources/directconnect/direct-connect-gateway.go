@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
+	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -21,12 +22,17 @@ func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Clie
 		))
 	}
 
-	// get tags for the resources in a map by their ARNs
-	tags, err := arnToTags(context.Background(), cli, resourceARNs)
-	if err != nil {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: err.Error(),
+	tags := make(map[string][]types.Tag)
+	var err error
+
+	if len(resourceARNs) > 0 {
+		// get tags for the resources in a map by their ARNs
+		tags, err = arnToTags(context.Background(), cli, resourceARNs)
+		if err != nil {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
+				ErrorString: err.Error(),
+			}
 		}
 	}
 
@@ -37,12 +43,14 @@ func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Clie
 			return nil, err
 		}
 
+		relevantTags, _ := tags[arn(scope, *directConnectGateway.OwnerAccount, *directConnectGateway.DirectConnectGatewayId)]
+
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway",
 			UniqueAttribute: "directConnectGatewayId",
 			Attributes:      attributes,
 			Scope:           scope,
-			Tags:            tagsToMap(tags[arn(scope, *directConnectGateway.OwnerAccount, *directConnectGateway.DirectConnectGatewayId)]),
+			Tags:            tagsToMap(relevantTags),
 		}
 
 		// stateChangeError =>The error message if the state of an object failed to advance.

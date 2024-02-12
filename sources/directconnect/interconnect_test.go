@@ -74,6 +74,12 @@ func TestInterconnectOutputMapper(t *testing.T) {
 			ExpectedQuery:  "dxcon-fguhmqlc",
 			ExpectedScope:  "foo",
 		},
+		{
+			ExpectedType:   "directconnect-hosted-connection",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "dxcon-fguhmqlc",
+			ExpectedScope:  "foo",
+		},
 	}
 
 	tests.Execute(t, item)
@@ -149,6 +155,13 @@ func TestNewInterconnectSource(t *testing.T) {
 	test := sources.E2ETest{
 		Source:  source,
 		Timeout: 10 * time.Second,
+		// Listing these in our test account gives "An error occurred
+		// (DirectConnectClientException) when calling the DescribeInterconnects
+		// operation: Account [NUMBER] is not an authorized Direct Connect
+		// partner in eu-west-2."
+		//
+		// Skipping tests for now
+		SkipList: true,
 	}
 
 	test.Run(t)

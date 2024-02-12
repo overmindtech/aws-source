@@ -106,8 +106,7 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:type directconnect-hosted-connection
 // +overmind:descriptiveType Direct Connect Hosted Connection
 // +overmind:get Get a Hosted Connection by connection ID
-// +overmind:list List all
-// +overmind:search Search Hosted Connections by ARN
+// +overmind:search Search Hosted Connections by Interconnect or LAG ID
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_hosted_connection.id
 
@@ -126,9 +125,14 @@ func NewHostedConnectionSource(config aws.Config, accountID string, limit *sourc
 				ConnectionId: &query,
 			}, nil
 		},
-		InputMapperList: func(scope string) (*directconnect.DescribeHostedConnectionsInput, error) {
-			return &directconnect.DescribeHostedConnectionsInput{}, nil
+		InputMapperSearch: func(ctx context.Context, client *directconnect.Client, scope, query string) (*directconnect.DescribeHostedConnectionsInput, error) {
+			return &directconnect.DescribeHostedConnectionsInput{
+				ConnectionId: &query,
+			}, nil
 		},
+		// InputMapperList: func(scope string) (*directconnect.DescribeHostedConnectionsInput, error) {
+		// 	return &directconnect.DescribeHostedConnectionsInput{}, nil
+		// },
 		OutputMapper: hostedConnectionOutputMapper,
 	}
 }
