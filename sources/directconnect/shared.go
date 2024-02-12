@@ -21,6 +21,10 @@ func tagsToMap(tags []types.Tag) map[string]string {
 }
 
 func arnToTags(ctx context.Context, cli *directconnect.Client, resourceARNs []string) (map[string][]types.Tag, error) {
+	if cli == nil {
+		return nil, nil
+	}
+
 	tagsOutput, err := cli.DescribeTags(ctx, &directconnect.DescribeTagsInput{
 		ResourceArns: resourceARNs,
 	})

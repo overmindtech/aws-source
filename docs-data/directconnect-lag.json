@@ -12,6 +12,7 @@
 	"terraformScope": "*",
 	"links": [
 		"directconnect-connection",
+		"directconnect-hosted-connection",
 		"directconnect-location"
 	]
 }

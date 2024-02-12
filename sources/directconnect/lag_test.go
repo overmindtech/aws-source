@@ -154,6 +154,12 @@ func TestLagOutputMapper(t *testing.T) {
 			ExpectedQuery:  "EqDC2",
 			ExpectedScope:  "foo",
 		},
+		{
+			ExpectedType:   "directconnect-hosted-connection",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "dxlag-fgsu9erb",
+			ExpectedScope:  "foo",
+		},
 	}
 
 	tests.Execute(t, item)

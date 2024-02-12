@@ -1,7 +1,7 @@
 version: "3"
 services:
   devcontainer:
-    image: "mcr.microsoft.com/devcontainers/go:1-bullseye" # Avoid broken python in Debian bookworm https://github.com/devcontainers/features/issues/577
+    image: "mcr.microsoft.com/devcontainers/base:ubuntu"
     volumes:
       # mount the user's AWS config so that the CLI works as expected
       - ~/.aws:/home/vscode/.aws:cached
