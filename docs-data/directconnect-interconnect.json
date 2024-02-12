@@ -6,6 +6,7 @@
 	"searchDescription": "Search Interconnects by ARN",
 	"group": "AWS",
 	"links": [
+		"directconnect-hosted-connection",
 		"directconnect-lag",
 		"directconnect-loa",
 		"directconnect-location"
