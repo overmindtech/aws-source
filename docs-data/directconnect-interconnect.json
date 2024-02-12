@@ -1,0 +1,13 @@
+{
+	"type": "directconnect-interconnect",
+	"descriptiveType": "Direct Connect Interconnect",
+	"getDescription": "Get a Interconnect by InterconnectId",
+	"listDescription": "List all Interconnects",
+	"searchDescription": "Search Interconnects by ARN",
+	"group": "AWS",
+	"links": [
+		"directconnect-lag",
+		"directconnect-loa",
+		"directconnect-location"
+	]
+}
