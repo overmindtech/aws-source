@@ -101,6 +101,7 @@ jobs:
           project: xnsnw3m20t
           file: build/package/${{ matrix.dockerfile }}
           context: .
+          sbom: true
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
