@@ -72,6 +72,12 @@ func TestListenerOutputMapper(t *testing.T) {
 			ExpectedQuery:  "arn:aws:acm:eu-west-2:944651592624:certificate/acd84d34-fb78-4411-bd8a-43684a3477c5",
 			ExpectedScope:  "944651592624.eu-west-2",
 		},
+		{
+			ExpectedType:   "elbv2-rule",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:944651592624:listener/app/ingress/1bf10920c5bd199d/9d28f512be129134",
+			ExpectedScope:  "944651592624.eu-west-2",
+		},
 	}
 
 	tests.Execute(t, item)
