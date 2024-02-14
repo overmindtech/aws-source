@@ -64,6 +64,8 @@ github.com/aws/aws-sdk-go-v2/service/lambda v1.50.0 h1:fBJs+X3ZOEqpmiSb7as6DBqm7
 github.com/aws/aws-sdk-go-v2/service/lambda v1.50.0/go.mod h1:yEO3Ejj0qBhdIDlRYQ8O9+gB5CAUKyaYYiFBkvGX8ZA=
 github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.37.1 h1:awbQFyp8kCvkpfWghtbxperZ2fgACCteEWg2vyfQQmI=
 github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.37.1/go.mod h1:+msbQNoA4zBkVKy9dtsK5GmuJT3Y2FUNX8OzWGt/jCI=
+github.com/aws/aws-sdk-go-v2/service/networkmanager v1.23.6 h1:XPS4rNrUPpZMkOutgnQoyKMbNygtEWMD3PMtzlyIdHk=
+github.com/aws/aws-sdk-go-v2/service/networkmanager v1.23.6/go.mod h1:iCLwCEQHzzAdUcZg8ARvMf4f7cZywQlo+1njFlcQQG4=
 github.com/aws/aws-sdk-go-v2/service/rds v1.70.0 h1:tbzoDyZewwHeEFwDyYvP16k7ZBH9oXelu9S3ifgAOaE=
 github.com/aws/aws-sdk-go-v2/service/rds v1.70.0/go.mod h1:3GxUcfiSRQS+iGNMGtAvtkma/PMuyU4VCUZF5iID3uA=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.38.0 h1:CGCV5Ew5WxGoavl747VjaeCRQXNhzN9+G89QNsrS7uY=
