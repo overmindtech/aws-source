@@ -82,6 +82,20 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 						Out: true,
 					},
 				})
+
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "elbv2-rule",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *listener.ListenerArn,
+						Scope:  sources.FormatScope(a.AccountID, a.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Tightly coupled
+						In:  true,
+						Out: true,
+					},
+				})
 			}
 		}
 
