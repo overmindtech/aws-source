@@ -18,6 +18,15 @@ func resourcePolicyGetFunc(ctx context.Context, client *networkmanager.Client, s
 	return out.PolicyDocument, nil
 }
 
+func resourcePolicyItemMapper(scope string, awsItem *string) (*sdp.Item, error) {
+	item := sdp.Item{
+		Type:            "networkmanager-resource-policy",
+		UniqueAttribute: "id", // highly likely this is id, can we omit this for this case?
+		Scope:           scope,
+	}
+	return &item, nil
+}
+
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-resource-policy
 // +overmind:descriptiveType Networkmanager Resource Policy
@@ -34,6 +43,7 @@ func NewResourcePolicySource(config aws.Config, accountID string, limit *sources
 			limit.Wait(ctx) // Wait for rate limiting
 			return resourcePolicyGetFunc(ctx, client, scope, query)
 		},
+		ItemMapper: resourcePolicyItemMapper,
 		ListFunc: func(ctx context.Context, client *networkmanager.Client, scope string) ([]*string, error) {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,

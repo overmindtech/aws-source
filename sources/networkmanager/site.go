@@ -2,7 +2,6 @@ package networkmanager
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
@@ -11,73 +10,63 @@ import (
 	"strings"
 )
 
-func sitesGetFunc(ctx context.Context, client NetworkmanagerClient, scope string, input *networkmanager.GetSitesInput) (*sdp.Item, error) {
-	if input == nil || input.GlobalNetworkId == nil {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: "GetSitesInput.GlobalNetworkId param is mandatory",
+func siteOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _ *networkmanager.GetSitesInput, output *networkmanager.GetSitesOutput) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+
+	for _, s := range output.Sites {
+		var err error
+		var attrs *sdp.ItemAttributes
+		attrs, err = sources.ToAttributesCase(s, "tags")
+
+		if err != nil {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
+				ErrorString: err.Error(),
+				Scope:       scope,
+			}
 		}
-	}
-	out, err := client.GetSites(ctx, input)
-	if err != nil {
-		return nil, err
-	}
-	if len(out.Sites) == 0 {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: fmt.Sprintf("site with ID %s not found", input.SiteIds[0]),
-		}
-	}
-	if len(out.Sites) != 1 {
-		return nil, fmt.Errorf("got %d sites, expected 1", len(out.Sites))
-	}
 
-	site := out.Sites[0]
-
-	attributes, err := sources.ToAttributesCase(site, "tags")
-	if err != nil {
-		return nil, err
-	}
-
-	item := sdp.Item{
-		Type:            "networkmanager-site",
-		UniqueAttribute: "siteId",
-		Scope:           scope,
-		Attributes:      attributes,
-		Tags:            tagsToMap(site.Tags),
-		LinkedItemQueries: []*sdp.LinkedItemQuery{
-			{
-				Query: &sdp.Query{
-					// +overmind:link networkmanager-global-network
-					// Search for all sites with this global network
-					Type:   "networkmanager-global-network",
-					Method: sdp.QueryMethod_GET,
-					Query:  *site.GlobalNetworkId,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// ?? Sites can affect the global network
-					In: true,
-					// The global network will definitely affect the site
-					// instances
-					Out: true,
+		item := sdp.Item{
+			Type:            "networkmanager-site",
+			UniqueAttribute: "siteId",
+			Scope:           scope,
+			Attributes:      attrs,
+			Tags:            tagsToMap(s.Tags),
+			LinkedItemQueries: []*sdp.LinkedItemQuery{
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-global-network
+						// Search for all sites with this global network
+						Type:   "networkmanager-global-network",
+						Method: sdp.QueryMethod_GET,
+						Query:  *s.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// ?? Sites can affect the global network
+						In: true,
+						// The global network will definitely affect the site
+						// instances
+						Out: true,
+					},
 				},
 			},
-		},
+		}
+		switch s.State {
+		case types.SiteStatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.SiteStateAvailable:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.SiteStateUpdating:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.SiteStateDeleting:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		}
+
+		items = append(items, &item)
 	}
 
-	switch site.State {
-	case types.SiteStatePending:
-		item.Health = sdp.Health_HEALTH_PENDING.Enum()
-	case types.SiteStateAvailable:
-		item.Health = sdp.Health_HEALTH_OK.Enum()
-	case types.SiteStateUpdating:
-		item.Health = sdp.Health_HEALTH_PENDING.Enum()
-	case types.SiteStateDeleting:
-		item.Health = sdp.Health_HEALTH_PENDING.Enum()
-	}
-
-	return &item, nil
+	return items, nil
 }
 
 //go:generate docgen ../../docs-data
@@ -86,51 +75,44 @@ func sitesGetFunc(ctx context.Context, client NetworkmanagerClient, scope string
 // +overmind:get Get a Networkmanager Site
 // +overmind:list List a Networkmanager Sites
 // +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_site.id
 
-func NewSiteSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.AlwaysGetSource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options] {
-	return &sources.AlwaysGetSource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options]{
+func NewSiteSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options] {
+	return &sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options]{
 		Client:    networkmanager.NewFromConfig(config),
 		AccountID: accountID,
 		ItemType:  "networkmanager-sites",
-		GetFunc:   sitesGetFunc,
-		GetInputMapper: func(scope, query string) *networkmanager.GetSitesInput {
+		DescribeFunc: func(ctx context.Context, client NetworkmanagerClient, input *networkmanager.GetSitesInput) (*networkmanager.GetSitesOutput, error) {
+			return client.GetSites(ctx, input)
+		},
+		InputMapperGet: func(scope, query string) (*networkmanager.GetSitesInput, error) {
 			// We are using a custom id of {globalNetworkId}/{siteId} e.g.
 			sections := strings.Split(query, "/")
 
 			if len(sections) != 2 {
-				return nil
+				return nil, &sdp.QueryError{
+					ErrorType:   sdp.QueryError_NOTFOUND,
+					ErrorString: "invalid query for networkmanager-site get function",
+				}
 			}
 			return &networkmanager.GetSitesInput{
 				GlobalNetworkId: &sections[0],
 				SiteIds: []string{
 					sections[1],
 				},
+			}, nil
+		},
+		InputMapperList: func(scope string) (*networkmanager.GetSitesInput, error) {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_NOTFOUND,
+				ErrorString: "list not supported for networkmanager-site, use search",
 			}
 		},
-		ListInput: &networkmanager.GetSitesInput{},
-		ListFuncPaginatorBuilder: func(client NetworkmanagerClient, input *networkmanager.GetSitesInput) sources.Paginator[*networkmanager.GetSitesOutput, *networkmanager.Options] {
-			// GlobalNetworkId is required
-			// SiteIds must be valid slice, not nil
-			if input.GlobalNetworkId == nil {
-				input.GlobalNetworkId = aws.String("")
-				input.SiteIds = []string{}
-			}
-			return networkmanager.NewGetSitesPaginator(client, input)
+		PaginatorBuilder: func(client NetworkmanagerClient, params *networkmanager.GetSitesInput) sources.Paginator[*networkmanager.GetSitesOutput, *networkmanager.Options] {
+			return networkmanager.NewGetSitesPaginator(client, params)
 		},
-		ListFuncOutputMapper: func(output *networkmanager.GetSitesOutput, input *networkmanager.GetSitesInput) ([]*networkmanager.GetSitesInput, error) {
-			inputs := make([]*networkmanager.GetSitesInput, 0)
-			for _, s := range output.Sites {
-				inputs = append(inputs, &networkmanager.GetSitesInput{
-					SiteIds: []string{
-						*s.SiteId, // This will be the id of the site
-					},
-				})
-			}
-
-			return inputs, nil
-		},
-		SearchInputMapper: func(scope, query string) (*networkmanager.GetSitesInput, error) {
+		OutputMapper: siteOutputMapper,
+		InputMapperSearch: func(ctx context.Context, client NetworkmanagerClient, scope, query string) (*networkmanager.GetSitesInput, error) {
+			// Search by listener ARN
 			return &networkmanager.GetSitesInput{
 				GlobalNetworkId: &query,
 			}, nil

@@ -20,7 +20,24 @@ func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, sc
 	return out.VpcAttachment, nil
 }
 
-//TODO: connect core-network here
+// TODO: connect core-network here
+func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
+	attributes, err := sources.ToAttributesCase(awsItem)
+
+	if err != nil {
+		return nil, err
+	}
+
+	item := sdp.Item{
+		Type:            "networkmanager-vpc-attachment",
+		UniqueAttribute: "Attachment.AttachmentId",
+		Attributes:      attributes,
+		Scope:           scope,
+	}
+
+	return &item, nil
+}
+
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-vpc-attachment
 // +overmind:descriptiveType Networkmanager VPC Attachment
@@ -38,6 +55,7 @@ func NewVPCAttachmentSource(config aws.Config, accountID string, limit *sources.
 			limit.Wait(ctx) // Wait for rate limiting
 			return vpcAttachmentGetFunc(ctx, client, scope, query)
 		},
+		ItemMapper: vpcAttachmentItemMapper,
 		ListFunc: func(ctx context.Context, client *networkmanager.Client, scope string) ([]*types.VpcAttachment, error) {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,
