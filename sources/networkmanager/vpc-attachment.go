@@ -20,19 +20,39 @@ func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, sc
 	return out.VpcAttachment, nil
 }
 
-// TODO: connect core-network here
 func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {
 		return nil, err
 	}
+	// The uniqueAttributeValue for this is a custom field:
+	// {clusterName}/{NodegroupName}
 
+	attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
 	item := sdp.Item{
 		Type:            "networkmanager-vpc-attachment",
-		UniqueAttribute: "Attachment.AttachmentId",
+		UniqueAttribute: "attachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
+		LinkedItemQueries: []*sdp.LinkedItemQuery{
+			{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-core-network
+					// Search for all vpc attachments with this core network
+					Type:   "networkmanager-core-network",
+					Method: sdp.QueryMethod_GET,
+					Query:  *awsItem.Attachment.CoreNetworkId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// ?? vpc attachment can affect the global network (depends on meaning of "affect" in this case)
+					In: true,
+					// The core network will definitely affect the vpc attachment
+					Out: true,
+				},
+			},
+		},
 	}
 
 	return &item, nil
