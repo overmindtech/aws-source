@@ -18,6 +18,7 @@ This source requies the following IAM Policy
         "cloudfront:List*",
         "cloudwatch:Describe*",
         "cloudwatch:ListTagsForResource",
+        "directconnect:Describe*",
         "dynamodb:Describe*",
         "dynamodb:List*",
         "ec2:Describe*",
