@@ -91,6 +91,7 @@ var rootCmd = &cobra.Command{
 			SecretAccessKey: viper.GetString("aws-secret-access-key"),
 			ExternalID:      viper.GetString("aws-external-id"),
 			TargetRoleARN:   viper.GetString("aws-target-role-arn"),
+			Profile:         viper.GetString("aws-profile"),
 			AutoConfig:      viper.GetBool("auto-config"),
 		}
 
@@ -112,6 +113,7 @@ var rootCmd = &cobra.Command{
 			"aws-access-strategy": awsAuthConfig.Strategy,
 			"aws-external-id":     awsAuthConfig.ExternalID,
 			"aws-target-role-arn": awsAuthConfig.TargetRoleARN,
+			"aws-profile":         awsAuthConfig.Profile,
 			"auto-config":         awsAuthConfig.AutoConfig,
 			"health-check-port":   healthCheckPort,
 		}).Info("Got config")
@@ -254,11 +256,12 @@ func init() {
 	rootCmd.PersistentFlags().Int("max-parallel", 2_000, "Max number of requests to run in parallel")
 
 	// Custom flags for this source
-	rootCmd.PersistentFlags().String("aws-access-strategy", "access-key", "The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id'. Default: 'access-key'.")
+	rootCmd.PersistentFlags().String("aws-access-strategy", "defaults", "The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id', 'sso-profile', 'defaults'. Default: 'defaults'.")
 	rootCmd.PersistentFlags().String("aws-access-key-id", "", "The ID of the access key to use")
 	rootCmd.PersistentFlags().String("aws-secret-access-key", "", "The secret access key to use for auth")
 	rootCmd.PersistentFlags().String("aws-external-id", "", "The external ID to use when assuming the customer's role")
 	rootCmd.PersistentFlags().String("aws-target-role-arn", "", "The role to assume in the customer's account")
+	rootCmd.PersistentFlags().String("aws-profile", "", "The AWS SSO Profile to use. Defaults to $AWS_PROFILE, then whatever the AWS SDK's SSO config defaults to")
 	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
@@ -331,12 +334,18 @@ type AwsAuthConfig struct {
 	SecretAccessKey string
 	ExternalID      string
 	TargetRoleARN   string
+	Profile         string
 	AutoConfig      bool
 
 	Regions []string
 }
 
 func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
+	// Validate inputs
+	if region == "" {
+		return aws.Config{}, errors.New("aws-region cannot be blank")
+	}
+
 	ctx := context.Background()
 
 	options := []func(*config.LoadOptions) error{
@@ -345,15 +354,15 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 	}
 
 	if c.AutoConfig {
+		if c.Strategy != "defaults" {
+			log.WithField("aws-access-strategy", c.Strategy).Warn("auto-config is set to true, but aws-access-strategy is not set to 'defaults'. This may cause unexpected behaviour")
+		}
 		return config.LoadDefaultConfig(ctx, options...)
 	}
 
-	// Validate inputs
-	if region == "" {
-		return aws.Config{}, errors.New("aws-region cannot be blank")
-	}
-
-	if c.Strategy == "access-key" {
+	if c.Strategy == "defaults" {
+		return config.LoadDefaultConfig(ctx, options...)
+	} else if c.Strategy == "access-key" {
 		if c.AccessKeyID == "" {
 			return aws.Config{}, errors.New("with access-key strategy, aws-access-key-id cannot be blank")
 		}
@@ -365,6 +374,9 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 		}
 		if c.TargetRoleARN != "" {
 			return aws.Config{}, errors.New("with access-key strategy, aws-target-role-arn must be blank")
+		}
+		if c.Profile != "" {
+			return aws.Config{}, errors.New("with access-key strategy, aws-profile must be blank")
 		}
 
 		options = append(options, config.WithCredentialsProvider(
@@ -385,6 +397,9 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 		if c.TargetRoleARN == "" {
 			return aws.Config{}, errors.New("with external-id strategy, aws-target-role-arn cannot be blank")
 		}
+		if c.Profile != "" {
+			return aws.Config{}, errors.New("with external-id strategy, aws-profile must be blank")
+		}
 
 		assumecnf, err := config.LoadDefaultConfig(ctx)
 		if err != nil {
@@ -400,6 +415,26 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 				},
 			)),
 		))
+
+		return config.LoadDefaultConfig(ctx, options...)
+	} else if c.Strategy == "sso-profile" {
+		if c.AccessKeyID != "" {
+			return aws.Config{}, errors.New("with sso-profile strategy, aws-access-key-id must be blank")
+		}
+		if c.SecretAccessKey != "" {
+			return aws.Config{}, errors.New("with sso-profile strategy, aws-secret-access-key must be blank")
+		}
+		if c.ExternalID != "" {
+			return aws.Config{}, errors.New("with sso-profile strategy, aws-external-id must be blank")
+		}
+		if c.TargetRoleARN != "" {
+			return aws.Config{}, errors.New("with sso-profile strategy, aws-target-role-arn must be blank")
+		}
+		if c.Profile == "" {
+			return aws.Config{}, errors.New("with sso-profile strategy, aws-profile cannot be blank")
+		}
+
+		options = append(options, config.WithSharedConfigProfile(c.Profile))
 
 		return config.LoadDefaultConfig(ctx, options...)
 	} else {
