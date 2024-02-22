@@ -1,0 +1,14 @@
+{
+	"type": "sqs-queue",
+	"descriptiveType": "SQS Queue",
+	"getDescription": "Get an SQS queue attributes by its URL",
+	"listDescription": "List all SQS queue URLs",
+	"searchDescription": "Search SQS queue by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_sqs_queue.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": []
+}
