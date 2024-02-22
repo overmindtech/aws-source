@@ -25,11 +25,16 @@ func getFunc(ctx context.Context, client client, scope string, input *sqs.GetQue
 	if output.Attributes == nil {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: "queue response was nil",
+			ErrorString: "get queue attributes response was nil",
 		}
 	}
 
 	attributes, err := sources.ToAttributesCase(output.Attributes)
+	if err != nil {
+		return nil, err
+	}
+
+	err = attributes.Set("queueURL", input.QueueUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +49,7 @@ func getFunc(ctx context.Context, client client, scope string, input *sqs.GetQue
 
 	return &sdp.Item{
 		Type:            "sqs-queue",
-		UniqueAttribute: "queueArn",
+		UniqueAttribute: "queueURL",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            resourceTags,
