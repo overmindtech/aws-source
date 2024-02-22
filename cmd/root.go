@@ -382,7 +382,6 @@ var rootCmd = &cobra.Command{
 				)
 				globalDone = true
 			}
-
 		}
 
 		// Start HTTP server for status
@@ -474,7 +473,14 @@ func init() {
 	rootCmd.PersistentFlags().String("nats-name-prefix", "", "A name label prefix. Sources should append a dot and their hostname .{hostname} to this, then set this is the NATS connection name which will be sent to the server on CONNECT to identify the client")
 	rootCmd.PersistentFlags().String("nats-jwt", "", "The JWT token that should be used to authenticate to NATS, provided in raw format e.g. eyJ0eXAiOiJKV1Q...")
 	rootCmd.PersistentFlags().String("nats-nkey-seed", "", "The NKey seed which corresponds to the NATS JWT e.g. SUAFK6QUC...")
+
 	rootCmd.PersistentFlags().String("api-key", "", "The API key to use to authenticate to the Overmind API")
+	// Support API Keys in the environment
+	err := viper.BindEnv("api-key", "OVM_API_KEY", "API_KEY")
+	if err != nil {
+		log.WithError(err).Fatal("could not bind api key to env")
+	}
+
 	rootCmd.PersistentFlags().String("api-path", "https://api.prod.overmind.tech", "The URL of the Overmind API")
 	rootCmd.PersistentFlags().Int("max-parallel", 2_000, "Max number of requests to run in parallel")
 
