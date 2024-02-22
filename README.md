@@ -4,7 +4,7 @@ This source integrates with AWS, allowing Overmind to pull data about many types
 
 ## Required Permissions
 
-This source requies the following IAM Policy
+This source requires the following IAM Policy
 
 ```json
 {
@@ -39,7 +39,10 @@ This source requies the following IAM Policy
         "route53:Get*",
         "route53:List*",
         "s3:GetBucket*",
-        "s3:ListAllMyBuckets"
+        "s3:ListAllMyBuckets",
+        "sqs:ListQueues",
+        "sqs:GetQueueAttributes",
+        "sqs:ListQueueTags"
       ],
       "Resource": "*"
     }
@@ -61,7 +64,7 @@ Meaning that the type in Overmind should be:
 ec2-security-group
 ```
 
-Note that plurals should be converted to their singluar form hence `security-groups` becomes `security-group`
+Note that plurals should be converted to their singular form hence `security-groups` becomes `security-group`
 
 ## Rate limiting
 
