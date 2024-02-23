@@ -25,6 +25,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.72.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.0
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.30.3
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.0
 	github.com/aws/smithy-go v1.20.1
 	github.com/getsentry/sentry-go v0.27.0
@@ -113,5 +114,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/aws/aws-sdk-go-v2/service/sqs v1.30.3
