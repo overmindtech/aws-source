@@ -144,8 +144,6 @@ github.com/minio/highwayhash v1.0.2 h1:Aak5U0nElisjDCfPSG79Tgzkn2gl66NxOMspRrKnA
 github.com/minio/highwayhash v1.0.2/go.mod h1:BQskDq+xkJ12lmlUUi7U0M5Swg3EWR+dLTk+kldvVxY=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/nats-io/jwt/v2 v2.5.4 h1:Bz+drKl2GbE30fxTOtb0NYl1BQ5RwZ+Zcqkg3mR5bbI=
-github.com/nats-io/jwt/v2 v2.5.4/go.mod h1:ZdWS1nZa6WMZfFwwgpEaqBV8EPGVgOTDHN/wTbz0Y5A=
 github.com/nats-io/jwt/v2 v2.5.5 h1:ROfXb50elFq5c9+1ztaUbdlrArNFl2+fQWP6B8HGEq4=
 github.com/nats-io/jwt/v2 v2.5.5/go.mod h1:ZdWS1nZa6WMZfFwwgpEaqBV8EPGVgOTDHN/wTbz0Y5A=
 github.com/nats-io/nats-server/v2 v2.10.10 h1:g1Wd64J5SGsoqWSx1qoNu9/At7a2x+jE7Qtf2XpEx/I=
@@ -160,8 +158,6 @@ github.com/overmindtech/api-client v0.14.0 h1:zXyjJsIeawNqoWv7FqOjwcqgFpLrDYz7l9
 github.com/overmindtech/api-client v0.14.0/go.mod h1:msdkTAQFlvDGOU4tQk2adk2P8j23uaMWkJ9YRX4wGWI=
 github.com/overmindtech/discovery v0.26.3 h1:FLXfyCq36XaD6mF6D9OriHnFqwidLQq5WnTxaJpgg/c=
 github.com/overmindtech/discovery v0.26.3/go.mod h1:k0E4UtBa8Fvv1LbQ6zb/w3IZZh8KY85HS3V6vS6Ab0Y=
-github.com/overmindtech/sdp-go v0.66.1 h1:yuPdP0i0s4vWgsLt4QiX3qEdUzcqHjQ1d06ubWRLF84=
-github.com/overmindtech/sdp-go v0.66.1/go.mod h1:p8+DRx17Og086v9NeACpoFO4vbpThozyROzECPIxFSY=
 github.com/overmindtech/sdp-go v0.66.2 h1:NUW1lvx9uJekjRsgFgJdKUBOD1Jy2Ahbe+JRl84mgHQ=
 github.com/overmindtech/sdp-go v0.66.2/go.mod h1:p8+DRx17Og086v9NeACpoFO4vbpThozyROzECPIxFSY=
 github.com/overmindtech/sdpcache v1.6.3 h1:Uf6xrh6cKdDInvTnIVBtfdb7rujrAVtZW4ySK0VYtbU=
