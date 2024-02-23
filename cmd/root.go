@@ -37,6 +37,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
+	"github.com/overmindtech/aws-source/sources/sqs"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go/auth"
@@ -351,6 +352,9 @@ var rootCmd = &cobra.Command{
 				directconnect.NewHostedConnectionSource(cfg, *callerID.Account, &autoScalingRateLimit),
 				directconnect.NewInterconnectSource(cfg, *callerID.Account, &autoScalingRateLimit),
 				directconnect.NewRouterConfigurationSource(cfg, *callerID.Account, &autoScalingRateLimit),
+
+				// SQS
+				sqs.NewQueueSource(cfg, *callerID.Account, region),
 			}
 
 			e.AddSources(sources...)
