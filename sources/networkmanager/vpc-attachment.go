@@ -26,10 +26,12 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 	if err != nil {
 		return nil, err
 	}
-	// The uniqueAttributeValue for this is a custom field:
-	// {clusterName}/{NodegroupName}
 
-	attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
+	// The uniqueAttributeValue for this is a nested value of AttachmentId:
+	if awsItem != nil && awsItem.Attachment != nil {
+		attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
+	}
+
 	item := sdp.Item{
 		Type:            "networkmanager-vpc-attachment",
 		UniqueAttribute: "attachmentId",

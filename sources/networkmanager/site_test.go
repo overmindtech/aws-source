@@ -4,11 +4,10 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/sdp-go"
-	"testing"
-	"time"
-
 	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
+	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func (t *TestClient) GetSites(ctx context.Context, params *networkmanager.GetSitesInput, optFns ...func(*networkmanager.Options)) (*networkmanager.GetSitesOutput, error) {
@@ -28,37 +27,48 @@ func (t *TestClient) GetSites(ctx context.Context, params *networkmanager.GetSit
 	}, nil
 }
 
-func TestSiteSearchFunc(t *testing.T) {
+func TestSiteOutputMapper(t *testing.T) {
+	output := networkmanager.GetSitesOutput{
+		Sites: []types.Site{
+			{
+				SiteId:          sources.PtrString("site1"),
+				GlobalNetworkId: sources.PtrString("default"),
+			},
+		},
+	}
 	scope := "123456789012.eu-west-2"
-	item, err := globalNetworkGetFunc(context.Background(), &TestClient{}, scope, &networkmanager.DescribeGlobalNetworksInput{})
+	items, err := siteOutputMapper(context.Background(), &TestClient{}, scope, &networkmanager.GetSitesInput{}, &output)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if err = item.Validate(); err != nil {
-		t.Error(err)
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
 	}
+
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %v", len(items))
+	}
+
+	item := items[0]
+
+	// Ensure unique attribute
+	require.NotNil(t, item.Attributes)
+	uniqueAttr, err := item.Attributes.Get("globalNetworkSiteId")
+	require.Nil(t, err)
+	require.Equal(t, "default/site1", uniqueAttr.(string))
 
 	tests := sources.QueryTests{
 		{
-			ExpectedType:   "networkmanager-site",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedType:   "networkmanager-global-network",
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "default",
 			ExpectedScope:  scope,
 		},
 	}
 
 	tests.Execute(t, item)
-}
-
-func TestNewSite(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
-	source := NewSiteSource(config, account, &TestRateLimit)
-	test := sources.E2ETest{
-		Source:   source,
-		Timeout:  30 * time.Second,
-		SkipList: true,
-	}
-	test.Run(t)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 	"testing"
-	"time"
 )
 
 func (t *TestClient) DescribeGlobalNetworks(ctx context.Context, params *networkmanager.DescribeGlobalNetworksInput, optFns ...func(*networkmanager.Options)) (*networkmanager.DescribeGlobalNetworksOutput, error) {
@@ -22,39 +21,42 @@ func (t *TestClient) DescribeGlobalNetworks(ctx context.Context, params *network
 	}, nil
 }
 
-func TestGlobalNetworkGetFunc(t *testing.T) {
-	scope := "123456789012.eu-west-2"
-	item, err := globalNetworkGetFunc(context.Background(), &TestClient{}, scope, &networkmanager.DescribeGlobalNetworksInput{})
+func TestLoadBalancerOutputMapper(t *testing.T) {
+	output := networkmanager.DescribeGlobalNetworksOutput{
+		GlobalNetworks: []types.GlobalNetwork{
+			{
+				GlobalNetworkArn: sources.PtrString("arn:aws:networkmanager:eu-west-2:052392120703:networkmanager/global-network/default"),
+				GlobalNetworkId:  sources.PtrString("default"),
+			},
+		},
+	}
+
+	items, err := globalNetworkOutputMapper(context.Background(), &TestClient{}, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if err = item.Validate(); err != nil {
-		t.Error(err)
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
 	}
+
+	if len(items) != 1 {
+		t.Fatalf("expected 1 item, got %v", len(items))
+	}
+
+	item := items[0]
 
 	tests := sources.QueryTests{
 		{
 			ExpectedType:   "networkmanager-site",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
-			ExpectedScope:  scope,
+			ExpectedScope:  "foo",
 		},
 	}
 
 	tests.Execute(t, item)
-}
-
-func TestNewGlobalNetworkSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
-
-	source := NewGlobalNetworkSource(config, account, region)
-
-	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
-	}
-
-	test.Run(t)
 }

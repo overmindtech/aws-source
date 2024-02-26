@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
@@ -26,9 +27,11 @@ func siteOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _
 			}
 		}
 
+		attrs.Set("globalNetworkSiteId", fmt.Sprintf("%s/%s", *s.GlobalNetworkId, *s.SiteId))
+
 		item := sdp.Item{
 			Type:            "networkmanager-site",
-			UniqueAttribute: "siteId",
+			UniqueAttribute: "globalNetworkSiteId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(s.Tags),
@@ -112,7 +115,7 @@ func NewSiteSource(config aws.Config, accountID string, limit *sources.LimitBuck
 		},
 		OutputMapper: siteOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client NetworkmanagerClient, scope, query string) (*networkmanager.GetSitesInput, error) {
-			// Search by listener ARN
+			// Search by GlobalNetworkId
 			return &networkmanager.GetSitesInput{
 				GlobalNetworkId: &query,
 			}, nil
