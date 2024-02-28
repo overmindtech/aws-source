@@ -64,7 +64,7 @@ func TestGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewSqsSource(t *testing.T) {
+func TestNewQueueSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
 	source := NewQueueSource(config, account, region)
