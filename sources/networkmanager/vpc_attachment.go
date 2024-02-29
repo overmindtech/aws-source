@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
@@ -37,24 +38,26 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 		UniqueAttribute: "attachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
-		LinkedItemQueries: []*sdp.LinkedItemQuery{
-			{
-				Query: &sdp.Query{
-					// +overmind:link networkmanager-core-network
-					// Search for all vpc attachments with this core network
-					Type:   "networkmanager-core-network",
-					Method: sdp.QueryMethod_GET,
-					Query:  *awsItem.Attachment.CoreNetworkId,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					// ?? vpc attachment can affect the global network (depends on meaning of "affect" in this case)
-					In: true,
-					// The core network will definitely affect the vpc attachment
-					Out: true,
-				},
+	}
+
+	if awsItem.Attachment.CoreNetworkId != nil {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				// +overmind:link networkmanager-core-network
+				// Search for all vpc attachments with this core network
+				Type:   "networkmanager-core-network",
+				Method: sdp.QueryMethod_GET,
+				Query:  *awsItem.Attachment.CoreNetworkId,
+				Scope:  scope,
 			},
-		},
+			BlastPropagation: &sdp.BlastPropagation{
+				// ?? vpc attachment can affect the global network (depends on meaning of "affect" in this case)
+				In: true,
+				// The core network will definitely affect the vpc attachment
+				Out: true,
+			},
+		})
+
 	}
 
 	return &item, nil
@@ -67,7 +70,6 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
-// TODO: connect coreNetwork here
 func NewVPCAttachmentSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    networkmanager.NewFromConfig(config),

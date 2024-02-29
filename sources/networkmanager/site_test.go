@@ -2,12 +2,12 @@ package networkmanager
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func (t *TestClient) GetSites(ctx context.Context, params *networkmanager.GetSitesInput, optFns ...func(*networkmanager.Options)) (*networkmanager.GetSitesOutput, error) {
@@ -56,10 +56,15 @@ func TestSiteOutputMapper(t *testing.T) {
 	item := items[0]
 
 	// Ensure unique attribute
-	require.NotNil(t, item.Attributes)
-	uniqueAttr, err := item.Attributes.Get("globalNetworkSiteId")
-	require.Nil(t, err)
-	require.Equal(t, "default/site1", uniqueAttr.(string))
+	err = item.Validate()
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if item.UniqueAttributeValue() != "default/site1" {
+		t.Fatalf("expected default/site1, got %v", item.UniqueAttributeValue())
+	}
 
 	tests := sources.QueryTests{
 		{

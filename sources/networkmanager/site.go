@@ -3,12 +3,13 @@ package networkmanager
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
-	"strings"
 )
 
 func siteOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _ *networkmanager.GetSitesInput, output *networkmanager.GetSitesOutput) ([]*sdp.Item, error) {
@@ -76,7 +77,8 @@ func siteOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _
 // +overmind:type networkmanager-site
 // +overmind:descriptiveType Networkmanager Site
 // +overmind:get Get a Networkmanager Site
-// +overmind:list List a Networkmanager Sites
+// +overmind:list List all Networkmanager Sites
+// +overmind:search Search for Networkmanager Sites by GlobalNetworkId
 // +overmind:group AWS
 
 func NewSiteSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options] {
