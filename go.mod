@@ -22,6 +22,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/iam v1.31.0
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.53.0
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.38.0
+	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.23.6
 	github.com/aws/aws-sdk-go-v2/service/rds v1.72.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.0

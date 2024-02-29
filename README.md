@@ -34,14 +34,17 @@ This source requires the following IAM Policy
         "lambda:List*",
         "network-firewall:Describe*",
         "network-firewall:List*",
+        "networkmanager:Describe*",
+        "networkmanager:Get*",
+        "networkmanager:List*",
         "rds:Describe*",
         "rds:ListTagsForResource",
         "route53:Get*",
         "route53:List*",
         "s3:GetBucket*",
         "s3:ListAllMyBuckets",
-        "sqs:ListQueues",
         "sqs:GetQueueAttributes",
+        "sqs:ListQueues",
         "sqs:ListQueueTags"
       ],
       "Resource": "*"

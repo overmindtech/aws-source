@@ -1,0 +1,16 @@
+{
+	"type": "networkmanager-global-network",
+	"descriptiveType": "Netwotkmanager Global Network",
+	"getDescription": "Get a global network by id",
+	"listDescription": "List all global networks",
+	"searchDescription": "Search for a global network by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkmanager_global_network.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": [
+		"networkmanager-site"
+	]
+}
