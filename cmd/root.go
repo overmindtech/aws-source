@@ -34,6 +34,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/iam"
 	"github.com/overmindtech/aws-source/sources/lambda"
 	"github.com/overmindtech/aws-source/sources/networkfirewall"
+	"github.com/overmindtech/aws-source/sources/networkmanager"
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
@@ -568,12 +569,26 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			RefillRate:  10,
 		}
 
+		directConnectRateLimit := sources.LimitBucket{
+			// Use EC2 limits as it's not documented
+			MaxCapacity: 50,
+			RefillRate:  10,
+		}
+
+		networkManagerRateLimit := sources.LimitBucket{
+			// Use EC2 limits as it's not documented
+			MaxCapacity: 50,
+			RefillRate:  10,
+		}
+
 		rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
 		defer rateLimitCancel()
 
 		ec2RateLimit.Start(rateLimitCtx)
 		autoScalingRateLimit.Start(rateLimitCtx)
 		iamRateLimit.Start(rateLimitCtx)
+		directConnectRateLimit.Start(rateLimitCtx)
+		networkManagerRateLimit.Start(rateLimitCtx)
 
 		sources := []discovery.Source{
 			// EC2
@@ -679,19 +694,24 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			networkfirewall.NewTLSInspectionConfigurationSource(cfg, *callerID.Account, region),
 
 			// Direct Connect
-			directconnect.NewDirectConnectGatewaySource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewDirectConnectGatewayAssociationSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewDirectConnectGatewayAssociationProposalSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewConnectionSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewDirectConnectGatewayAttachmentSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewVirtualInterfaceSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewVirtualGatewaySource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewCustomerMetadataSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewLagSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewLocationSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewHostedConnectionSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewInterconnectSource(cfg, *callerID.Account, &autoScalingRateLimit),
-			directconnect.NewRouterConfigurationSource(cfg, *callerID.Account, &autoScalingRateLimit),
+			directconnect.NewDirectConnectGatewaySource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAssociationSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAssociationProposalSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewConnectionSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAttachmentSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewVirtualInterfaceSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewVirtualGatewaySource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewCustomerMetadataSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewLagSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewLocationSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewHostedConnectionSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewInterconnectSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewRouterConfigurationSource(cfg, *callerID.Account, &directConnectRateLimit),
+
+			// Network Manager
+			networkmanager.NewGlobalNetworkSource(cfg, *callerID.Account, region),
+			networkmanager.NewSiteSource(cfg, *callerID.Account, &networkManagerRateLimit),
+			networkmanager.NewVPCAttachmentSource(cfg, *callerID.Account, &networkManagerRateLimit),
 
 			// SQS
 			sqs.NewQueueSource(cfg, *callerID.Account, region),
