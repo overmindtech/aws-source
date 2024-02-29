@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, scope, query string) (*types.VpcAttachment, error) {
+func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, _, query string) (*types.VpcAttachment, error) {
 	out, err := client.GetVpcAttachment(ctx, &networkmanager.GetVpcAttachmentInput{
 		AttachmentId: &query,
 	})
