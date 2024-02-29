@@ -46,6 +46,29 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 		Tags:            tagsToMap(resourceTags),
 	}
 
+	kmsMasterKeyID, err := attributes.Get("kmsMasterKeyId")
+	if err != nil {
+		return nil, err
+	}
+
+	if kmsMasterKeyID.(string) != "" {
+		// +overmind:link kms-key
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "kms-key",
+				Method: sdp.QueryMethod_GET,
+				Query:  kmsMasterKeyID.(string),
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing the key will affect the topic
+				In: true,
+				// Changing the topic won't affect the key
+				Out: false,
+			},
+		})
+	}
+
 	return item, nil
 }
 

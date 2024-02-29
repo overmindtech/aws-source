@@ -22,6 +22,7 @@ func (t testTopicClient) GetTopicAttributes(ctx context.Context, params *sns.Get
 		"Policy":                  "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:DeleteTopic\",\"SNS:GetTopicAttributes\",\"SNS:Publish\",\"SNS:RemovePermission\",\"SNS:AddPermission\",\"SNS:SetTopicAttributes\"],\"Resource\":\"arn:aws:sns:us-west-2:123456789012:my-topic\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"0123456789012\"}}}]}",
 		"TopicArn":                "arn:aws:sns:us-west-2:123456789012:my-topic",
 		"SubscriptionsPending":    "0",
+		"KmsMasterKeyId":          "alias/aws/sns",
 	}}, nil
 }
 
