@@ -21,6 +21,7 @@ func (t testClient) GetSubscriptionAttributes(ctx context.Context, params *sns.G
 		"Owner":                        "123456789012",
 		"SubscriptionArn":              "arn:aws:sns:us-west-2:123456789012:my-topic:8a21d249-4329-4871-acc6-7be709c6ea7f",
 		"TopicArn":                     "arn:aws:sns:us-west-2:123456789012:my-topic",
+		"SubscriptionRoleArn":          "arn:aws:iam::123456789012:role/my-role",
 	}}, nil
 }
 
