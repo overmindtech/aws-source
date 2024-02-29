@@ -1,11 +1,11 @@
 package networkmanager
 
 import (
+	"testing"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestVPCAttachmentItemMapper(t *testing.T) {
@@ -26,10 +26,9 @@ func TestVPCAttachmentItemMapper(t *testing.T) {
 	}
 
 	// Ensure unique attribute
-	require.NotNil(t, item.Attributes)
-	uniqueAttr, err := item.Attributes.Get("attachmentId")
-	require.Nil(t, err)
-	require.Equal(t, "attachment1", uniqueAttr.(string))
+	if item.UniqueAttributeValue() != "attachment1" {
+		t.Fatalf("expected %v, got %v", "attachment1", item.UniqueAttributeValue())
+	}
 
 	tests := sources.QueryTests{
 		{
