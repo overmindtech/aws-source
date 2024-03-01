@@ -11,6 +11,7 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
+		"iam-role",
 		"sns-topic"
 	]
 }
