@@ -45,7 +45,11 @@ This source requires the following IAM Policy
         "s3:ListAllMyBuckets",
         "sqs:GetQueueAttributes",
         "sqs:ListQueues",
-        "sqs:ListQueueTags"
+        "sns:GetSubscriptionAttributes",
+        "sns:ListSubscriptions",
+        "sns:ListTagsForResource",
+        "sns:GetTopicAttributes",
+        "sns:ListTopics"
       ],
       "Resource": "*"
     }

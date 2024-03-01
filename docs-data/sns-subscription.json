@@ -1,0 +1,17 @@
+{
+	"type": "sns-subscription",
+	"descriptiveType": "SNS Subscription",
+	"getDescription": "Get an SNS subscription by its ARN",
+	"listDescription": "List all SNS subscriptions",
+	"searchDescription": "Search SNS subscription by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_sns_topic_subscription.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"iam-role",
+		"sns-topic"
+	]
+}

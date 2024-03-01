@@ -1,0 +1,16 @@
+{
+	"type": "sns-topic",
+	"descriptiveType": "SNS Topic",
+	"getDescription": "Get an SNS topic by its ARN",
+	"listDescription": "List all SNS topics",
+	"searchDescription": "Search SNS topic by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_sns_topic.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"kms-key"
+	]
+}
