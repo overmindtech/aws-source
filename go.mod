@@ -26,6 +26,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.74.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.40.1
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.1
+	github.com/aws/aws-sdk-go-v2/service/sns v1.29.1
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.31.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.1
 	github.com/aws/smithy-go v1.20.1

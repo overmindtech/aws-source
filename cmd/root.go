@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/overmindtech/aws-source/sources/sns"
 	"net/http"
 	"os"
 	"os/signal"
@@ -715,6 +716,10 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 
 			// SQS
 			sqs.NewQueueSource(cfg, *callerID.Account, region),
+
+			// SNS
+			sns.NewSubscriptionSource(cfg, *callerID.Account, region),
+			sns.NewTopicSource(cfg, *callerID.Account, region),
 		}
 
 		e.AddSources(sources...)
