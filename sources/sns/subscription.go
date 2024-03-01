@@ -77,19 +77,14 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		return nil, err
 	}
 
-	if subsRoleArn.(string) != "" {
-		arn, errP := sources.ParseARN(subsRoleArn.(string))
-		if errP != nil {
-			return nil, errP
-		}
-
+	if arn, err := sources.ParseARN(subsRoleArn.(string)); err == nil {
 		// +overmind:link iam-role
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-role",
 				Method: sdp.QueryMethod_GET,
 				Query:  arn.ResourceID(),
-				Scope:  scope,
+				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
 			},
 			BlastPropagation: &sdp.BlastPropagation{
 				// If role is not healthy, subscription will not work
@@ -98,6 +93,7 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 				Out: false,
 			},
 		})
+
 	}
 
 	return item, nil
