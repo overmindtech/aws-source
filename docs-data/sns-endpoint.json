@@ -1,0 +1,8 @@
+{
+	"type": "sns-endpoint",
+	"descriptiveType": "SNS Endpoint",
+	"getDescription": "Get an SNS endpoint by its ARN",
+	"searchDescription": "Search SNS endpoints by associated Platform Application ARN",
+	"group": "AWS",
+	"links": []
+}

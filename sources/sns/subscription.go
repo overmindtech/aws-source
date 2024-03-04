@@ -93,7 +93,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 				Out: false,
 			},
 		})
-
 	}
 
 	return item, nil
