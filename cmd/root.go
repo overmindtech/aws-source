@@ -720,6 +720,8 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			// SNS
 			sns.NewSubscriptionSource(cfg, *callerID.Account, region),
 			sns.NewTopicSource(cfg, *callerID.Account, region),
+			sns.NewPlatformApplicationSource(cfg, *callerID.Account, region),
+			sns.NewEndpointSource(cfg, *callerID.Account, region),
 		}
 
 		e.AddSources(sources...)

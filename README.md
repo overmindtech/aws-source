@@ -49,7 +49,9 @@ This source requires the following IAM Policy
         "sns:ListSubscriptions",
         "sns:ListTagsForResource",
         "sns:GetTopicAttributes",
-        "sns:ListTopics"
+        "sns:ListTopics",
+        "sns:GetEndpointAttributes",
+        "sns:ListEndpointsByPlatformApplication"
       ],
       "Resource": "*"
     }
