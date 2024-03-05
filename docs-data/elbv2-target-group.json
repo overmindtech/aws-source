@@ -3,7 +3,7 @@
 	"descriptiveType": "Target Group",
 	"getDescription": "Get a target group by name",
 	"listDescription": "List all target groups",
-	"searchDescription": "Search for target groups by load balancer ARN",
+	"searchDescription": "Search for target groups by load balancer ARN or target group ARN",
 	"group": "AWS",
 	"terraformQuery": [
 		"aws_alb_target_group.arn",

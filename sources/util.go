@@ -66,6 +66,21 @@ func (a *ARN) ResourceID() string {
 	return a.Resource[separatorLocation+1:]
 }
 
+// Type The type of the resource, this is everything after the service and
+// before the resource ID
+//
+// e.g. "task-definition" would be the Type for
+// "arn:aws:ecs:eu-west-1:052392120703:task-definition/ecs-template-ecs-demo-app:1"
+func (a *ARN) Type() string {
+	// Find the first separator
+	separatorLocation := strings.IndexFunc(a.Resource, func(r rune) bool {
+		return r == '/' || r == ':'
+	})
+
+	// Keep the first field since this is the type, then remove the rest
+	return a.Resource[:separatorLocation]
+}
+
 // ParseARN Parses an ARN and tries to determine the resource ID from it. The
 // logic is that the resource ID will be the last component when separated by
 // slashes or colons: https://devopscube.com/aws-arn-guide/

@@ -279,7 +279,7 @@ func TestFunctionGetFunc(t *testing.T) {
 		},
 		{
 			ExpectedType:   "sns-topic",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "arn:aws:sns:eu-west-2:540044833068:example-topic",
 			ExpectedScope:  "540044833068.eu-west-2",
 		},

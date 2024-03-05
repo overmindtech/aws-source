@@ -2,6 +2,7 @@ package elbv2
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
@@ -108,7 +109,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 // +overmind:descriptiveType Target Group
 // +overmind:get Get a target group by name
 // +overmind:list List all target groups
-// +overmind:search Search for target groups by load balancer ARN
+// +overmind:search Search for target groups by load balancer ARN or target group ARN
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_alb_target_group.arn
 // +overmind:terraform:queryMap aws_lb_target_group.arn
@@ -132,10 +133,28 @@ func NewTargetGroupSource(config aws.Config, accountID string) *sources.Describe
 			return &elbv2.DescribeTargetGroupsInput{}, nil
 		},
 		InputMapperSearch: func(ctx context.Context, client elbClient, scope, query string) (*elbv2.DescribeTargetGroupsInput, error) {
-			// Search by load balancer
-			return &elbv2.DescribeTargetGroupsInput{
-				LoadBalancerArn: &query,
-			}, nil
+			arn, err := sources.ParseARN(query)
+
+			if err != nil {
+				return nil, err
+			}
+
+			switch arn.Type() {
+			case "targetgroup":
+				// Search by target group
+				return &elbv2.DescribeTargetGroupsInput{
+					TargetGroupArns: []string{
+						query,
+					},
+				}, nil
+			case "loadbalancer":
+				// Search by load balancer
+				return &elbv2.DescribeTargetGroupsInput{
+					LoadBalancerArn: &query,
+				}, nil
+			default:
+				return nil, fmt.Errorf("unsupported resource type: %s", arn.Resource)
+			}
 		},
 		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeTargetGroupsInput) sources.Paginator[*elbv2.DescribeTargetGroupsOutput, *elbv2.Options] {
 			return elbv2.NewDescribeTargetGroupsPaginator(client, params)
