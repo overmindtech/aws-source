@@ -43,15 +43,10 @@ This source requires the following IAM Policy
         "route53:List*",
         "s3:GetBucket*",
         "s3:ListAllMyBuckets",
+        "sns:Get*",
+        "sns:List*",
         "sqs:GetQueueAttributes",
-        "sqs:ListQueues",
-        "sns:GetSubscriptionAttributes",
-        "sns:ListSubscriptions",
-        "sns:ListTagsForResource",
-        "sns:GetTopicAttributes",
-        "sns:ListTopics",
-        "sns:GetEndpointAttributes",
-        "sns:ListEndpointsByPlatformApplication"
+        "sqs:ListQueues"
       ],
       "Resource": "*"
     }
