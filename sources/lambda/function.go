@@ -2,6 +2,7 @@ package lambda
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -18,6 +19,7 @@ type FunctionDetails struct {
 	Configuration      *types.FunctionConfiguration
 	UrlConfigs         []*types.FunctionUrlConfig
 	EventInvokeConfigs []*types.FunctionEventInvokeConfig
+	Policy             *PolicyDocument
 	Tags               map[string]string
 }
 
@@ -82,6 +84,23 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		}
 	}
 
+	// Get policies as this is often where triggers are stored
+	policyResponse, err := client.GetPolicy(ctx, &lambda.GetPolicyInput{
+		FunctionName: out.Configuration.FunctionName,
+	})
+
+	var linkedItemQueries []*sdp.LinkedItemQuery
+
+	if err == nil && policyResponse != nil && policyResponse.Policy != nil {
+		// Try to parse the policy
+		policy := PolicyDocument{}
+		err := json.Unmarshal([]byte(*policyResponse.Policy), &policy)
+
+		if err == nil {
+			linkedItemQueries = ExtractLinksFromPolicy(&policy)
+		}
+	}
+
 	attributes, err := sources.ToAttributesCase(function, "resultMetadata")
 
 	if err != nil {
@@ -95,11 +114,12 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	}
 
 	item := sdp.Item{
-		Type:            "lambda-function",
-		UniqueAttribute: "name",
-		Attributes:      attributes,
-		Scope:           scope,
-		Tags:            out.Tags,
+		Type:              "lambda-function",
+		UniqueAttribute:   "name",
+		Attributes:        attributes,
+		Scope:             scope,
+		Tags:              out.Tags,
+		LinkedItemQueries: linkedItemQueries,
 	}
 
 	if function.Code != nil {
@@ -466,6 +486,64 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	}
 
 	return &item, nil
+}
+
+func ExtractLinksFromPolicy(policy *PolicyDocument) []*sdp.LinkedItemQuery {
+	links := make([]*sdp.LinkedItemQuery, 0)
+
+	for _, statement := range policy.Statement {
+		var queryType string
+		var scope string
+
+		switch statement.Principal.Service {
+		case "sns.amazonaws.com":
+			queryType = "sns-topic"
+		case "elasticloadbalancing.amazonaws.com":
+			queryType = "elbv2-target-group"
+		case "vpc-lattice.amazonaws.com":
+			queryType = "vpc-lattice-target-group"
+		case "logs.amazonaws.com":
+			queryType = "logs-log-group"
+		case "events.amazonaws.com":
+			queryType = "events-rule"
+		case "s3.amazonaws.com":
+			// S3 is global and runs in an account scope so we need to extract
+			// that from the policy as the ARN doesn't contain the account that
+			// the bucket is in
+			queryType = "s3-bucket"
+			scope = sources.FormatScope(statement.Condition.StringEquals.AWSSourceAccount, "")
+		default:
+			continue
+		}
+
+		if scope == "" {
+			// If we don't have a scope set then extract it from the target ARN
+			parsedARN, err := sources.ParseARN(statement.Condition.ArnLike.AWSSourceArn)
+
+			if err != nil {
+				continue
+			}
+
+			scope = sources.FormatScope(parsedARN.AccountID, parsedARN.Region)
+		}
+
+		links = append(links, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   queryType,
+				Method: sdp.QueryMethod_SEARCH,
+				Query:  statement.Condition.ArnLike.AWSSourceArn,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Changing a lambda shouldn't affect the upstream source
+				Out: false,
+				// Changing the source should affect the lambda
+				In: true,
+			},
+		})
+	}
+
+	return links
 }
 
 // GetEventLinkedItem Gets the linked item request for a given destination ARN
