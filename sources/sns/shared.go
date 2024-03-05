@@ -24,7 +24,7 @@ func tagsByResourceARN(ctx context.Context, cli tagLister, resourceARN string) (
 		return nil, err
 	}
 
-	if output != nil && output.Tags == nil {
+	if output != nil && output.Tags != nil {
 		return output.Tags, nil
 	}
 

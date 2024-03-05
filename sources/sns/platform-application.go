@@ -55,6 +55,7 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 			Type:   "sns-endpoint",
 			Method: sdp.QueryMethod_SEARCH,
 			Query:  *input.PlatformApplicationArn,
+			Scope:  scope,
 		},
 		BlastPropagation: &sdp.BlastPropagation{
 			// An unhealthy endpoint won't affect the platform application
