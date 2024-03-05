@@ -118,4 +118,18 @@ func TestParseARN(t *testing.T) {
 			t.Errorf("expected account ID to be OvermindReadonly, got %v", a.ResourceID())
 		}
 	})
+
+	t.Run("arn:aws:elasticloadbalancing:eu-west-2:540044833068:targetgroup/lambda-rvaaio9n3auuhnvvvjmp/6f23de9c63bd4653", func(t *testing.T) {
+		arn := "arn:aws:elasticloadbalancing:eu-west-2:540044833068:targetgroup/lambda-rvaaio9n3auuhnvvvjmp/6f23de9c63bd4653"
+
+		a, err := ParseARN(arn)
+
+		if err != nil {
+			t.Error(err)
+		}
+
+		if a.Type() != "targetgroup" {
+			t.Errorf("expected type to be targetgroup, got %v", a.Type())
+		}
+	})
 }

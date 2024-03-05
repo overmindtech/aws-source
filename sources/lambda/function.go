@@ -494,10 +494,12 @@ func ExtractLinksFromPolicy(policy *PolicyDocument) []*sdp.LinkedItemQuery {
 	for _, statement := range policy.Statement {
 		var queryType string
 		var scope string
+		method := sdp.QueryMethod_SEARCH
 
 		switch statement.Principal.Service {
 		case "sns.amazonaws.com":
 			queryType = "sns-topic"
+			method = sdp.QueryMethod_GET
 		case "elasticloadbalancing.amazonaws.com":
 			queryType = "elbv2-target-group"
 		case "vpc-lattice.amazonaws.com":
@@ -530,7 +532,7 @@ func ExtractLinksFromPolicy(policy *PolicyDocument) []*sdp.LinkedItemQuery {
 		links = append(links, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   queryType,
-				Method: sdp.QueryMethod_SEARCH,
+				Method: method,
 				Query:  statement.Condition.ArnLike.AWSSourceArn,
 				Scope:  scope,
 			},
