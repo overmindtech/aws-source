@@ -33,17 +33,15 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 		return nil, err
 	}
 
-	resourceTags, err := tagsByResourceARN(ctx, client, *input.TopicArn)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &sdp.Item{
 		Type:            "sns-topic",
 		UniqueAttribute: "topicArn",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(resourceTags),
+	}
+
+	if resourceTags, err := tagsByResourceARN(ctx, client, *input.TopicArn); err == nil {
+		item.Tags = tagsToMap(resourceTags)
 	}
 
 	kmsMasterKeyID, err := attributes.Get("kmsMasterKeyId")

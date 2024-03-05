@@ -38,17 +38,15 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 		return nil, err
 	}
 
-	resourceTags, err := tagsByResourceARN(ctx, client, *input.EndpointArn)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &sdp.Item{
 		Type:            "sns-endpoint",
 		UniqueAttribute: "endpointArn",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(resourceTags),
+	}
+
+	if resourceTags, err := tagsByResourceARN(ctx, client, *input.EndpointArn); err == nil {
+		item.Tags = tagsToMap(resourceTags)
 	}
 
 	return item, nil

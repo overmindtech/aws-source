@@ -33,20 +33,15 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		return nil, err
 	}
 
-	resourceTags, err := tagsByResourceARN(ctx, client, *input.SubscriptionArn)
-	if err != nil {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: err.Error(),
-		}
-	}
-
 	item := &sdp.Item{
 		Type:            "sns-subscription",
 		UniqueAttribute: "subscriptionArn",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(resourceTags),
+	}
+
+	if resourceTags, err := tagsByResourceARN(ctx, client, *input.SubscriptionArn); err == nil {
+		item.Tags = tagsToMap(resourceTags)
 	}
 
 	topicArn, err := attributes.Get("topicArn")

@@ -38,17 +38,15 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 		return nil, err
 	}
 
-	resourceTags, err := tagsByResourceARN(ctx, client, *input.PlatformApplicationArn)
-	if err != nil {
-		return nil, err
-	}
-
 	item := &sdp.Item{
 		Type:            "sns-platform-application",
 		UniqueAttribute: "platformApplicationArn",
 		Attributes:      attributes,
 		Scope:           scope,
-		Tags:            tagsToMap(resourceTags),
+	}
+
+	if resourceTags, err := tagsByResourceARN(ctx, client, *input.PlatformApplicationArn); err == nil {
+		item.Tags = tagsToMap(resourceTags)
 	}
 
 	// +overmind:link sns-endpoint
