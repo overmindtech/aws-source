@@ -163,6 +163,12 @@ func (t *TestLambdaClient) ListFunctions(context.Context, *lambda.ListFunctionsI
 	}, nil
 }
 
+func (t TestLambdaClient) GetPolicy(ctx context.Context, params *lambda.GetPolicyInput, optFns ...func(*lambda.Options)) (*lambda.GetPolicyOutput, error) {
+	return &lambda.GetPolicyOutput{
+		Policy: &testPolicyJSON,
+	}, nil
+}
+
 func TestFunctionGetFunc(t *testing.T) {
 	item, err := functionGetFunc(context.Background(), &TestLambdaClient{}, "foo", &lambda.GetFunctionInput{})
 
@@ -270,6 +276,42 @@ func TestFunctionGetFunc(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "id",
 			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "sns-topic",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:sns:eu-west-2:540044833068:example-topic",
+			ExpectedScope:  "540044833068.eu-west-2",
+		},
+		{
+			ExpectedType:   "elbv2-target-group",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:elasticloadbalancing:eu-west-2:540044833068:targetgroup/lambda-rvaaio9n3auuhnvvvjmp/6f23de9c63bd4653",
+			ExpectedScope:  "540044833068.eu-west-2",
+		},
+		{
+			ExpectedType:   "vpc-lattice-target-group",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:vpc-lattice:eu-west-2:540044833068:targetgroup/tg-0510fc8a1fef35ef0",
+			ExpectedScope:  "540044833068.eu-west-2",
+		},
+		{
+			ExpectedType:   "logs-log-group",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:logs:eu-west-2:540044833068:log-group:/aws/ecs/example:*",
+			ExpectedScope:  "540044833068.eu-west-2",
+		},
+		{
+			ExpectedType:   "events-rule",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:events:eu-west-2:540044833068:rule/test",
+			ExpectedScope:  "540044833068.eu-west-2",
+		},
+		{
+			ExpectedType:   "s3-bucket",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:s3:::second-example-profound-lamb",
+			ExpectedScope:  "540044833068",
 		},
 	}
 
