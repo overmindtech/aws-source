@@ -2,6 +2,7 @@ package sns
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
@@ -44,12 +45,7 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		item.Tags = tagsToMap(resourceTags)
 	}
 
-	topicArn, err := attributes.Get("topicArn")
-	if err != nil {
-		return nil, err
-	}
-
-	if topicArn.(string) != "" {
+	if topicArn, err := attributes.Get("topicArn"); err == nil {
 		// +overmind:link sns-topic
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
@@ -67,27 +63,24 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		})
 	}
 
-	subsRoleArn, err := attributes.Get("subscriptionRoleArn")
-	if err != nil {
-		return nil, err
-	}
-
-	if arn, err := sources.ParseARN(subsRoleArn.(string)); err == nil {
-		// +overmind:link iam-role
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			Query: &sdp.Query{
-				Type:   "iam-role",
-				Method: sdp.QueryMethod_GET,
-				Query:  arn.ResourceID(),
-				Scope:  sources.FormatScope(arn.AccountID, arn.Region),
-			},
-			BlastPropagation: &sdp.BlastPropagation{
-				// If role is not healthy, subscription will not work
-				In: true,
-				// Subscription won't affect the role
-				Out: false,
-			},
-		})
+	if subsRoleArn, err := attributes.Get("subscriptionRoleArn"); err == nil {
+		if arn, err := sources.ParseARN(fmt.Sprint(subsRoleArn)); err == nil {
+			// +overmind:link iam-role
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "iam-role",
+					Method: sdp.QueryMethod_GET,
+					Query:  arn.ResourceID(),
+					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// If role is not healthy, subscription will not work
+					In: true,
+					// Subscription won't affect the role
+					Out: false,
+				},
+			})
+		}
 	}
 
 	return item, nil

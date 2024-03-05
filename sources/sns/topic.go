@@ -2,6 +2,7 @@ package sns
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
@@ -44,18 +45,13 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 		item.Tags = tagsToMap(resourceTags)
 	}
 
-	kmsMasterKeyID, err := attributes.Get("kmsMasterKeyId")
-	if err != nil {
-		return nil, err
-	}
-
-	if kmsMasterKeyID.(string) != "" {
+	if kmsMasterKeyID, err := attributes.Get("kmsMasterKeyId"); err == nil {
 		// +overmind:link kms-key
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-key",
 				Method: sdp.QueryMethod_GET,
-				Query:  kmsMasterKeyID.(string),
+				Query:  fmt.Sprint(kmsMasterKeyID),
 				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{
