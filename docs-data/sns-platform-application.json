@@ -1,0 +1,16 @@
+{
+	"type": "sns-platform-application",
+	"descriptiveType": "SNS Platform Application",
+	"getDescription": "Get an SNS platform application by its ARN",
+	"listDescription": "List all SNS platform applications",
+	"searchDescription": "Search SNS platform applications by ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_sns_platform_application.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"sns-endpoint"
+	]
+}
