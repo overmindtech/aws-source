@@ -46,7 +46,8 @@ This source requires the following IAM Policy
         "sns:Get*",
         "sns:List*",
         "sqs:GetQueueAttributes",
-        "sqs:ListQueues"
+        "sqs:ListQueues",
+        "sqs:ListQueueTags"
       ],
       "Resource": "*"
     }
