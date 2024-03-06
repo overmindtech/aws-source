@@ -61,7 +61,7 @@ func ToTargetHealthUniqueID(id string) (TargetHealthUniqueID, error) {
 	}
 
 	if sections[3] != "" {
-		port, err := strconv.Atoi(sections[3])
+		port, err := strconv.ParseInt(sections[3], 10, 32)
 
 		if err != nil {
 			return TargetHealthUniqueID{}, err
