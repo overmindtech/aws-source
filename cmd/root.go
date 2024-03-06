@@ -722,6 +722,7 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			sns.NewTopicSource(cfg, *callerID.Account, region),
 			sns.NewPlatformApplicationSource(cfg, *callerID.Account, region),
 			sns.NewEndpointSource(cfg, *callerID.Account, region),
+			sns.NewDataProtectionPolicySource(cfg, *callerID.Account, region),
 		}
 
 		e.AddSources(sources...)

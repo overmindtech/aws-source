@@ -1,0 +1,15 @@
+{
+	"type": "sns-data-protection-policy",
+	"descriptiveType": "SNS Data Protection Policy",
+	"getDescription": "Get an SNS data protection policy by associated topic ARN",
+	"searchDescription": "Search SNS data protection policies by its ARN",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_sns_topic_data_protection_policy.arn"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"sns-topic"
+	]
+}
