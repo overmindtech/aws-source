@@ -42,6 +42,7 @@ func TestNewDataProtectionPolicySource(t *testing.T) {
 		Source:   source,
 		Timeout:  10 * time.Second,
 		SkipList: true,
+		SkipGet:  true,
 	}
 
 	test.Run(t)

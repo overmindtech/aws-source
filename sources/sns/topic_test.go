@@ -69,7 +69,6 @@ func TestNewTopicSource(t *testing.T) {
 	test := sources.E2ETest{
 		Source:  source,
 		Timeout: 10 * time.Second,
-		SkipGet: true,
 	}
 
 	test.Run(t)
