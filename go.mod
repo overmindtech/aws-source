@@ -35,7 +35,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.5
 	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.26.5
-	github.com/overmindtech/sdp-go v0.67.1
+	github.com/overmindtech/sdp-go v0.68.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
