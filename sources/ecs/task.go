@@ -46,7 +46,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		return nil, err
 	}
 
-	// Create unique attribute in the format {clusterName}/{id} e.g.
+	// Create unique attribute in the format {clusterName}/{id}
 	// test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2
 	attributes.Set("id", a.ResourceID())
 

@@ -6,6 +6,8 @@
 	"searchDescription": "Search for Networkmanager Sites by GlobalNetworkId",
 	"group": "AWS",
 	"links": [
-		"networkmanager-global-network"
+		"networkmanager-device",
+		"networkmanager-global-network",
+		"networkmanager-link"
 	]
 }
