@@ -10,17 +10,19 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TestSiteOutputMapper(t *testing.T) {
-	output := networkmanager.GetSitesOutput{
-		Sites: []types.Site{
+func TestConnectPeerAssociationsOutputMapper(t *testing.T) {
+	output := networkmanager.GetConnectPeerAssociationsOutput{
+		ConnectPeerAssociations: []types.ConnectPeerAssociation{
 			{
-				SiteId:          sources.PtrString("site1"),
+				ConnectPeerId:   sources.PtrString("cp-1"),
+				DeviceId:        sources.PtrString("dvc-1"),
 				GlobalNetworkId: sources.PtrString("default"),
+				LinkId:          sources.PtrString("link-1"),
 			},
 		},
 	}
 	scope := "123456789012.eu-west-2"
-	items, err := siteOutputMapper(context.Background(), &networkmanager.Client{}, scope, &networkmanager.GetSitesInput{}, &output)
+	items, err := connectPeerAssociationsOutputMapper(context.Background(), &networkmanager.Client{}, scope, &networkmanager.GetConnectPeerAssociationsInput{}, &output)
 
 	if err != nil {
 		t.Error(err)
@@ -45,8 +47,8 @@ func TestSiteOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.UniqueAttributeValue() != "default|site1" {
-		t.Fatalf("expected default|site1, got %v", item.UniqueAttributeValue())
+	if item.UniqueAttributeValue() != "default|cp-1" {
+		t.Fatalf("expected default|cp-1, got %v", item.UniqueAttributeValue())
 	}
 
 	tests := sources.QueryTests{
@@ -57,15 +59,21 @@ func TestSiteOutputMapper(t *testing.T) {
 			ExpectedScope:  scope,
 		},
 		{
+			ExpectedType:   "networkmanager-connect-peer",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "cp-1",
+			ExpectedScope:  scope,
+		},
+		{
 			ExpectedType:   "networkmanager-link",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "default|site1",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "default|link-1",
 			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "networkmanager-device",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "default|site1",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "default|dvc-1",
 			ExpectedScope:  scope,
 		},
 	}

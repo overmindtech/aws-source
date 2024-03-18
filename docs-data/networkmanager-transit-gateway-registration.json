@@ -1,0 +1,12 @@
+{
+	"type": "networkmanager-transit-gateway-registration",
+	"descriptiveType": "Networkmanager Transit Gateway Registrations",
+	"getDescription": "Get a Networkmanager Transit Gateway Registrations",
+	"listDescription": "List all Networkmanager Transit Gateway Registrations",
+	"searchDescription": "Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId",
+	"group": "AWS",
+	"links": [
+		"ec2-transit-gateway",
+		"networkmanager-global-network"
+	]
+}
