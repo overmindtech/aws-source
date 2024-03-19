@@ -55,10 +55,6 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		Tags:            tags,
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	if d.Status != nil {
 		switch *d.Status {
 		case "InProgress":
