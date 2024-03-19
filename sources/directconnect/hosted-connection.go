@@ -111,7 +111,7 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
-
+		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-hosted-connection",

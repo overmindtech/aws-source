@@ -132,7 +132,7 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 
 func NewInterconnectSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
-
+		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-interconnect",

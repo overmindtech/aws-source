@@ -84,7 +84,7 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 
 func NewCapacityReservationFleetSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options]{
-
+		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-capacity-reservation-fleet",

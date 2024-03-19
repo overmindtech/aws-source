@@ -57,8 +57,8 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 
 func NewOptionGroupSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
-		ItemType: "rds-option-group",
-
+		ItemType:  "rds-option-group",
+		Region:    region,
 		AccountID: accountID,
 		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeOptionGroupsInput) sources.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {

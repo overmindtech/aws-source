@@ -71,9 +71,9 @@ func TestHealthCheckItemMapper(t *testing.T) {
 }
 
 func TestNewHealthCheckSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewHealthCheckSource(config, account, region)
+	source := NewHealthCheckSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

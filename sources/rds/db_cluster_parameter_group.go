@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -44,10 +43,10 @@ func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 // +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBClusterParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, rdsClient, *rds.Options] {
+func NewDBClusterParameterGroupSource(client rdsClient, accountID string, region string) *sources.GetListSource[*ClusterParameterGroup, rdsClient, *rds.Options] {
 	return &sources.GetListSource[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-cluster-parameter-group",
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ClusterParameterGroup, error) {

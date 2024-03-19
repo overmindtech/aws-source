@@ -119,8 +119,8 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 func NewDBSubnetGroupSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
-		ItemType: "rds-db-subnet-group",
-
+		ItemType:  "rds-db-subnet-group",
+		Region:    region,
 		AccountID: accountID,
 		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBSubnetGroupsInput) sources.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {

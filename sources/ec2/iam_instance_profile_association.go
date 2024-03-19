@@ -80,7 +80,7 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 // NewIamInstanceProfileAssociationSource Creates a new source for aws-IamInstanceProfileAssociation resources
 func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
-
+		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-iam-instance-profile-association",

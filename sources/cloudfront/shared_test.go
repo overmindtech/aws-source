@@ -2,6 +2,7 @@ package cloudfront
 
 import (
 	"context"
+	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
@@ -22,3 +23,10 @@ func (c TestCloudFrontClient) ListTagsForResource(ctx context.Context, params *c
 }
 
 type TestCloudFrontClient struct{}
+
+func GetAutoConfig(t *testing.T) (*cloudfront.Client, string, string) {
+	config, account, region := sources.GetAutoConfig(t)
+	client := cloudfront.NewFromConfig(config)
+
+	return client, account, region
+}

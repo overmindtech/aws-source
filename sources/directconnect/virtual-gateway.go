@@ -40,7 +40,7 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 
 func NewVirtualGatewaySource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
-
+		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-virtual-gateway",

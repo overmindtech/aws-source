@@ -224,6 +224,7 @@ func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, reg
 	return &sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:  "autoscaling-auto-scaling-group",
 		AccountID: accountID,
+		Region:    region,
 		Client:    client,
 		InputMapperGet: func(scope, query string) (*autoscaling.DescribeAutoScalingGroupsInput, error) {
 			return &autoscaling.DescribeAutoScalingGroupsInput{

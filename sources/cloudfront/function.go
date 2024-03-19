@@ -3,7 +3,6 @@ package cloudfront
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -36,10 +35,10 @@ func functionItemMapper(scope string, awsItem *types.FunctionSummary) (*sdp.Item
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_function.name
 
-func NewFunctionSource(config aws.Config, accountID string) *sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
+func NewFunctionSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-function",
-		Client:    cloudfront.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.FunctionSummary, error) {

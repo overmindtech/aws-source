@@ -2,7 +2,7 @@ package networkmanager
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -76,10 +76,11 @@ func globalNetworkOutputMapper(_ context.Context, _ NetworkmanagerClient, scope 
 // +overmind:terraform:queryMap aws_networkmanager_global_network.arn
 // +overmind:terraform:method SEARCH
 
-func NewGlobalNetworkSource(config aws.Config, accountID string, region string) *sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, NetworkmanagerClient, *networkmanager.Options] {
+func NewGlobalNetworkSource(client NetworkmanagerClient, accountID string, region string) *sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, NetworkmanagerClient, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, NetworkmanagerClient, *networkmanager.Options]{
 		ItemType:  "networkmanager-global-network",
-		Client:    networkmanager.NewFromConfig(config),
+		Client:    client,
+		Region:    region,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client NetworkmanagerClient, input *networkmanager.DescribeGlobalNetworksInput) (*networkmanager.DescribeGlobalNetworksOutput, error) {
 			return client.DescribeGlobalNetworks(ctx, input)

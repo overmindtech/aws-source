@@ -3,7 +3,6 @@ package cloudfront
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -36,10 +35,10 @@ func ResponseHeadersPolicyItemMapper(scope string, awsItem *types.ResponseHeader
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_response_headers_policy.id
 
-func NewResponseHeadersPolicySource(config aws.Config, accountID string) *sources.GetListSource[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
+func NewResponseHeadersPolicySource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-response-headers-policy",
-		Client:    cloudfront.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ResponseHeadersPolicy, error) {

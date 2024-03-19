@@ -506,8 +506,8 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 func NewDBInstanceSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
-		ItemType: "rds-db-instance",
-
+		ItemType:  "rds-db-instance",
+		Region:    region,
 		AccountID: accountID,
 		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBInstancesInput) sources.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {

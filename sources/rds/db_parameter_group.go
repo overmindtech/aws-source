@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -44,10 +43,10 @@ func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Ite
 // +overmind:terraform:queryMap aws_db_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBParameterGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*ParameterGroup, rdsClient, *rds.Options] {
+func NewDBParameterGroupSource(client rdsClient, accountID string, region string) *sources.GetListSource[*ParameterGroup, rdsClient, *rds.Options] {
 	return &sources.GetListSource[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-parameter-group",
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ParameterGroup, error) {

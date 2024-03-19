@@ -74,9 +74,9 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 }
 
 func TestNewResourceRecordSetSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewResourceRecordSetSource(config, account, region)
+	source := NewResourceRecordSetSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

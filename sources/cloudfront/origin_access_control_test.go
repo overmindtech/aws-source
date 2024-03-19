@@ -32,9 +32,9 @@ func TestOriginAccessControlItemMapper(t *testing.T) {
 }
 
 func TestNewOriginAccessControlSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, _ := GetAutoConfig(t)
 
-	source := NewOriginAccessControlSource(config, account)
+	source := NewOriginAccessControlSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -81,9 +80,10 @@ func siteOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _
 // +overmind:search Search for Networkmanager Sites by GlobalNetworkId
 // +overmind:group AWS
 
-func NewSiteSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options] {
+func NewSiteSource(client NetworkmanagerClient, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, NetworkmanagerClient, *networkmanager.Options]{
-		Client:    networkmanager.NewFromConfig(config),
+		Client:    client,
+		Region:    region,
 		AccountID: accountID,
 		ItemType:  "networkmanager-sites",
 		DescribeFunc: func(ctx context.Context, client NetworkmanagerClient, input *networkmanager.GetSitesInput) (*networkmanager.GetSitesOutput, error) {

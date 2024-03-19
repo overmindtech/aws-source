@@ -24,7 +24,9 @@ import (
 	awselasticloadbalancingv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	awslambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	awsnetworkfirewall "github.com/aws/aws-sdk-go-v2/service/networkfirewall"
+	awsnetworkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	awsrds "github.com/aws/aws-sdk-go-v2/service/rds"
+	awsroute53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	awssns "github.com/aws/aws-sdk-go-v2/service/sns"
 	awssqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 
@@ -625,6 +627,8 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 		rdsClient := awsrds.NewFromConfig(cfg)
 		snsClient := awssns.NewFromConfig(cfg)
 		sqsClient := awssqs.NewFromConfig(cfg)
+		route53Client := awsroute53.NewFromConfig(cfg)
+		networkmanagerClient := awsnetworkmanager.NewFromConfig(cfg)
 
 		sources := []discovery.Source{
 			// EC2
@@ -670,9 +674,9 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			eks.NewNodegroupSource(eksClient, *callerID.Account, region),
 
 			// Route 53
-			route53.NewHealthCheckSource(cfg, *callerID.Account, region),
-			route53.NewHostedZoneSource(cfg, *callerID.Account, region),
-			route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
+			route53.NewHealthCheckSource(route53Client, *callerID.Account, region),
+			route53.NewHostedZoneSource(route53Client, *callerID.Account, region),
+			route53.NewResourceRecordSetSource(route53Client, *callerID.Account, region),
 
 			// Cloudwatch
 			cloudwatch.NewAlarmSource(cloudwatchClient, *callerID.Account, region),
@@ -686,7 +690,7 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 
 			// Lambda
 			lambda.NewFunctionSource(lambdaClient, *callerID.Account, region),
-			lambda.NewLayerSource(cfg, *callerID.Account, region),
+			lambda.NewLayerSource(lambdaClient, *callerID.Account, region),
 			lambda.NewLayerVersionSource(lambdaClient, *callerID.Account, region),
 
 			// ECS
@@ -702,10 +706,10 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			dynamodb.NewTableSource(dynamodbClient, *callerID.Account, region),
 
 			// RDS
-			rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
+			rds.NewDBClusterParameterGroupSource(rdsClient, *callerID.Account, region),
 			rds.NewDBClusterSource(rdsClient, *callerID.Account, region),
 			rds.NewDBInstanceSource(rdsClient, *callerID.Account, region),
-			rds.NewDBParameterGroupSource(cfg, *callerID.Account, region),
+			rds.NewDBParameterGroupSource(rdsClient, *callerID.Account, region),
 			rds.NewDBSubnetGroupSource(rdsClient, *callerID.Account, region),
 			rds.NewOptionGroupSource(rdsClient, *callerID.Account, region),
 
@@ -745,9 +749,9 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			directconnect.NewRouterConfigurationSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
 
 			// Network Manager
-			networkmanager.NewGlobalNetworkSource(cfg, *callerID.Account, region),
-			networkmanager.NewSiteSource(cfg, *callerID.Account, &networkManagerRateLimit),
-			networkmanager.NewVPCAttachmentSource(cfg, *callerID.Account, &networkManagerRateLimit),
+			networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region, &networkManagerRateLimit),
+			networkmanager.NewVPCAttachmentSource(networkmanagerClient, *callerID.Account, region, &networkManagerRateLimit),
 
 			// SQS
 			sqs.NewQueueSource(sqsClient, *callerID.Account, region),
@@ -769,15 +773,15 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 		if !globalDone {
 			e.AddSources(
 				// Cloudfront
-				cloudfront.NewCachePolicySource(cfg, *callerID.Account),
-				cloudfront.NewContinuousDeploymentPolicySource(cfg, *callerID.Account),
+				cloudfront.NewCachePolicySource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewContinuousDeploymentPolicySource(cloudfrontClient, *callerID.Account),
 				cloudfront.NewDistributionSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewFunctionSource(cfg, *callerID.Account),
-				cloudfront.NewKeyGroupSource(cfg, *callerID.Account),
-				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account),
-				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account),
-				cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account),
-				cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account),
+				cloudfront.NewFunctionSource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewKeyGroupSource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewOriginAccessControlSource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewOriginRequestPolicySource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewResponseHeadersPolicySource(cloudfrontClient, *callerID.Account),
+				cloudfront.NewRealtimeLogConfigsSource(cloudfrontClient, *callerID.Account),
 				cloudfront.NewStreamingDistributionSource(cloudfrontClient, *callerID.Account),
 
 				// S3
