@@ -12,14 +12,21 @@ import (
 	"time"
 
 	awsautoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	awscloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	awscloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	awsdirectconnect "github.com/aws/aws-sdk-go-v2/service/directconnect"
+	awsdynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	awsec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	awsecs "github.com/aws/aws-sdk-go-v2/service/ecs"
 	awsefs "github.com/aws/aws-sdk-go-v2/service/efs"
+	awseks "github.com/aws/aws-sdk-go-v2/service/eks"
 	awselasticloadbalancing "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	awselasticloadbalancingv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	awslambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	awsnetworkfirewall "github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	awsrds "github.com/aws/aws-sdk-go-v2/service/rds"
+	awssns "github.com/aws/aws-sdk-go-v2/service/sns"
+	awssqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -602,15 +609,22 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 		networkManagerRateLimit.Start(rateLimitCtx)
 
 		// Create shared clients for each API
-		ec2Client := awsec2.NewFromConfig(cfg)
-		efsClient := awsefs.NewFromConfig(cfg)
-		ecsClient := awsecs.NewFromConfig(cfg)
-		rdsClient := awsrds.NewFromConfig(cfg)
-		cloudwatchClient := awscloudwatch.NewFromConfig(cfg)
 		autoscalingClient := awsautoscaling.NewFromConfig(cfg)
+		cloudfrontClient := awscloudfront.NewFromConfig(cfg)
+		cloudwatchClient := awscloudwatch.NewFromConfig(cfg)
+		directconnectClient := awsdirectconnect.NewFromConfig(cfg)
+		dynamodbClient := awsdynamodb.NewFromConfig(cfg)
+		ec2Client := awsec2.NewFromConfig(cfg)
+		ecsClient := awsecs.NewFromConfig(cfg)
+		efsClient := awsefs.NewFromConfig(cfg)
+		eksClient := awseks.NewFromConfig(cfg)
 		elbClient := awselasticloadbalancing.NewFromConfig(cfg)
 		elbv2Client := awselasticloadbalancingv2.NewFromConfig(cfg)
-		directconnectClient := awsdirectconnect.NewFromConfig(cfg)
+		lambdaClient := awslambda.NewFromConfig(cfg)
+		networkfirewallClient := awsnetworkfirewall.NewFromConfig(cfg)
+		rdsClient := awsrds.NewFromConfig(cfg)
+		snsClient := awssns.NewFromConfig(cfg)
+		sqsClient := awssqs.NewFromConfig(cfg)
 
 		sources := []discovery.Source{
 			// EC2
@@ -650,10 +664,10 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			efs.NewReplicationConfigurationSource(efsClient, *callerID.Account, region, &ec2RateLimit),
 
 			// EKS
-			eks.NewAddonSource(cfg, *callerID.Account, region),
-			eks.NewClusterSource(cfg, *callerID.Account, region),
-			eks.NewFargateProfileSource(cfg, *callerID.Account, region),
-			eks.NewNodegroupSource(cfg, *callerID.Account, region),
+			eks.NewAddonSource(eksClient, *callerID.Account, region),
+			eks.NewClusterSource(eksClient, *callerID.Account, region),
+			eks.NewFargateProfileSource(eksClient, *callerID.Account, region),
+			eks.NewNodegroupSource(eksClient, *callerID.Account, region),
 
 			// Route 53
 			route53.NewHealthCheckSource(cfg, *callerID.Account, region),
@@ -671,21 +685,21 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			iam.NewUserSource(cfg, *callerID.Account, region, &iamRateLimit),
 
 			// Lambda
-			lambda.NewFunctionSource(cfg, *callerID.Account, region),
+			lambda.NewFunctionSource(lambdaClient, *callerID.Account, region),
 			lambda.NewLayerSource(cfg, *callerID.Account, region),
-			lambda.NewLayerVersionSource(cfg, *callerID.Account, region),
+			lambda.NewLayerVersionSource(lambdaClient, *callerID.Account, region),
 
 			// ECS
 			ecs.NewCapacityProviderSource(ecsClient, *callerID.Account, region),
-			ecs.NewClusterSource(cfg, *callerID.Account, region),
-			ecs.NewContainerInstanceSource(cfg, *callerID.Account, region),
-			ecs.NewServiceSource(cfg, *callerID.Account, region),
-			ecs.NewTaskDefinitionSource(cfg, *callerID.Account, region),
-			ecs.NewTaskSource(cfg, *callerID.Account, region),
+			ecs.NewClusterSource(ecsClient, *callerID.Account, region),
+			ecs.NewContainerInstanceSource(ecsClient, *callerID.Account, region),
+			ecs.NewServiceSource(ecsClient, *callerID.Account, region),
+			ecs.NewTaskDefinitionSource(ecsClient, *callerID.Account, region),
+			ecs.NewTaskSource(ecsClient, *callerID.Account, region),
 
 			// DynamoDB
-			dynamodb.NewBackupSource(cfg, *callerID.Account, region),
-			dynamodb.NewTableSource(cfg, *callerID.Account, region),
+			dynamodb.NewBackupSource(dynamodbClient, *callerID.Account, region),
+			dynamodb.NewTableSource(dynamodbClient, *callerID.Account, region),
 
 			// RDS
 			rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
@@ -710,10 +724,10 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			elbv2.NewTargetHealthSource(elbv2Client, *callerID.Account, region),
 
 			// Network Firewall
-			networkfirewall.NewFirewallSource(cfg, *callerID.Account, region),
-			networkfirewall.NewFirewallPolicySource(cfg, *callerID.Account, region),
-			networkfirewall.NewRuleGroupSource(cfg, *callerID.Account, region),
-			networkfirewall.NewTLSInspectionConfigurationSource(cfg, *callerID.Account, region),
+			networkfirewall.NewFirewallSource(networkfirewallClient, *callerID.Account, region),
+			networkfirewall.NewFirewallPolicySource(networkfirewallClient, *callerID.Account, region),
+			networkfirewall.NewRuleGroupSource(networkfirewallClient, *callerID.Account, region),
+			networkfirewall.NewTLSInspectionConfigurationSource(networkfirewallClient, *callerID.Account, region),
 
 			// Direct Connect
 			directconnect.NewDirectConnectGatewaySource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
@@ -736,14 +750,14 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			networkmanager.NewVPCAttachmentSource(cfg, *callerID.Account, &networkManagerRateLimit),
 
 			// SQS
-			sqs.NewQueueSource(cfg, *callerID.Account, region),
+			sqs.NewQueueSource(sqsClient, *callerID.Account, region),
 
 			// SNS
-			sns.NewSubscriptionSource(cfg, *callerID.Account, region),
-			sns.NewTopicSource(cfg, *callerID.Account, region),
-			sns.NewPlatformApplicationSource(cfg, *callerID.Account, region),
-			sns.NewEndpointSource(cfg, *callerID.Account, region),
-			sns.NewDataProtectionPolicySource(cfg, *callerID.Account, region),
+			sns.NewSubscriptionSource(snsClient, *callerID.Account, region),
+			sns.NewTopicSource(snsClient, *callerID.Account, region),
+			sns.NewPlatformApplicationSource(snsClient, *callerID.Account, region),
+			sns.NewEndpointSource(snsClient, *callerID.Account, region),
+			sns.NewDataProtectionPolicySource(snsClient, *callerID.Account, region),
 		}
 
 		e.AddSources(sources...)
@@ -757,14 +771,14 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 				// Cloudfront
 				cloudfront.NewCachePolicySource(cfg, *callerID.Account),
 				cloudfront.NewContinuousDeploymentPolicySource(cfg, *callerID.Account),
-				cloudfront.NewDistributionSource(cfg, *callerID.Account),
+				cloudfront.NewDistributionSource(cloudfrontClient, *callerID.Account),
 				cloudfront.NewFunctionSource(cfg, *callerID.Account),
 				cloudfront.NewKeyGroupSource(cfg, *callerID.Account),
 				cloudfront.NewOriginAccessControlSource(cfg, *callerID.Account),
 				cloudfront.NewOriginRequestPolicySource(cfg, *callerID.Account),
 				cloudfront.NewResponseHeadersPolicySource(cfg, *callerID.Account),
 				cloudfront.NewRealtimeLogConfigsSource(cfg, *callerID.Account),
-				cloudfront.NewStreamingDistributionSource(cfg, *callerID.Account),
+				cloudfront.NewStreamingDistributionSource(cloudfrontClient, *callerID.Account),
 
 				// S3
 				s3.NewS3Source(cfg, *callerID.Account),

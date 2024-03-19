@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -182,10 +181,10 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ecs_task_definition.family
 
-func NewTaskDefinitionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
+func NewTaskDefinitionSource(client ECSClient, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-task-definition",
-		Client:    ecs.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc:   taskDefinitionGetFunc,

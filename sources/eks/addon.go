@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -54,10 +53,10 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 // +overmind:terraform:queryMap aws_eks_addon.arn
 // +overmind:terraform:method SEARCH
 
-func NewAddonSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
+func NewAddonSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:    "eks-addon",
-		Client:      eks.NewFromConfig(config),
+		Client:      client,
 		AccountID:   accountID,
 		Region:      region,
 		DisableList: true,

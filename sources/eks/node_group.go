@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -184,10 +183,10 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 // +overmind:terraform:queryMap aws_eks_node_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewNodegroupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
+func NewNodegroupSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-nodegroup",
-		Client:           eks.NewFromConfig(config),
+		Client:           client,
 		AccountID:        accountID,
 		Region:           region,
 		DisableList:      true,

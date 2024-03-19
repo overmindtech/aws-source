@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -82,10 +81,10 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 // found so far that can only be queries by ARN for Get. For this reason I'm
 // going to just disable GET. LIST works fine and allows it to be linked to the
 // table so this is enough for me at the moment
-func NewBackupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options] {
+func NewBackupSource(client Client, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options] {
 	return &sources.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options]{
 		ItemType:  "dynamodb-backup",
-		Client:    dynamodb.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc:   backupGetFunc,

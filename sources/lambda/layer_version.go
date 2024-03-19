@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -122,10 +121,10 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 // +overmind:terraform:queryMap aws_lambda_layer_version.arn
 // +overmind:terraform:method SEARCH
 
-func NewLayerVersionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
+func NewLayerVersionSource(client LambdaClient, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &sources.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
 		ItemType:       "lambda-layer-version",
-		Client:         lambda.NewFromConfig(config),
+		Client:         client,
 		AccountID:      accountID,
 		Region:         region,
 		DisableList:    true,

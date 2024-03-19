@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -95,10 +94,10 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic_subscription.id
 
-func NewSubscriptionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
+func NewSubscriptionSource(client subsCli, accountID string, region string) *sources.AlwaysGetSource[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{
 		ItemType:  "sns-subscription",
-		Client:    sns.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &sns.ListSubscriptionsInput{},

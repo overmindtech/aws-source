@@ -131,9 +131,9 @@ func TestNodegroupGetFunc(t *testing.T) {
 }
 
 func TestNewNodegroupSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewNodegroupSource(config, account, region)
+	source := NewNodegroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:            source,

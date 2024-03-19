@@ -3,7 +3,6 @@ package sns
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -77,10 +76,10 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_platform_application.id
 
-func NewPlatformApplicationSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
+func NewPlatformApplicationSource(client platformApplicationClient, accountID string, region string) *sources.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
 		ItemType:  "sns-platform-application",
-		Client:    sns.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &sns.ListPlatformApplicationsInput{},

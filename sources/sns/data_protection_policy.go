@@ -3,7 +3,6 @@ package sns
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -72,10 +71,10 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic_data_protection_policy.arn
 
-func NewDataProtectionPolicySource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
+func NewDataProtectionPolicySource(client dataProtectionPolicyClient, accountID string, region string) *sources.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
 	return &sources.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
 		ItemType:    "sns-data-protection-policy",
-		Client:      sns.NewFromConfig(config),
+		Client:      client,
 		AccountID:   accountID,
 		Region:      region,
 		DisableList: true,

@@ -3,7 +3,6 @@ package networkfirewall
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -164,10 +163,10 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 // +overmind:search Search for Network Firewall TLS Inspection Configurations by ARN
 // +overmind:group AWS
 
-func NewTLSInspectionConfigurationSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
+func NewTLSInspectionConfigurationSource(client networkFirewallClient, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &sources.AlwaysGetSource[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-tls-inspection-configuration",
-		Client:    networkfirewall.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &networkfirewall.ListTLSInspectionConfigurationsInput{},

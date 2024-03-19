@@ -69,9 +69,9 @@ func TestGetPlatformApplicationFunc(t *testing.T) {
 }
 
 func TestNewPlatformApplicationSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewPlatformApplicationSource(config, account, region)
+	source := NewPlatformApplicationSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

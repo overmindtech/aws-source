@@ -6,7 +6,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -633,10 +632,10 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 // +overmind:terraform:queryMap aws_lambda_function_url.function_arn
 // +overmind:terraform:method SEARCH
 
-func NewFunctionSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
+func NewFunctionSource(client LambdaClient, accountID string, region string) *sources.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
 	return &sources.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{
 		ItemType:  "lambda-function",
-		Client:    lambda.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &lambda.ListFunctionsInput{},

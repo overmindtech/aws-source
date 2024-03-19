@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -171,10 +170,10 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 // +overmind:terraform:queryMap aws_cloudfront_Streamingdistribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewStreamingDistributionSource(config aws.Config, accountID string) *sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+func NewStreamingDistributionSource(client CloudFrontClient, accountID string) *sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &sources.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:  "cloudfront-streaming-distribution",
-		Client:    cloudfront.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    "", // Cloudfront resources aren't tied to a region
 		ListInput: &cloudfront.ListStreamingDistributionsInput{},

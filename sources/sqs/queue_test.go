@@ -66,8 +66,9 @@ func TestGetFunc(t *testing.T) {
 
 func TestNewQueueSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
+	client := sqs.NewFromConfig(config)
 
-	source := NewQueueSource(config, account, region)
+	source := NewQueueSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

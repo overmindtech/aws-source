@@ -3,7 +3,6 @@ package eks
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -272,10 +271,10 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 // +overmind:terraform:queryMap aws_eks_cluster.arn
 // +overmind:terraform:method SEARCH
 
-func NewClusterSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
+func NewClusterSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
 		ItemType:  "eks-cluster",
-		Client:    eks.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &eks.ListClustersInput{},

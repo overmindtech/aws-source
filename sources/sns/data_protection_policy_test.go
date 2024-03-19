@@ -34,9 +34,9 @@ func TestGetDataProtectionPolicyFunc(t *testing.T) {
 }
 
 func TestNewDataProtectionPolicySource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDataProtectionPolicySource(config, account, region)
+	source := NewDataProtectionPolicySource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:   source,

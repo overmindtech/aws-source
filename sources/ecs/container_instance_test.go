@@ -348,9 +348,9 @@ func TestContainerInstanceGetFunc(t *testing.T) {
 }
 
 func TestNewContainerInstanceSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewContainerInstanceSource(config, account, region)
+	source := NewContainerInstanceSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:            source,

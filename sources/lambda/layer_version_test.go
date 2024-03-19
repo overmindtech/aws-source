@@ -114,9 +114,9 @@ func TestLayerVersionGetFunc(t *testing.T) {
 }
 
 func TestNewLayerVersionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewLayerVersionSource(config, account, region)
+	source := NewLayerVersionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

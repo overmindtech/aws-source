@@ -65,9 +65,9 @@ func TestGetFunc(t *testing.T) {
 }
 
 func TestNewSubscriptionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewSubscriptionSource(config, account, region)
+	source := NewSubscriptionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

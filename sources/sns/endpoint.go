@@ -3,7 +3,6 @@ package sns
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -59,10 +58,10 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 // +overmind:search Search SNS endpoints by associated Platform Application ARN
 // +overmind:group AWS
 
-func NewEndpointSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
+func NewEndpointSource(client endpointClient, accountID string, region string) *sources.AlwaysGetSource[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options]{
 		ItemType:    "sns-endpoint",
-		Client:      sns.NewFromConfig(config),
+		Client:      client,
 		AccountID:   accountID,
 		Region:      region,
 		DisableList: true, // This source only supports listing by platform application ARN

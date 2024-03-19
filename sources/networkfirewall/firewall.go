@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -270,10 +269,10 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_firewall.name
 
-func NewFirewallSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
+func NewFirewallSource(client networkFirewallClient, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &sources.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-firewall",
-		Client:    networkfirewall.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &networkfirewall.ListFirewallsInput{},
