@@ -153,9 +153,10 @@ func TestAlarmOutputMapper(t *testing.T) {
 }
 
 func TestNewAlarmSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	config, account, region := sources.GetAutoConfig(t)
+	client := cloudwatch.NewFromConfig(config)
 
-	source := NewAlarmSource(config, account)
+	source := NewAlarmSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

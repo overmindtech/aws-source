@@ -148,9 +148,9 @@ func TestInterconnectHealth(t *testing.T) {
 }
 
 func TestNewInterconnectSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewInterconnectSource(config, account, &TestRateLimit)
+	source := NewInterconnectSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -3,7 +3,6 @@ package ec2
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -71,10 +70,10 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ami.id
 
-func NewImageSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
+func NewImageSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
-		Config:    config,
-		Client:    ec2.NewFromConfig(config),
+
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-image",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {

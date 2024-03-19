@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -65,11 +64,11 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_access_point.id
 
-func NewAccessPointSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
+func NewAccessPointSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-access-point",
-		Config:    config,
-		Client:    efs.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeAccessPointsInput) (*efs.DescribeAccessPointsOutput, error) {
 			// Wait for rate limiting

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -96,10 +96,10 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 // +overmind:list List all instance healths
 // +overmind:group AWS
 
-func NewInstanceHealthSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
+func NewInstanceHealthSource(client *elasticloadbalancing.Client, accountID string, region string) *sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
-		Config:    config,
-		Client:    elb.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elb-instance-health",
 		DescribeFunc: func(ctx context.Context, client *elb.Client, input *elb.DescribeInstanceHealthInput) (*elb.DescribeInstanceHealthOutput, error) {

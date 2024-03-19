@@ -92,9 +92,9 @@ func TestSnapshotOutputMapper(t *testing.T) {
 }
 
 func TestNewSnapshotSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewSnapshotSource(config, account, &TestRateLimit)
+	source := NewSnapshotSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

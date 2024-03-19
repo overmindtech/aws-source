@@ -108,9 +108,9 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 }
 
 func TestNewInstanceEventWindowSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewInstanceEventWindowSource(config, account, &TestRateLimit)
+	source := NewInstanceEventWindowSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

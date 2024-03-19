@@ -95,9 +95,9 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 }
 
 func TestNewInternetGatewaySource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewInternetGatewaySource(config, account, &TestRateLimit)
+	source := NewInternetGatewaySource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

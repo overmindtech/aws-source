@@ -3,7 +3,6 @@ package rds
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -346,12 +345,12 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_rds_cluster.cluster_identifier
 
-func NewDBClusterSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
+func NewDBClusterSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-cluster",
-		Config:    config,
+		Region:    region,
 		AccountID: accountID,
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBClustersInput) sources.Paginator[*rds.DescribeDBClustersOutput, *rds.Options] {
 			return rds.NewDescribeDBClustersPaginator(client, params)
 		},

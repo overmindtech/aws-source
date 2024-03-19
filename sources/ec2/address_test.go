@@ -120,9 +120,9 @@ func TestAddressOutputMapper(t *testing.T) {
 }
 
 func TestNewAddressSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewAddressSource(config, account, &TestRateLimit)
+	source := NewAddressSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

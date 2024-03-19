@@ -3,7 +3,6 @@ package elbv2
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -66,10 +65,10 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 // +overmind:terraform:queryMap aws_lb_listener_rule.arn
 // +overmind:terraform:method SEARCH
 
-func NewRuleSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
+func NewRuleSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
-		Config:    config,
-		Client:    elbv2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elbv2-rule",
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {

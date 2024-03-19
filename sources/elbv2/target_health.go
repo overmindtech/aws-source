@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -221,10 +221,10 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 // +overmind:search Search for target health by target group ARN
 // +overmind:group AWS
 
-func NewTargetHealthSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
+func NewTargetHealthSource(client *elasticloadbalancingv2.Client, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{
-		Config:    config,
-		Client:    elbv2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elbv2-target-health",
 		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeTargetHealthInput) (*elbv2.DescribeTargetHealthOutput, error) {

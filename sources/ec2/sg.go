@@ -3,7 +3,6 @@ package ec2
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -84,10 +83,10 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 // +overmind:terraform:queryMap aws_security_group.id
 // +overmind:terraform:queryMap aws_security_group_rule.security_group_id
 
-func NewSecurityGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
+func NewSecurityGroupSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{
-		Config:    config,
-		Client:    ec2.NewFromConfig(config),
+
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-security-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {

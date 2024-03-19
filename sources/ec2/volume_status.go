@@ -3,7 +3,6 @@ package ec2
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -105,10 +104,10 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 // +overmind:search Search for volume statuses by ARN
 // +overmind:group AWS
 
-func NewVolumeStatusSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
+func NewVolumeStatusSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{
-		Config:    config,
-		Client:    ec2.NewFromConfig(config),
+
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-volume-status",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumeStatusInput) (*ec2.DescribeVolumeStatusOutput, error) {

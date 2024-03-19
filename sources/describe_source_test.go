@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/sdp-go"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -42,9 +41,7 @@ func TestName(t *testing.T) {
 
 func TestScopes(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "outer-space",
-		},
+		Region:    "outer-space",
 		AccountID: "mars",
 	}
 
@@ -66,9 +63,7 @@ func TestGet(t *testing.T) {
 		var describeFuncCalled bool
 
 		s := DescribeOnlySource[string, string, struct{}, struct{}]{
-			Config: aws.Config{
-				Region: "eu-west-2",
-			},
+			Region:    "eu-west-2",
 			AccountID: "foo",
 			InputMapperGet: func(scope, query string) (string, error) {
 				inputMapperCalled = true
@@ -121,9 +116,7 @@ func TestGet(t *testing.T) {
 		var describeFuncCalled bool
 
 		s := DescribeOnlySource[string, string, struct{}, struct{}]{
-			Config: aws.Config{
-				Region: "eu-west-2",
-			},
+			Region:    "eu-west-2",
 			AccountID: "foo",
 			InputMapperGet: func(scope, query string) (string, error) {
 				inputMapperCalled = true
@@ -189,9 +182,7 @@ func TestGet(t *testing.T) {
 
 	t.Run("with too many results", func(t *testing.T) {
 		s := DescribeOnlySource[string, string, struct{}, struct{}]{
-			Config: aws.Config{
-				Region: "eu-west-2",
-			},
+			Region:    "eu-west-2",
 			AccountID: "foo",
 			InputMapperGet: func(scope, query string) (string, error) {
 				return "input", nil
@@ -220,9 +211,7 @@ func TestGet(t *testing.T) {
 
 	t.Run("with no results", func(t *testing.T) {
 		s := DescribeOnlySource[string, string, struct{}, struct{}]{
-			Config: aws.Config{
-				Region: "eu-west-2",
-			},
+			Region:    "eu-west-2",
 			AccountID: "foo",
 			InputMapperGet: func(scope, query string) (string, error) {
 				return "input", nil
@@ -248,9 +237,7 @@ func TestGet(t *testing.T) {
 
 func TestSearchARN(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "region",
-		},
+		Region:    "region",
 		AccountID: "account-id",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -281,9 +268,7 @@ func TestSearchARN(t *testing.T) {
 
 func TestSearchCustom(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "region",
-		},
+		Region:    "region",
 		AccountID: "account-id",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -331,9 +316,7 @@ func TestSearchCustom(t *testing.T) {
 
 func TestNoInputMapper(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		OutputMapper: func(_ context.Context, _ struct{}, scope, input, output string) ([]*sdp.Item, error) {
 			return []*sdp.Item{
@@ -364,9 +347,7 @@ func TestNoInputMapper(t *testing.T) {
 
 func TestNoOutputMapper(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -398,9 +379,7 @@ func TestNoOutputMapper(t *testing.T) {
 
 func TestNoDescribeFunc(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -434,9 +413,7 @@ func TestNoDescribeFunc(t *testing.T) {
 
 func TestFailingInputMapper(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", errors.New("foobar")
@@ -483,9 +460,7 @@ func TestFailingInputMapper(t *testing.T) {
 
 func TestFailingOutputMapper(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -530,9 +505,7 @@ func TestFailingOutputMapper(t *testing.T) {
 
 func TestFailingDescribeFunc(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
+		Region:    "eu-west-2",
 		AccountID: "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
@@ -601,10 +574,8 @@ func (t *TestPaginator) NextPage(context.Context, ...func(struct{})) (string, er
 func TestPaginated(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		MaxResultsPerPage: 1,
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
-		AccountID: "foo",
+		Region:            "eu-west-2",
+		AccountID:         "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
 		},
@@ -655,10 +626,8 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 	s := DescribeOnlySource[string, string, struct{}, struct{}]{
 		ItemType:          "test-type",
 		MaxResultsPerPage: 1,
-		Config: aws.Config{
-			Region: "eu-west-2",
-		},
-		AccountID: "foo",
+		Region:            "eu-west-2",
+		AccountID:         "foo",
 		InputMapperGet: func(scope, query string) (string, error) {
 			return "input", nil
 		},

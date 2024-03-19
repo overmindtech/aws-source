@@ -95,9 +95,9 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 }
 
 func TestNewReservedInstanceSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewReservedInstanceSource(config, account, &TestRateLimit)
+	source := NewReservedInstanceSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

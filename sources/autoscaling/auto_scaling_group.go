@@ -3,7 +3,6 @@ package autoscaling
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -221,12 +220,11 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 // +overmind:terraform:method SEARCH
 //
 //go:generate docgen ../../docs-data
-func NewAutoScalingGroupSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
+func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:  "autoscaling-auto-scaling-group",
-		Config:    config,
 		AccountID: accountID,
-		Client:    autoscaling.NewFromConfig(config),
+		Client:    client,
 		InputMapperGet: func(scope, query string) (*autoscaling.DescribeAutoScalingGroupsInput, error) {
 			return &autoscaling.DescribeAutoScalingGroupsInput{
 				AutoScalingGroupNames: []string{query},

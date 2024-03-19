@@ -4,13 +4,22 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/overmindtech/aws-source/sources/sns"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
+
+	awsautoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
+	awscloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	awsdirectconnect "github.com/aws/aws-sdk-go-v2/service/directconnect"
+	awsec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	awsecs "github.com/aws/aws-sdk-go-v2/service/ecs"
+	awsefs "github.com/aws/aws-sdk-go-v2/service/efs"
+	awselasticloadbalancing "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
+	awselasticloadbalancingv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	awsrds "github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -39,6 +48,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/rds"
 	"github.com/overmindtech/aws-source/sources/route53"
 	"github.com/overmindtech/aws-source/sources/s3"
+	"github.com/overmindtech/aws-source/sources/sns"
 	"github.com/overmindtech/aws-source/sources/sqs"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
@@ -591,42 +601,53 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 		directConnectRateLimit.Start(rateLimitCtx)
 		networkManagerRateLimit.Start(rateLimitCtx)
 
+		// Create shared clients for each API
+		ec2Client := awsec2.NewFromConfig(cfg)
+		efsClient := awsefs.NewFromConfig(cfg)
+		ecsClient := awsecs.NewFromConfig(cfg)
+		rdsClient := awsrds.NewFromConfig(cfg)
+		cloudwatchClient := awscloudwatch.NewFromConfig(cfg)
+		autoscalingClient := awsautoscaling.NewFromConfig(cfg)
+		elbClient := awselasticloadbalancing.NewFromConfig(cfg)
+		elbv2Client := awselasticloadbalancingv2.NewFromConfig(cfg)
+		directconnectClient := awsdirectconnect.NewFromConfig(cfg)
+
 		sources := []discovery.Source{
 			// EC2
-			ec2.NewAddressSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewCapacityReservationFleetSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewCapacityReservationSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewEgressOnlyInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewIamInstanceProfileAssociationSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewImageSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewInstanceEventWindowSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewInstanceStatusSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewInternetGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewKeyPairSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewLaunchTemplateSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewLaunchTemplateVersionSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewNatGatewaySource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewNetworkAclSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewNetworkInterfacePermissionSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewNetworkInterfaceSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewPlacementGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewReservedInstanceSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewRouteTableSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewSecurityGroupSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewSnapshotSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewSubnetSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewVolumeSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewVolumeStatusSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewVpcPeeringConnectionSource(cfg, *callerID.Account, &ec2RateLimit),
-			ec2.NewVpcSource(cfg, *callerID.Account, &ec2RateLimit),
+			ec2.NewAddressSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewCapacityReservationFleetSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewCapacityReservationSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewEgressOnlyInternetGatewaySource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewIamInstanceProfileAssociationSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewImageSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewInstanceEventWindowSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewInstanceSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewInstanceStatusSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewInternetGatewaySource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewKeyPairSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewLaunchTemplateSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewLaunchTemplateVersionSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewNatGatewaySource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewNetworkAclSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewNetworkInterfacePermissionSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewNetworkInterfaceSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewPlacementGroupSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewReservedInstanceSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewRouteTableSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewSecurityGroupSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewSnapshotSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewSubnetSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewVolumeSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewVolumeStatusSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewVpcPeeringConnectionSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
+			ec2.NewVpcSource(ec2Client, *callerID.Account, region, &ec2RateLimit),
 
 			// EFS (I'm assuming it shares its rate limit with EC2))
-			efs.NewAccessPointSource(cfg, *callerID.Account, &ec2RateLimit),
-			efs.NewBackupPolicySource(cfg, *callerID.Account, &ec2RateLimit),
-			efs.NewFileSystemSource(cfg, *callerID.Account, &ec2RateLimit),
-			efs.NewMountTargetSource(cfg, *callerID.Account, &ec2RateLimit),
-			efs.NewReplicationConfigurationSource(cfg, *callerID.Account, &ec2RateLimit),
+			efs.NewAccessPointSource(efsClient, *callerID.Account, region, &ec2RateLimit),
+			efs.NewBackupPolicySource(efsClient, *callerID.Account, region, &ec2RateLimit),
+			efs.NewFileSystemSource(efsClient, *callerID.Account, region, &ec2RateLimit),
+			efs.NewMountTargetSource(efsClient, *callerID.Account, region, &ec2RateLimit),
+			efs.NewReplicationConfigurationSource(efsClient, *callerID.Account, region, &ec2RateLimit),
 
 			// EKS
 			eks.NewAddonSource(cfg, *callerID.Account, region),
@@ -640,7 +661,7 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			route53.NewResourceRecordSetSource(cfg, *callerID.Account, region),
 
 			// Cloudwatch
-			cloudwatch.NewAlarmSource(cfg, *callerID.Account),
+			cloudwatch.NewAlarmSource(cloudwatchClient, *callerID.Account, region),
 
 			// IAM
 			iam.NewGroupSource(cfg, *callerID.Account, region, &iamRateLimit),
@@ -655,7 +676,7 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			lambda.NewLayerVersionSource(cfg, *callerID.Account, region),
 
 			// ECS
-			ecs.NewCapacityProviderSource(cfg, *callerID.Account),
+			ecs.NewCapacityProviderSource(ecsClient, *callerID.Account, region),
 			ecs.NewClusterSource(cfg, *callerID.Account, region),
 			ecs.NewContainerInstanceSource(cfg, *callerID.Account, region),
 			ecs.NewServiceSource(cfg, *callerID.Account, region),
@@ -668,25 +689,25 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 
 			// RDS
 			rds.NewDBClusterParameterGroupSource(cfg, *callerID.Account, region),
-			rds.NewDBClusterSource(cfg, *callerID.Account),
-			rds.NewDBInstanceSource(cfg, *callerID.Account),
+			rds.NewDBClusterSource(rdsClient, *callerID.Account, region),
+			rds.NewDBInstanceSource(rdsClient, *callerID.Account, region),
 			rds.NewDBParameterGroupSource(cfg, *callerID.Account, region),
-			rds.NewDBSubnetGroupSource(cfg, *callerID.Account),
-			rds.NewOptionGroupSource(cfg, *callerID.Account),
+			rds.NewDBSubnetGroupSource(rdsClient, *callerID.Account, region),
+			rds.NewOptionGroupSource(rdsClient, *callerID.Account, region),
 
 			// Autoscaling
-			autoscaling.NewAutoScalingGroupSource(cfg, *callerID.Account, &autoScalingRateLimit),
+			autoscaling.NewAutoScalingGroupSource(autoscalingClient, *callerID.Account, region, &autoScalingRateLimit),
 
 			// ELB
-			elb.NewInstanceHealthSource(cfg, *callerID.Account),
-			elb.NewLoadBalancerSource(cfg, *callerID.Account),
+			elb.NewInstanceHealthSource(elbClient, *callerID.Account, region),
+			elb.NewLoadBalancerSource(elbClient, *callerID.Account, region),
 
 			// ELBv2
-			elbv2.NewListenerSource(cfg, *callerID.Account),
-			elbv2.NewLoadBalancerSource(cfg, *callerID.Account),
-			elbv2.NewRuleSource(cfg, *callerID.Account),
-			elbv2.NewTargetGroupSource(cfg, *callerID.Account),
-			elbv2.NewTargetHealthSource(cfg, *callerID.Account),
+			elbv2.NewListenerSource(elbv2Client, *callerID.Account, region),
+			elbv2.NewLoadBalancerSource(elbv2Client, *callerID.Account, region),
+			elbv2.NewRuleSource(elbv2Client, *callerID.Account, region),
+			elbv2.NewTargetGroupSource(elbv2Client, *callerID.Account, region),
+			elbv2.NewTargetHealthSource(elbv2Client, *callerID.Account, region),
 
 			// Network Firewall
 			networkfirewall.NewFirewallSource(cfg, *callerID.Account, region),
@@ -695,19 +716,19 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			networkfirewall.NewTLSInspectionConfigurationSource(cfg, *callerID.Account, region),
 
 			// Direct Connect
-			directconnect.NewDirectConnectGatewaySource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewDirectConnectGatewayAssociationSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewDirectConnectGatewayAssociationProposalSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewConnectionSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewDirectConnectGatewayAttachmentSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewVirtualInterfaceSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewVirtualGatewaySource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewCustomerMetadataSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewLagSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewLocationSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewHostedConnectionSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewInterconnectSource(cfg, *callerID.Account, &directConnectRateLimit),
-			directconnect.NewRouterConfigurationSource(cfg, *callerID.Account, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewaySource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAssociationSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAssociationProposalSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewConnectionSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewDirectConnectGatewayAttachmentSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewVirtualInterfaceSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewVirtualGatewaySource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewCustomerMetadataSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewLagSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewLocationSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewHostedConnectionSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewInterconnectSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
+			directconnect.NewRouterConfigurationSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
 
 			// Network Manager
 			networkmanager.NewGlobalNetworkSource(cfg, *callerID.Account, region),

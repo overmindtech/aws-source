@@ -73,9 +73,9 @@ func TestDirectConnectGatewayAssociationProposalOutputMapper(t *testing.T) {
 }
 
 func TestNewDirectConnectGatewayAssociationProposalSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewayAssociationProposalSource(config, account, &TestRateLimit)
+	source := NewDirectConnectGatewayAssociationProposalSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

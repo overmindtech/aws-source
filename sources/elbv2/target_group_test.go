@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -85,9 +86,10 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 }
 
 func TestNewTargetGroupSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	config, account, region := sources.GetAutoConfig(t)
+	client := elasticloadbalancingv2.NewFromConfig(config)
 
-	source := NewTargetGroupSource(config, account)
+	source := NewTargetGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

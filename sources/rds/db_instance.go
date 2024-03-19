@@ -3,7 +3,6 @@ package rds
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -505,12 +504,12 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 // +overmind:terraform:queryMap aws_db_instance.identifier
 // +overmind:terraform:queryMap aws_db_instance_role_association.db_instance_identifier
 
-func NewDBInstanceSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
+func NewDBInstanceSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-db-instance",
-		Config:    config,
+		ItemType: "rds-db-instance",
+
 		AccountID: accountID,
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBInstancesInput) sources.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {
 			return rds.NewDescribeDBInstancesPaginator(client, params)
 		},

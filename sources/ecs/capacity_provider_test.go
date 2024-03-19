@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -124,10 +123,7 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 }
 
 func TestCapacityProviderSource(t *testing.T) {
-	src := NewCapacityProviderSource(aws.Config{}, "")
-
-	// Override the client
-	src.Client = &TestClient{}
+	src := NewCapacityProviderSource(&TestClient{}, "", "")
 
 	items, err := src.List(context.Background(), "", false)
 
@@ -141,9 +137,10 @@ func TestCapacityProviderSource(t *testing.T) {
 }
 
 func TestNewCapacityProviderSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	config, account, region := sources.GetAutoConfig(t)
+	client := ecs.NewFromConfig(config)
 
-	source := NewCapacityProviderSource(config, account)
+	source := NewCapacityProviderSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

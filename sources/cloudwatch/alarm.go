@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -216,12 +215,12 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudwatch_metric_alarm.alarm_name
 
-func NewAlarmSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
+func NewAlarmSource(client *cloudwatch.Client, accountID string, region string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
 	return &sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
 		ItemType:  "cloudwatch-alarm",
-		Client:    cloudwatch.NewFromConfig(config),
+		Client:    client,
+		Region:    region,
 		AccountID: accountID,
-		Config:    config,
 		PaginatorBuilder: func(client CloudwatchClient, params *cloudwatch.DescribeAlarmsInput) sources.Paginator[*cloudwatch.DescribeAlarmsOutput, *cloudwatch.Options] {
 			return cloudwatch.NewDescribeAlarmsPaginator(client, params)
 		},

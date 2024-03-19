@@ -98,9 +98,9 @@ func TestVpcOutputMapper(t *testing.T) {
 }
 
 func TestNewVpcSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewVpcSource(config, account, &TestRateLimit)
+	source := NewVpcSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -198,9 +198,9 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 }
 
 func TestNewNetworkInterfaceSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkInterfaceSource(config, account, &TestRateLimit)
+	source := NewNetworkInterfaceSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

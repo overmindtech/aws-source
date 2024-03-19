@@ -84,9 +84,9 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 }
 
 func TestNewDBSubnetGroupSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDBSubnetGroupSource(config, account)
+	source := NewDBSubnetGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

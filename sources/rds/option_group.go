@@ -3,7 +3,6 @@ package rds
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -56,12 +55,12 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 // +overmind:terraform:queryMap aws_db_option_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewOptionGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
+func NewOptionGroupSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-option-group",
-		Config:    config,
+		ItemType: "rds-option-group",
+
 		AccountID: accountID,
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeOptionGroupsInput) sources.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {
 			return rds.NewDescribeOptionGroupsPaginator(client, params)
 		},
