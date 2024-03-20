@@ -52,9 +52,9 @@ func TestLayerItemMapper(t *testing.T) {
 }
 
 func TestNewLayerSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewLayerSource(config, account, region)
+	source := NewLayerSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

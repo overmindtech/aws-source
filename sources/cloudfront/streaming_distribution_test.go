@@ -109,8 +109,9 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 
 func TestNewStreamingDistributionSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
+	client := cloudfront.NewFromConfig(config)
 
-	source := NewStreamingDistributionSource(config, account)
+	source := NewStreamingDistributionSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

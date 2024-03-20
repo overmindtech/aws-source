@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -117,10 +116,10 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_rule_group.name
 
-func NewRuleGroupSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
+func NewRuleGroupSource(client networkFirewallClient, accountID string, region string) *sources.AlwaysGetSource[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &sources.AlwaysGetSource[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-rule-group",
-		Client:    networkfirewall.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &networkfirewall.ListRuleGroupsInput{},

@@ -140,10 +140,10 @@ func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_health_check.id
 
-func NewHealthCheckSource(config aws.Config, accountID string, region string) *sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options] {
+func NewHealthCheckSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options]{
 		ItemType:   "route53-health-check",
-		Client:     route53.NewFromConfig(config),
+		Client:     client,
 		AccountID:  accountID,
 		Region:     region,
 		GetFunc:    healthCheckGetFunc,

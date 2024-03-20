@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -124,10 +123,10 @@ func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOut
 // +overmind:search Search for container instances by cluster
 // +overmind:group AWS
 
-func NewContainerInstanceSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
+func NewContainerInstanceSource(client ECSClient, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-container-instance",
-		Client:    ecs.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc:   containerInstanceGetFunc,

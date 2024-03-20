@@ -3,20 +3,19 @@ package sqs
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
-type client interface {
+type sqsClient interface {
 	GetQueueAttributes(ctx context.Context, params *sqs.GetQueueAttributesInput, optFns ...func(*sqs.Options)) (*sqs.GetQueueAttributesOutput, error)
 	ListQueueTags(ctx context.Context, params *sqs.ListQueueTagsInput, optFns ...func(*sqs.Options)) (*sqs.ListQueueTagsOutput, error)
 	ListQueues(context.Context, *sqs.ListQueuesInput, ...func(*sqs.Options)) (*sqs.ListQueuesOutput, error)
 }
 
-func getFunc(ctx context.Context, client client, scope string, input *sqs.GetQueueAttributesInput) (*sdp.Item, error) {
+func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.GetQueueAttributesInput) (*sdp.Item, error) {
 	output, err := client.GetQueueAttributes(ctx, input)
 	if err != nil {
 		return nil, err
@@ -65,10 +64,10 @@ func getFunc(ctx context.Context, client client, scope string, input *sqs.GetQue
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sqs_queue.id
 
-func NewQueueSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, client, *sqs.Options] {
-	return &sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, client, *sqs.Options]{
+func NewQueueSource(client sqsClient, accountID string, region string) *sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
+	return &sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
 		ItemType:  "sqs-queue",
-		Client:    sqs.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &sqs.ListQueuesInput{},
@@ -79,7 +78,7 @@ func NewQueueSource(config aws.Config, accountID string, region string) *sources
 				AttributeNames: []types.QueueAttributeName{"All"},
 			}
 		},
-		ListFuncPaginatorBuilder: func(client client, input *sqs.ListQueuesInput) sources.Paginator[*sqs.ListQueuesOutput, *sqs.Options] {
+		ListFuncPaginatorBuilder: func(client sqsClient, input *sqs.ListQueuesInput) sources.Paginator[*sqs.ListQueuesOutput, *sqs.Options] {
 			return sqs.NewListQueuesPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *sqs.ListQueuesOutput, _ *sqs.ListQueuesInput) ([]*sqs.GetQueueAttributesInput, error) {

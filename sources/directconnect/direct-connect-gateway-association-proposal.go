@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -60,10 +59,10 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association_proposal.id
 
-func NewDirectConnectGatewayAssociationProposalSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
+func NewDirectConnectGatewayAssociationProposalSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-direct-connect-gateway-association-proposal",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationProposalsInput) (*directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, error) {

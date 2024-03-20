@@ -3,7 +3,6 @@ package rds
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -118,12 +117,12 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 // +overmind:terraform:queryMap aws_db_subnet_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBSubnetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
+func NewDBSubnetGroupSource(client rdsClient, accountID string, region string) *sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
 	return &sources.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-subnet-group",
-		Config:    config,
+		Region:    region,
 		AccountID: accountID,
-		Client:    rds.NewFromConfig(config),
+		Client:    client,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBSubnetGroupsInput) sources.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {
 			return rds.NewDescribeDBSubnetGroupsPaginator(client, params)
 		},

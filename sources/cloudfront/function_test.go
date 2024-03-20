@@ -36,9 +36,9 @@ func TestFunctionItemMapper(t *testing.T) {
 }
 
 func TestNewFunctionSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, _ := GetAutoConfig(t)
 
-	source := NewFunctionSource(config, account)
+	source := NewFunctionSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -33,9 +33,9 @@ func TestKeyGroupItemMapper(t *testing.T) {
 }
 
 func TestNewKeyGroupSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, _ := GetAutoConfig(t)
 
-	source := NewKeyGroupSource(config, account)
+	source := NewKeyGroupSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

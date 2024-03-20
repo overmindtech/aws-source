@@ -243,9 +243,9 @@ func TestTaskDefinitionGetFunc(t *testing.T) {
 }
 
 func TestNewTaskDefinitionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewTaskDefinitionSource(config, account, region)
+	source := NewTaskDefinitionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

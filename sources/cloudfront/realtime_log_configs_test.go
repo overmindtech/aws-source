@@ -57,9 +57,9 @@ func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 }
 
 func TestNewRealtimeLogConfigsSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, _ := GetAutoConfig(t)
 
-	source := NewRealtimeLogConfigsSource(config, account)
+	source := NewRealtimeLogConfigsSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

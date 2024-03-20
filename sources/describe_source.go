@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
 )
@@ -54,8 +53,10 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// create new items for each result
 	OutputMapper func(ctx context.Context, client ClientStruct, scope string, input Input, output Output) ([]*sdp.Item, error)
 
-	// Config AWS Config including region and credentials
-	Config aws.Config
+	// The region that this source is configured in, each source can only be
+	// configured for one region. Getting data from many regions requires a
+	// source per region. This is used in the scope of returned resources
+	Region string
 
 	// AccountID The id of the account that is being used. This is used by
 	// sources as the first element in the scope
@@ -139,7 +140,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Name() string
 // in the format {accountID}.{region}
 func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Scopes() []string {
 	return []string{
-		FormatScope(s.AccountID, s.Config.Region),
+		FormatScope(s.AccountID, s.Region),
 	}
 }
 

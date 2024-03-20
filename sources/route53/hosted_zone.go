@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -84,10 +83,10 @@ func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, e
 // +overmind:terraform:queryMap aws_route53_zone.zone_id
 // +overmind:terraform:queryMap aws_route53_zone_association.zone_id
 
-func NewHostedZoneSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options] {
+func NewHostedZoneSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.HostedZone, *route53.Client, *route53.Options]{
 		ItemType:   "route53-hosted-zone",
-		Client:     route53.NewFromConfig(config),
+		Client:     client,
 		AccountID:  accountID,
 		Region:     region,
 		GetFunc:    hostedZoneGetFunc,

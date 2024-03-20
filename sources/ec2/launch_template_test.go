@@ -66,9 +66,9 @@ func TestLaunchTemplateOutputMapper(t *testing.T) {
 }
 
 func TestNewLaunchTemplateSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewLaunchTemplateSource(config, account, &TestRateLimit)
+	source := NewLaunchTemplateSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

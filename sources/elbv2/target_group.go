@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -115,10 +114,10 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 // +overmind:terraform:queryMap aws_lb_target_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewTargetGroupSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
+func NewTargetGroupSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options]{
-		Config:    config,
-		Client:    elbv2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elbv2-target-group",
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {

@@ -66,9 +66,9 @@ func TestFargateProfileGetFunc(t *testing.T) {
 }
 
 func TestNewFargateProfileSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewFargateProfileSource(config, account, region)
+	source := NewFargateProfileSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:            source,

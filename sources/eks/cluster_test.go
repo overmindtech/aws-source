@@ -205,9 +205,9 @@ func TestClusterGetFunc(t *testing.T) {
 }
 
 func TestNewClusterSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewClusterSource(config, account, region)
+	source := NewClusterSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

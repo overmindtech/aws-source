@@ -85,9 +85,9 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 }
 
 func TestNewDBClusterParameterGroupSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDBClusterParameterGroupSource(config, account, region)
+	source := NewDBClusterParameterGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

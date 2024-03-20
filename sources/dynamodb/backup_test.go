@@ -112,8 +112,9 @@ func TestBackupGetFunc(t *testing.T) {
 
 func TestNewBackupSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
+	client := dynamodb.NewFromConfig(config)
 
-	source := NewBackupSource(config, account, region)
+	source := NewBackupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -70,12 +69,12 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 // +overmind:terraform:queryMap aws_ecs_capacity_provider.arn
 // +overmind:terraform:method SEARCH
 
-func NewCapacityProviderSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
+func NewCapacityProviderSource(client ECSClient, accountID string, region string) *sources.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &sources.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-capacity-provider",
-		Config:    config,
+		Region:    region,
 		AccountID: accountID,
-		Client:    ecs.NewFromConfig(config),
+		Client:    client,
 		DescribeFunc: func(ctx context.Context, client ECSClient, input *ecs.DescribeCapacityProvidersInput) (*ecs.DescribeCapacityProvidersOutput, error) {
 			return client.DescribeCapacityProviders(ctx, input)
 		},

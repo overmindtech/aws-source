@@ -91,9 +91,9 @@ func TestCapacityReservationOutputMapper(t *testing.T) {
 }
 
 func TestNewCapacityReservationSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewCapacityReservationSource(config, account, &TestRateLimit)
+	source := NewCapacityReservationSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -62,9 +62,9 @@ func TestGetTopicFunc(t *testing.T) {
 }
 
 func TestNewTopicSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewTopicSource(config, account, region)
+	source := NewTopicSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

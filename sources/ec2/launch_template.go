@@ -3,7 +3,6 @@ package ec2
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -60,10 +59,10 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_launch_template.id
 
-func NewLaunchTemplateSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
+func NewLaunchTemplateSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
-		Config:    config,
-		Client:    ec2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {

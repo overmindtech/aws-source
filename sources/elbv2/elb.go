@@ -5,7 +5,6 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -273,10 +272,10 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:terraform:queryMap aws_lb.arn
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
+func NewLoadBalancerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
-		Config:    config,
-		Client:    elbv2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elbv2-load-balancer",
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {

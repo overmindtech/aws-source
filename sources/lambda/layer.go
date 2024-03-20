@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -71,10 +70,10 @@ func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, er
 // +overmind:list List all lambda layers
 // +overmind:group AWS
 
-func NewLayerSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options] {
+func NewLayerSource(client *lambda.Client, accountID string, region string) *sources.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options] {
 	return &sources.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options]{
 		ItemType:  "lambda-layer",
-		Client:    lambda.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc: func(_ context.Context, _ *lambda.Client, _, _ string) (*types.LayersListItem, error) {

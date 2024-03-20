@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -158,10 +157,10 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:terraform:queryMap aws_dx_public_virtual_interface.id
 // +overmind:terraform:queryMap aws_dx_transit_virtual_interface.id
 
-func NewVirtualInterfaceSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
+func NewVirtualInterfaceSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-virtual-interface",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualInterfacesInput) (*directconnect.DescribeVirtualInterfacesOutput, error) {

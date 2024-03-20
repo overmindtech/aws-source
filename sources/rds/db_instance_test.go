@@ -310,9 +310,9 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 }
 
 func TestNewDBInstanceSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDBInstanceSource(config, account)
+	source := NewDBInstanceSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

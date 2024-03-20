@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -75,10 +74,10 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic.id
 
-func NewTopicSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
+func NewTopicSource(client topicClient, accountID string, region string) *sources.AlwaysGetSource[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{
 		ItemType:  "sns-topic",
-		Client:    sns.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		ListInput: &sns.ListTopicsInput{},

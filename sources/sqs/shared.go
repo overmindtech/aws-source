@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-func tags(ctx context.Context, cli client, queURL string) (map[string]string, error) {
+func tags(ctx context.Context, cli sqsClient, queURL string) (map[string]string, error) {
 	if cli == nil {
 		return nil, nil
 	}

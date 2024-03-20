@@ -48,9 +48,9 @@ func TestHostedZoneItemMapper(t *testing.T) {
 }
 
 func TestNewHostedZoneSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewHostedZoneSource(config, account, region)
+	source := NewHostedZoneSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

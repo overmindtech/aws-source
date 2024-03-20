@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -103,11 +102,11 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_file_system.id
 
-func NewFileSystemSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
+func NewFileSystemSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-file-system",
-		Config:    config,
-		Client:    efs.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeFileSystemsInput) (*efs.DescribeFileSystemsOutput, error) {
 			// Wait for rate limiting

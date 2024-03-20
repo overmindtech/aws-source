@@ -73,9 +73,9 @@ func TestDBParameterGroupOutputMapper(t *testing.T) {
 }
 
 func TestNewDBParameterGroupSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDBParameterGroupSource(config, account, region)
+	source := NewDBParameterGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

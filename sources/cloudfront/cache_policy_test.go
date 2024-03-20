@@ -85,9 +85,9 @@ func TestCachePolicyListFunc(t *testing.T) {
 }
 
 func TestNewCachePolicySource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, _ := GetAutoConfig(t)
 
-	source := NewCachePolicySource(config, account)
+	source := NewCachePolicySource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -310,9 +310,9 @@ func TestServiceGetFunc(t *testing.T) {
 }
 
 func TestNewServiceSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewServiceSource(config, account, region)
+	source := NewServiceSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:            source,

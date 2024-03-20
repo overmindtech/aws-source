@@ -497,8 +497,9 @@ func TestDistributionGetFunc(t *testing.T) {
 
 func TestNewDistributionSource(t *testing.T) {
 	config, account, _ := sources.GetAutoConfig(t)
+	client := cloudfront.NewFromConfig(config)
 
-	source := NewDistributionSource(config, account)
+	source := NewDistributionSource(client, account)
 
 	test := sources.E2ETest{
 		Source:  source,

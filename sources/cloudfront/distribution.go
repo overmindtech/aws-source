@@ -4,7 +4,6 @@ import (
 	"context"
 	"regexp"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -53,10 +52,6 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,
-	}
-
-	if err != nil {
-		return nil, err
 	}
 
 	if d.Status != nil {
@@ -675,10 +670,10 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:terraform:queryMap aws_cloudfront_distribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewDistributionSource(config aws.Config, accountID string) *sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+func NewDistributionSource(client CloudFrontClient, accountID string) *sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:  "cloudfront-distribution",
-		Client:    cloudfront.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    "", // Cloudfront resources aren't tied to a region
 		ListInput: &cloudfront.ListDistributionsInput{},

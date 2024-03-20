@@ -8,7 +8,6 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -149,10 +148,10 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 // +overmind:terraform:queryMap aws_lb_listener.arn
 // +overmind:terraform:method SEARCH
 
-func NewListenerSource(config aws.Config, accountID string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
+func NewListenerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options]{
-		Config:    config,
-		Client:    elbv2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "elbv2-listener",
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {

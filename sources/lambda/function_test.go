@@ -374,9 +374,9 @@ func TestGetEventLinkedItem(t *testing.T) {
 }
 
 func TestNewFunctionSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewFunctionSource(config, account, region)
+	source := NewFunctionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

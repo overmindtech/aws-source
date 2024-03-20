@@ -3,7 +3,6 @@ package directconnect
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -56,10 +55,10 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_router_configuration.virtual_interface_id
 
-func NewRouterConfigurationSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
+func NewRouterConfigurationSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-router-configuration",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeRouterConfigurationInput) (*directconnect.DescribeRouterConfigurationOutput, error) {

@@ -367,7 +367,6 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 // used to create an input for ListFunc, at which point the usual logic is used
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
 	var items []*sdp.Item
-	var err error
 
 	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
 
@@ -403,12 +402,6 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		items = []*sdp.Item{item}
 	} else {
 		return nil, errors.New("SearchCustom called without SearchInputMapper or SearchGetInputMapper")
-	}
-
-	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
-		return nil, err
 	}
 
 	for _, item := range items {

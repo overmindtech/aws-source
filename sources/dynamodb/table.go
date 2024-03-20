@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -179,10 +178,10 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 // +overmind:terraform:queryMap aws_dynamodb_table.arn
 // +overmind:terraform:method SEARCH
 
-func NewTableSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
+func NewTableSource(client Client, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
 	return &sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{
 		ItemType:  "dynamodb-table",
-		Client:    dynamodb.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    region,
 		GetFunc:   tableGetFunc,

@@ -56,9 +56,9 @@ func TestGetEndpointFunc(t *testing.T) {
 }
 
 func TestNewEndpointSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewEndpointSource(config, account, region)
+	source := NewEndpointSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:   source,

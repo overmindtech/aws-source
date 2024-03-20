@@ -196,9 +196,9 @@ func TestRouteTableOutputMapper(t *testing.T) {
 }
 
 func TestNewRouteTableSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewRouteTableSource(config, account, &TestRateLimit)
+	source := NewRouteTableSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -3,7 +3,6 @@ package directconnect
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -40,10 +39,10 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_location.location_code
 
-func NewLocationSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
+func NewLocationSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-location",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLocationsInput) (*directconnect.DescribeLocationsOutput, error) {

@@ -48,9 +48,9 @@ func TestAddonGetFunc(t *testing.T) {
 }
 
 func TestNewAddonSource(t *testing.T) {
-	config, account, region := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewAddonSource(config, account, region)
+	source := NewAddonSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:            source,

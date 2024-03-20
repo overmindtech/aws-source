@@ -222,8 +222,9 @@ func TestTableGetFunc(t *testing.T) {
 
 func TestNewTableSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
+	client := dynamodb.NewFromConfig(config)
 
-	source := NewTableSource(config, account, region)
+	source := NewTableSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

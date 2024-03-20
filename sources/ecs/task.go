@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -242,10 +241,10 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 // +overmind:search Search for ECS tasks by cluster
 // +overmind:group AWS
 
-func NewTaskSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
+func NewTaskSource(client ECSClient, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
 		ItemType:       "ecs-task",
-		Client:         ecs.NewFromConfig(config),
+		Client:         client,
 		AccountID:      accountID,
 		Region:         region,
 		GetFunc:        taskGetFunc,

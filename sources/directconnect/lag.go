@@ -5,7 +5,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -117,10 +116,10 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_lag.id
 
-func NewLagSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
+func NewLagSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-lag",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLagsInput) (*directconnect.DescribeLagsOutput, error) {

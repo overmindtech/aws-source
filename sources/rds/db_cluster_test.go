@@ -252,9 +252,9 @@ func TestDBClusterOutputMapper(t *testing.T) {
 }
 
 func TestNewDBClusterSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewDBClusterSource(config, account)
+	source := NewDBClusterSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

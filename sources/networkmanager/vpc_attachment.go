@@ -3,7 +3,6 @@ package networkmanager
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -70,9 +69,10 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
-func NewVPCAttachmentSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
+func NewVPCAttachmentSource(client *networkmanager.Client, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
-		Client:    networkmanager.NewFromConfig(config),
+		Client:    client,
+		Region:    region,
 		AccountID: accountID,
 		ItemType:  "networkmanager-vpc-attachment",
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.VpcAttachment, error) {

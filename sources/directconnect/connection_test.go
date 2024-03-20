@@ -89,9 +89,9 @@ func TestConnectionOutputMapper(t *testing.T) {
 }
 
 func TestNewConnectionSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewConnectionSource(config, account, &TestRateLimit)
+	source := NewConnectionSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

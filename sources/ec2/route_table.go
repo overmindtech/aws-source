@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -273,10 +272,10 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:terraform:queryMap aws_default_route_table.default_route_table_id
 // +overmind:terraform:queryMap aws_route.route_table_id
 
-func NewRouteTableSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
+func NewRouteTableSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
-		Config:    config,
-		Client:    ec2.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-route-table",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {

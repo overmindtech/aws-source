@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -59,11 +58,11 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_backup_policy.id
 
-func NewBackupPolicySource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
+func NewBackupPolicySource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-backup-policy",
-		Config:    config,
-		Client:    efs.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeBackupPolicyInput) (*efs.DescribeBackupPolicyOutput, error) {
 			// Wait for rate limiting

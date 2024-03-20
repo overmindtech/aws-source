@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -131,11 +130,11 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_mount_target.id
 
-func NewMountTargetSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
+func NewMountTargetSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-mount-target",
-		Config:    config,
-		Client:    efs.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeMountTargetsInput) (*efs.DescribeMountTargetsOutput, error) {
 			// Wait for rate limiting

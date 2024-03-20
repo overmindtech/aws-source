@@ -3,7 +3,6 @@ package cloudfront
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -81,10 +80,10 @@ func realtimeLogConfigsItemMapper(scope string, awsItem *types.RealtimeLogConfig
 // +overmind:terraform:queryMap aws_cloudfront_realtime_log_config.arn
 // +overmind:terraform:method SEARCH
 
-func NewRealtimeLogConfigsSource(config aws.Config, accountID string) *sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
+func NewRealtimeLogConfigsSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:  "cloudfront-realtime-log-config",
-		Client:    cloudfront.NewFromConfig(config),
+		Client:    client,
 		AccountID: accountID,
 		Region:    "", // Cloudfront resources aren't tied to a region
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.RealtimeLogConfig, error) {

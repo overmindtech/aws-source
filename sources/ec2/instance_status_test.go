@@ -105,9 +105,9 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 }
 
 func TestNewInstanceStatusSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewInstanceStatusSource(config, account, &TestRateLimit)
+	source := NewInstanceStatusSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -66,9 +66,9 @@ func TestIamInstanceProfileAssociationOutputMapper(t *testing.T) {
 }
 
 func TestNewIamInstanceProfileAssociationSource(t *testing.T) {
-	config, account, _ := sources.GetAutoConfig(t)
+	client, account, region := GetAutoConfig(t)
 
-	source := NewIamInstanceProfileAssociationSource(config, account, &TestRateLimit)
+	source := NewIamInstanceProfileAssociationSource(client, account, region, &TestRateLimit)
 
 	test := sources.E2ETest{
 		Source:  source,

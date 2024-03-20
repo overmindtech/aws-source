@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -391,10 +390,10 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 // +overmind:terraform:queryMap aws_ecs_service.cluster_name
 // +overmind:terraform:method SEARCH
 
-func NewServiceSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
+func NewServiceSource(client ECSClient, accountID string, region string) *sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &sources.AlwaysGetSource[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{
 		ItemType:    "ecs-service",
-		Client:      ecs.NewFromConfig(config),
+		Client:      client,
 		AccountID:   accountID,
 		Region:      region,
 		GetFunc:     serviceGetFunc,

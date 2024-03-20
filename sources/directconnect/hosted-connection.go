@@ -3,7 +3,6 @@ package directconnect
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -110,10 +109,10 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_hosted_connection.id
 
-func NewHostedConnectionSource(config aws.Config, accountID string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
+func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
-		Config:    config,
-		Client:    directconnect.NewFromConfig(config),
+		Region:    region,
+		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-hosted-connection",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeHostedConnectionsInput) (*directconnect.DescribeHostedConnectionsOutput, error) {

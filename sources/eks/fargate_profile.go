@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -93,10 +92,10 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 // +overmind:terraform:queryMap aws_eks_fargate_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewFargateProfileSource(config aws.Config, accountID string, region string) *sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
+func NewFargateProfileSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-fargate-profile",
-		Client:           eks.NewFromConfig(config),
+		Client:           client,
 		AccountID:        accountID,
 		Region:           region,
 		DisableList:      true,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -81,10 +80,10 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 // +overmind:terraform:queryMap aws_route53_record.arn
 // +overmind:terraform:method SEARCH
 
-func NewResourceRecordSetSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
+func NewResourceRecordSetSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
 		ItemType:    "route53-resource-record-set",
-		Client:      route53.NewFromConfig(config),
+		Client:      client,
 		DisableList: true,
 		AccountID:   accountID,
 		Region:      region,
