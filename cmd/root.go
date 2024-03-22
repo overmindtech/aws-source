@@ -273,7 +273,7 @@ func init() {
 		log.WithError(err).Fatal("could not bind api key to env")
 	}
 
-	rootCmd.PersistentFlags().String("api-path", "https://api.prod.overmind.tech", "The URL of the Overmind API")
+	rootCmd.PersistentFlags().String("api-path", "https://api.app.overmind.tech", "The URL of the Overmind API")
 	rootCmd.PersistentFlags().Int("max-parallel", 2_000, "Max number of requests to run in parallel")
 
 	// Custom flags for this source
