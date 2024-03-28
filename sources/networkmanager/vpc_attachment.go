@@ -39,20 +39,17 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 		Scope:           scope,
 	}
 
-	if awsItem.Attachment.CoreNetworkId != nil {
+	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				// +overmind:link networkmanager-core-network
-				// Search for all vpc attachments with this core network
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.Attachment.CoreNetworkId,
 				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{
-				// ?? vpc attachment can affect the global network (depends on meaning of "affect" in this case)
-				In: true,
-				// The core network will definitely affect the vpc attachment
+				In:  true,
 				Out: true,
 			},
 		})
@@ -62,6 +59,10 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 	return &item, nil
 }
 
+// TODO: add networkmanager-attachment (list), so we can get the attachment id from there
+// otherwise we will never know about VPC attachments
+// https://docs.aws.amazon.com/cli/latest/reference/networkmanager/list-attachments.html
+
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-vpc-attachment
 // +overmind:descriptiveType Networkmanager VPC Attachment
@@ -69,21 +70,20 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
-func NewVPCAttachmentSource(client *networkmanager.Client, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
+func NewVPCAttachmentSource(client *networkmanager.Client, accountID, region string) *sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		Region:    region,
 		AccountID: accountID,
 		ItemType:  "networkmanager-vpc-attachment",
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.VpcAttachment, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return vpcAttachmentGetFunc(ctx, client, scope, query)
 		},
 		ItemMapper: vpcAttachmentItemMapper,
 		ListFunc: func(ctx context.Context, client *networkmanager.Client, scope string) ([]*types.VpcAttachment, error) {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,
-				ErrorString: "list not supported for  networkmanager-vpc-attachment, use get",
+				ErrorString: "list not supported for networkmanager-vpc-attachment, use get",
 			}
 		},
 	}

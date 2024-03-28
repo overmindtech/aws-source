@@ -10,17 +10,18 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TestSiteOutputMapper(t *testing.T) {
-	output := networkmanager.GetSitesOutput{
-		Sites: []types.Site{
+func TestLinkAssociationOutputMapper(t *testing.T) {
+	output := networkmanager.GetLinkAssociationsOutput{
+		LinkAssociations: []types.LinkAssociation{
 			{
-				SiteId:          sources.PtrString("site1"),
+				LinkId:          sources.PtrString("link-1"),
 				GlobalNetworkId: sources.PtrString("default"),
+				DeviceId:        sources.PtrString("dvc-1"),
 			},
 		},
 	}
 	scope := "123456789012.eu-west-2"
-	items, err := siteOutputMapper(context.Background(), &networkmanager.Client{}, scope, &networkmanager.GetSitesInput{}, &output)
+	items, err := linkAssociationOutputMapper(context.Background(), &networkmanager.Client{}, scope, &networkmanager.GetLinkAssociationsInput{}, &output)
 
 	if err != nil {
 		t.Error(err)
@@ -45,8 +46,8 @@ func TestSiteOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.UniqueAttributeValue() != "default|site1" {
-		t.Fatalf("expected default|site1, got %v", item.UniqueAttributeValue())
+	if item.UniqueAttributeValue() != "default|link-1|dvc-1" {
+		t.Fatalf("expected default|link-1|dvc-1, got %v", item.UniqueAttributeValue())
 	}
 
 	tests := sources.QueryTests{
@@ -58,14 +59,14 @@ func TestSiteOutputMapper(t *testing.T) {
 		},
 		{
 			ExpectedType:   "networkmanager-link",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "default|site1",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "default|link-1",
 			ExpectedScope:  scope,
 		},
 		{
 			ExpectedType:   "networkmanager-device",
-			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "default|site1",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "default|dvc-1",
 			ExpectedScope:  scope,
 		},
 	}

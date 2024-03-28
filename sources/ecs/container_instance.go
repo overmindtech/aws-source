@@ -37,7 +37,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	}
 
 	// Create an ID param since they don't have anything that uniquely
-	// identifies them. This is {clusterName}/{id} e.g.
+	// identifies them. This is {clusterName}/{id}
 	// ecs-template-ECSCluster-8nS0WOLbs3nZ/50e9bf71ed57450ca56293cc5a042886
 	if a, err := sources.ParseARN(*containerInstance.ContainerInstanceArn); err == nil {
 		attributes.Set("id", a.Resource)

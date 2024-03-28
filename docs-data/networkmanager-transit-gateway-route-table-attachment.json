@@ -1,0 +1,16 @@
+{
+	"type": "networkmanager-transit-gateway-route-table-attachment",
+	"descriptiveType": "Networkmanager Transit Gateway Route Table Attachment",
+	"getDescription": "Get a Networkmanager Transit Gateway Route Table Attachment by id",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkmanager_transit_gateway_route_table_attachment.id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"ec2-transit-gateway-route-table",
+		"networkmanager-core-network",
+		"networkmanager-transit-gateway-peering"
+	]
+}
