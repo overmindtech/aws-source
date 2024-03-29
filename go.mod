@@ -13,10 +13,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/directconnect v1.24.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.31.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.152.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.41.3
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.155.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.41.5
 	github.com/aws/aws-sdk-go-v2/service/efs v1.28.3
-	github.com/aws/aws-sdk-go-v2/service/eks v1.41.2
+	github.com/aws/aws-sdk-go-v2/service/eks v1.42.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.24.3
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.30.4
 	github.com/aws/aws-sdk-go-v2/service/iam v1.31.3
