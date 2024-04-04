@@ -34,8 +34,8 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.5.5
 	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.26.5
-	github.com/overmindtech/sdp-go v0.68.1
+	github.com/overmindtech/discovery v0.26.6
+	github.com/overmindtech/sdp-go v0.69.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
@@ -90,7 +90,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/nats-io/nats.go v1.34.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/overmindtech/api-client v0.14.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
