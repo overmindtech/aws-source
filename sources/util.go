@@ -97,7 +97,7 @@ func ParseARN(arnString string) (*ARN, error) {
 }
 
 // WrapAWSError Wraps an AWS error in the appropriate SDP error
-func WrapAWSError(err error) error {
+func WrapAWSError(err error) *sdp.QueryError {
 	var responseErr *awshttp.ResponseError
 
 	if errors.As(err, &responseErr) {
