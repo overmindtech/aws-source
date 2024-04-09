@@ -150,14 +150,14 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 
 	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
 	if err != nil {
-		s.cache.StoreError(err, s.cacheDuration(), ck)
-		return nil, WrapAWSError(err)
+		err = s.processError(err, ck)
+		return nil, err
 	}
 
 	item, err := s.ItemMapper(scope, awsItem)
 	if err != nil {
-		s.cache.StoreError(err, s.cacheDuration(), ck)
-		return nil, WrapAWSError(err)
+		err = s.processError(err, ck)
+		return nil, err
 	}
 
 	if s.ListTagsFunc != nil {
@@ -211,8 +211,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 		if s.ListTagsFunc != nil {
 			item.Tags, err = s.ListTagsFunc(ctx, awsItem, s.Client)
 			if err != nil {
-				s.cache.StoreError(err, s.CacheDuration, ck)
-				return nil, WrapAWSError(err)
+				err = s.processError(err, ck)
+				return nil, err
 			}
 		}
 
@@ -293,4 +293,22 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 // seen on, so the one with the higher weight value will win.
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Weight() int {
 	return 100
+}
+
+// Processes an error returned by the AWS API so that it can be handled by
+// Overmind. This includes extracting the correct error type, wrapping in an SDP
+// error, and caching that error if it is non-transient (like a 404)
+func (s *GetListSource[AWSItem, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
+	var sdpErr *sdp.QueryError
+
+	if err != nil {
+		sdpErr = WrapAWSError(err)
+
+		// Only cache the error if is something that won't be fixed by retrying
+		if sdpErr.GetErrorType() == sdp.QueryError_NOTFOUND || sdpErr.GetErrorType() == sdp.QueryError_NOSCOPE {
+			s.cache.StoreError(sdpErr, s.cacheDuration(), cacheKey)
+		}
+	}
+
+	return sdpErr
 }

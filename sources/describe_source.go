@@ -183,23 +183,20 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 	// Get the input object
 	input, err = s.InputMapperGet(scope, query)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
 	// Call the API using the object
 	output, err = s.DescribeFunc(ctx, s.Client, input)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
 	items, err = s.OutputMapper(ctx, s.Client, scope, input, output)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
@@ -280,15 +277,13 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 
 	input, err := s.InputMapperList(scope)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
 	items, err = s.describe(ctx, input, scope)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
@@ -351,8 +346,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(
 
 	items, err := s.describe(ctx, input, scope)
 	if err != nil {
-		err = WrapAWSError(err)
-		s.cache.StoreError(err, s.cacheDuration(), ck)
+		err = s.processError(err, ck)
 		return nil, err
 	}
 
@@ -361,6 +355,24 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(
 	}
 
 	return items, nil
+}
+
+// Processes an error returned by the AWS API so that it can be handled by
+// Overmind. This includes extracting the correct error type, wrapping in an SDP
+// error, and caching that error if it is non-transient (like a 404)
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
+	var sdpErr *sdp.QueryError
+
+	if err != nil {
+		sdpErr = WrapAWSError(err)
+
+		// Only cache the error if is something that won't be fixed by retrying
+		if sdpErr.GetErrorType() == sdp.QueryError_NOTFOUND || sdpErr.GetErrorType() == sdp.QueryError_NOSCOPE {
+			s.cache.StoreError(sdpErr, s.cacheDuration(), cacheKey)
+		}
+	}
+
+	return sdpErr
 }
 
 // describe Runs describe on the given input, intelligently choosing whether to
