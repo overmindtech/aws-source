@@ -69,7 +69,6 @@ var rootCmd = &cobra.Command{
 			AutoConfig:      viper.GetBool("auto-config"),
 		}
 
-		var regions []string
 		viper.UnmarshalKey("aws-regions", &awsAuthConfig.Regions)
 
 		var natsNKeySeedLog string
@@ -83,7 +82,7 @@ var rootCmd = &cobra.Command{
 			"nats-jwt":            natsJWT,
 			"nats-nkey-seed":      natsNKeySeedLog,
 			"max-parallel":        maxParallel,
-			"aws-regions":         regions,
+			"aws-regions":         awsAuthConfig.Regions,
 			"aws-access-strategy": awsAuthConfig.Strategy,
 			"aws-external-id":     awsAuthConfig.ExternalID,
 			"aws-target-role-arn": awsAuthConfig.TargetRoleARN,
