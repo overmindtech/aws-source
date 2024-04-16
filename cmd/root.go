@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -122,7 +123,10 @@ var rootCmd = &cobra.Command{
 			TokenClient:       tokenClient,
 		}
 
-		e, err := proc.InitializeAwsSourceEngine(natsOptions, awsAuthConfig, maxParallel)
+		rateLimitContext, rateLimitCancel := context.WithCancel(context.Background())
+		defer rateLimitCancel()
+
+		e, err := proc.InitializeAwsSourceEngine(rateLimitContext, natsOptions, awsAuthConfig, maxParallel)
 		if err != nil {
 			log.WithError(err).Error("Could not initialize aws source")
 			return

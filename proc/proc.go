@@ -177,7 +177,10 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 	}
 }
 
-func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAuthConfig, maxParallel int) (*discovery.Engine, error) {
+// InitializeAwsSourceEngine initializes an Engine with AWS sources, returns the
+// engine, and an error if any. The xontext provided will be used for the rate
+// limit buckets and should not be cancelled until the source is shut down
+func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions, awsAuthConfig AwsAuthConfig, maxParallel int) (*discovery.Engine, error) {
 	e, err := discovery.NewEngine()
 	if err != nil {
 		return nil, fmt.Errorf("error initializing Engine: %w", err)
@@ -263,14 +266,11 @@ func InitializeAwsSourceEngine(natsOptions auth.NATSOptions, awsAuthConfig AwsAu
 			RefillRate:  10,
 		}
 
-		rateLimitCtx, rateLimitCancel := context.WithCancel(context.Background())
-		defer rateLimitCancel()
-
-		ec2RateLimit.Start(rateLimitCtx)
-		autoScalingRateLimit.Start(rateLimitCtx)
-		iamRateLimit.Start(rateLimitCtx)
-		directConnectRateLimit.Start(rateLimitCtx)
-		networkManagerRateLimit.Start(rateLimitCtx)
+		ec2RateLimit.Start(ctx)
+		autoScalingRateLimit.Start(ctx)
+		iamRateLimit.Start(ctx)
+		directConnectRateLimit.Start(ctx)
+		networkManagerRateLimit.Start(ctx)
 
 		// Create shared clients for each API
 		autoscalingClient := awsautoscaling.NewFromConfig(cfg)
