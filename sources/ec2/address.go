@@ -156,7 +156,7 @@ func NewAddressSource(client *ec2.Client, accountID string, region string, limit
 		AccountID: accountID,
 		ItemType:  "ec2-address",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
+			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeAddresses(ctx, input)
 		},
 		InputMapperGet:  addressInputMapperGet,
