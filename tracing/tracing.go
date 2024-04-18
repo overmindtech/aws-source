@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	_ "embed"
+
 	"github.com/MrAlias/otel-schema-utils/schema"
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
@@ -20,20 +22,9 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 )
 
-// for stdout debugging of traces
-// import "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
-
-// use this as template, or for tracing in the cmd package (currently not used)
-// import "go.opentelemetry.io/otel/trace"
-// const (
-// 	instrumentationName    = "github.com/overmindtech/gateway/cmd"
-// 	instrumentationVersion = "0.0.1"
-// )
-// var tracer = otel.GetTracerProvider().Tracer(
-// 		instrumentationName,
-// 		trace.WithInstrumentationVersion(instrumentationVersion),
-// 		trace.WithSchemaURL(semconv.SchemaURL),
-// 	)
+//go:generate sh -c "echo -n $(git describe --tags --long --all) > commit.txt"
+//go:embed commit.txt
+var ServiceVersion string
 
 func tracingResource() *resource.Resource {
 	// Identify your application using resource detection
@@ -77,7 +68,7 @@ func tracingResource() *resource.Resource {
 		// Add your own custom attributes to identify your application
 		resource.WithAttributes(
 			semconv.ServiceNameKey.String("aws-source"),
-			semconv.ServiceVersionKey.String("0.0.1"),
+			semconv.ServiceVersionKey.String(ServiceVersion),
 		),
 	)
 	if err != nil {
