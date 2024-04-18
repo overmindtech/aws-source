@@ -29,6 +29,9 @@ jobs:
         run: |
           go get -v -t -d ./...
 
+      - name: Go Generate
+        run: go generate ./...
+
       - name: Validate Docs Data
         run: |
           mkdir -p ~/.local/bin/ && curl -Lo ~/.local/bin/docgen https://github.com/overmindtech/docgen/releases/latest/download/docgen-amd64 && chmod +x ~/.local/bin/docgen

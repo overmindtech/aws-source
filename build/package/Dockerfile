@@ -17,8 +17,10 @@ RUN go mod download
 COPY . .
 
 # Build
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o source main.go
+RUN --mount=type=cache,target=/go/pkg \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go generate ./... \
+    && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o source main.go
 
 FROM alpine:3.19
 WORKDIR /
