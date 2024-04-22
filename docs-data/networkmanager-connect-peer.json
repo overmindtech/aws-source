@@ -4,11 +4,15 @@
 	"getDescription": "Get a Networkmanager Connect Peer by id",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_networkmanager_connect_peer.core_network_id"
+		"aws_networkmanager_connect_peer.id"
 	],
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"networkmanager-core-network"
+		"ec2-subnet",
+		"ip",
+		"networkmanager-connect-attachment",
+		"networkmanager-core-network",
+		"rdap-asn"
 	]
 }

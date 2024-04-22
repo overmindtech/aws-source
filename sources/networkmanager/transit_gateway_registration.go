@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -15,7 +16,7 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 	for _, r := range output.TransitGatewayRegistrations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(r, "tags")
+		attrs, err = sources.ToAttributesCase(r)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -23,6 +24,10 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if r.GlobalNetworkId == nil || r.TransitGatewayArn == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId or transitGatewayArn is nil for transit gateway registration"))
 		}
 
 		attrs.Set("globalNetworkIdWithTransitGatewayARN", idWithGlobalNetwork(*r.GlobalNetworkId, *r.TransitGatewayArn))
@@ -49,22 +54,23 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 			},
 		}
 
-		// TODO: add support for ec2-transit-gateway
 		// ARN example: "arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234"
 		if r.TransitGatewayArn != nil {
-			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway
-					Type:   "ec2-transit-gateway",
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  *r.TransitGatewayArn,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			})
+			if arn, err := sources.ParseARN(*r.TransitGatewayArn); err == nil {
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						// +overmind:link ec2-transit-gateway
+						Type:   "ec2-transit-gateway",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *r.TransitGatewayArn,
+						Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  true,
+						Out: false,
+					},
+				})
+			}
 		}
 
 		items = append(items, &item)
@@ -92,27 +98,19 @@ func NewTransitGatewayRegistrationSource(client *networkmanager.Client, accountI
 		},
 		InputMapperGet: func(scope, query string) (*networkmanager.GetTransitGatewayRegistrationsInput, error) {
 			sections := strings.Split(query, "|")
-			switch len(sections) {
-			case 1:
-				// only GlobalNetworkId
-				return &networkmanager.GetTransitGatewayRegistrationsInput{
-					GlobalNetworkId: &sections[0],
-				}, nil
-			case 2:
-				// we are using a custom id of {globalNetworkId}|{ec2-transit-gateway.ID}
-				// e.g. searching from ec2-transit-gateway
-				return &networkmanager.GetTransitGatewayRegistrationsInput{
-					GlobalNetworkId: &sections[0],
-					TransitGatewayArns: []string{
-						sections[1],
-					},
-				}, nil
-			default:
-				return nil, &sdp.QueryError{
-					ErrorType:   sdp.QueryError_NOTFOUND,
-					ErrorString: "invalid query for networkmanager-transit-gateway-registration get function",
-				}
+
+			if len(sections) != 2 {
+				return nil, sdp.NewQueryError(errors.New("invalid query for networkmanager-transit-gateway-registration get function, must be in the format {globalNetworkId}|{transitGatewayARN}"))
 			}
+
+			// we are using a custom id of {globalNetworkId}|{transitGatewayARN}
+			// e.g. searching from ec2-transit-gateway
+			return &networkmanager.GetTransitGatewayRegistrationsInput{
+				GlobalNetworkId: &sections[0],
+				TransitGatewayArns: []string{
+					sections[1],
+				},
+			}, nil
 		},
 		InputMapperList: func(scope string) (*networkmanager.GetTransitGatewayRegistrationsInput, error) {
 			return nil, &sdp.QueryError{

@@ -2,11 +2,13 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
+	"strings"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
-	"strings"
 )
 
 func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string, _ *networkmanager.GetSitesInput, output *networkmanager.GetSitesOutput) ([]*sdp.Item, error) {
@@ -23,6 +25,10 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if s.GlobalNetworkId == nil || s.SiteId == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId or siteId is nil for site"))
 		}
 
 		attrs.Set("globalNetworkIdSiteId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId))
@@ -99,6 +105,8 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:list List all Networkmanager Sites
 // +overmind:search Search for Networkmanager Sites by GlobalNetworkId
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_networkmanager_site.arn
+// +overmind:terraform:method SEARCH
 
 func NewSiteSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{

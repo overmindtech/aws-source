@@ -43,8 +43,8 @@ func TestTransitGatewayRouteTableAttachmentItemMapper(t *testing.T) {
 				{
 					ExpectedType:   "ec2-transit-gateway-route-table",
 					ExpectedMethod: sdp.QueryMethod_SEARCH,
-					ExpectedQuery:  "tgw-rtb-9876543210123456",
-					ExpectedScope:  scope,
+					ExpectedQuery:  "arn:aws:ec2:us-west-2:123456789012:transit-gateway-route-table/tgw-rtb-9876543210123456",
+					ExpectedScope:  "123456789012.us-west-2",
 				},
 			},
 		},

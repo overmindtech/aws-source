@@ -41,7 +41,7 @@ func TestTransitGatewayPeeringOutputMapper(t *testing.T) {
 					ExpectedType:   "ec2-transit-gateway",
 					ExpectedMethod: sdp.QueryMethod_SEARCH,
 					ExpectedQuery:  "arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234",
-					ExpectedScope:  scope,
+					ExpectedScope:  "123456789012.us-west-2",
 				},
 				{
 					ExpectedType:   "ec2-transit-gateway-peering-attachment",

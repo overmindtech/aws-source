@@ -1,8 +1,6 @@
 {
 	"type": "networkmanager-network-resource-relationship",
 	"descriptiveType": "Networkmanager Network Resource Relationships",
-	"getDescription": "Get a Networkmanager Network Resource Relationship by GlobalNetworkId and ResourceARN",
-	"listDescription": "List all Networkmanager NetworkResourceRelationships",
 	"searchDescription": "Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId",
 	"group": "AWS",
 	"links": [
