@@ -411,9 +411,24 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 			directconnect.NewRouterConfigurationSource(directconnectClient, *callerID.Account, region, &directConnectRateLimit),
 
 			// Network Manager
+			networkmanager.NewConnectAttachmentSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewConnectionSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewConnectPeerSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewCoreNetworkPolicySource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewCoreNetworkSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewDeviceSource(networkmanagerClient, *callerID.Account, region),
 			networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region, &networkManagerRateLimit),
-			networkmanager.NewVPCAttachmentSource(networkmanagerClient, *callerID.Account, region, &networkManagerRateLimit),
+			networkmanager.NewLinkAssociationSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewLinkSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewNetworkResourceRelationshipsSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewSiteToSiteVpnAttachmentSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewTransitGatewayConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewTransitGatewayPeeringSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewTransitGatewayRegistrationSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewTransitGatewayRouteTableAttachmentSource(networkmanagerClient, *callerID.Account, region),
+			networkmanager.NewVPCAttachmentSource(networkmanagerClient, *callerID.Account, region),
 
 			// SQS
 			sqs.NewQueueSource(sqsClient, *callerID.Account, region),
