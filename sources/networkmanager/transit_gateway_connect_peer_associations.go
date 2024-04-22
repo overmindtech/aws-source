@@ -102,7 +102,7 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-transit-gateway-connect-peer-association
 // +overmind:descriptiveType Networkmanager Connect Peer Associations
-// +overmind:get Get a Networkmanager Transit GatewayConnect Peer Associations
+// +overmind:get Get a Networkmanager Transit GatewayConnect Peer Association
 // +overmind:list List all Networkmanager Transit Gateway Connect Peer Associations
 // +overmind:search Search for Networkmanager TransitGatewayConnectPeerAssociations by GlobalNetworkId
 // +overmind:group AWS
@@ -118,31 +118,26 @@ func NewTransitGatewayConnectPeerAssociationSource(client *networkmanager.Client
 		},
 		InputMapperGet: func(scope, query string) (*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, error) {
 			sections := strings.Split(query, "|")
-			switch len(sections) {
-			case 1:
-				// only GlobalNetworkId
-				return &networkmanager.GetTransitGatewayConnectPeerAssociationsInput{
-					GlobalNetworkId: &sections[0],
-				}, nil
-			case 2:
-				// we are using a custom id of {globalNetworkId}|{networkmanager-connect-peer.ID}
-				// e.g. searching from networkmanager-connect-peer
-				return &networkmanager.GetTransitGatewayConnectPeerAssociationsInput{
-					GlobalNetworkId: &sections[0],
-					TransitGatewayConnectPeerArns: []string{
-						sections[1],
-					},
-				}, nil
-			default:
+
+			if len(sections) != 2 {
 				return nil, &sdp.QueryError{
 					ErrorType:   sdp.QueryError_NOTFOUND,
-					ErrorString: "invalid query for networkmanager-transit-gateway-connect-peer-association get function",
+					ErrorString: "invalid query for networkmanager-transit-gateway-connect-peer-association. Use {GlobalNetworkId}|{TransitGatewayConnectPeerArn} format",
 				}
 			}
+
+			// we are using a custom id of {globalNetworkId}|{networkmanager-connect-peer.ID}
+			// e.g. searching from networkmanager-connect-peer
+			return &networkmanager.GetTransitGatewayConnectPeerAssociationsInput{
+				GlobalNetworkId: &sections[0],
+				TransitGatewayConnectPeerArns: []string{
+					sections[1],
+				},
+			}, nil
 		},
 		InputMapperList: func(scope string) (*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, error) {
 			return nil, &sdp.QueryError{
-				ErrorType:   sdp.QueryError_NOTFOUND,
+				ErrorType:   sdp.QueryError_OTHER,
 				ErrorString: "list not supported for networkmanager-transit-gateway-connect-peer-association, use search",
 			}
 		},

@@ -11,6 +11,7 @@
 	"links": [
 		"networkmanager-connect-peer",
 		"networkmanager-core-network-policy",
-		"networkmanager-global-network"
+		"networkmanager-global-network",
+		"rdap-asn"
 	]
 }

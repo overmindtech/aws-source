@@ -6,3 +6,4 @@ vendor
 Gopkg.lock
 build/compiled
 .idea
+commit.txt

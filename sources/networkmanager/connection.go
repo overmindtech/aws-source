@@ -2,10 +2,13 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
+	"strings"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
-	"strings"
 )
 
 func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope string, _ *networkmanager.GetConnectionsInput, output *networkmanager.GetConnectionsOutput) ([]*sdp.Item, error) {
@@ -22,6 +25,10 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if s.GlobalNetworkId == nil || s.ConnectionId == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId or connectionId is nil for connection"))
 		}
 
 		attrs.Set("globalNetworkIdConnectionId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectionId))
@@ -46,59 +53,82 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 						Out: false,
 					},
 				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
-						Type:   "networkmanager-link",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
-						Type:   "networkmanager-link",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedLinkId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
-						Type:   "networkmanager-device",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
-						Type:   "networkmanager-device",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedDeviceId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
 			},
+		}
+
+		if s.LinkId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-link
+					Type:   "networkmanager-link",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		if s.ConnectedLinkId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-link
+					Type:   "networkmanager-link",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedLinkId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		if s.DeviceId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-device
+					Type:   "networkmanager-device",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		if s.ConnectedDeviceId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-device
+					Type:   "networkmanager-device",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedDeviceId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		switch s.State {
+		case types.ConnectionStatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.ConnectionStateAvailable:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.ConnectionStateDeleting:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.ConnectionStateUpdating:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		}
 
 		items = append(items, &item)
@@ -114,6 +144,8 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 // +overmind:list List all Networkmanager Connections
 // +overmind:search Search for Networkmanager Connections by GlobalNetworkId
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_networkmanager_connection.arn
+// +overmind:terraform:method SEARCH
 
 func NewConnectionSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{

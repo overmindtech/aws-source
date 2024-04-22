@@ -49,36 +49,10 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-site
-						Type:   "networkmanager-site",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-network-resource-relationship
-						Type:   "networkmanager-network-resource-relationship",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkArn),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
 						// +overmind:link networkmanager-link-association
 						Type:   "networkmanager-link-association",
 						Method: sdp.QueryMethod_SEARCH,
-						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, resourceTypeLink, *s.LinkId),
+						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, "link", *s.LinkId),
 						Scope:  scope,
 					},
 					BlastPropagation: &sdp.BlastPropagation{
@@ -87,6 +61,38 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 					},
 				},
 			},
+		}
+
+		if s.SiteId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-site
+					Type:   "networkmanager-site",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		if s.LinkArn != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-network-resource-relationship
+					Type:   "networkmanager-network-resource-relationship",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkArn),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
 		}
 
 		items = append(items, &item)
@@ -102,6 +108,8 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:list List all Networkmanager Links
 // +overmind:search Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_networkmanager_link.arn
+// +overmind:terraform:method SEARCH
 
 func NewLinkSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{

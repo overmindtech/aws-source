@@ -2,8 +2,10 @@ package networkmanager
 
 import (
 	"context"
+	"crypto/sha1"
+	"encoding/base64"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/overmindtech/aws-source/sources"
@@ -22,84 +24,44 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 			continue
 		}
 
-		// Define item FROM
-		arnFrom, err := sources.ParseARN(*relationship.From)
+		// Parse the ARNs
+		fromArn, err := sources.ParseARN(*relationship.From)
+
 		if err != nil {
 			return nil, err
 		}
-		fromResourceType := fmt.Sprintf("%s-%s", arnFrom.Service, arnFrom.Type())
-		// For each item we have to set correct UniqueAttribute
-		uniqueAttrName, uniqueAttrVal := "", ""
-		switch fromResourceType {
-		case "networkmanager-connection":
-			uniqueAttrName = "globalNetworkIdConnectionId"
-			uniqueAttrVal = idWithGlobalNetwork(*input.GlobalNetworkId, arnFrom.ResourceID())
-		case "networkmanager-device":
-			uniqueAttrName = "globalNetworkIdDeviceId"
-			uniqueAttrVal = idWithGlobalNetwork(*input.GlobalNetworkId, arnFrom.ResourceID())
-		case "networkmanager-link":
-			uniqueAttrName = "globalNetworkIdLinkId"
-			uniqueAttrVal = idWithGlobalNetwork(*input.GlobalNetworkId, arnFrom.ResourceID())
-		case "networkmanager-site":
-			uniqueAttrName = "globalNetworkIdSiteId"
-			uniqueAttrVal = idWithGlobalNetwork(*input.GlobalNetworkId, arnFrom.ResourceID())
-		case "directconnect-connection":
-			uniqueAttrName = "connectionId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "directconnect-direct-connect-gateway":
-			uniqueAttrName = "directConnectGatewayId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "directconnect-virtual-interface":
-			uniqueAttrName = "virtualInterfaceId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-customer-gateway":
-			// TODO: add support for ec2-customer-gateway
-			uniqueAttrName = "customerGatewayId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-transit-gateway":
-			// TODO: add support for ec2-transit-gateway
-			uniqueAttrName = "transitGatewayId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-transit-gateway-attachment":
-			// TODO: add support for ec2-transit-gateway-attachment
-			uniqueAttrName = "transitGatewayAttachmentId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-transit-gateway-connect-peer":
-			// TODO: add support for ec2-transit-gateway-connect-peer
-			uniqueAttrName = "transitGatewayConnectPeerId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-transit-gateway-route-table":
-			// TODO: add support for ec2-transit-gateway-route-table
-			uniqueAttrName = "transitGatewayRouteTableId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		case "ec2-vpn-connection":
-			// TODO: add support for ec2-vpn-connection
-			uniqueAttrName = "vpnConnectionId"
-			uniqueAttrVal = arnFrom.ResourceID()
-		default:
-			// skip unknown item types
-			continue
+
+		toArn, err := sources.ParseARN(*relationship.To)
+
+		if err != nil {
+			return nil, err
 		}
+
+		// We need to create a unique attribute for each item so we'll create a
+		// hash to avoid it being too long
+		hasher := sha1.New()
+		hasher.Write([]byte(fromArn.String()))
+		hasher.Write([]byte(toArn.String()))
+		sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
 		attrs, err := sdp.ToAttributes(map[string]interface{}{
-			uniqueAttrName: uniqueAttrVal,
+			"hash": sha,
+			"from": fromArn.String(),
+			"to":   toArn.String(),
 		})
 		if err != nil {
 			return nil, err
 		}
+
 		item := sdp.Item{
-			Type:              fmt.Sprintf("%s-%s", arnFrom.Service, arnFrom.Resource),
-			UniqueAttribute:   uniqueAttrName,
+			Type:              "networkmanager-network-resource-relationship",
+			UniqueAttribute:   "hash",
 			Scope:             scope,
 			Attributes:        attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{},
 		}
 
-		// Define item TO
-		arnTo, err := sources.ParseARN(*relationship.To)
-		if err != nil {
-			return nil, err
-		}
-		toResourceType := fmt.Sprintf("%s-%s", arnTo.Service, arnTo.Type())
+		toResourceType := fmt.Sprintf("%s-%s", toArn.Service, toArn.Type())
 		// For each linked item we must define +overmind:link comment section
 		switch toResourceType {
 		case "networkmanager-connection":
@@ -108,7 +70,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link networkmanager-connection
 					Type:   "networkmanager-connection",
 					Method: sdp.QueryMethod_SEARCH,
-					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, arnTo.ResourceID()),
+					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -122,7 +84,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link networkmanager-device
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_SEARCH,
-					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, arnTo.ResourceID()),
+					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -136,7 +98,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link networkmanager-link
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_SEARCH,
-					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, arnTo.ResourceID()),
+					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -150,7 +112,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link networkmanager-site
 					Type:   "networkmanager-site",
 					Method: sdp.QueryMethod_SEARCH,
-					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, arnTo.ResourceID()),
+					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -164,7 +126,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link directconnect-connection
 					Type:   "directconnect-connection",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -178,7 +140,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link directconnect-direct-connect-gateway
 					Type:   "directconnect-direct-connect-gateway",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -192,7 +154,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 					// +overmind:link directconnect-virtual-interface
 					Type:   "directconnect-virtual-interface",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -201,13 +163,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-customer-gateway":
-			// TODO: add support for ec2-customer-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-customer-gateway
 					Type:   "ec2-customer-gateway",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -216,13 +177,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-transit-gateway":
-			// TODO: add support for ec2-transit-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway
 					Type:   "ec2-transit-gateway",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -231,13 +191,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-transit-gateway-attachment":
-			// TODO: add support for ec2-transit-gateway-attachment
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway-attachment
 					Type:   "ec2-transit-gateway-attachment",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -246,13 +205,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-transit-gateway-connect-peer":
-			// TODO: add support for ec2-transit-gateway-connect-peer
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway-connect-peer
 					Type:   "ec2-transit-gateway-connect-peer",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -261,13 +219,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-transit-gateway-route-table":
-			// TODO: add support for ec2-transit-gateway-route-table
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway-route-table
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -276,13 +233,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 				},
 			})
 		case "ec2-vpn-connection":
-			// TODO: add support for ec2-vpn-connection
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-vpn-connection
 					Type:   "ec2-vpn-connection",
 					Method: sdp.QueryMethod_GET,
-					Query:  arnTo.ResourceID(),
+					Query:  toArn.ResourceID(),
 					Scope:  scope,
 				},
 				BlastPropagation: &sdp.BlastPropagation{
@@ -303,34 +259,21 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-network-resource-relationship
 // +overmind:descriptiveType Networkmanager Network Resource Relationships
-// +overmind:get Get a Networkmanager Network Resource Relationship by GlobalNetworkId and ResourceARN
-// +overmind:list List all Networkmanager NetworkResourceRelationships
 // +overmind:search Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId
 // +overmind:group AWS
 
 func NewNetworkResourceRelationshipsSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-network-resource-relationship",
+		Client:       client,
+		AccountID:    accountID,
+		Region:       region,
+		ItemType:     "networkmanager-network-resource-relationship",
+		OutputMapper: networkResourceRelationshipOutputMapper,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetNetworkResourceRelationshipsInput) (*networkmanager.GetNetworkResourceRelationshipsOutput, error) {
 			return client.GetNetworkResourceRelationships(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
-			// We are using a custom id of {globalNetworkId}|{resourceARN}
-			sections := strings.Split(query, "|")
-
-			if len(sections) != 2 {
-				return nil, &sdp.QueryError{
-					ErrorType:   sdp.QueryError_NOTFOUND,
-					ErrorString: "invalid query for networkmanager-network-resource-relationship get function",
-				}
-			}
-			return &networkmanager.GetNetworkResourceRelationshipsInput{
-				GlobalNetworkId: &sections[0],
-				ResourceArn:     &sections[1],
-			}, nil
+			return nil, sdp.NewQueryError(errors.New("get not supported for networkmanager-network-resource-relationship, use search"))
 		},
 		InputMapperList: func(scope string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
 			return nil, &sdp.QueryError{
@@ -341,7 +284,6 @@ func NewNetworkResourceRelationshipsSource(client *networkmanager.Client, accoun
 		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetNetworkResourceRelationshipsInput) sources.Paginator[*networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetNetworkResourceRelationshipsPaginator(client, params)
 		},
-		OutputMapper: networkResourceRelationshipOutputMapper,
 		InputMapperSearch: func(ctx context.Context, client *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
 			// Search by GlobalNetworkId
 			return &networkmanager.GetNetworkResourceRelationshipsInput{

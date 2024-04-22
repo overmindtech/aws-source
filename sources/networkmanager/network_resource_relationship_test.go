@@ -13,11 +13,10 @@ import (
 func TestNetworkResourceRelationshipOutputMapper(t *testing.T) {
 	scope := "123456789012.eu-west-2"
 	tests := []struct {
-		name        string
-		input       networkmanager.GetNetworkResourceRelationshipsInput
-		output      networkmanager.GetNetworkResourceRelationshipsOutput
-		tests       []sources.QueryTests
-		uniqueAttrs [][]string // [i]name,val
+		name   string
+		input  networkmanager.GetNetworkResourceRelationshipsInput
+		output networkmanager.GetNetworkResourceRelationshipsOutput
+		tests  []sources.QueryTests
 	}{
 		{
 			name: "ok, one entity",
@@ -89,50 +88,6 @@ func TestNetworkResourceRelationshipOutputMapper(t *testing.T) {
 						To:   sources.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
 						From: sources.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/conn-1"),
 					},
-				},
-			},
-			uniqueAttrs: [][]string{
-				{
-					"globalNetworkIdConnectionId", "default|conn-1",
-				},
-				{
-					"globalNetworkIdDeviceId", "default|d-1",
-				},
-				{
-					"globalNetworkIdLinkId", "default|link-1",
-				},
-				{
-					"globalNetworkIdSiteId", "default|site-1",
-				},
-				{
-					"connectionId", "dxconn-1",
-				},
-				{
-					"directConnectGatewayId", "gw-1",
-				},
-				{
-					"virtualInterfaceId", "vif-1",
-				},
-				{
-					"customerGatewayId", "gw-1",
-				},
-				{
-					"transitGatewayId", "tgw-06910e97a1fbdf66a",
-				},
-				{
-					"transitGatewayAttachmentId", "tgwa-1",
-				},
-				{
-					"transitGatewayConnectPeerId", "tgw-cnp-1",
-				},
-				{
-					"transitGatewayRouteTableId", "tgw-rtb-043b7b4c0db1e4833",
-				},
-				{
-					"globalNetworkIdConnectionId", "default|conn-1",
-				},
-				{
-					"vpnConnectionId", "conn-1",
 				},
 			},
 			tests: []sources.QueryTests{
@@ -272,15 +227,9 @@ func TestNetworkResourceRelationshipOutputMapper(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			for i, _ := range items {
+			for i := range items {
 				if err := items[i].Validate(); err != nil {
 					t.Error(err)
-				}
-				if items[i].UniqueAttribute != tt.uniqueAttrs[i][0] {
-					t.Fatalf("expected unique attr name %s, got %s", tt.uniqueAttrs[i][0], items[i].UniqueAttribute)
-				}
-				if items[i].UniqueAttributeValue() != tt.uniqueAttrs[i][1] {
-					t.Fatalf("expected unique attr name %s, got %s", tt.uniqueAttrs[i][1], items[i].UniqueAttributeValue())
 				}
 				tt.tests[i].Execute(t, items[i])
 			}

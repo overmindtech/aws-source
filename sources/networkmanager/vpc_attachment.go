@@ -37,6 +37,7 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 		UniqueAttribute: "attachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(awsItem.Attachment.Tags),
 	}
 
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
@@ -58,10 +59,6 @@ func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.I
 
 	return &item, nil
 }
-
-// TODO: add networkmanager-attachment (list), so we can get the attachment id from there
-// otherwise we will never know about VPC attachments
-// https://docs.aws.amazon.com/cli/latest/reference/networkmanager/list-attachments.html
 
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-vpc-attachment

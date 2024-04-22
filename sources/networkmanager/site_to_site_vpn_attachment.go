@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -67,7 +68,6 @@ func siteToSiteVpnAttachmentItemMapper(scope string, awsItem *types.SiteToSiteVp
 			item.Health = sdp.Health_HEALTH_ERROR.Enum()
 		}
 	}
-	// TODO: add support for ec2-vpn-connection
 	if awsItem.VpnConnectionArn != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{

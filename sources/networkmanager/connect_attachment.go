@@ -2,6 +2,8 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -26,10 +28,12 @@ func connectAttachmentItemMapper(scope string, ca *types.ConnectAttachment) (*sd
 		return nil, err
 	}
 
-	// The uniqueAttributeValue for this is a nested value of AttachmentId:
-	if ca != nil && ca.Attachment != nil {
-		attributes.Set("attachmentId", *ca.Attachment.AttachmentId)
+	if ca == nil || ca.Attachment == nil {
+		return nil, sdp.NewQueryError(errors.New("attachment is nil for connect attachment"))
 	}
+
+	// The uniqueAttributeValue for this is a nested value of AttachmentId:
+	attributes.Set("attachmentId", *ca.Attachment.AttachmentId)
 
 	item := sdp.Item{
 		Type:            "networkmanager-connect-attachment",
@@ -38,7 +42,7 @@ func connectAttachmentItemMapper(scope string, ca *types.ConnectAttachment) (*sd
 		Scope:           scope,
 	}
 
-	if ca.Attachment != nil && ca.Attachment.CoreNetworkId != nil {
+	if ca.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				// +overmind:link networkmanager-core-network
@@ -53,6 +57,26 @@ func connectAttachmentItemMapper(scope string, ca *types.ConnectAttachment) (*sd
 			},
 		})
 	}
+
+	if ca.Attachment.CoreNetworkArn != nil {
+		if arn, err := sources.ParseARN(*ca.Attachment.CoreNetworkArn); err == nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-core-network
+					Type:   "networkmanager-core-network",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *ca.Attachment.CoreNetworkArn,
+					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: false,
+				},
+			})
+		}
+	}
+
+	item.Tags = tagsToMap(ca.Attachment.Tags)
 
 	return &item, nil
 }

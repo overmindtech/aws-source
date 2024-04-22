@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -16,7 +17,7 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 	for _, a := range output.ConnectPeerAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(a, "tags")
+		attrs, err = sources.ToAttributesCase(a)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -24,6 +25,10 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if a.GlobalNetworkId == nil || a.ConnectPeerId == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId or connectPeerId is nil for connect peer association"))
 		}
 
 		attrs.Set("globalNetworkIdConnectPeerId", idWithGlobalNetwork(*a.GlobalNetworkId, *a.ConnectPeerId))
@@ -60,32 +65,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 						Out: false,
 					},
 				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
-						Type:   "networkmanager-device",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: false,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
-						Type:   "networkmanager-link",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: false,
-					},
-				},
 			},
 		}
 
@@ -98,6 +77,38 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		case types.ConnectPeerAssociationStateDeleted:
 			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		}
+
+		if a.DeviceId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-device
+					Type:   "networkmanager-device",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: false,
+				},
+			})
+		}
+
+		if a.LinkId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-link
+					Type:   "networkmanager-link",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: false,
+				},
+			})
 		}
 
 		items = append(items, &item)

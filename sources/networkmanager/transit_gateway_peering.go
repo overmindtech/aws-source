@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -36,6 +37,7 @@ func transitGatewayPeeringItemMapper(scope string, awsItem *types.TransitGateway
 		UniqueAttribute: "peeringId",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(awsItem.Peering.Tags),
 	}
 
 	if awsItem.Peering != nil {
@@ -43,7 +45,6 @@ func transitGatewayPeeringItemMapper(scope string, awsItem *types.TransitGateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link networkmanager-core-network
-					// Search for core network
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
 					Query:  *awsItem.Peering.CoreNetworkId,
@@ -67,7 +68,6 @@ func transitGatewayPeeringItemMapper(scope string, awsItem *types.TransitGateway
 			item.Health = sdp.Health_HEALTH_ERROR.Enum()
 		}
 	}
-	// TODO: add support for ec2-transit-gateway-peering-attachment
 	if awsItem.TransitGatewayPeeringAttachmentId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
@@ -84,22 +84,23 @@ func transitGatewayPeeringItemMapper(scope string, awsItem *types.TransitGateway
 		})
 	}
 
-	// TODO: add support for ec2-transit-gateway
 	// ARN example: "arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234"
 	if awsItem.TransitGatewayArn != nil {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			Query: &sdp.Query{
-				// +overmind:link ec2-transit-gateway
-				Type:   "ec2-transit-gateway",
-				Method: sdp.QueryMethod_SEARCH,
-				Query:  *awsItem.TransitGatewayArn,
-				Scope:  scope,
-			},
-			BlastPropagation: &sdp.BlastPropagation{
-				In:  true,
-				Out: true,
-			},
-		})
+		if arn, err := sources.ParseARN(*awsItem.TransitGatewayArn); err == nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link ec2-transit-gateway
+					Type:   "ec2-transit-gateway",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *awsItem.TransitGatewayArn,
+					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
 	}
 
 	return &item, nil

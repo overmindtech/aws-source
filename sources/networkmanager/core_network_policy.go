@@ -2,7 +2,8 @@ package networkmanager
 
 import (
 	"context"
-	"fmt"
+	"errors"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -25,11 +26,14 @@ func coreNetworkPolicyItemMapper(scope string, cn *types.CoreNetworkPolicy) (*sd
 	if err != nil {
 		return nil, err
 	}
-	attributes.Set("coreNetworkIdPolicyVersionId", fmt.Sprintf("%s|%d", *cn.CoreNetworkId, *cn.PolicyVersionId))
+
+	if cn.CoreNetworkId == nil {
+		return nil, sdp.NewQueryError(errors.New("coreNetworkId is nil for core network policy"))
+	}
 
 	item := sdp.Item{
 		Type:            "networkmanager-core-network-policy",
-		UniqueAttribute: "coreNetworkIdPolicyVersionId",
+		UniqueAttribute: "coreNetworkId",
 		Attributes:      attributes,
 		Scope:           scope,
 		LinkedItemQueries: []*sdp.LinkedItemQuery{

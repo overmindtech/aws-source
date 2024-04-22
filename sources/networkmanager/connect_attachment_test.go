@@ -13,8 +13,9 @@ func TestConnectAttachmentItemMapper(t *testing.T) {
 	scope := "123456789012.eu-west-2"
 	item, err := connectAttachmentItemMapper(scope, &types.ConnectAttachment{
 		Attachment: &types.Attachment{
-			AttachmentId:  sources.PtrString("att-1"),
-			CoreNetworkId: sources.PtrString("cn-1"),
+			AttachmentId:   sources.PtrString("att-1"),
+			CoreNetworkId:  sources.PtrString("cn-1"),
+			CoreNetworkArn: sources.PtrString("arn:aws:networkmanager:eu-west-2:123456789012:core-network/cn-1"),
 		},
 	})
 	if err != nil {
@@ -37,6 +38,12 @@ func TestConnectAttachmentItemMapper(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "cn-1",
 			ExpectedScope:  scope,
+		},
+		{
+			ExpectedType:   "networkmanager-core-network",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:networkmanager:eu-west-2:123456789012:core-network/cn-1",
+			ExpectedScope:  "123456789012.eu-west-2",
 		},
 	}
 

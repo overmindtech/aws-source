@@ -2,9 +2,11 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -23,6 +25,10 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if s.GlobalNetworkId == nil || s.DeviceId == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId or deviceId is nil for device"))
 		}
 
 		attrs.Set("globalNetworkIdDeviceId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId))
@@ -49,36 +55,10 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-site
-						Type:   "networkmanager-site",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: false,
-					},
-				},
-				{
-					Query: &sdp.Query{
-						// +overmind:link networkmanager-network-resource-relationship
-						Type:   "networkmanager-network-resource-relationship",
-						Method: sdp.QueryMethod_GET,
-						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceArn),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  true,
-						Out: true,
-					},
-				},
-				{
-					Query: &sdp.Query{
 						// +overmind:link networkmanager-link-association
 						Type:   "networkmanager-link-association",
 						Method: sdp.QueryMethod_SEARCH,
-						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, resourceTypeDevice, *s.DeviceId),
+						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, "device", *s.DeviceId),
 						Scope:  scope,
 					},
 					BlastPropagation: &sdp.BlastPropagation{
@@ -102,6 +82,49 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 			},
 		}
 
+		if s.SiteId != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-site
+					Type:   "networkmanager-site",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: false,
+				},
+			})
+		}
+
+		if s.DeviceArn != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link networkmanager-network-resource-relationship
+					Type:   "networkmanager-network-resource-relationship",
+					Method: sdp.QueryMethod_GET,
+					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceArn),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+
+		switch s.State {
+		case types.DeviceStatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.DeviceStateAvailable:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.DeviceStateDeleting:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.DeviceStateUpdating:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		}
+
 		items = append(items, &item)
 	}
 
@@ -115,6 +138,8 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 // +overmind:list List all Networkmanager Devices
 // +overmind:search Search for Networkmanager Devices by GlobalNetworkId, or by GlobalNetworkId with SiteId
 // +overmind:group AWS
+// +overmind:terraform:queryMap aws_networkmanager_device.arn
+// +overmind:terraform:method SEARCH
 
 func NewDeviceSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{

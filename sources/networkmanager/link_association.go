@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -24,6 +25,10 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 				ErrorString: err.Error(),
 				Scope:       scope,
 			}
+		}
+
+		if s.GlobalNetworkId == nil || s.LinkId == nil || s.DeviceId == nil {
+			return nil, sdp.NewQueryError(errors.New("globalNetworkId, linkId or deviceId is nil for link association"))
 		}
 
 		attrs.Set("globalNetworkIdLinkIdDeviceId", fmt.Sprintf("%s|%s|%s", *s.GlobalNetworkId, *s.LinkId, *s.DeviceId))
@@ -139,13 +144,13 @@ func NewLinkAssociationSource(client *networkmanager.Client, accountID, region s
 				}, nil
 			case 3:
 				switch sections[1] {
-				case resourceTypeLink:
+				case "link":
 					// default|link|link-1
 					return &networkmanager.GetLinkAssociationsInput{
 						GlobalNetworkId: &sections[0],
 						LinkId:          &sections[1],
 					}, nil
-				case resourceTypeDevice:
+				case "device":
 					// default|device|dvc-1
 					return &networkmanager.GetLinkAssociationsInput{
 						GlobalNetworkId: &sections[0],

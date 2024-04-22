@@ -2,24 +2,27 @@ package networkmanager
 
 import (
 	"context"
+	"errors"
+	"strconv"
+
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
 
-func coreNetworkGetFunc(ctx context.Context, client *networkmanager.Client, _, query string) (*types.CoreNetwork, error) {
-	out, err := client.GetCoreNetwork(ctx, &networkmanager.GetCoreNetworkInput{
-		CoreNetworkId: &query,
-	})
+func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope string, input *networkmanager.GetCoreNetworkInput) (*sdp.Item, error) {
+	out, err := client.GetCoreNetwork(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	return out.CoreNetwork, nil
-}
+	if out.CoreNetwork == nil {
+		return nil, sdp.NewQueryError(errors.New("coreNetwork is nil for core network"))
+	}
 
-func coreNetworkItemMapper(scope string, cn *types.CoreNetwork) (*sdp.Item, error) {
+	cn := out.CoreNetwork
+
 	attributes, err := sources.ToAttributesCase(cn)
 
 	if err != nil {
@@ -31,20 +34,8 @@ func coreNetworkItemMapper(scope string, cn *types.CoreNetwork) (*sdp.Item, erro
 		UniqueAttribute: "coreNetworkId",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(cn.Tags),
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
-			{
-				Query: &sdp.Query{
-					// +overmind:link networkmanager-global-network
-					Type:   "networkmanager-global-network",
-					Method: sdp.QueryMethod_GET,
-					Query:  *cn.GlobalNetworkId,
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  true,
-					Out: false,
-				},
-			},
 			{
 				Query: &sdp.Query{
 					// +overmind:link networkmanager-core-network-policy
@@ -74,6 +65,51 @@ func coreNetworkItemMapper(scope string, cn *types.CoreNetwork) (*sdp.Item, erro
 		},
 	}
 
+	if cn.GlobalNetworkId != nil {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				// +overmind:link networkmanager-global-network
+				Type:   "networkmanager-global-network",
+				Method: sdp.QueryMethod_GET,
+				Query:  *cn.GlobalNetworkId,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				In:  true,
+				Out: false,
+			},
+		})
+	}
+
+	for _, edge := range cn.Edges {
+		if edge.Asn != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					// +overmind:link rdap-asn
+					Type:   "rdap-asn",
+					Method: sdp.QueryMethod_GET,
+					Query:  strconv.FormatInt(*edge.Asn, 10),
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: false,
+				},
+			})
+		}
+	}
+
+	switch cn.State {
+	case types.CoreNetworkStateCreating:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	case types.CoreNetworkStateUpdating:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	case types.CoreNetworkStateAvailable:
+		item.Health = sdp.Health_HEALTH_OK.Enum()
+	case types.CoreNetworkStateDeleting:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	}
+
 	return &item, nil
 }
 
@@ -84,38 +120,32 @@ func coreNetworkItemMapper(scope string, cn *types.CoreNetwork) (*sdp.Item, erro
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
-func NewCoreNetworkSource(client *networkmanager.Client, accountID, region string) *sources.GetListSource[*types.CoreNetwork, *networkmanager.Client, *networkmanager.Options] {
-	return &sources.GetListSource[*types.CoreNetwork, *networkmanager.Client, *networkmanager.Options]{
+func NewCoreNetworkSource(client NetworkManagerClient, accountID, region string) *sources.AlwaysGetSource[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
+	return &sources.AlwaysGetSource[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,
+		GetFunc:   coreNetworkGetFunc,
 		ItemType:  "networkmanager-core-network",
-		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.CoreNetwork, error) {
-			return coreNetworkGetFunc(ctx, client, scope, query)
-		},
-		ItemMapper: coreNetworkItemMapper,
-
-		ListFunc: func(ctx context.Context, client *networkmanager.Client, scope string) ([]*types.CoreNetwork, error) {
-			out, err := client.ListCoreNetworks(ctx, &networkmanager.ListCoreNetworksInput{})
-
-			if err != nil {
-				return nil, err
+		ListInput: &networkmanager.ListCoreNetworksInput{},
+		GetInputMapper: func(scope, query string) *networkmanager.GetCoreNetworkInput {
+			return &networkmanager.GetCoreNetworkInput{
+				CoreNetworkId: &query,
 			}
+		},
+		ListFuncPaginatorBuilder: func(client NetworkManagerClient, input *networkmanager.ListCoreNetworksInput) sources.Paginator[*networkmanager.ListCoreNetworksOutput, *networkmanager.Options] {
+			return networkmanager.NewListCoreNetworksPaginator(client, input)
+		},
+		ListFuncOutputMapper: func(output *networkmanager.ListCoreNetworksOutput, input *networkmanager.ListCoreNetworksInput) ([]*networkmanager.GetCoreNetworkInput, error) {
+			queries := make([]*networkmanager.GetCoreNetworkInput, len(output.CoreNetworks))
 
-			coreNetworks := make([]*types.CoreNetwork, len(out.CoreNetworks))
-
-			for i, _ := range out.CoreNetworks {
-				coreNetworks[i] = &types.CoreNetwork{
-					CoreNetworkArn:  out.CoreNetworks[i].CoreNetworkArn,
-					CoreNetworkId:   out.CoreNetworks[i].CoreNetworkId,
-					Description:     out.CoreNetworks[i].Description,
-					GlobalNetworkId: out.CoreNetworks[i].GlobalNetworkId,
-					State:           out.CoreNetworks[i].State,
-					Tags:            out.CoreNetworks[i].Tags,
+			for i := range output.CoreNetworks {
+				queries[i] = &networkmanager.GetCoreNetworkInput{
+					CoreNetworkId: output.CoreNetworks[i].CoreNetworkId,
 				}
 			}
 
-			return coreNetworks, nil
+			return queries, nil
 		},
 	}
 }

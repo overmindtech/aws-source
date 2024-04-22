@@ -5,6 +5,11 @@
 	"listDescription": "List all Networkmanager Sites",
 	"searchDescription": "Search for Networkmanager Sites by GlobalNetworkId",
 	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkmanager_site.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
 	"links": [
 		"networkmanager-device",
 		"networkmanager-global-network",

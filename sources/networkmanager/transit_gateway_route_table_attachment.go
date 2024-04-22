@@ -2,7 +2,6 @@ package networkmanager
 
 import (
 	"context"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
@@ -38,6 +37,7 @@ func transitGatewayRouteTableAttachmentItemMapper(scope string, awsItem *types.T
 		UniqueAttribute: "attachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
+		Tags:            tagsToMap(awsItem.Attachment.Tags),
 	}
 
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
@@ -72,18 +72,16 @@ func transitGatewayRouteTableAttachmentItemMapper(scope string, awsItem *types.T
 		})
 	}
 
-	// TODO: add support for ec2-transit-gateway-route-table
 	// ARN example: "arn:aws:ec2:us-west-2:123456789012:transit-gateway-route-table/tgw-rtb-9876543210123456"
 	if awsItem.TransitGatewayRouteTableArn != nil {
-		tmp := strings.Split(*awsItem.TransitGatewayRouteTableArn, "/")
-		if len(tmp) == 2 {
+		if arn, err := sources.ParseARN(*awsItem.TransitGatewayRouteTableArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway-route-table
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_SEARCH,
-					Query:  tmp[1],
-					Scope:  scope,
+					Query:  *awsItem.TransitGatewayRouteTableArn,
+					Scope:  sources.FormatScope(arn.AccountID, arn.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					In:  true,

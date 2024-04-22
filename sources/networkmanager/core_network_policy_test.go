@@ -25,8 +25,8 @@ func TestCoreNetworkPolicyItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.UniqueAttributeValue() != "cn-1|1" {
-		t.Fatalf("expected cn-1|1, got %v", item.UniqueAttributeValue())
+	if item.UniqueAttributeValue() != "cn-1" {
+		t.Fatalf("expected cn-1, got %v", item.UniqueAttributeValue())
 	}
 
 	tests := sources.QueryTests{
