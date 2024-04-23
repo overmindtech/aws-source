@@ -1,0 +1,13 @@
+{
+	"type": "networkmanager-link-association",
+	"descriptiveType": "Networkmanager LinkAssociation",
+	"getDescription": "Get a Networkmanager Link Association",
+	"listDescription": "List all Networkmanager Link Associations",
+	"searchDescription": "Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId",
+	"group": "AWS",
+	"links": [
+		"networkmanager-device",
+		"networkmanager-global-network",
+		"networkmanager-link"
+	]
+}

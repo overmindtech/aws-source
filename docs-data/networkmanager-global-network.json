@@ -11,6 +11,14 @@
 	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
-		"networkmanager-site"
+		"networkmanager-connect-peer-association",
+		"networkmanager-connection",
+		"networkmanager-device",
+		"networkmanager-link",
+		"networkmanager-network-resource",
+		"networkmanager-network-resource-relationship",
+		"networkmanager-site",
+		"networkmanager-transit-gateway-connect-peer-association",
+		"networkmanager-transit-gateway-registration"
 	]
 }

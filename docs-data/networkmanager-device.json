@@ -1,0 +1,20 @@
+{
+	"type": "networkmanager-device",
+	"descriptiveType": "Networkmanager Device",
+	"getDescription": "Get a Networkmanager Device",
+	"listDescription": "List all Networkmanager Devices",
+	"searchDescription": "Search for Networkmanager Devices by GlobalNetworkId, or by GlobalNetworkId with SiteId",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkmanager_device.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": [
+		"networkmanager-connection",
+		"networkmanager-global-network",
+		"networkmanager-link-association",
+		"networkmanager-network-resource-relationship",
+		"networkmanager-site"
+	]
+}

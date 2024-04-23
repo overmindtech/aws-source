@@ -9,19 +9,7 @@ import (
 	"testing"
 )
 
-func (t *TestClient) DescribeGlobalNetworks(ctx context.Context, params *networkmanager.DescribeGlobalNetworksInput, optFns ...func(*networkmanager.Options)) (*networkmanager.DescribeGlobalNetworksOutput, error) {
-	return &networkmanager.DescribeGlobalNetworksOutput{
-		GlobalNetworks: []types.GlobalNetwork{
-			{
-				Tags:             []types.Tag{},
-				GlobalNetworkArn: sources.PtrString("arn:aws:networkmanager:eu-west-2:052392120703:global-network/default"),
-				GlobalNetworkId:  sources.PtrString("default"),
-			},
-		},
-	}, nil
-}
-
-func TestLoadBalancerOutputMapper(t *testing.T) {
+func TestGlobalNetworkOutputMapper(t *testing.T) {
 	output := networkmanager.DescribeGlobalNetworksOutput{
 		GlobalNetworks: []types.GlobalNetwork{
 			{
@@ -31,7 +19,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 		},
 	}
 
-	items, err := globalNetworkOutputMapper(context.Background(), &TestClient{}, "foo", nil, &output)
+	items, err := globalNetworkOutputMapper(context.Background(), &networkmanager.Client{}, "foo", nil, &output)
 
 	if err != nil {
 		t.Error(err)
@@ -52,6 +40,54 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 	tests := sources.QueryTests{
 		{
 			ExpectedType:   "networkmanager-site",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-transit-gateway-registration",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-connect-peer-association",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-transit-gateway-connect-peer-association",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-network-resource",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-network-resource-relationship",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-link",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-device",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "default",
+			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "networkmanager-connection",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "default",
 			ExpectedScope:  "foo",

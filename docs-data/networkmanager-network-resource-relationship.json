@@ -1,0 +1,21 @@
+{
+	"type": "networkmanager-network-resource-relationship",
+	"descriptiveType": "Networkmanager Network Resource Relationships",
+	"searchDescription": "Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId",
+	"group": "AWS",
+	"links": [
+		"directconnect-connection",
+		"directconnect-direct-connect-gateway",
+		"directconnect-virtual-interface",
+		"ec2-customer-gateway",
+		"ec2-transit-gateway",
+		"ec2-transit-gateway-attachment",
+		"ec2-transit-gateway-connect-peer",
+		"ec2-transit-gateway-route-table",
+		"ec2-vpn-connection",
+		"networkmanager-connection",
+		"networkmanager-device",
+		"networkmanager-link",
+		"networkmanager-site"
+	]
+}

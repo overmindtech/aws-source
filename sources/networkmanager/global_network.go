@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
@@ -9,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func globalNetworkOutputMapper(_ context.Context, _ NetworkmanagerClient, scope string, _ *networkmanager.DescribeGlobalNetworksInput, output *networkmanager.DescribeGlobalNetworksOutput) ([]*sdp.Item, error) {
+func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client, scope string, _ *networkmanager.DescribeGlobalNetworksInput, output *networkmanager.DescribeGlobalNetworksOutput) ([]*sdp.Item, error) {
 	items := make([]*sdp.Item, 0)
 
 	for _, gn := range output.GlobalNetworks {
@@ -35,16 +36,117 @@ func globalNetworkOutputMapper(_ context.Context, _ NetworkmanagerClient, scope 
 				{
 					Query: &sdp.Query{
 						// +overmind:link networkmanager-site
-						// Search for all sites with this global network
 						Type:   "networkmanager-site",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
 						Scope:  scope,
 					},
 					BlastPropagation: &sdp.BlastPropagation{
-						// ?? Sites can affect the global network
-						In: true,
-						// The global network will definitely affect the site
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-transit-gateway-registration
+						Type:   "networkmanager-transit-gateway-registration",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-connect-peer-association
+						Type:   "networkmanager-connect-peer-association",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-transit-gateway-connect-peer-association
+						Type:   "networkmanager-transit-gateway-connect-peer-association",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-network-resource
+						Type:   "networkmanager-network-resource",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-network-resource-relationship
+						Type:   "networkmanager-network-resource-relationship",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-link
+						Type:   "networkmanager-link",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-device
+						Type:   "networkmanager-device",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				},
+				{
+					Query: &sdp.Query{
+						// +overmind:link networkmanager-connection
+						Type:   "networkmanager-connection",
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  *gn.GlobalNetworkId,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
 						Out: true,
 					},
 				},
@@ -76,13 +178,13 @@ func globalNetworkOutputMapper(_ context.Context, _ NetworkmanagerClient, scope 
 // +overmind:terraform:queryMap aws_networkmanager_global_network.arn
 // +overmind:terraform:method SEARCH
 
-func NewGlobalNetworkSource(client NetworkmanagerClient, accountID string, region string) *sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, NetworkmanagerClient, *networkmanager.Options] {
-	return &sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, NetworkmanagerClient, *networkmanager.Options]{
+func NewGlobalNetworkSource(client *networkmanager.Client, accountID string, region string) *sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &sources.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{
 		ItemType:  "networkmanager-global-network",
 		Client:    client,
 		Region:    region,
 		AccountID: accountID,
-		DescribeFunc: func(ctx context.Context, client NetworkmanagerClient, input *networkmanager.DescribeGlobalNetworksInput) (*networkmanager.DescribeGlobalNetworksOutput, error) {
+		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.DescribeGlobalNetworksInput) (*networkmanager.DescribeGlobalNetworksOutput, error) {
 			return client.DescribeGlobalNetworks(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*networkmanager.DescribeGlobalNetworksInput, error) {
@@ -93,9 +195,19 @@ func NewGlobalNetworkSource(client NetworkmanagerClient, accountID string, regio
 		InputMapperList: func(scope string) (*networkmanager.DescribeGlobalNetworksInput, error) {
 			return &networkmanager.DescribeGlobalNetworksInput{}, nil
 		},
-		PaginatorBuilder: func(client NetworkmanagerClient, params *networkmanager.DescribeGlobalNetworksInput) sources.Paginator[*networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.DescribeGlobalNetworksInput) sources.Paginator[*networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Options] {
 			return networkmanager.NewDescribeGlobalNetworksPaginator(client, params)
 		},
 		OutputMapper: globalNetworkOutputMapper,
 	}
+}
+
+// idWithGlobalNetwork makes custom ID of given entity with global network ID and this entity ID/ARN
+func idWithGlobalNetwork(gn, idOrArn string) string {
+	return fmt.Sprintf("%s|%s", gn, idOrArn)
+}
+
+// idWithTypeAndGlobalNetwork makes custom ID of given entity with global network ID and this entity type and ID/ARN
+func idWithTypeAndGlobalNetwork(gb, rType, idOrArn string) string {
+	return fmt.Sprintf("%s|%s|%s", gb, rType, idOrArn)
 }

@@ -1,0 +1,13 @@
+{
+	"type": "networkmanager-transit-gateway-connect-peer-association",
+	"descriptiveType": "Networkmanager Connect Peer Associations",
+	"getDescription": "Get a Networkmanager Transit GatewayConnect Peer Association",
+	"listDescription": "List all Networkmanager Transit Gateway Connect Peer Associations",
+	"searchDescription": "Search for Networkmanager TransitGatewayConnectPeerAssociations by GlobalNetworkId",
+	"group": "AWS",
+	"links": [
+		"networkmanager-device",
+		"networkmanager-global-network",
+		"networkmanager-link"
+	]
+}

@@ -1,0 +1,18 @@
+{
+	"type": "networkmanager-connection",
+	"descriptiveType": "Networkmanager Connection",
+	"getDescription": "Get a Networkmanager Connection",
+	"listDescription": "List all Networkmanager Connections",
+	"searchDescription": "Search for Networkmanager Connections by GlobalNetworkId",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_networkmanager_connection.arn"
+	],
+	"terraformMethod": "SEARCH",
+	"terraformScope": "*",
+	"links": [
+		"networkmanager-device",
+		"networkmanager-global-network",
+		"networkmanager-link"
+	]
+}
