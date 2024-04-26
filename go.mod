@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/directconnect v1.24.4
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.31.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.157.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.159.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.41.7
 	github.com/aws/aws-sdk-go-v2/service/efs v1.28.4
 	github.com/aws/aws-sdk-go-v2/service/eks v1.42.1
@@ -23,7 +23,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.38.5
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.25.4
-	github.com/aws/aws-sdk-go-v2/service/rds v1.77.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.77.3
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.40.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/aws/aws-sdk-go-v2/service/sns v1.29.4
