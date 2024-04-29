@@ -166,6 +166,8 @@ github.com/overmindtech/sdp-go v0.69.0 h1:Bvp3n7E6HtOQcj0CG+atFjUG3EyCuc0glfQvkq
 github.com/overmindtech/sdp-go v0.69.0/go.mod h1:Kx73sbtgQoUQl2rgFE9RZDh8MR0O3GEVS61YVaFKKj4=
 github.com/overmindtech/sdp-go v0.70.0 h1:SBjAybjkVz5sAYXp9YI2sPmdjWuxaQ15NWzajN5izyQ=
 github.com/overmindtech/sdp-go v0.70.0/go.mod h1:wlktpRz0BMJsDyBjA1YbFeswFetMQ8+clQJG6slXMG8=
+github.com/overmindtech/sdp-go v0.71.1 h1:8c9IofcVHFmecWeOWmm2GJ8KLfugbc+enJnLcpUGzBc=
+github.com/overmindtech/sdp-go v0.71.1/go.mod h1:wlktpRz0BMJsDyBjA1YbFeswFetMQ8+clQJG6slXMG8=
 github.com/overmindtech/sdpcache v1.6.4 h1:MJoYBDqDE3s8FrRzZ0RPgFiH39HWI/Mv2ImH1NdLT8k=
 github.com/overmindtech/sdpcache v1.6.4/go.mod h1:/F9XStVdntRJEQjlZ86BPuB1Y7VPo1PFcsCNiU1IoGE=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
