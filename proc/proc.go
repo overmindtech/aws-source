@@ -228,7 +228,8 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 				lf["targetRoleARN"] = awsAuthConfig.TargetRoleARN
 				lf["externalID"] = awsAuthConfig.ExternalID
 			}
-			log.WithError(err).WithFields(lf).Fatal("Error retrieving account information")
+			log.WithError(err).WithFields(lf).Error("Error retrieving account information")
+			return nil, fmt.Errorf("error getting caller identity for region %v: %w", region, err)
 		}
 
 		// Create an EC2 rate limit which limits the source to 50% of the
