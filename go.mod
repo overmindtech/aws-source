@@ -32,7 +32,7 @@ require (
 	github.com/aws/smithy-go v1.20.2
 	github.com/getsentry/sentry-go v0.27.0
 	github.com/iancoleman/strcase v0.2.0
-	github.com/nats-io/jwt/v2 v2.5.6
+	github.com/nats-io/jwt/v2 v2.5.7
 	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.27.0
 	github.com/overmindtech/sdp-go v0.73.0
