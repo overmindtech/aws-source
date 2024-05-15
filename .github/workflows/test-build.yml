@@ -36,12 +36,12 @@ jobs:
         run: go install github.com/overmindtech/docgen@latest
 
       - name: Go Generate
-        run: go generate ./...
+        run: |
+          go generate ./...
+          cat tracing/commit.txt
 
       - name: Validate Docs Data
         run: |
-          mkdir -p ~/.local/bin/ && curl -Lo ~/.local/bin/docgen https://github.com/overmindtech/docgen/releases/latest/download/docgen-amd64 && chmod +x ~/.local/bin/docgen
-          go generate ./...
           if [ -z "$(git status --porcelain)" ]; then
             echo "No pending docs changes"
           else
