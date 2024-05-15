@@ -3,6 +3,9 @@ FROM golang:1.22-alpine3.18 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
+# required for generating the version descriptor
+RUN apk add --no-cache git
+
 WORKDIR /workspace
 
 # Copy the Go Modules manifests
