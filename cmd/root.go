@@ -136,9 +136,12 @@ var rootCmd = &cobra.Command{
 		healthCheckPath := "/healthz"
 
 		http.HandleFunc(healthCheckPath, func(rw http.ResponseWriter, r *http.Request) {
-			// Check that NATS is connected
-			if !e.IsNATSConnected() {
-				http.Error(rw, "NATS not connected", http.StatusInternalServerError)
+			ctx, span := healthCheckTracer.Start(r.Context(), "healthcheck")
+			defer span.End()
+
+			err := e.HealthCheck(ctx)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
