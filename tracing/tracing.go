@@ -88,6 +88,14 @@ func tracingResource() *resource.Resource {
 }
 
 var tp *sdktrace.TracerProvider
+var healthTp *sdktrace.TracerProvider
+
+func GetHealthCheckTracerProvider() *sdktrace.TracerProvider {
+	if healthTp == nil {
+		panic("healthTp not initialised")
+	}
+	return healthTp
+}
 
 func InitTracing(opts ...otlptracehttp.Option) error {
 	if sentry_dsn := viper.GetString("sentry-dsn"); sentry_dsn != "" {
@@ -130,7 +138,13 @@ func InitTracing(opts ...otlptracehttp.Option) error {
 
 	log.Infof("otlptracehttp client configured itself: %v", client)
 	tp = sdktrace.NewTracerProvider(
-		// sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		// for stdout debugging of traces
+		// sdktrace.WithBatcher(stdoutExp),
+		sdktrace.WithBatcher(otlpExp),
+		sdktrace.WithResource(tracingResource()),
+	)
+	healthTp = sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased((0.1)))),
 		// for stdout debugging of traces
 		// sdktrace.WithBatcher(stdoutExp),
 		sdktrace.WithBatcher(otlpExp),
