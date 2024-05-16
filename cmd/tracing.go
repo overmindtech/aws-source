@@ -13,11 +13,13 @@ const (
 )
 
 // healthCheckTracer is the tracer used for health checks. This is heavily sampled to avoid getting spammed by k8s or ELBs
-var healthCheckTracer = tracing.GetHealthCheckTracerProvider().Tracer(
-	instrumentationName,
-	trace.WithInstrumentationVersion(instrumentationVersion),
-	trace.WithSchemaURL(semconv.SchemaURL),
-	trace.WithInstrumentationAttributes(
-		attribute.Bool("ovm.healthCheck", true),
-	),
-)
+func healthCheckTracer() trace.Tracer {
+	return tracing.GetHealthCheckTracerProvider().Tracer(
+		instrumentationName,
+		trace.WithInstrumentationVersion(instrumentationVersion),
+		trace.WithSchemaURL(semconv.SchemaURL),
+		trace.WithInstrumentationAttributes(
+			attribute.Bool("ovm.healthCheck", true),
+		),
+	)
+}
