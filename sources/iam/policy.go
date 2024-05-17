@@ -25,7 +25,7 @@ type PolicyDetails struct {
 	PolicyUsers  []types.PolicyUser
 }
 
-func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*PolicyDetails, error) {
+func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
 	// Construct the ARN from the name etc.
 	a := sources.ARN{
 		ARN: arn.ARN{
@@ -36,9 +36,6 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 			Resource:  "policy/" + query, // The query should policyFullName which is (path + name)
 		},
 	}
-
-	limit.Wait(ctx)
-
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
 		PolicyArn: sources.PtrString(a.String()),
 	})
@@ -52,7 +49,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 	}
 
 	if out.Policy != nil {
-		err := addPolicyEntities(ctx, client, &details, limit)
+		err := addPolicyEntities(ctx, client, &details)
 
 		if err != nil {
 			return nil, err
@@ -62,7 +59,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string, l
 	return &details, nil
 }
 
-func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails, limit *sources.LimitBucket) error {
+func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails) error {
 	var span trace.Span
 	if log.GetLevel() == log.TraceLevel {
 		// Only create new spans on trace level logging
@@ -83,8 +80,6 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 	})
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx)
-
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -102,7 +97,7 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 // PolicyListFunc Lists all attached policies. There is no way to list
 // unattached policies since I don't think it will be very valuable, there are
 // hundreds by default and if you aren't using them they aren't very interesting
-func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*PolicyDetails, error) {
+func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
 	var span trace.Span
 	if log.GetLevel() == log.TraceLevel {
 		// Only create new spans on trace level logging
@@ -128,8 +123,6 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 	})
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx)
-
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -148,7 +141,7 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string, limit *
 			Policy: p,
 		}
 
-		err := addPolicyEntities(ctx, client, &details, limit)
+		err := addPolicyEntities(ctx, client, &details)
 
 		return &details, err
 	})
@@ -287,7 +280,7 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-source/issues/68
-func NewPolicySource(config aws.Config, accountID string, _ string, limit *sources.LimitBucket) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
+func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-policy",
 		Client:        iam.NewFromConfig(config),
@@ -300,10 +293,10 @@ func NewPolicySource(config aws.Config, accountID string, _ string, limit *sourc
 		// setting means these also work
 		SupportGlobalResources: true,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
-			return policyGetFunc(ctx, client, scope, query, limit)
+			return policyGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
-			return policyListFunc(ctx, client, scope, limit)
+			return policyListFunc(ctx, client, scope)
 		},
 		ListTagsFunc: policyListTagsFunc,
 		ItemMapper:   policyItemMapper,

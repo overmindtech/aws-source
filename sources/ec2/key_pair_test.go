@@ -74,7 +74,7 @@ func TestKeyPairOutputMapper(t *testing.T) {
 func TestNewKeyPairSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewKeyPairSource(client, account, region, &TestRateLimit)
+	source := NewKeyPairSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -59,14 +59,13 @@ func placementGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_placement_group.id
 
-func NewPlacementGroupSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
+func NewPlacementGroupSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-placement-group",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput) (*ec2.DescribePlacementGroupsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribePlacementGroups(ctx, input)
 		},
 		InputMapperGet:  placementGroupInputMapperGet,

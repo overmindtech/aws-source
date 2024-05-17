@@ -94,7 +94,7 @@ func (t *TestIAMClient) ListPolicyTags(ctx context.Context, params *iam.ListPoli
 }
 
 func TestPolicyGetFunc(t *testing.T) {
-	policy, err := policyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar", &TestRateLimit)
+	policy, err := policyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -118,7 +118,7 @@ func TestPolicyGetFunc(t *testing.T) {
 }
 
 func TestPolicyListFunc(t *testing.T) {
-	policies, err := policyListFunc(context.Background(), &TestIAMClient{}, "foo", &TestRateLimit)
+	policies, err := policyListFunc(context.Background(), &TestIAMClient{}, "foo")
 
 	if err != nil {
 		t.Error(err)
@@ -218,7 +218,7 @@ func TestPolicyItemMapper(t *testing.T) {
 func TestNewPolicySource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
-	source := NewPolicySource(config, account, region, &TestRateLimit)
+	source := NewPolicySource(config, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

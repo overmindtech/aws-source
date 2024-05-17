@@ -94,7 +94,7 @@ func TestFileSystemOutputMapper(t *testing.T) {
 func TestNewFileSystemSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewFileSystemSource(client, account, region, &TestRateLimit)
+	source := NewFileSystemSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -56,14 +56,13 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 // +overmind:search Search reserved EC2 instances by ARN
 // +overmind:group AWS
 
-func NewReservedInstanceSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
+func NewReservedInstanceSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-reserved-instance",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeReservedInstancesInput) (*ec2.DescribeReservedInstancesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeReservedInstances(ctx, input)
 		},
 		InputMapperGet:  reservedInstanceInputMapperGet,

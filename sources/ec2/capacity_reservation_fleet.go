@@ -82,14 +82,13 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 // +overmind:search Search capacity reservation fleets by ARN
 // +overmind:group AWS
 
-func NewCapacityReservationFleetSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options] {
+func NewCapacityReservationFleetSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-capacity-reservation-fleet",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationFleetsInput) (*ec2.DescribeCapacityReservationFleetsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeCapacityReservationFleets(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeCapacityReservationFleetsInput, error) {

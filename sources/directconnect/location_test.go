@@ -43,7 +43,7 @@ func TestLocationOutputMapper(t *testing.T) {
 func TestNewLocationSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLocationSource(client, account, region, &TestRateLimit)
+	source := NewLocationSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

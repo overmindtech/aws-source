@@ -109,14 +109,13 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_hosted_connection.id
 
-func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
+func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-hosted-connection",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeHostedConnectionsInput) (*directconnect.DescribeHostedConnectionsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeHostedConnections(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeHostedConnectionsInput, error) {

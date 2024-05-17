@@ -131,15 +131,13 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_replication_configuration.source_file_system_id
 
-func NewReplicationConfigurationSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
+func NewReplicationConfigurationSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-replication-configuration",
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeReplicationConfigurationsInput) (*efs.DescribeReplicationConfigurationsOutput, error) {
-			// Wait for rate limiting
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeReplicationConfigurations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeReplicationConfigurationsInput, error) {

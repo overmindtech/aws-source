@@ -87,14 +87,13 @@ func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 // +overmind:search Search snapshots by ARN
 // +overmind:group AWS
 
-func NewSnapshotSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
+func NewSnapshotSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-snapshot",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSnapshots(ctx, input)
 		},
 		InputMapperGet:  snapshotInputMapperGet,

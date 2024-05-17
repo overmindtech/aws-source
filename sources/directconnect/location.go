@@ -39,14 +39,13 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_location.location_code
 
-func NewLocationSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
+func NewLocationSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-location",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLocationsInput) (*directconnect.DescribeLocationsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeLocations(ctx, input)
 		},
 		// We want to use the list API for get and list operations

@@ -59,14 +59,13 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association_proposal.id
 
-func NewDirectConnectGatewayAssociationProposalSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
+func NewDirectConnectGatewayAssociationProposalSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-direct-connect-gateway-association-proposal",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationProposalsInput) (*directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeDirectConnectGatewayAssociationProposals(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, error) {

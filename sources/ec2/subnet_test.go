@@ -114,7 +114,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 func TestNewSubnetSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSubnetSource(client, account, region, &TestRateLimit)
+	source := NewSubnetSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

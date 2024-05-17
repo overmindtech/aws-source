@@ -78,14 +78,13 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 // +overmind:group AWS
 
 // NewIamInstanceProfileAssociationSource Creates a new source for aws-IamInstanceProfileAssociation resources
-func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
+func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-iam-instance-profile-association",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeIamInstanceProfileAssociationsInput) (*ec2.DescribeIamInstanceProfileAssociationsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeIamInstanceProfileAssociations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeIamInstanceProfileAssociationsInput, error) {

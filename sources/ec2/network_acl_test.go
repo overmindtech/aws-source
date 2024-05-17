@@ -133,7 +133,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 func TestNewNetworkAclSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkAclSource(client, account, region, &TestRateLimit)
+	source := NewNetworkAclSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

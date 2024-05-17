@@ -90,7 +90,7 @@ func TestVirtualInterfaceOutputMapper(t *testing.T) {
 func TestNewVirtualInterfaceSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVirtualInterfaceSource(client, account, region, &TestRateLimit)
+	source := NewVirtualInterfaceSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

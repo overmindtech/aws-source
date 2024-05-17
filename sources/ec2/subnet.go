@@ -78,14 +78,13 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 // +overmind:terraform:queryMap aws_route_table_association.subnet_id
 // +overmind:terraform:queryMap aws_subnet.id
 
-func NewSubnetSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
+func NewSubnetSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-subnet",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSubnets(ctx, input)
 		},
 		InputMapperGet:  subnetInputMapperGet,

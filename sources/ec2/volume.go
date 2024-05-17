@@ -76,14 +76,13 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ebs_volume.id
 
-func NewVolumeSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
+func NewVolumeSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-volume",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVolumes(ctx, input)
 		},
 		InputMapperGet:  volumeInputMapperGet,

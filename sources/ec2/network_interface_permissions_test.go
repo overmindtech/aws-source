@@ -90,7 +90,7 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 func TestNewNetworkInterfacePermissionSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkInterfacePermissionSource(client, account, region, &TestRateLimit)
+	source := NewNetworkInterfacePermissionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

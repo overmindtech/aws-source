@@ -82,14 +82,13 @@ func arn(region, accountID, gatewayID string) string {
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway.id
 
-func NewDirectConnectGatewaySource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options] {
+func NewDirectConnectGatewaySource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-direct-connect-gateway",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewaysInput) (*directconnect.DescribeDirectConnectGatewaysOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeDirectConnectGateways(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewaysInput, error) {

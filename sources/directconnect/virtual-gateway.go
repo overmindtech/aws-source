@@ -38,14 +38,13 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 // +overmind:search Search virtual gateways by ARN
 // +overmind:group AWS
 
-func NewVirtualGatewaySource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
+func NewVirtualGatewaySource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-virtual-gateway",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualGatewaysInput) (*directconnect.DescribeVirtualGatewaysOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeVirtualGateways(ctx, input)
 		},
 		// We want to use the list API for get and list operations

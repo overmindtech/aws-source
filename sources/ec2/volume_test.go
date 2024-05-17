@@ -103,7 +103,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 func TestNewVolumeSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVolumeSource(client, account, region, &TestRateLimit)
+	source := NewVolumeSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

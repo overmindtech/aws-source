@@ -92,14 +92,13 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 // +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
 // +overmind:group AWS
 
-func NewDirectConnectGatewayAttachmentSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
+func NewDirectConnectGatewayAttachmentSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-direct-connect-gateway-attachment",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAttachmentsInput) (*directconnect.DescribeDirectConnectGatewayAttachmentsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeDirectConnectGatewayAttachments(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeDirectConnectGatewayAttachmentsInput, error) {

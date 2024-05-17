@@ -104,7 +104,7 @@ func TestVpcPeeringConnectionOutputMapper(t *testing.T) {
 func TestNewVpcPeeringConnectionSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVpcPeeringConnectionSource(client, account, region, &TestRateLimit)
+	source := NewVpcPeeringConnectionSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

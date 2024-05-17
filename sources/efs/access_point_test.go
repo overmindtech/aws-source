@@ -83,7 +83,7 @@ func TestAccessPointOutputMapper(t *testing.T) {
 func TestNewAccessPointSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewAccessPointSource(client, account, region, &TestRateLimit)
+	source := NewAccessPointSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

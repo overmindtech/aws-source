@@ -95,14 +95,13 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_security_group_rule.security_group_rule_id
 
-func NewSecurityGroupRuleSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
+func NewSecurityGroupRuleSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-security-group-rule",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupRulesInput) (*ec2.DescribeSecurityGroupRulesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeSecurityGroupRules(ctx, input)
 		},
 		InputMapperGet:  securityGroupRuleInputMapperGet,

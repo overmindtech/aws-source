@@ -97,14 +97,13 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_network_acl.id
 
-func NewNetworkAclSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkAclSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-network-acl",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkAclsInput) (*ec2.DescribeNetworkAclsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNetworkAcls(ctx, input)
 		},
 		InputMapperGet:  networkAclInputMapperGet,

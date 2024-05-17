@@ -38,14 +38,13 @@ func customerMetadataOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:search Search Customer Agreements by ARN
 // +overmind:group AWS
 
-func NewCustomerMetadataSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options] {
+func NewCustomerMetadataSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-customer-metadata",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeCustomerMetadataInput) (*directconnect.DescribeCustomerMetadataOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeCustomerMetadata(ctx, input)
 		},
 		// We want to use the list API for get and list operations

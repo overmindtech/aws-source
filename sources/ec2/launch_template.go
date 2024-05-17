@@ -59,14 +59,13 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_launch_template.id
 
-func NewLaunchTemplateSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
+func NewLaunchTemplateSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
 		InputMapperGet:  launchTemplateInputMapperGet,

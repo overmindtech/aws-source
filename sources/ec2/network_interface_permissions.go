@@ -74,14 +74,13 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 // +overmind:search Search network interface permissions by ARN
 // +overmind:group AWS
 
-func NewNetworkInterfacePermissionSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+func NewNetworkInterfacePermissionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-network-interface-permission",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
 		InputMapperGet:  networkInterfacePermissionInputMapperGet,

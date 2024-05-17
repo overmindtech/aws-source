@@ -220,7 +220,7 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 // +overmind:terraform:method SEARCH
 //
 //go:generate docgen ../../docs-data
-func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
+func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, region string) *sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &sources.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:  "autoscaling-auto-scaling-group",
 		AccountID: accountID,
@@ -238,7 +238,6 @@ func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, reg
 			return autoscaling.NewDescribeAutoScalingGroupsPaginator(client, params)
 		},
 		DescribeFunc: func(ctx context.Context, client *autoscaling.Client, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for rate limiting
 			return client.DescribeAutoScalingGroups(ctx, input)
 		},
 		OutputMapper: autoScalingGroupOutputMapper,

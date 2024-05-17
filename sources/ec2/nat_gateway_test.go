@@ -151,7 +151,7 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 func TestNewNatGatewaySource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNatGatewaySource(client, account, region, &TestRateLimit)
+	source := NewNatGatewaySource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

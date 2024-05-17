@@ -168,7 +168,7 @@ func TestLagOutputMapper(t *testing.T) {
 func TestNewLagSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLagSource(client, account, region, &TestRateLimit)
+	source := NewLagSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

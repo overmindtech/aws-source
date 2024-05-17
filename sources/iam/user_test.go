@@ -111,7 +111,7 @@ func (t *TestIAMClient) ListUserTags(context.Context, *iam.ListUserTagsInput, ..
 }
 
 func TestGetUserGroups(t *testing.T) {
-	groups, err := getUserGroups(context.Background(), &TestIAMClient{}, sources.PtrString("foo"), &TestRateLimit)
+	groups, err := getUserGroups(context.Background(), &TestIAMClient{}, sources.PtrString("foo"))
 
 	if err != nil {
 		t.Error(err)
@@ -123,7 +123,7 @@ func TestGetUserGroups(t *testing.T) {
 }
 
 func TestUserGetFunc(t *testing.T) {
-	user, err := userGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar", &TestRateLimit)
+	user, err := userGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
 	if err != nil {
 		t.Error(err)
@@ -140,7 +140,7 @@ func TestUserGetFunc(t *testing.T) {
 }
 
 func TestUserListFunc(t *testing.T) {
-	users, err := userListFunc(context.Background(), &TestIAMClient{}, "foo", &TestRateLimit)
+	users, err := userListFunc(context.Background(), &TestIAMClient{}, "foo")
 
 	if err != nil {
 		t.Error(err)
@@ -218,7 +218,7 @@ func TestUserItemMapper(t *testing.T) {
 func TestNewUserSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
-	source := NewUserSource(config, account, region, &TestRateLimit)
+	source := NewUserSource(config, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

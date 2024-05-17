@@ -130,14 +130,13 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 // +overmind:search Search Interconnects by ARN
 // +overmind:group AWS
 
-func NewInterconnectSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
+func NewInterconnectSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-interconnect",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeInterconnectsInput) (*directconnect.DescribeInterconnectsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeInterconnects(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeInterconnectsInput, error) {

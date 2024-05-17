@@ -116,14 +116,13 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 // +overmind:terraform:queryMap aws_vpc_peering_connection_accepter.id
 // +overmind:terraform:queryMap aws_vpc_peering_connection_options.vpc_peering_connection_id
 
-func NewVpcPeeringConnectionSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
+func NewVpcPeeringConnectionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-vpc-peering-connection",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVpcPeeringConnections(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeVpcPeeringConnectionsInput, error) {

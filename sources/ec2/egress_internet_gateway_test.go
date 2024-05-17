@@ -90,7 +90,7 @@ func TestEgressOnlyInternetGatewayOutputMapper(t *testing.T) {
 func TestNewEgressOnlyInternetGatewaySource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewEgressOnlyInternetGatewaySource(client, account, region, &TestRateLimit)
+	source := NewEgressOnlyInternetGatewaySource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,
