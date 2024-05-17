@@ -58,7 +58,7 @@ func TestRouterConfigurationOutputMapper(t *testing.T) {
 func TestNewRouterConfigurationSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewRouterConfigurationSource(client, account, region, &TestRateLimit)
+	source := NewRouterConfigurationSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:   source,

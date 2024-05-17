@@ -94,14 +94,13 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:search Search for event windows by ARN
 // +overmind:group AWS
 
-func NewInstanceEventWindowSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
+func NewInstanceEventWindowSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-instance-event-window",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput) (*ec2.DescribeInstanceEventWindowsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
 		InputMapperGet:  instanceEventWindowInputMapperGet,

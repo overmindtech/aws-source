@@ -59,14 +59,13 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_key_pair.id
 
-func NewKeyPairSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
+func NewKeyPairSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-key-pair",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeKeyPairs(ctx, input)
 		},
 		InputMapperGet:  keyPairInputMapperGet,

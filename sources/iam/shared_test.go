@@ -1,23 +1,16 @@
 package iam
 
 import (
-	"context"
 	"log"
 	"os"
 	"testing"
 
-	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/aws-source/tracing"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 )
 
 // TestIAMClient Test client that returns three pages
 type TestIAMClient struct{}
-
-var TestRateLimit = sources.LimitBucket{
-	MaxCapacity: 50,
-	RefillRate:  20,
-}
 
 func TestMain(m *testing.M) {
 	// Add tracing if present
@@ -34,10 +27,6 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 	defer tracing.ShutdownTracing()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	TestRateLimit.Start(ctx)
 
 	os.Exit(m.Run())
 }

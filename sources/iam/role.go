@@ -23,9 +23,7 @@ type RoleDetails struct {
 	AttachedPolicies []types.AttachedPolicy
 }
 
-func roleGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*RoleDetails, error) {
-	limit.Wait(ctx)
-
+func roleGetFunc(ctx context.Context, client IAMClient, _, query string) (*RoleDetails, error) {
 	out, err := client.GetRole(ctx, &iam.GetRoleInput{
 		RoleName: &query,
 	})
@@ -38,7 +36,7 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string, lim
 		Role: out.Role,
 	}
 
-	err = enrichRole(ctx, client, &details, limit)
+	err = enrichRole(ctx, client, &details)
 
 	if err != nil {
 		return nil, err
@@ -47,21 +45,21 @@ func roleGetFunc(ctx context.Context, client IAMClient, scope, query string, lim
 	return &details, nil
 }
 
-func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails, limit *sources.LimitBucket) error {
+func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails) error {
 	var err error
 
 	// In this section we want to get the embedded polices, and determine links
 	// to the attached policies
 
 	// Get embedded policies
-	roleDetails.EmbeddedPolicies, err = getEmbeddedPolicies(ctx, client, *roleDetails.Role.RoleName, limit)
+	roleDetails.EmbeddedPolicies, err = getEmbeddedPolicies(ctx, client, *roleDetails.Role.RoleName)
 
 	if err != nil {
 		return err
 	}
 
 	// Get the attached policies and create links to these
-	roleDetails.AttachedPolicies, err = getAttachedPolicies(ctx, client, *roleDetails.Role.RoleName, limit)
+	roleDetails.AttachedPolicies, err = getAttachedPolicies(ctx, client, *roleDetails.Role.RoleName)
 
 	if err != nil {
 		return err
@@ -76,7 +74,7 @@ type embeddedPolicy struct {
 }
 
 // getEmbeddedPolicies returns a list of inline policies embedded in the role
-func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]embeddedPolicy, error) {
+func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string) ([]embeddedPolicy, error) {
 	policiesPaginator := iam.NewListRolePoliciesPaginator(client, &iam.ListRolePoliciesInput{
 		RoleName: &roleName,
 	})
@@ -86,8 +84,6 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 	policies := make([]embeddedPolicy, 0)
 
 	for policiesPaginator.HasMorePages() {
-		limit.Wait(ctx)
-
 		out, err := policiesPaginator.NextPage(ctx)
 
 		if err != nil {
@@ -95,7 +91,7 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 		}
 
 		for _, policyName := range out.PolicyNames {
-			embeddedPolicy, err := getRolePolicyDetails(ctx, client, roleName, policyName, limit)
+			embeddedPolicy, err := getRolePolicyDetails(ctx, client, roleName, policyName)
 
 			if err != nil {
 				// Ignore these errors
@@ -109,12 +105,9 @@ func getEmbeddedPolicies(ctx context.Context, client IAMClient, roleName string,
 	return policies, nil
 }
 
-func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string, policyName string, limit *sources.LimitBucket) (*embeddedPolicy, error) {
+func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string, policyName string) (*embeddedPolicy, error) {
 	ctx, span := tracer.Start(ctx, "getRolePolicyDetails")
 	defer span.End()
-
-	limit.Wait(ctx)
-
 	policy, err := client.GetRolePolicy(ctx, &iam.GetRolePolicyInput{
 		RoleName:   &roleName,
 		PolicyName: &policyName,
@@ -152,7 +145,7 @@ func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string
 
 // getAttachedPolicies Gets the attached policies for a role, these are actual
 // managed policies that can be linked to rather than embedded ones
-func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string, limit *sources.LimitBucket) ([]types.AttachedPolicy, error) {
+func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string) ([]types.AttachedPolicy, error) {
 	paginator := iam.NewListAttachedRolePoliciesPaginator(client, &iam.ListAttachedRolePoliciesInput{
 		RoleName: &roleName,
 	})
@@ -160,8 +153,6 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string,
 	attachedPolicies := make([]types.AttachedPolicy, 0)
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx)
-
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -174,7 +165,7 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string,
 	return attachedPolicies, nil
 }
 
-func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*RoleDetails, error) {
+func roleListFunc(ctx context.Context, client IAMClient, _ string) ([]*RoleDetails, error) {
 	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
 	roles := make([]*RoleDetails, 0)
 	ctx, span := tracer.Start(ctx, "roleListFunc")
@@ -185,8 +176,6 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 	}
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx)
-
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
@@ -198,7 +187,7 @@ func roleListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 				Role: role,
 			}
 
-			err := enrichRole(ctx, client, &details, limit)
+			err := enrichRole(ctx, client, &details)
 
 			if err != nil {
 				return nil, err
@@ -302,17 +291,17 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_role.arn
 // +overmind:terraform:method SEARCH
 
-func NewRoleSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
+func NewRoleSource(config aws.Config, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-role",
 		Client:        iam.NewFromConfig(config),
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
-			return roleGetFunc(ctx, client, scope, query, limit)
+			return roleGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
-			return roleListFunc(ctx, client, scope, limit)
+			return roleListFunc(ctx, client, scope)
 		},
 		ListTagsFunc: roleListTagsFunc,
 		ItemMapper:   roleItemMapper,

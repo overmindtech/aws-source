@@ -119,7 +119,7 @@ func TestDirectConnectGatewayAssociationOutputMapper_Health_Error(t *testing.T) 
 func TestNewDirectConnectGatewayAssociationSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewayAssociationSource(client, account, region, &TestRateLimit)
+	source := NewDirectConnectGatewayAssociationSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:   source,

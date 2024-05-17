@@ -157,14 +157,13 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:terraform:queryMap aws_dx_public_virtual_interface.id
 // +overmind:terraform:queryMap aws_dx_transit_virtual_interface.id
 
-func NewVirtualInterfaceSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
+func NewVirtualInterfaceSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-virtual-interface",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualInterfacesInput) (*directconnect.DescribeVirtualInterfacesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeVirtualInterfaces(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeVirtualInterfacesInput, error) {

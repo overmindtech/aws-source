@@ -149,14 +149,13 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 // +overmind:terraform:queryMap aws_eip_association.public_ip
 
 // NewAddressSource Creates a new source for aws-Address resources
-func NewAddressSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
+func NewAddressSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-address",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeAddresses(ctx, input)
 		},
 		InputMapperGet:  addressInputMapperGet,

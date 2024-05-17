@@ -39,7 +39,7 @@ func TestCustomerMetadataOutputMapper(t *testing.T) {
 func TestNewCustomerMetadataSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewCustomerMetadataSource(client, account, region, &TestRateLimit)
+	source := NewCustomerMetadataSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

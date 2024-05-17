@@ -130,15 +130,13 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_mount_target.id
 
-func NewMountTargetSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
+func NewMountTargetSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-mount-target",
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeMountTargetsInput) (*efs.DescribeMountTargetsOutput, error) {
-			// Wait for rate limiting
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeMountTargets(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeMountTargetsInput, error) {

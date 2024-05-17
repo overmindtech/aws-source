@@ -99,14 +99,13 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ec2_capacity_reservation.id
 
-func NewCapacityReservationSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
+func NewCapacityReservationSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-capacity-reservation",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationsInput) (*ec2.DescribeCapacityReservationsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeCapacityReservations(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*ec2.DescribeCapacityReservationsInput, error) {

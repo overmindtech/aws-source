@@ -150,7 +150,7 @@ func TestInterconnectHealth(t *testing.T) {
 func TestNewInterconnectSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInterconnectSource(client, account, region, &TestRateLimit)
+	source := NewInterconnectSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

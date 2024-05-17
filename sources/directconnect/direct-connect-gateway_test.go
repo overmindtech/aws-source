@@ -81,7 +81,7 @@ func TestDirectConnectGatewayOutputMapper_Health_ERROR(t *testing.T) {
 func TestNewDirectConnectGatewaySource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewaySource(client, account, region, &TestRateLimit)
+	source := NewDirectConnectGatewaySource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

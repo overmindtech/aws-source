@@ -272,14 +272,13 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:terraform:queryMap aws_default_route_table.default_route_table_id
 // +overmind:terraform:queryMap aws_route.route_table_id
 
-func NewRouteTableSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
+func NewRouteTableSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-route-table",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeRouteTables(ctx, input)
 		},
 		InputMapperGet:  routeTableInputMapperGet,

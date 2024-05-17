@@ -104,14 +104,13 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 // +overmind:search Search for volume statuses by ARN
 // +overmind:group AWS
 
-func NewVolumeStatusSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
+func NewVolumeStatusSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-volume-status",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumeStatusInput) (*ec2.DescribeVolumeStatusOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeVolumeStatus(ctx, input)
 		},
 		InputMapperGet:  volumeStatusInputMapperGet,

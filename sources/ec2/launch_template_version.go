@@ -318,14 +318,13 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 // +overmind:search Search launch template versions by ARN
 // +overmind:group AWS
 
-func NewLaunchTemplateVersionSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
+func NewLaunchTemplateVersionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-launch-template-version",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
 		InputMapperGet:  launchTemplateVersionInputMapperGet,

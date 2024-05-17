@@ -55,14 +55,13 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_router_configuration.virtual_interface_id
 
-func NewRouterConfigurationSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
+func NewRouterConfigurationSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-router-configuration",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeRouterConfigurationInput) (*directconnect.DescribeRouterConfigurationOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeRouterConfiguration(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeRouterConfigurationInput, error) {

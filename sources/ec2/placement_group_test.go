@@ -75,7 +75,7 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 func TestNewPlacementGroupSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewPlacementGroupSource(client, account, region, &TestRateLimit)
+	source := NewPlacementGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

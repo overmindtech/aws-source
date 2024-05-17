@@ -64,15 +64,13 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_access_point.id
 
-func NewAccessPointSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
+func NewAccessPointSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-access-point",
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeAccessPointsInput) (*efs.DescribeAccessPointsOutput, error) {
-			// Wait for rate limiting
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeAccessPoints(ctx, input)
 		},
 		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeAccessPointsInput) sources.Paginator[*efs.DescribeAccessPointsOutput, *efs.Options] {

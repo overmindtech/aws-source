@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func instanceProfileGetFunc(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
+func instanceProfileGetFunc(ctx context.Context, client *iam.Client, _, query string) (*types.InstanceProfile, error) {
 	out, err := client.GetInstanceProfile(ctx, &iam.GetInstanceProfileInput{
 		InstanceProfileName: &query,
 	})
@@ -24,7 +24,7 @@ func instanceProfileGetFunc(ctx context.Context, client *iam.Client, scope, quer
 	return out.InstanceProfile, nil
 }
 
-func instanceProfileListFunc(ctx context.Context, client *iam.Client, scope string) ([]*types.InstanceProfile, error) {
+func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.InstanceProfile, error) {
 	out, err := client.ListInstanceProfiles(ctx, &iam.ListInstanceProfilesInput{})
 
 	if err != nil {
@@ -131,22 +131,19 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 // +overmind:terraform:queryMap aws_iam_instance_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewInstanceProfileSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
+func NewInstanceProfileSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:      "iam-instance-profile",
 		Client:        iam.NewFromConfig(config),
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return instanceProfileGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.InstanceProfile, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return instanceProfileListFunc(ctx, client, scope)
 		},
 		ListTagsFunc: func(ctx context.Context, ip *types.InstanceProfile, c *iam.Client) (map[string]string, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return instanceProfileListTagsFunc(ctx, ip, c), nil
 		},
 		ItemMapper: instanceProfileItemMapper,

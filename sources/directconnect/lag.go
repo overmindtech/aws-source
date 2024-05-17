@@ -116,14 +116,13 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_lag.id
 
-func NewLagSource(client *directconnect.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
+func NewLagSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "directconnect-lag",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLagsInput) (*directconnect.DescribeLagsOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeLags(ctx, input)
 		},
 		InputMapperGet: func(scope, query string) (*directconnect.DescribeLagsInput, error) {

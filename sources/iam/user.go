@@ -17,8 +17,7 @@ type UserDetails struct {
 	UserGroups []types.Group
 }
 
-func userGetFunc(ctx context.Context, client IAMClient, scope, query string, limit *sources.LimitBucket) (*UserDetails, error) {
-	limit.Wait(ctx) // Wait for rate limiting
+func userGetFunc(ctx context.Context, client IAMClient, _, query string) (*UserDetails, error) {
 	out, err := client.GetUser(ctx, &iam.GetUserInput{
 		UserName: &query,
 	})
@@ -32,17 +31,17 @@ func userGetFunc(ctx context.Context, client IAMClient, scope, query string, lim
 	}
 
 	if out.User != nil {
-		enrichUser(ctx, client, &details, limit)
+		enrichUser(ctx, client, &details)
 	}
 
 	return &details, nil
 }
 
 // enrichUser Enriches the user with group and tag info
-func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails, limit *sources.LimitBucket) error {
+func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails) error {
 	var err error
 
-	userDetails.UserGroups, err = getUserGroups(ctx, client, userDetails.User.UserName, limit)
+	userDetails.UserGroups, err = getUserGroups(ctx, client, userDetails.User.UserName)
 
 	if err != nil {
 		return err
@@ -52,7 +51,7 @@ func enrichUser(ctx context.Context, client IAMClient, userDetails *UserDetails,
 }
 
 // Gets all of the groups that a user is in
-func getUserGroups(ctx context.Context, client IAMClient, userName *string, limit *sources.LimitBucket) ([]types.Group, error) {
+func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]types.Group, error) {
 	var out *iam.ListGroupsForUserOutput
 	var err error
 	groups := make([]types.Group, 0)
@@ -62,7 +61,6 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string, limi
 	})
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx) // Wait for rate limiting
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -76,7 +74,7 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string, limi
 	return groups, nil
 }
 
-func userListFunc(ctx context.Context, client IAMClient, scope string, limit *sources.LimitBucket) ([]*UserDetails, error) {
+func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetails, error) {
 	var out *iam.ListUsersOutput
 	var err error
 	users := make([]types.User, 0)
@@ -84,7 +82,6 @@ func userListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 	paginator := iam.NewListUsersPaginator(client, &iam.ListUsersInput{})
 
 	for paginator.HasMorePages() {
-		limit.Wait(ctx) // Wait for rate limiting
 		out, err = paginator.NextPage(ctx)
 
 		if err != nil {
@@ -101,7 +98,7 @@ func userListFunc(ctx context.Context, client IAMClient, scope string, limit *so
 			User: &users[i],
 		}
 
-		enrichUser(ctx, client, &details, limit)
+		enrichUser(ctx, client, &details)
 
 		userDetails[i] = &details
 	}
@@ -178,7 +175,7 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_user.arn
 // +overmind:terraform:method SEARCH
 
-func NewUserSource(config aws.Config, accountID string, region string, limit *sources.LimitBucket) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
+func NewUserSource(config aws.Config, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-user",
 		Client:        iam.NewFromConfig(config),
@@ -186,10 +183,10 @@ func NewUserSource(config aws.Config, accountID string, region string, limit *so
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		Region:        region,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
-			return userGetFunc(ctx, client, scope, query, limit)
+			return userGetFunc(ctx, client, scope, query)
 		},
 		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
-			return userListFunc(ctx, client, scope, limit)
+			return userListFunc(ctx, client, scope)
 		},
 		ListTagsFunc: userListTagsFunc,
 		ItemMapper:   userItemMapper,

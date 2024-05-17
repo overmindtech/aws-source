@@ -115,7 +115,7 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 func TestNewSecurityGroupSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSecurityGroupSource(client, account, region, &TestRateLimit)
+	source := NewSecurityGroupSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

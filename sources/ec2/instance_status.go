@@ -85,14 +85,13 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:search Search EC2 instance statuses by ARN
 // +overmind:group AWS
 
-func NewInstanceStatusSource(client *ec2.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
+func NewInstanceStatusSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "ec2-instance-status",
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput) (*ec2.DescribeInstanceStatusOutput, error) {
-			limit.Wait(ctx) // Wait for rate limiting // Wait for late limiting
 			return client.DescribeInstanceStatus(ctx, input)
 		},
 		InputMapperGet:  instanceStatusInputMapperGet,

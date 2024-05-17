@@ -108,7 +108,7 @@ func TestImageOutputMapper(t *testing.T) {
 func TestNewImageSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewImageSource(client, account, region, &TestRateLimit)
+	source := NewImageSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

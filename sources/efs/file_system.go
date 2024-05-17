@@ -102,15 +102,13 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_file_system.id
 
-func NewFileSystemSource(client *efs.Client, accountID string, region string, limit *sources.LimitBucket) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
+func NewFileSystemSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
 		ItemType:  "efs-file-system",
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeFileSystemsInput) (*efs.DescribeFileSystemsOutput, error) {
-			// Wait for rate limiting
-			limit.Wait(ctx) // Wait for rate limiting
 			return client.DescribeFileSystems(ctx, input)
 		},
 		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeFileSystemsInput) sources.Paginator[*efs.DescribeFileSystemsOutput, *efs.Options] {

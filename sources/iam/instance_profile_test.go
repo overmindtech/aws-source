@@ -52,7 +52,7 @@ func TestInstanceProfileItemMapper(t *testing.T) {
 func TestNewInstanceProfileSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 
-	source := NewInstanceProfileSource(config, account, region, &TestRateLimit)
+	source := NewInstanceProfileSource(config, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

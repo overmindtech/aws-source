@@ -100,7 +100,7 @@ func TestVpcOutputMapper(t *testing.T) {
 func TestNewVpcSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVpcSource(client, account, region, &TestRateLimit)
+	source := NewVpcSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

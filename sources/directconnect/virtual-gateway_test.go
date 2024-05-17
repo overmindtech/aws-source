@@ -39,7 +39,7 @@ func TestVirtualGatewayOutputMapper(t *testing.T) {
 func TestNewVirtualGatewaySource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVirtualGatewaySource(client, account, region, &TestRateLimit)
+	source := NewVirtualGatewaySource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,
