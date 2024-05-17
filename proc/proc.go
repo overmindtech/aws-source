@@ -177,7 +177,7 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 }
 
 // InitializeAwsSourceEngine initializes an Engine with AWS sources, returns the
-// engine, and an error if any. The xontext provided will be used for the rate
+// engine, and an error if any. The context provided will be used for the rate
 // limit buckets and should not be cancelled until the source is shut down
 func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions, awsAuthConfig AwsAuthConfig, maxParallel int) (*discovery.Engine, error) {
 	e, err := discovery.NewEngine()
