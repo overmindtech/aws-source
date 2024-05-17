@@ -207,11 +207,9 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 			return nil, fmt.Errorf("error getting AWS config for region %v: %w", region, err)
 		}
 
-		if log.GetLevel() == log.TraceLevel {
-			// Add OTel instrumentation
-			cfg.HTTPClient = &http.Client{
-				Transport: otelhttp.NewTransport(http.DefaultTransport),
-			}
+		// Add OTel instrumentation
+		cfg.HTTPClient = &http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport),
 		}
 
 		// Work out what account we're using. This will be used in item scopes
