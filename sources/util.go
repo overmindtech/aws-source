@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -300,6 +301,10 @@ func (e E2ETest) Run(t *testing.T) {
 // unavailable
 func GetAutoConfig(t *testing.T) (aws.Config, string, string) {
 	t.Helper()
+
+	if os.Getenv("AWS_PROFILE") == "" {
+		t.Skip("AWS_PROFILE not set")
+	}
 
 	config, err := config.LoadDefaultConfig(context.Background())
 
