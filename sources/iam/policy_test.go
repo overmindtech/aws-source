@@ -323,9 +323,12 @@ func TestNewPolicySource(t *testing.T) {
 		defer span.End()
 
 		items, err := source.List(ctx, "aws", false)
-
 		if err != nil {
 			t.Error(err)
+		}
+
+		if len(items) == 0 {
+			t.Fatal("expected items, got none")
 		}
 
 		for _, item := range items {
