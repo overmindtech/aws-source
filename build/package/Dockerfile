@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/go/pkg \
     go generate ./... \
     && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o source main.go
 
-FROM alpine:3.19
+FROM alpine:3.20
 WORKDIR /
 COPY --from=builder /workspace/source .
 USER 65534:65534
