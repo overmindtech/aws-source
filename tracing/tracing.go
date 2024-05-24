@@ -19,7 +19,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 )
 
 //go:generate sh -c "echo -n $(git describe --tags --long --all) > commit.txt"
@@ -77,7 +77,7 @@ func tracingResource() *resource.Resource {
 	}
 	resources = append(resources, localRes)
 
-	conv := schema.NewConverter(schema.NewLocalClient())
+	conv := schema.NewConverter(schema.DefaultClient)
 	res, err := conv.MergeResources(context.Background(), semconv.SchemaURL, resources...)
 
 	if err != nil {
