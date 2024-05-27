@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -101,9 +102,9 @@ func WrapAWSError(err error) *sdp.QueryError {
 	var responseErr *awshttp.ResponseError
 
 	if errors.As(err, &responseErr) {
-		// If the input is bad or the thing wasn't found then it's definitely
-		// not there
-		if responseErr.HTTPStatusCode() == 400 || responseErr.HTTPStatusCode() == 404 {
+		// If the input is bad, access is denied, or the thing wasn't found then
+		// we should assume that it is not exist for this source
+		if slices.Contains([]int{400, 403, 404}, responseErr.HTTPStatusCode()) {
 			return &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,
 				ErrorString: err.Error(),
