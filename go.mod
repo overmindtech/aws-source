@@ -35,7 +35,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.7
 	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.27.3
-	github.com/overmindtech/sdp-go v0.73.1
+	github.com/overmindtech/sdp-go v0.74.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
@@ -55,7 +55,7 @@ require (
 
 // Transitive dependencies
 require (
-	connectrpc.com/connect v1.16.1 // indirect
+	connectrpc.com/connect v1.16.2 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/auth0/go-jwt-middleware/v2 v2.2.1 // indirect
 	github.com/aws/aws-sdk-go v1.53.6 // indirect
@@ -75,7 +75,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
@@ -87,7 +87,7 @@ require (
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/nats-io/nats.go v1.34.1 // indirect
+	github.com/nats-io/nats.go v1.35.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
