@@ -294,7 +294,9 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 func NewRoleSource(config aws.Config, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-role",
-		Client:        iam.NewFromConfig(config),
+		Client: iam.NewFromConfig(config, func(o *iam.Options) {
+			o.RetryMode = aws.RetryModeAdaptive
+		}),
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {

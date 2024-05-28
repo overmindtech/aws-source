@@ -69,8 +69,10 @@ func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 
 func NewGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
-		ItemType:      "iam-group",
-		Client:        iam.NewFromConfig(config),
+		ItemType: "iam-group",
+		Client: iam.NewFromConfig(config, func(o *iam.Options) {
+			o.RetryMode = aws.RetryModeAdaptive
+		}),
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {

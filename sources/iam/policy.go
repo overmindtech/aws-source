@@ -282,8 +282,10 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // https://github.com/overmindtech/aws-source/issues/68
 func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType:      "iam-policy",
-		Client:        iam.NewFromConfig(config),
+		ItemType: "iam-policy",
+		Client: iam.NewFromConfig(config, func(o *iam.Options) {
+			o.RetryMode = aws.RetryModeAdaptive
+		}),
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		Region:        "", // IAM policies aren't tied to a region
