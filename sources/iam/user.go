@@ -177,8 +177,10 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 
 func NewUserSource(config aws.Config, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{
-		ItemType:      "iam-user",
-		Client:        iam.NewFromConfig(config),
+		ItemType: "iam-user",
+		Client: iam.NewFromConfig(config, func(o *iam.Options) {
+			o.RetryMode = aws.RetryModeAdaptive
+		}),
 		AccountID:     accountID,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		Region:        region,
