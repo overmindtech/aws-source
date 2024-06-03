@@ -19,6 +19,7 @@ import (
 	awseks "github.com/aws/aws-sdk-go-v2/service/eks"
 	awselasticloadbalancing "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	awselasticloadbalancingv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
+	awsiam "github.com/aws/aws-sdk-go-v2/service/iam"
 	awslambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	awsnetworkfirewall "github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	awsnetworkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -284,6 +285,11 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 		networkmanagerClient := awsnetworkmanager.NewFromConfig(cfg, func(o *awsnetworkmanager.Options) {
 			o.RetryMode = aws.RetryModeAdaptive
 		})
+		iamClient := awsiam.NewFromConfig(cfg, func(o *awsiam.Options) {
+			o.RetryMode = aws.RetryModeAdaptive
+			// Increase this from the default of 3 since IAM as such low rate limits
+			o.RetryMaxAttempts = 5
+		})
 
 		sources := []discovery.Source{
 			// EC2
@@ -337,11 +343,11 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 			cloudwatch.NewAlarmSource(cloudwatchClient, *callerID.Account, region),
 
 			// IAM
-			iam.NewGroupSource(cfg, *callerID.Account, region),
-			iam.NewInstanceProfileSource(cfg, *callerID.Account, region),
-			iam.NewPolicySource(cfg, *callerID.Account, region),
-			iam.NewRoleSource(cfg, *callerID.Account, region),
-			iam.NewUserSource(cfg, *callerID.Account, region),
+			iam.NewGroupSource(iamClient, *callerID.Account, region),
+			iam.NewInstanceProfileSource(iamClient, *callerID.Account, region),
+			iam.NewPolicySource(iamClient, *callerID.Account, region),
+			iam.NewRoleSource(iamClient, *callerID.Account, region),
+			iam.NewUserSource(iamClient, *callerID.Account, region),
 
 			// Lambda
 			lambda.NewFunctionSource(lambdaClient, *callerID.Account, region),

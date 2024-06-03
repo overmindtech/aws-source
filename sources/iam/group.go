@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -67,12 +66,10 @@ func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:terraform:queryMap aws_iam_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewGroupSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
+func NewGroupSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
-		ItemType: "iam-group",
-		Client: iam.NewFromConfig(config, func(o *iam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		}),
+		ItemType:      "iam-group",
+		Client:        client,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {

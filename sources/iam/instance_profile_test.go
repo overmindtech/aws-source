@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/overmindtech/aws-source/sources"
 )
@@ -51,8 +53,12 @@ func TestInstanceProfileItemMapper(t *testing.T) {
 
 func TestNewInstanceProfileSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
+	client := iam.NewFromConfig(config, func(o *iam.Options) {
+		o.RetryMode = aws.RetryModeAdaptive
+		o.RetryMaxAttempts = 10
+	})
 
-	source := NewInstanceProfileSource(config, account, region)
+	source := NewInstanceProfileSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -217,8 +218,12 @@ func TestUserItemMapper(t *testing.T) {
 
 func TestNewUserSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
+	client := iam.NewFromConfig(config, func(o *iam.Options) {
+		o.RetryMode = aws.RetryModeAdaptive
+		o.RetryMaxAttempts = 10
+	})
 
-	source := NewUserSource(config, account, region)
+	source := NewUserSource(client, account, region)
 
 	test := sources.E2ETest{
 		Source:  source,
