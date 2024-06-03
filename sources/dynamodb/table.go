@@ -202,13 +202,9 @@ func NewTableSource(client Client, accountID string, region string) *sources.Alw
 			inputs := make([]*dynamodb.DescribeTableInput, len(output.TableNames))
 
 			for i := range output.TableNames {
-				if output.TableNames[i] == "" {
-					continue
-				}
-
-				inputs = append(inputs, &dynamodb.DescribeTableInput{
+				inputs[i] = &dynamodb.DescribeTableInput{
 					TableName: &output.TableNames[i],
-				})
+				}
 			}
 
 			return inputs, nil
