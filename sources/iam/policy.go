@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
@@ -280,12 +279,10 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-source/issues/68
-func NewPolicySource(config aws.Config, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
+func NewPolicySource(client *iam.Client, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType: "iam-policy",
-		Client: iam.NewFromConfig(config, func(o *iam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		}),
+		ItemType:      "iam-policy",
+		Client:        client,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		Region:        "", // IAM policies aren't tied to a region

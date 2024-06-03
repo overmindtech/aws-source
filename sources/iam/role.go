@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"go.opentelemetry.io/otel/attribute"
@@ -291,12 +290,10 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_role.arn
 // +overmind:terraform:method SEARCH
 
-func NewRoleSource(config aws.Config, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
+func NewRoleSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-role",
-		Client: iam.NewFromConfig(config, func(o *iam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		}),
+		Client:        client,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {

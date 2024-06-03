@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -175,12 +174,10 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_user.arn
 // +overmind:terraform:method SEARCH
 
-func NewUserSource(config aws.Config, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
+func NewUserSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*UserDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*UserDetails, IAMClient, *iam.Options]{
-		ItemType: "iam-user",
-		Client: iam.NewFromConfig(config, func(o *iam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		}),
+		ItemType:      "iam-user",
+		Client:        client,
 		AccountID:     accountID,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		Region:        region,

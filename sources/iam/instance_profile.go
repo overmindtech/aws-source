@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
@@ -131,12 +130,10 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 // +overmind:terraform:queryMap aws_iam_instance_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewInstanceProfileSource(config aws.Config, accountID string, region string) *sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
+func NewInstanceProfileSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options]{
-		ItemType: "iam-instance-profile",
-		Client: iam.NewFromConfig(config, func(o *iam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		}),
+		ItemType:      "iam-instance-profile",
+		Client:        client,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
