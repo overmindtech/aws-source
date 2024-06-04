@@ -30,10 +30,10 @@ func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) 
 		return nil, err
 	}
 
-	zones := make([]*types.InstanceProfile, len(out.InstanceProfiles))
+	zones := make([]*types.InstanceProfile, 0, len(out.InstanceProfiles))
 
 	for i := range out.InstanceProfiles {
-		zones[i] = &out.InstanceProfiles[i]
+		zones = append(zones, &out.InstanceProfiles[i])
 	}
 
 	return zones, nil

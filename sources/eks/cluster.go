@@ -287,12 +287,12 @@ func NewClusterSource(client EKSClient, accountID string, region string) *source
 			return eks.NewListClustersPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListClustersOutput, _ *eks.ListClustersInput) ([]*eks.DescribeClusterInput, error) {
-			inputs := make([]*eks.DescribeClusterInput, len(output.Clusters))
+			inputs := make([]*eks.DescribeClusterInput, 0, len(output.Clusters))
 
 			for i := range output.Clusters {
-				inputs[i] = &eks.DescribeClusterInput{
+				inputs = append(inputs, &eks.DescribeClusterInput{
 					Name: &output.Clusters[i],
-				}
+				})
 			}
 
 			return inputs, nil

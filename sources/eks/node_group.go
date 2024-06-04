@@ -218,13 +218,13 @@ func NewNodegroupSource(client EKSClient, accountID string, region string) *sour
 			return eks.NewListNodegroupsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListNodegroupsOutput, input *eks.ListNodegroupsInput) ([]*eks.DescribeNodegroupInput, error) {
-			inputs := make([]*eks.DescribeNodegroupInput, len(output.Nodegroups))
+			inputs := make([]*eks.DescribeNodegroupInput, 0, len(output.Nodegroups))
 
 			for i := range output.Nodegroups {
-				inputs[i] = &eks.DescribeNodegroupInput{
+				inputs = append(inputs, &eks.DescribeNodegroupInput{
 					ClusterName:   input.ClusterName,
 					NodegroupName: &output.Nodegroups[i],
-				}
+				})
 			}
 
 			return inputs, nil

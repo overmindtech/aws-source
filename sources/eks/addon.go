@@ -87,13 +87,13 @@ func NewAddonSource(client EKSClient, accountID string, region string) *sources.
 			return eks.NewListAddonsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListAddonsOutput, input *eks.ListAddonsInput) ([]*eks.DescribeAddonInput, error) {
-			inputs := make([]*eks.DescribeAddonInput, len(output.Addons))
+			inputs := make([]*eks.DescribeAddonInput, 0, len(output.Addons))
 
 			for i := range output.Addons {
-				inputs[i] = &eks.DescribeAddonInput{
+				inputs = append(inputs, &eks.DescribeAddonInput{
 					AddonName:   &output.Addons[i],
 					ClusterName: input.ClusterName,
-				}
+				})
 			}
 
 			return inputs, nil

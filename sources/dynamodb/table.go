@@ -199,12 +199,12 @@ func NewTableSource(client Client, accountID string, region string) *sources.Alw
 				return nil, errors.New("cannot map nil output")
 			}
 
-			inputs := make([]*dynamodb.DescribeTableInput, len(output.TableNames))
+			inputs := make([]*dynamodb.DescribeTableInput, 0, len(output.TableNames))
 
 			for i := range output.TableNames {
-				inputs[i] = &dynamodb.DescribeTableInput{
+				inputs = append(inputs, &dynamodb.DescribeTableInput{
 					TableName: &output.TableNames[i],
-				}
+				})
 			}
 
 			return inputs, nil

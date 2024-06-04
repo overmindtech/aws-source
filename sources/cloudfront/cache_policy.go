@@ -30,7 +30,7 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 	policies := make([]*types.CachePolicy, 0, len(out.CachePolicyList.Items))
 
 	for i := range out.CachePolicyList.Items {
-		policies[i] = out.CachePolicyList.Items[i].CachePolicy
+		policies = append(policies, out.CachePolicyList.Items[i].CachePolicy)
 	}
 
 	return policies, nil

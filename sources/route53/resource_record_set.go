@@ -25,10 +25,10 @@ func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 		return nil, err
 	}
 
-	zones := make([]*types.ResourceRecordSet, len(out.ResourceRecordSets))
+	zones := make([]*types.ResourceRecordSet, 0, len(out.ResourceRecordSets))
 
-	for i, zone := range out.ResourceRecordSets {
-		zones[i] = &zone
+	for _, zone := range out.ResourceRecordSets {
+		zones = append(zones, &zone)
 	}
 
 	return zones, nil

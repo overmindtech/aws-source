@@ -12,13 +12,13 @@ import (
 
 func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Client, scope string, _ *directconnect.DescribeDirectConnectGatewaysInput, output *directconnect.DescribeDirectConnectGatewaysOutput) ([]*sdp.Item, error) {
 	// create a slice of ARNs for the resources
-	resourceARNs := make([]string, len(output.DirectConnectGateways))
-	for i, directConnectGateway := range output.DirectConnectGateways {
-		resourceARNs[i] = arn(
+	resourceARNs := make([]string, 0, len(output.DirectConnectGateways))
+	for _, directConnectGateway := range output.DirectConnectGateways {
+		resourceARNs = append(resourceARNs, arn(
 			scope,
 			*directConnectGateway.OwnerAccount,
 			*directConnectGateway.DirectConnectGatewayId,
-		)
+		))
 	}
 
 	tags := make(map[string][]types.Tag)

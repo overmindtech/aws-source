@@ -30,10 +30,10 @@ func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.
 		return nil, err
 	}
 
-	zones := make([]*types.Group, len(out.Groups))
+	zones := make([]*types.Group, 0, len(out.Groups))
 
 	for i := range out.Groups {
-		zones[i] = &out.Groups[i]
+		zones = append(zones, &out.Groups[i])
 	}
 
 	return zones, nil

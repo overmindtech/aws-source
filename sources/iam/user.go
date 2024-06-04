@@ -90,7 +90,7 @@ func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetai
 		users = append(users, out.Users...)
 	}
 
-	userDetails := make([]*UserDetails, len(users))
+	userDetails := make([]*UserDetails, 0, len(users))
 
 	for i := range users {
 		details := UserDetails{
@@ -99,7 +99,7 @@ func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetai
 
 		enrichUser(ctx, client, &details)
 
-		userDetails[i] = &details
+		userDetails = append(userDetails, &details)
 	}
 
 	return userDetails, nil

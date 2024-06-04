@@ -59,10 +59,10 @@ func NewKeyGroupSource(client *cloudfront.Client, accountID string) *sources.Get
 				return nil, err
 			}
 
-			keyGroups := make([]*types.KeyGroup, len(out.KeyGroupList.Items))
+			keyGroups := make([]*types.KeyGroup, 0, len(out.KeyGroupList.Items))
 
-			for i, item := range out.KeyGroupList.Items {
-				keyGroups[i] = item.KeyGroup
+			for _, item := range out.KeyGroupList.Items {
+				keyGroups = append(keyGroups, item.KeyGroup)
 			}
 
 			return keyGroups, nil

@@ -649,12 +649,12 @@ func NewFunctionSource(client LambdaClient, accountID string, region string) *so
 			return lambda.NewListFunctionsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *lambda.ListFunctionsOutput, input *lambda.ListFunctionsInput) ([]*lambda.GetFunctionInput, error) {
-			inputs := make([]*lambda.GetFunctionInput, len(output.Functions))
+			inputs := make([]*lambda.GetFunctionInput, 0,len(output.Functions))
 
 			for i := range output.Functions {
-				inputs[i] = &lambda.GetFunctionInput{
+				inputs = append(inputs, &lambda.GetFunctionInput{
 					FunctionName: output.Functions[i].FunctionName,
-				}
+				})
 			}
 
 			return inputs, nil

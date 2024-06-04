@@ -104,10 +104,10 @@ func NewRealtimeLogConfigsSource(client *cloudfront.Client, accountID string) *s
 				return nil, err
 			}
 
-			logConfigs := make([]*types.RealtimeLogConfig, len(out.RealtimeLogConfigs.Items))
+			logConfigs := make([]*types.RealtimeLogConfig, 0, len(out.RealtimeLogConfigs.Items))
 
-			for i, logConfig := range out.RealtimeLogConfigs.Items {
-				logConfigs[i] = &logConfig
+			for _, logConfig := range out.RealtimeLogConfigs.Items {
+				logConfigs = append(logConfigs, &logConfig)
 			}
 
 			return logConfigs, nil

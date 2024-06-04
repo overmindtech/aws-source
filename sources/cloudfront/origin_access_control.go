@@ -16,13 +16,13 @@ func originAccessControlListFunc(ctx context.Context, client *cloudfront.Client,
 		return nil, err
 	}
 
-	originAccessControls := make([]*types.OriginAccessControl, len(out.OriginAccessControlList.Items))
+	originAccessControls := make([]*types.OriginAccessControl, 0, len(out.OriginAccessControlList.Items))
 
-	for i, item := range out.OriginAccessControlList.Items {
+	for _, item := range out.OriginAccessControlList.Items {
 		// Annoyingly the "summary" types has exactly the same information as
 		// the type returned by get, but in a slightly different format. So we
 		// map it to the get format here
-		originAccessControls[i] = &types.OriginAccessControl{
+		originAccessControls = append(originAccessControls, &types.OriginAccessControl{
 			Id: item.Id,
 			OriginAccessControlConfig: &types.OriginAccessControlConfig{
 				Name:                          item.Name,
@@ -31,7 +31,7 @@ func originAccessControlListFunc(ctx context.Context, client *cloudfront.Client,
 				SigningProtocol:               item.SigningProtocol,
 				Description:                   item.Description,
 			},
-		}
+		})
 	}
 
 	return originAccessControls, nil

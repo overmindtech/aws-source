@@ -29,10 +29,10 @@ func hostedZoneListFunc(ctx context.Context, client *route53.Client, scope strin
 		return nil, err
 	}
 
-	zones := make([]*types.HostedZone, len(out.HostedZones))
+	zones := make([]*types.HostedZone, 0, len(out.HostedZones))
 
-	for i, zone := range out.HostedZones {
-		zones[i] = &zone
+	for _, zone := range out.HostedZones {
+		zones = append(zones, &zone)
 	}
 
 	return zones, nil
