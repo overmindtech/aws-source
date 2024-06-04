@@ -137,12 +137,12 @@ func NewCoreNetworkSource(client NetworkManagerClient, accountID, region string)
 			return networkmanager.NewListCoreNetworksPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *networkmanager.ListCoreNetworksOutput, input *networkmanager.ListCoreNetworksInput) ([]*networkmanager.GetCoreNetworkInput, error) {
-			queries := make([]*networkmanager.GetCoreNetworkInput, len(output.CoreNetworks))
+			queries := make([]*networkmanager.GetCoreNetworkInput, 0, len(output.CoreNetworks))
 
 			for i := range output.CoreNetworks {
-				queries[i] = &networkmanager.GetCoreNetworkInput{
+				queries = append(queries, &networkmanager.GetCoreNetworkInput{
 					CoreNetworkId: output.CoreNetworks[i].CoreNetworkId,
-				}
+				})
 			}
 
 			return queries, nil

@@ -59,10 +59,10 @@ func NewResponseHeadersPolicySource(client *cloudfront.Client, accountID string)
 				return nil, err
 			}
 
-			policies := make([]*types.ResponseHeadersPolicy, len(out.ResponseHeadersPolicyList.Items))
+			policies := make([]*types.ResponseHeadersPolicy, 0, len(out.ResponseHeadersPolicyList.Items))
 
-			for i, policy := range out.ResponseHeadersPolicyList.Items {
-				policies[i] = policy.ResponseHeadersPolicy
+			for _, policy := range out.ResponseHeadersPolicyList.Items {
+				policies = append(policies, policy.ResponseHeadersPolicy)
 			}
 
 			return policies, nil

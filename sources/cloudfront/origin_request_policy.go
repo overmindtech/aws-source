@@ -59,10 +59,10 @@ func NewOriginRequestPolicySource(client *cloudfront.Client, accountID string) *
 				return nil, err
 			}
 
-			policies := make([]*types.OriginRequestPolicy, len(out.OriginRequestPolicyList.Items))
+			policies := make([]*types.OriginRequestPolicy, 0, len(out.OriginRequestPolicyList.Items))
 
-			for i, policy := range out.OriginRequestPolicyList.Items {
-				policies[i] = policy.OriginRequestPolicy
+			for _, policy := range out.OriginRequestPolicyList.Items {
+				policies = append(policies, policy.OriginRequestPolicy)
 			}
 
 			return policies, nil

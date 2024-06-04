@@ -216,11 +216,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 
 	switch {
 	case numItems > 1:
-		itemNames := make([]string, len(items))
+		itemNames := make([]string, 0, len(items))
 
 		// Get the names for logging
 		for i := range items {
-			itemNames[i] = items[i].GloballyUniqueName()
+			itemNames = append(itemNames, items[i].GloballyUniqueName())
 		}
 
 		qErr := &sdp.QueryError{

@@ -49,9 +49,9 @@ func healthCheckListFunc(ctx context.Context, client *route53.Client, scope stri
 		return nil, err
 	}
 
-	healthChecks := make([]*HealthCheck, len(out.HealthChecks))
+	healthChecks := make([]*HealthCheck,0, len(out.HealthChecks))
 
-	for i, healthCheck := range out.HealthChecks {
+	for _, healthCheck := range out.HealthChecks {
 		status, err := client.GetHealthCheckStatus(ctx, &route53.GetHealthCheckStatusInput{
 			HealthCheckId: healthCheck.Id,
 		})
@@ -60,10 +60,10 @@ func healthCheckListFunc(ctx context.Context, client *route53.Client, scope stri
 			return nil, err
 		}
 
-		healthChecks[i] = &HealthCheck{
+		healthChecks = append(healthChecks, &HealthCheck{
 			HealthCheck:             healthCheck,
 			HealthCheckObservations: status.HealthCheckObservations,
-		}
+		})
 	}
 
 	return healthChecks, nil

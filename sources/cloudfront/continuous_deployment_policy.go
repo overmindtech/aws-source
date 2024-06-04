@@ -80,10 +80,10 @@ func NewContinuousDeploymentPolicySource(client *cloudfront.Client, accountID st
 				return nil, err
 			}
 
-			policies := make([]*types.ContinuousDeploymentPolicy, len(out.ContinuousDeploymentPolicyList.Items))
+			policies := make([]*types.ContinuousDeploymentPolicy, 0, len(out.ContinuousDeploymentPolicyList.Items))
 
-			for i, policy := range out.ContinuousDeploymentPolicyList.Items {
-				policies[i] = policy.ContinuousDeploymentPolicy
+			for _, policy := range out.ContinuousDeploymentPolicyList.Items {
+				policies = append(policies, policy.ContinuousDeploymentPolicy)
 			}
 
 			return policies, nil

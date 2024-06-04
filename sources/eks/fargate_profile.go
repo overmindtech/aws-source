@@ -127,13 +127,13 @@ func NewFargateProfileSource(client EKSClient, accountID string, region string) 
 			return eks.NewListFargateProfilesPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListFargateProfilesOutput, input *eks.ListFargateProfilesInput) ([]*eks.DescribeFargateProfileInput, error) {
-			inputs := make([]*eks.DescribeFargateProfileInput, len(output.FargateProfileNames))
+			inputs := make([]*eks.DescribeFargateProfileInput, 0, len(output.FargateProfileNames))
 
 			for i := range output.FargateProfileNames {
-				inputs[i] = &eks.DescribeFargateProfileInput{
+				inputs = append(inputs, &eks.DescribeFargateProfileInput{
 					ClusterName:        input.ClusterName,
 					FargateProfileName: &output.FargateProfileNames[i],
-				}
+				})
 			}
 
 			return inputs, nil

@@ -61,10 +61,10 @@ func NewFunctionSource(client *cloudfront.Client, accountID string) *sources.Get
 				return nil, err
 			}
 
-			summaries := make([]*types.FunctionSummary, len(out.FunctionList.Items))
+			summaries := make([]*types.FunctionSummary, 0, len(out.FunctionList.Items))
 
-			for i, item := range out.FunctionList.Items {
-				summaries[i] = &item
+			for _, item := range out.FunctionList.Items {
+				summaries = append(summaries, &item)
 			}
 
 			return summaries, nil

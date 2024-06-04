@@ -175,10 +175,10 @@ func CamelCase(i interface{}) interface{} {
 
 		return newMap
 	case reflect.Array, reflect.Slice:
-		newSlice := make([]interface{}, v.Len())
+		newSlice := make([]interface{}, 0, v.Len())
 
 		for index := 0; index < v.Len(); index++ {
-			newSlice[index] = CamelCase(v.Index(index).Interface())
+			newSlice = append(newSlice, CamelCase(v.Index(index).Interface()))
 		}
 
 		return newSlice
