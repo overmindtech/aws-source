@@ -30,7 +30,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.12
 	github.com/aws/smithy-go v1.20.2
-	github.com/getsentry/sentry-go v0.28.0
+	github.com/getsentry/sentry-go v0.28.1
 	github.com/iancoleman/strcase v0.2.0
 	github.com/nats-io/jwt/v2 v2.5.7
 	github.com/nats-io/nkeys v0.4.7
