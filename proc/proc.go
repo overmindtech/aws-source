@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	awsautoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
@@ -27,6 +28,7 @@ import (
 	awsroute53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	awssns "github.com/aws/aws-sdk-go-v2/service/sns"
 	awssqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/sourcegraph/conc/pool"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -194,277 +196,285 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 		log.Fatal("No regions specified")
 	}
 
-	var globalDone bool
+	var globalDone atomic.Bool
+
+	p := pool.New().WithContext(ctx).WithCancelOnError()
 
 	for _, region := range awsAuthConfig.Regions {
 		region = strings.Trim(region, " ")
+		p.Go(func(ctx context.Context) error {
+			configCtx, configCancel := context.WithTimeout(ctx, 10*time.Second)
+			defer configCancel()
 
-		configCtx, configCancel := context.WithTimeout(ctx, 10*time.Second)
-		defer configCancel()
-
-		cfg, err := awsAuthConfig.GetAWSConfig(region)
-		if err != nil {
-			configCancel()
-			return nil, fmt.Errorf("error getting AWS config for region %v: %w", region, err)
-		}
-
-		// Add OTel instrumentation
-		cfg.HTTPClient = &http.Client{
-			Transport: otelhttp.NewTransport(http.DefaultTransport),
-		}
-
-		// Work out what account we're using. This will be used in item scopes
-		stsClient := sts.NewFromConfig(cfg)
-
-		callerID, err := stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
-		if err != nil {
-			lf := log.Fields{
-				"region":   region,
-				"strategy": awsAuthConfig.Strategy,
+			cfg, err := awsAuthConfig.GetAWSConfig(region)
+			if err != nil {
+				configCancel()
+				return fmt.Errorf("error getting AWS config for region %v: %w", region, err)
 			}
-			if awsAuthConfig.TargetRoleARN != "" {
-				lf["targetRoleARN"] = awsAuthConfig.TargetRoleARN
-				lf["externalID"] = awsAuthConfig.ExternalID
+
+			// Add OTel instrumentation
+			cfg.HTTPClient = &http.Client{
+				Transport: otelhttp.NewTransport(http.DefaultTransport),
 			}
-			log.WithError(err).WithFields(lf).Error("Error retrieving account information")
-			return nil, fmt.Errorf("error getting caller identity for region %v: %w", region, err)
-		}
 
-		// Create shared clients for each API
-		autoscalingClient := awsautoscaling.NewFromConfig(cfg, func(o *awsautoscaling.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
+			// Work out what account we're using. This will be used in item scopes
+			stsClient := sts.NewFromConfig(cfg)
+
+			callerID, err := stsClient.GetCallerIdentity(configCtx, &sts.GetCallerIdentityInput{})
+			if err != nil {
+				lf := log.Fields{
+					"region":   region,
+					"strategy": awsAuthConfig.Strategy,
+				}
+				if awsAuthConfig.TargetRoleARN != "" {
+					lf["targetRoleARN"] = awsAuthConfig.TargetRoleARN
+					lf["externalID"] = awsAuthConfig.ExternalID
+				}
+				log.WithError(err).WithFields(lf).Error("Error retrieving account information")
+				return fmt.Errorf("error getting caller identity for region %v: %w", region, err)
+			}
+
+			// Create shared clients for each API
+			autoscalingClient := awsautoscaling.NewFromConfig(cfg, func(o *awsautoscaling.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			cloudfrontClient := awscloudfront.NewFromConfig(cfg, func(o *awscloudfront.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			cloudwatchClient := awscloudwatch.NewFromConfig(cfg, func(o *awscloudwatch.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			directconnectClient := awsdirectconnect.NewFromConfig(cfg, func(o *awsdirectconnect.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			dynamodbClient := awsdynamodb.NewFromConfig(cfg, func(o *awsdynamodb.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			ec2Client := awsec2.NewFromConfig(cfg, func(o *awsec2.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			ecsClient := awsecs.NewFromConfig(cfg, func(o *awsecs.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			efsClient := awsefs.NewFromConfig(cfg, func(o *awsefs.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			eksClient := awseks.NewFromConfig(cfg, func(o *awseks.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			elbClient := awselasticloadbalancing.NewFromConfig(cfg, func(o *awselasticloadbalancing.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			elbv2Client := awselasticloadbalancingv2.NewFromConfig(cfg, func(o *awselasticloadbalancingv2.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			lambdaClient := awslambda.NewFromConfig(cfg, func(o *awslambda.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			networkfirewallClient := awsnetworkfirewall.NewFromConfig(cfg, func(o *awsnetworkfirewall.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			rdsClient := awsrds.NewFromConfig(cfg, func(o *awsrds.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			snsClient := awssns.NewFromConfig(cfg, func(o *awssns.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			sqsClient := awssqs.NewFromConfig(cfg, func(o *awssqs.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			route53Client := awsroute53.NewFromConfig(cfg, func(o *awsroute53.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			networkmanagerClient := awsnetworkmanager.NewFromConfig(cfg, func(o *awsnetworkmanager.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
+			iamClient := awsiam.NewFromConfig(cfg, func(o *awsiam.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+				// Increase this from the default of 3 since IAM as such low rate limits
+				o.RetryMaxAttempts = 5
+			})
+
+			sources := []discovery.Source{
+				// EC2
+				ec2.NewAddressSource(ec2Client, *callerID.Account, region),
+				ec2.NewCapacityReservationFleetSource(ec2Client, *callerID.Account, region),
+				ec2.NewCapacityReservationSource(ec2Client, *callerID.Account, region),
+				ec2.NewEgressOnlyInternetGatewaySource(ec2Client, *callerID.Account, region),
+				ec2.NewIamInstanceProfileAssociationSource(ec2Client, *callerID.Account, region),
+				ec2.NewImageSource(ec2Client, *callerID.Account, region),
+				ec2.NewInstanceEventWindowSource(ec2Client, *callerID.Account, region),
+				ec2.NewInstanceSource(ec2Client, *callerID.Account, region),
+				ec2.NewInstanceStatusSource(ec2Client, *callerID.Account, region),
+				ec2.NewInternetGatewaySource(ec2Client, *callerID.Account, region),
+				ec2.NewKeyPairSource(ec2Client, *callerID.Account, region),
+				ec2.NewLaunchTemplateSource(ec2Client, *callerID.Account, region),
+				ec2.NewLaunchTemplateVersionSource(ec2Client, *callerID.Account, region),
+				ec2.NewNatGatewaySource(ec2Client, *callerID.Account, region),
+				ec2.NewNetworkAclSource(ec2Client, *callerID.Account, region),
+				ec2.NewNetworkInterfacePermissionSource(ec2Client, *callerID.Account, region),
+				ec2.NewNetworkInterfaceSource(ec2Client, *callerID.Account, region),
+				ec2.NewPlacementGroupSource(ec2Client, *callerID.Account, region),
+				ec2.NewReservedInstanceSource(ec2Client, *callerID.Account, region),
+				ec2.NewRouteTableSource(ec2Client, *callerID.Account, region),
+				ec2.NewSecurityGroupSource(ec2Client, *callerID.Account, region),
+				ec2.NewSnapshotSource(ec2Client, *callerID.Account, region),
+				ec2.NewSubnetSource(ec2Client, *callerID.Account, region),
+				ec2.NewVolumeSource(ec2Client, *callerID.Account, region),
+				ec2.NewVolumeStatusSource(ec2Client, *callerID.Account, region),
+				ec2.NewVpcPeeringConnectionSource(ec2Client, *callerID.Account, region),
+				ec2.NewVpcSource(ec2Client, *callerID.Account, region),
+
+				// EFS (I'm assuming it shares its rate limit with EC2))
+				efs.NewAccessPointSource(efsClient, *callerID.Account, region),
+				efs.NewBackupPolicySource(efsClient, *callerID.Account, region),
+				efs.NewFileSystemSource(efsClient, *callerID.Account, region),
+				efs.NewMountTargetSource(efsClient, *callerID.Account, region),
+				efs.NewReplicationConfigurationSource(efsClient, *callerID.Account, region),
+
+				// EKS
+				eks.NewAddonSource(eksClient, *callerID.Account, region),
+				eks.NewClusterSource(eksClient, *callerID.Account, region),
+				eks.NewFargateProfileSource(eksClient, *callerID.Account, region),
+				eks.NewNodegroupSource(eksClient, *callerID.Account, region),
+
+				// Route 53
+				route53.NewHealthCheckSource(route53Client, *callerID.Account, region),
+				route53.NewHostedZoneSource(route53Client, *callerID.Account, region),
+				route53.NewResourceRecordSetSource(route53Client, *callerID.Account, region),
+
+				// Cloudwatch
+				cloudwatch.NewAlarmSource(cloudwatchClient, *callerID.Account, region),
+
+				// IAM
+				iam.NewGroupSource(iamClient, *callerID.Account, region),
+				iam.NewInstanceProfileSource(iamClient, *callerID.Account, region),
+				iam.NewPolicySource(iamClient, *callerID.Account, region),
+				iam.NewRoleSource(iamClient, *callerID.Account, region),
+				iam.NewUserSource(iamClient, *callerID.Account, region),
+
+				// Lambda
+				lambda.NewFunctionSource(lambdaClient, *callerID.Account, region),
+				lambda.NewLayerSource(lambdaClient, *callerID.Account, region),
+				lambda.NewLayerVersionSource(lambdaClient, *callerID.Account, region),
+
+				// ECS
+				ecs.NewCapacityProviderSource(ecsClient, *callerID.Account, region),
+				ecs.NewClusterSource(ecsClient, *callerID.Account, region),
+				ecs.NewContainerInstanceSource(ecsClient, *callerID.Account, region),
+				ecs.NewServiceSource(ecsClient, *callerID.Account, region),
+				ecs.NewTaskDefinitionSource(ecsClient, *callerID.Account, region),
+				ecs.NewTaskSource(ecsClient, *callerID.Account, region),
+
+				// DynamoDB
+				dynamodb.NewBackupSource(dynamodbClient, *callerID.Account, region),
+				dynamodb.NewTableSource(dynamodbClient, *callerID.Account, region),
+
+				// RDS
+				rds.NewDBClusterParameterGroupSource(rdsClient, *callerID.Account, region),
+				rds.NewDBClusterSource(rdsClient, *callerID.Account, region),
+				rds.NewDBInstanceSource(rdsClient, *callerID.Account, region),
+				rds.NewDBParameterGroupSource(rdsClient, *callerID.Account, region),
+				rds.NewDBSubnetGroupSource(rdsClient, *callerID.Account, region),
+				rds.NewOptionGroupSource(rdsClient, *callerID.Account, region),
+
+				// Autoscaling
+				autoscaling.NewAutoScalingGroupSource(autoscalingClient, *callerID.Account, region),
+
+				// ELB
+				elb.NewInstanceHealthSource(elbClient, *callerID.Account, region),
+				elb.NewLoadBalancerSource(elbClient, *callerID.Account, region),
+
+				// ELBv2
+				elbv2.NewListenerSource(elbv2Client, *callerID.Account, region),
+				elbv2.NewLoadBalancerSource(elbv2Client, *callerID.Account, region),
+				elbv2.NewRuleSource(elbv2Client, *callerID.Account, region),
+				elbv2.NewTargetGroupSource(elbv2Client, *callerID.Account, region),
+				elbv2.NewTargetHealthSource(elbv2Client, *callerID.Account, region),
+
+				// Network Firewall
+				networkfirewall.NewFirewallSource(networkfirewallClient, *callerID.Account, region),
+				networkfirewall.NewFirewallPolicySource(networkfirewallClient, *callerID.Account, region),
+				networkfirewall.NewRuleGroupSource(networkfirewallClient, *callerID.Account, region),
+				networkfirewall.NewTLSInspectionConfigurationSource(networkfirewallClient, *callerID.Account, region),
+
+				// Direct Connect
+				directconnect.NewDirectConnectGatewaySource(directconnectClient, *callerID.Account, region),
+				directconnect.NewDirectConnectGatewayAssociationSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewDirectConnectGatewayAssociationProposalSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewConnectionSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewDirectConnectGatewayAttachmentSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewVirtualInterfaceSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewVirtualGatewaySource(directconnectClient, *callerID.Account, region),
+				directconnect.NewCustomerMetadataSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewLagSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewLocationSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewHostedConnectionSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewInterconnectSource(directconnectClient, *callerID.Account, region),
+				directconnect.NewRouterConfigurationSource(directconnectClient, *callerID.Account, region),
+
+				// Network Manager
+				networkmanager.NewConnectAttachmentSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewConnectionSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewConnectPeerSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewCoreNetworkPolicySource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewCoreNetworkSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewDeviceSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewLinkAssociationSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewLinkSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewNetworkResourceRelationshipsSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewSiteToSiteVpnAttachmentSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewTransitGatewayConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewTransitGatewayPeeringSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewTransitGatewayRegistrationSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewTransitGatewayRouteTableAttachmentSource(networkmanagerClient, *callerID.Account, region),
+				networkmanager.NewVPCAttachmentSource(networkmanagerClient, *callerID.Account, region),
+
+				// SQS
+				sqs.NewQueueSource(sqsClient, *callerID.Account, region),
+
+				// SNS
+				sns.NewSubscriptionSource(snsClient, *callerID.Account, region),
+				sns.NewTopicSource(snsClient, *callerID.Account, region),
+				sns.NewPlatformApplicationSource(snsClient, *callerID.Account, region),
+				sns.NewEndpointSource(snsClient, *callerID.Account, region),
+				sns.NewDataProtectionPolicySource(snsClient, *callerID.Account, region),
+			}
+
+			e.AddSources(sources...)
+
+			// Add "global" sources (those that aren't tied to a region, like
+			// cloudfront). but only do this once for the first region. For
+			// these APIs it doesn't matter which region we call them from, we
+			// get global results
+			if globalDone.CompareAndSwap(false, true) {
+				e.AddSources(
+					// Cloudfront
+					cloudfront.NewCachePolicySource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewContinuousDeploymentPolicySource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewDistributionSource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewFunctionSource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewKeyGroupSource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewOriginAccessControlSource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewOriginRequestPolicySource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewResponseHeadersPolicySource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewRealtimeLogConfigsSource(cloudfrontClient, *callerID.Account),
+					cloudfront.NewStreamingDistributionSource(cloudfrontClient, *callerID.Account),
+
+					// S3
+					s3.NewS3Source(cfg, *callerID.Account),
+				)
+			}
+			return nil
 		})
-		cloudfrontClient := awscloudfront.NewFromConfig(cfg, func(o *awscloudfront.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		cloudwatchClient := awscloudwatch.NewFromConfig(cfg, func(o *awscloudwatch.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		directconnectClient := awsdirectconnect.NewFromConfig(cfg, func(o *awsdirectconnect.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		dynamodbClient := awsdynamodb.NewFromConfig(cfg, func(o *awsdynamodb.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		ec2Client := awsec2.NewFromConfig(cfg, func(o *awsec2.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		ecsClient := awsecs.NewFromConfig(cfg, func(o *awsecs.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		efsClient := awsefs.NewFromConfig(cfg, func(o *awsefs.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		eksClient := awseks.NewFromConfig(cfg, func(o *awseks.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		elbClient := awselasticloadbalancing.NewFromConfig(cfg, func(o *awselasticloadbalancing.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		elbv2Client := awselasticloadbalancingv2.NewFromConfig(cfg, func(o *awselasticloadbalancingv2.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		lambdaClient := awslambda.NewFromConfig(cfg, func(o *awslambda.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		networkfirewallClient := awsnetworkfirewall.NewFromConfig(cfg, func(o *awsnetworkfirewall.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		rdsClient := awsrds.NewFromConfig(cfg, func(o *awsrds.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		snsClient := awssns.NewFromConfig(cfg, func(o *awssns.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		sqsClient := awssqs.NewFromConfig(cfg, func(o *awssqs.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		route53Client := awsroute53.NewFromConfig(cfg, func(o *awsroute53.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		networkmanagerClient := awsnetworkmanager.NewFromConfig(cfg, func(o *awsnetworkmanager.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-		})
-		iamClient := awsiam.NewFromConfig(cfg, func(o *awsiam.Options) {
-			o.RetryMode = aws.RetryModeAdaptive
-			// Increase this from the default of 3 since IAM as such low rate limits
-			o.RetryMaxAttempts = 5
-		})
+	}
 
-		sources := []discovery.Source{
-			// EC2
-			ec2.NewAddressSource(ec2Client, *callerID.Account, region),
-			ec2.NewCapacityReservationFleetSource(ec2Client, *callerID.Account, region),
-			ec2.NewCapacityReservationSource(ec2Client, *callerID.Account, region),
-			ec2.NewEgressOnlyInternetGatewaySource(ec2Client, *callerID.Account, region),
-			ec2.NewIamInstanceProfileAssociationSource(ec2Client, *callerID.Account, region),
-			ec2.NewImageSource(ec2Client, *callerID.Account, region),
-			ec2.NewInstanceEventWindowSource(ec2Client, *callerID.Account, region),
-			ec2.NewInstanceSource(ec2Client, *callerID.Account, region),
-			ec2.NewInstanceStatusSource(ec2Client, *callerID.Account, region),
-			ec2.NewInternetGatewaySource(ec2Client, *callerID.Account, region),
-			ec2.NewKeyPairSource(ec2Client, *callerID.Account, region),
-			ec2.NewLaunchTemplateSource(ec2Client, *callerID.Account, region),
-			ec2.NewLaunchTemplateVersionSource(ec2Client, *callerID.Account, region),
-			ec2.NewNatGatewaySource(ec2Client, *callerID.Account, region),
-			ec2.NewNetworkAclSource(ec2Client, *callerID.Account, region),
-			ec2.NewNetworkInterfacePermissionSource(ec2Client, *callerID.Account, region),
-			ec2.NewNetworkInterfaceSource(ec2Client, *callerID.Account, region),
-			ec2.NewPlacementGroupSource(ec2Client, *callerID.Account, region),
-			ec2.NewReservedInstanceSource(ec2Client, *callerID.Account, region),
-			ec2.NewRouteTableSource(ec2Client, *callerID.Account, region),
-			ec2.NewSecurityGroupSource(ec2Client, *callerID.Account, region),
-			ec2.NewSnapshotSource(ec2Client, *callerID.Account, region),
-			ec2.NewSubnetSource(ec2Client, *callerID.Account, region),
-			ec2.NewVolumeSource(ec2Client, *callerID.Account, region),
-			ec2.NewVolumeStatusSource(ec2Client, *callerID.Account, region),
-			ec2.NewVpcPeeringConnectionSource(ec2Client, *callerID.Account, region),
-			ec2.NewVpcSource(ec2Client, *callerID.Account, region),
-
-			// EFS (I'm assuming it shares its rate limit with EC2))
-			efs.NewAccessPointSource(efsClient, *callerID.Account, region),
-			efs.NewBackupPolicySource(efsClient, *callerID.Account, region),
-			efs.NewFileSystemSource(efsClient, *callerID.Account, region),
-			efs.NewMountTargetSource(efsClient, *callerID.Account, region),
-			efs.NewReplicationConfigurationSource(efsClient, *callerID.Account, region),
-
-			// EKS
-			eks.NewAddonSource(eksClient, *callerID.Account, region),
-			eks.NewClusterSource(eksClient, *callerID.Account, region),
-			eks.NewFargateProfileSource(eksClient, *callerID.Account, region),
-			eks.NewNodegroupSource(eksClient, *callerID.Account, region),
-
-			// Route 53
-			route53.NewHealthCheckSource(route53Client, *callerID.Account, region),
-			route53.NewHostedZoneSource(route53Client, *callerID.Account, region),
-			route53.NewResourceRecordSetSource(route53Client, *callerID.Account, region),
-
-			// Cloudwatch
-			cloudwatch.NewAlarmSource(cloudwatchClient, *callerID.Account, region),
-
-			// IAM
-			iam.NewGroupSource(iamClient, *callerID.Account, region),
-			iam.NewInstanceProfileSource(iamClient, *callerID.Account, region),
-			iam.NewPolicySource(iamClient, *callerID.Account, region),
-			iam.NewRoleSource(iamClient, *callerID.Account, region),
-			iam.NewUserSource(iamClient, *callerID.Account, region),
-
-			// Lambda
-			lambda.NewFunctionSource(lambdaClient, *callerID.Account, region),
-			lambda.NewLayerSource(lambdaClient, *callerID.Account, region),
-			lambda.NewLayerVersionSource(lambdaClient, *callerID.Account, region),
-
-			// ECS
-			ecs.NewCapacityProviderSource(ecsClient, *callerID.Account, region),
-			ecs.NewClusterSource(ecsClient, *callerID.Account, region),
-			ecs.NewContainerInstanceSource(ecsClient, *callerID.Account, region),
-			ecs.NewServiceSource(ecsClient, *callerID.Account, region),
-			ecs.NewTaskDefinitionSource(ecsClient, *callerID.Account, region),
-			ecs.NewTaskSource(ecsClient, *callerID.Account, region),
-
-			// DynamoDB
-			dynamodb.NewBackupSource(dynamodbClient, *callerID.Account, region),
-			dynamodb.NewTableSource(dynamodbClient, *callerID.Account, region),
-
-			// RDS
-			rds.NewDBClusterParameterGroupSource(rdsClient, *callerID.Account, region),
-			rds.NewDBClusterSource(rdsClient, *callerID.Account, region),
-			rds.NewDBInstanceSource(rdsClient, *callerID.Account, region),
-			rds.NewDBParameterGroupSource(rdsClient, *callerID.Account, region),
-			rds.NewDBSubnetGroupSource(rdsClient, *callerID.Account, region),
-			rds.NewOptionGroupSource(rdsClient, *callerID.Account, region),
-
-			// Autoscaling
-			autoscaling.NewAutoScalingGroupSource(autoscalingClient, *callerID.Account, region),
-
-			// ELB
-			elb.NewInstanceHealthSource(elbClient, *callerID.Account, region),
-			elb.NewLoadBalancerSource(elbClient, *callerID.Account, region),
-
-			// ELBv2
-			elbv2.NewListenerSource(elbv2Client, *callerID.Account, region),
-			elbv2.NewLoadBalancerSource(elbv2Client, *callerID.Account, region),
-			elbv2.NewRuleSource(elbv2Client, *callerID.Account, region),
-			elbv2.NewTargetGroupSource(elbv2Client, *callerID.Account, region),
-			elbv2.NewTargetHealthSource(elbv2Client, *callerID.Account, region),
-
-			// Network Firewall
-			networkfirewall.NewFirewallSource(networkfirewallClient, *callerID.Account, region),
-			networkfirewall.NewFirewallPolicySource(networkfirewallClient, *callerID.Account, region),
-			networkfirewall.NewRuleGroupSource(networkfirewallClient, *callerID.Account, region),
-			networkfirewall.NewTLSInspectionConfigurationSource(networkfirewallClient, *callerID.Account, region),
-
-			// Direct Connect
-			directconnect.NewDirectConnectGatewaySource(directconnectClient, *callerID.Account, region),
-			directconnect.NewDirectConnectGatewayAssociationSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewDirectConnectGatewayAssociationProposalSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewConnectionSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewDirectConnectGatewayAttachmentSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewVirtualInterfaceSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewVirtualGatewaySource(directconnectClient, *callerID.Account, region),
-			directconnect.NewCustomerMetadataSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewLagSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewLocationSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewHostedConnectionSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewInterconnectSource(directconnectClient, *callerID.Account, region),
-			directconnect.NewRouterConfigurationSource(directconnectClient, *callerID.Account, region),
-
-			// Network Manager
-			networkmanager.NewConnectAttachmentSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewConnectionSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewConnectPeerSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewCoreNetworkPolicySource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewCoreNetworkSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewDeviceSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewLinkAssociationSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewLinkSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewNetworkResourceRelationshipsSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewSiteToSiteVpnAttachmentSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewTransitGatewayConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewTransitGatewayPeeringSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewTransitGatewayRegistrationSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewTransitGatewayRouteTableAttachmentSource(networkmanagerClient, *callerID.Account, region),
-			networkmanager.NewVPCAttachmentSource(networkmanagerClient, *callerID.Account, region),
-
-			// SQS
-			sqs.NewQueueSource(sqsClient, *callerID.Account, region),
-
-			// SNS
-			sns.NewSubscriptionSource(snsClient, *callerID.Account, region),
-			sns.NewTopicSource(snsClient, *callerID.Account, region),
-			sns.NewPlatformApplicationSource(snsClient, *callerID.Account, region),
-			sns.NewEndpointSource(snsClient, *callerID.Account, region),
-			sns.NewDataProtectionPolicySource(snsClient, *callerID.Account, region),
-		}
-
-		e.AddSources(sources...)
-
-		// Add "global" sources (those that aren't tied to a region, like
-		// cloudfront). but only do this once for the first region. For
-		// these APIs it doesn't matter which region we call them from, we
-		// get global results
-		if !globalDone {
-			e.AddSources(
-				// Cloudfront
-				cloudfront.NewCachePolicySource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewContinuousDeploymentPolicySource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewDistributionSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewFunctionSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewKeyGroupSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewOriginAccessControlSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewOriginRequestPolicySource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewResponseHeadersPolicySource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewRealtimeLogConfigsSource(cloudfrontClient, *callerID.Account),
-				cloudfront.NewStreamingDistributionSource(cloudfrontClient, *callerID.Account),
-
-				// S3
-				s3.NewS3Source(cfg, *callerID.Account),
-			)
-			globalDone = true
-		}
+	err = p.Wait()
+	if err != nil {
+		return nil, err
 	}
 
 	return e, nil
