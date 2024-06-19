@@ -199,7 +199,7 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 	for _, region := range awsAuthConfig.Regions {
 		region = strings.Trim(region, " ")
 
-		configCtx, configCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		configCtx, configCancel := context.WithTimeout(ctx, 10*time.Second)
 		defer configCancel()
 
 		cfg, err := awsAuthConfig.GetAWSConfig(region)
