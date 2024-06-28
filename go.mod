@@ -6,29 +6,29 @@ go 1.22.4
 require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go-v2 v1.30.0
-	github.com/aws/aws-sdk-go-v2/config v1.27.21
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.21
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.37.1
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.39.1
-	github.com/aws/aws-sdk-go-v2/service/directconnect v1.26.0
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.33.2
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.165.1
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.43.1
-	github.com/aws/aws-sdk-go-v2/service/efs v1.30.1
-	github.com/aws/aws-sdk-go-v2/service/eks v1.44.1
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.25.1
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.32.1
-	github.com/aws/aws-sdk-go-v2/service/iam v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.55.1
-	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.39.1
-	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.27.1
-	github.com/aws/aws-sdk-go-v2/service/rds v1.80.1
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.56.1
-	github.com/aws/aws-sdk-go-v2/service/sns v1.30.1
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.33.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.29.1
+	github.com/aws/aws-sdk-go-v2/config v1.27.22
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.22
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.43.0
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.38.1
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/directconnect v1.27.0
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.34.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.167.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.44.0
+	github.com/aws/aws-sdk-go-v2/service/efs v1.31.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.45.0
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.26.0
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.33.0
+	github.com/aws/aws-sdk-go-v2/service/iam v1.34.0
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.56.0
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.81.1
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.42.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.57.0
+	github.com/aws/aws-sdk-go-v2/service/sns v1.31.0
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.30.0
 	github.com/aws/smithy-go v1.20.2
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/iancoleman/strcase v0.2.0
@@ -70,8 +70,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.9.13 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.21.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.25.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.22.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.26.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
