@@ -2,13 +2,16 @@ package iam
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
+	"github.com/micahhausler/aws-iam-policy/policy"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
@@ -19,6 +22,7 @@ import (
 
 type PolicyDetails struct {
 	Policy       *types.Policy
+	Document     *policy.Policy
 	PolicyGroups []types.PolicyGroup
 	PolicyRoles  []types.PolicyRole
 	PolicyUsers  []types.PolicyUser
@@ -38,7 +42,6 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
 		PolicyArn: sources.PtrString(a.String()),
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +52,59 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 
 	if out.Policy != nil {
 		err := addPolicyEntities(ctx, client, &details)
+		if err != nil {
+			return nil, err
+		}
 
+		err = addPolicyDocument(ctx, client, &details)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return &details, nil
+}
+
+// Gets the current policy version and parses it, adds to the policy details
+func addPolicyDocument(ctx context.Context, client IAMClient, pol *PolicyDetails) error {
+	if pol.Policy == nil {
+		return errors.New("policy is nil")
+	}
+	if pol.Policy.Arn == nil || pol.Policy.DefaultVersionId == nil {
+		return errors.New("policy ARN or default version ID is nil")
+	}
+
+	out, err := client.GetPolicyVersion(ctx, &iam.GetPolicyVersionInput{
+		PolicyArn: pol.Policy.Arn,
+		VersionId: pol.Policy.DefaultVersionId,
+	})
+	if err != nil {
+		return err
+	}
+	if out.PolicyVersion == nil {
+		return errors.New("policy version is nil")
+	}
+	if out.PolicyVersion.Document == nil {
+		return nil
+	}
+
+	// Decode the policy document which is RFC 3986 URL encoded
+	decoded, err := url.QueryUnescape(*out.PolicyVersion.Document)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshal the JSON
+	policyDocument := policy.Policy{}
+	err = json.Unmarshal([]byte(decoded), &policyDocument)
+	if err != nil {
+		return err
+	}
+
+	// Save to the pointer
+	pol.Document = &policyDocument
+
+	return nil
 }
 
 func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails) error {
@@ -141,8 +190,16 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 		}
 
 		err := addPolicyEntities(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
 
-		return &details, err
+		err = addPolicyDocument(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
+
+		return &details, nil
 	})
 
 	if err != nil {
@@ -232,6 +289,57 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 				Out: true,
 			},
 		})
+	}
+
+	if awsItem.Document != nil {
+		// We want to link all of the resources in the policy document, as long
+		// as they have a valid ARN
+		var arn *sources.ARN
+		var err error
+
+		for _, statement := range awsItem.Document.Statements.Values() {
+			for _, resource := range statement.Resource.Values() {
+				arn, err = sources.ParseARN(resource)
+				if err != nil {
+					continue
+				}
+
+				// If the ARN contains a wildcard then we want to bail out
+				possibleWildcards := arn.AccountID + arn.Type() + arn.ResourceID()
+				if strings.Contains(possibleWildcards, "*") {
+					continue
+				}
+
+				// Since this could be an ARN to anything we are going to rely
+				// on the fact that we *usually* have a SEARCH method that
+				// accepts ARNs
+				scope := sdp.WILDCARD
+				if arn.AccountID != "aws" {
+					// If we have an account and region, then use those
+					scope = sources.FormatScope(arn.AccountID, arn.Region)
+				}
+
+				// It would be good here if we had a way to definitely know what
+				// type a given ARN is, but I don't think the types are 1:1 so
+				// we are going to have to use a wildcard. This will cause a lot
+				// of failed searches which I don't love, but it will work
+				itemType := sdp.WILDCARD
+
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   itemType,
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  arn.String(),
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				})
+
+			}
+		}
 	}
 
 	return &item, nil
