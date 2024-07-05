@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"net/url"
 	"testing"
 	"time"
 
@@ -94,6 +95,84 @@ func (t *TestIAMClient) ListPolicyTags(ctx context.Context, params *iam.ListPoli
 	}, nil
 }
 
+const testPolicy = `{
+    "Version": "2012-10-17",
+    "Statement": {
+        "Effect": "Allow",
+        "Action": [
+            "iam:AddUserToGroup",
+            "iam:RemoveUserFromGroup",
+            "iam:GetGroup"
+        ],
+        "Resource": [
+            "arn:aws:iam::609103258633:group/Developers",
+            "arn:aws:iam::609103258633:group/Operators",
+			"arn:aws:iam::609103258633:user/*"
+        ]
+    }
+}`
+
+func (c *TestIAMClient) GetPolicyVersion(ctx context.Context, params *iam.GetPolicyVersionInput, optFns ...func(*iam.Options)) (*iam.GetPolicyVersionOutput, error) {
+	create := time.Now()
+	document := url.QueryEscape(testPolicy)
+	versionId := "v2"
+
+	return &iam.GetPolicyVersionOutput{
+		PolicyVersion: &types.PolicyVersion{
+			CreateDate:       &create,
+			Document:         &document,
+			IsDefaultVersion: true,
+			VersionId:        &versionId,
+		},
+	}, nil
+}
+
+func TestGetCurrentPolicyVersion(t *testing.T) {
+	client := &TestIAMClient{}
+	ctx := context.Background()
+
+	t.Run("with a good query", func(t *testing.T) {
+		arn := "arn:aws:iam::609103258633:policy/DevelopersPolicy"
+		version := "v2"
+		policy := PolicyDetails{
+			Policy: &types.Policy{
+				Arn:              &arn,
+				DefaultVersionId: &version,
+			},
+		}
+
+		err := addPolicyDocument(ctx, client, &policy)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("with empty values", func(t *testing.T) {
+		arn := ""
+		version := ""
+		policy := PolicyDetails{
+			Policy: &types.Policy{
+				Arn:              &arn,
+				DefaultVersionId: &version,
+			},
+		}
+
+		err := addPolicyDocument(ctx, client, &policy)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("with nil", func(t *testing.T) {
+		policy := PolicyDetails{}
+
+		err := addPolicyDocument(ctx, client, &policy)
+		if err == nil {
+			t.Fatal("expected error, got nil")
+		}
+	})
+}
+
 func TestPolicyGetFunc(t *testing.T) {
 	policy, err := policyGetFunc(context.Background(), &TestIAMClient{}, "foo", "bar")
 
@@ -115,6 +194,14 @@ func TestPolicyGetFunc(t *testing.T) {
 
 	if len(policy.PolicyUsers) != 1 {
 		t.Errorf("expected 1 User, got %v", len(policy.PolicyUsers))
+	}
+
+	if policy.Document.Version != "2012-10-17" {
+		t.Errorf("expected version 2012-10-17, got %v", policy.Document.Version)
+	}
+
+	if len(policy.Document.Statements.Values()) != 1 {
+		t.Errorf("expected 1 statement, got %v", len(policy.Document.Statements.Values()))
 	}
 }
 
@@ -147,7 +234,7 @@ func TestPolicyListTagsFunc(t *testing.T) {
 }
 
 func TestPolicyItemMapper(t *testing.T) {
-	item, err := policyItemMapper("foo", &PolicyDetails{
+	details := &PolicyDetails{
 		Policy: &types.Policy{
 			PolicyName:                    sources.PtrString("AWSControlTowerAdminPolicy"),
 			PolicyId:                      sources.PtrString("ANPA3VLV2U2745H37HTHN"),
@@ -178,7 +265,9 @@ func TestPolicyItemMapper(t *testing.T) {
 				UserName: sources.PtrString("userName"),
 			},
 		},
-	})
+	}
+	addPolicyDocument(context.Background(), &TestIAMClient{}, details)
+	item, err := policyItemMapper("foo", details)
 
 	if err != nil {
 		t.Error(err)
@@ -206,6 +295,18 @@ func TestPolicyItemMapper(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "roleName",
 			ExpectedScope:  "foo",
+		},
+		{
+			ExpectedType:   "*",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:iam::609103258633:group/Developers",
+			ExpectedScope:  "609103258633",
+		},
+		{
+			ExpectedType:   "*",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "arn:aws:iam::609103258633:group/Operators",
+			ExpectedScope:  "609103258633",
 		},
 	}
 
