@@ -415,17 +415,11 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 
 				// Network Manager
 				networkmanager.NewConnectAttachmentSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewConnectionSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewConnectPeerSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewCoreNetworkPolicySource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewCoreNetworkSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewDeviceSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewLinkAssociationSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewLinkSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewNetworkResourceRelationshipsSource(networkmanagerClient, *callerID.Account, region),
-				networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewSiteToSiteVpnAttachmentSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewTransitGatewayConnectPeerAssociationSource(networkmanagerClient, *callerID.Account, region),
 				networkmanager.NewTransitGatewayPeeringSource(networkmanagerClient, *callerID.Account, region),
@@ -466,6 +460,14 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 
 					// S3
 					s3.NewS3Source(cfg, *callerID.Account),
+
+					// Networkmanager
+					networkmanager.NewGlobalNetworkSource(networkmanagerClient, *callerID.Account),
+					networkmanager.NewSiteSource(networkmanagerClient, *callerID.Account),
+					networkmanager.NewLinkSource(networkmanagerClient, *callerID.Account),
+					networkmanager.NewDeviceSource(networkmanagerClient, *callerID.Account),
+					networkmanager.NewLinkAssociationSource(networkmanagerClient, *callerID.Account),
+					networkmanager.NewConnectionSource(networkmanagerClient, *callerID.Account),
 				)
 			}
 			return nil

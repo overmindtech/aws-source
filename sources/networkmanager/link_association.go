@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -81,6 +82,19 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 			},
 		}
 
+		switch s.LinkAssociationState {
+		case types.LinkAssociationStatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.LinkAssociationStateAvailable:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.LinkAssociationStateDeleting:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.LinkAssociationStateDeleted:
+			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		default:
+			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+		}
+
 		items = append(items, &item)
 	}
 
@@ -91,16 +105,14 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 // +overmind:type networkmanager-link-association
 // +overmind:descriptiveType Networkmanager LinkAssociation
 // +overmind:get Get a Networkmanager Link Association
-// +overmind:list List all Networkmanager Link Associations
 // +overmind:search Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId
 // +overmind:group AWS
 
-func NewLinkAssociationSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewLinkAssociationSource(client *networkmanager.Client, accountID string) *sources.DescribeOnlySource[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-link-ssociation",
+		ItemType:  "networkmanager-link-association",
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinkAssociationsInput) (*networkmanager.GetLinkAssociationsOutput, error) {
 			return client.GetLinkAssociations(ctx, input)
 		},
@@ -148,13 +160,13 @@ func NewLinkAssociationSource(client *networkmanager.Client, accountID, region s
 					// default|link|link-1
 					return &networkmanager.GetLinkAssociationsInput{
 						GlobalNetworkId: &sections[0],
-						LinkId:          &sections[1],
+						LinkId:          &sections[2],
 					}, nil
 				case "device":
 					// default|device|dvc-1
 					return &networkmanager.GetLinkAssociationsInput{
 						GlobalNetworkId: &sections[0],
-						DeviceId:        &sections[1],
+						DeviceId:        &sections[2],
 					}, nil
 				default:
 					return nil, &sdp.QueryError{

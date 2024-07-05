@@ -2,10 +2,20 @@ package ec2
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
+)
+
+var (
+	codePending      = int32(0)
+	codeRunning      = int32(16)
+	codeShuttingDown = int32(32)
+	codeTerminated   = int32(48)
+	codeStopping     = int32(64)
+	codeStopped      = int32(80)
 )
 
 func instanceInputMapperGet(scope, query string) (*ec2.DescribeInstancesInput, error) {
@@ -59,6 +69,23 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 						},
 					},
 				},
+			}
+
+			if instance.State != nil {
+				switch aws.ToInt32(instance.State.Code) {
+				case codeRunning:
+					item.Health = sdp.Health_HEALTH_OK.Enum()
+				case codePending:
+					item.Health = sdp.Health_HEALTH_PENDING.Enum()
+				case codeShuttingDown:
+					item.Health = sdp.Health_HEALTH_PENDING.Enum()
+				case codeTerminated:
+					item.Health = sdp.Health_HEALTH_ERROR.Enum()
+				case codeStopping:
+					item.Health = sdp.Health_HEALTH_PENDING.Enum()
+				case codeStopped:
+					item.Health = sdp.Health_HEALTH_PENDING.Enum()
+				}
 			}
 
 			if instance.IamInstanceProfile != nil {
