@@ -2,7 +2,6 @@
 	"type": "networkmanager-link",
 	"descriptiveType": "Networkmanager Link",
 	"getDescription": "Get a Networkmanager Link",
-	"listDescription": "List all Networkmanager Links",
 	"searchDescription": "Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId",
 	"group": "AWS",
 	"terraformQuery": [

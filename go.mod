@@ -115,3 +115,5 @@ require (
 )
 
 require github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7
+
+require github.com/overmindtech/docgen v0.3.2 // indirect

@@ -2,7 +2,6 @@
 	"type": "networkmanager-site",
 	"descriptiveType": "Networkmanager Site",
 	"getDescription": "Get a Networkmanager Site",
-	"listDescription": "List all Networkmanager Sites",
 	"searchDescription": "Search for Networkmanager Sites by GlobalNetworkId",
 	"group": "AWS",
 	"terraformQuery": [
