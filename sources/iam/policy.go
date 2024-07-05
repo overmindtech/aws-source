@@ -210,7 +210,14 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 }
 
 func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem.Policy)
+	finalAttributes := struct {
+		*types.Policy
+		Document *policy.Policy
+	}{
+		Policy:   awsItem.Policy,
+		Document: awsItem.Document,
+	}
+	attributes, err := sources.ToAttributesCase(finalAttributes)
 
 	if err != nil {
 		return nil, err
