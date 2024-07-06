@@ -2,12 +2,15 @@ package iam
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
+	"github.com/micahhausler/aws-iam-policy/policy"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 )
@@ -143,7 +146,25 @@ func TestRoleListTagsFunc(t *testing.T) {
 	}
 }
 
+const listBucketsPolicy = `{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": "s3:ListAllMyBuckets",
+			"Resource": "*"
+		}
+	]
+}`
+
 func TestRoleItemMapper(t *testing.T) {
+	policyDoc := policy.Policy{}
+	err := json.Unmarshal([]byte(listBucketsPolicy), &policyDoc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	role := RoleDetails{
 		Role: &types.Role{
 			Path:                     sources.PtrString("/service-role/"),
@@ -151,7 +172,7 @@ func TestRoleItemMapper(t *testing.T) {
 			RoleId:                   sources.PtrString("AROA3VLV2U27YSTBFCGCJ"),
 			Arn:                      sources.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
 			CreateDate:               sources.PtrTime(time.Now()),
-			AssumeRolePolicyDocument: sources.PtrString("FOO"),
+			AssumeRolePolicyDocument: sources.PtrString(`%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22config.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D`),
 			MaxSessionDuration:       sources.PtrInt32(3600),
 			Description:              sources.PtrString("description"),
 			PermissionsBoundary: &types.AttachedPermissionsBoundary{
@@ -165,18 +186,8 @@ func TestRoleItemMapper(t *testing.T) {
 		},
 		EmbeddedPolicies: []embeddedPolicy{
 			{
-				Name: "foo",
-				Document: map[string]interface{}{
-					"Version": "2012-10-17",
-					"Statement": []map[string]interface{}{
-						{
-							"Sid":      "VisualEditor0",
-							"Effect":   "Allow",
-							"Action":   "s3:ListAllMyBuckets",
-							"Resource": "*",
-						},
-					},
-				},
+				Name:     "foo",
+				Document: &policyDoc,
 			},
 		},
 		AttachedPolicies: []types.AttachedPolicy{
@@ -190,11 +201,11 @@ func TestRoleItemMapper(t *testing.T) {
 	item, err := roleItemMapper("foo", &role)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	if err = item.Validate(); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	tests := sources.QueryTests{
@@ -207,6 +218,8 @@ func TestRoleItemMapper(t *testing.T) {
 	}
 
 	tests.Execute(t, item)
+
+	fmt.Println(item.ToMap())
 }
 
 func TestNewRoleSource(t *testing.T) {
