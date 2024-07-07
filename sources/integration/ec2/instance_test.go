@@ -11,7 +11,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TestEC2(t *testing.T) {
+func EC2(t *testing.T) {
 	ctx := context.Background()
 
 	t.Log("Running EC2 integration test")

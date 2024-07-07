@@ -12,7 +12,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func TestNetworkManager(t *testing.T) {
+func NetworkManager(t *testing.T) {
 	ctx := context.Background()
 
 	t.Logf("Running NetworkManager integration tests")

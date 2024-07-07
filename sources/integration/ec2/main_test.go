@@ -21,14 +21,12 @@ func TestMain(m *testing.M) {
 }
 
 func TestIntegrationEC2(t *testing.T) {
-	TestSetup(t)
-
-	TestEC2(t)
-
-	TestTeardown(t)
+	t.Run("Setup", Setup)
+	t.Run("EC2", EC2)
+	t.Run("Teardown", Teardown)
 }
 
-func TestSetup(t *testing.T) {
+func Setup(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
@@ -42,7 +40,7 @@ func TestSetup(t *testing.T) {
 	}
 }
 
-func TestTeardown(t *testing.T) {
+func Teardown(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 

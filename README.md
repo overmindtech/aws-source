@@ -158,13 +158,40 @@ go run main.go --help
 
 ### Testing
 
-Tests in this package can be run using:
+Unit tests in this package can be run using:
 
 ```shell
 go test ./...
 ```
 
 Note that these tests require building real AWS resources in order to test against them. This mean you'll need local credentials and running the test will actually build real resources (and clean them up). At time of writing the tests cost approx $0.03 per run.
+
+#### Integration Tests
+Integration tests are located in the `sources/integration` package.
+Each resource group has a subfolder with the relevant name, i.e., `ec2`, `networkmanager`, etc.
+
+Running integration tests requires the following environment variables to be set:
+```shell
+export AWS_ACCESS_KEY_ID="some-id"
+export AWS_SECRET_ACCESS_KEY="some-key"
+export AWS_SESSION_TOKEN="some-token"
+
+export RUN_INTEGRATION_TESTS=true
+export AWS_ACCOUNT_ID=123456789012
+export AWS_REGION=eu-west-1
+```
+
+Even though the resources for the tests are segregated by the resource groups in AWS,
+it is highly recommended to run the tests for each resource group individually.
+For example, to run integration tests for the `ec2` resource group, from the root of the repository, run:
+```shell
+go test ./sources/integration/ec2 -v -count=1 -run ^TestIntegrationEC2$
+```
+
+For the `networkmanager` resource group, run:
+```shell
+go test ./sources/integration/networkmanager -v -count=1 -run ^TestIntegrationNetworkManager$
+```
 
 ### Packaging
 

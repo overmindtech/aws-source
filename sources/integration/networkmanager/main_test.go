@@ -21,14 +21,12 @@ func TestMain(m *testing.M) {
 }
 
 func TestIntegrationNetworkManager(t *testing.T) {
-	TestSetup(t)
-
-	TestNetworkManager(t)
-
-	TestTeardown(t)
+	t.Run("Setup", Setup)
+	t.Run("NetworkManager", NetworkManager)
+	t.Run("Teardown", Teardown)
 }
 
-func TestSetup(t *testing.T) {
+func Setup(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
@@ -42,7 +40,7 @@ func TestSetup(t *testing.T) {
 	}
 }
 
-func TestTeardown(t *testing.T) {
+func Teardown(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
