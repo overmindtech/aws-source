@@ -318,6 +318,7 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 				ec2.NewReservedInstanceSource(ec2Client, *callerID.Account, region),
 				ec2.NewRouteTableSource(ec2Client, *callerID.Account, region),
 				ec2.NewSecurityGroupSource(ec2Client, *callerID.Account, region),
+				ec2.NewSecurityGroupRuleSource(ec2Client, *callerID.Account, region),
 				ec2.NewSnapshotSource(ec2Client, *callerID.Account, region),
 				ec2.NewSubnetSource(ec2Client, *callerID.Account, region),
 				ec2.NewVolumeSource(ec2Client, *callerID.Account, region),
