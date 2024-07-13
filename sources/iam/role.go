@@ -257,12 +257,12 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 
 	// Extract links from policy documents
 	for _, policy := range awsItem.EmbeddedPolicies {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, linksFromPolicy(policy.Document)...)
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(policy.Document)...)
 	}
 
 	// Extract links from the assume role policy document
 	if enrichedRole.AssumeRolePolicyDocument != nil {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, linksFromPolicy(enrichedRole.AssumeRolePolicyDocument)...)
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(enrichedRole.AssumeRolePolicyDocument)...)
 	}
 
 	return &item, nil

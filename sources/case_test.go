@@ -12,6 +12,7 @@ func TestCamelCase(t *testing.T) {
 	exampleMap["Nested"] = map[string]interface{}{
 		"NestedKeyName":    "Value",
 		"NestedAWSAcronym": "Wow",
+		"AWS":              "what here?",
 		"NestedArray": []map[string]string{
 			{
 				"FooBar": "Baz",
