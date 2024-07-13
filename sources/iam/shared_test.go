@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/micahhausler/aws-iam-policy/policy"
 	"github.com/overmindtech/aws-source/tracing"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 )
@@ -29,4 +30,22 @@ func TestMain(m *testing.M) {
 	defer tracing.ShutdownTracing()
 
 	os.Exit(m.Run())
+}
+
+func TestLinksFromPolicy(t *testing.T) {
+	action := policy.NewStringOrSlice(true, "sts:AssumeRole")
+	pol := policy.Policy{
+		Statements: policy.NewSingularStatementOrSlice(policy.Statement{
+			Action:    action,
+			Effect:    "Allow",
+			Principal: policy.NewAWSPrincipal("arn:aws:iam::123456789:role/aws-controltower-AuditAdministratorRole"),
+		}),
+	}
+
+	queries := LinksFromPolicy(&pol)
+
+	if len(queries) != 1 {
+		t.Fatalf("expected 1 query got %v", len(queries))
+	}
+
 }

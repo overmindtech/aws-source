@@ -288,7 +288,7 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	}
 
 	if awsItem.Document != nil {
-		item.LinkedItemQueries = append(item.LinkedItemQueries, linksFromPolicy(awsItem.Document)...)
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(awsItem.Document)...)
 	}
 
 	return &item, nil

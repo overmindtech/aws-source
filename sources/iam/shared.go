@@ -36,7 +36,7 @@ type IAMClient interface {
 // entities that are explicitly mentioned in the policy. If we were to link to
 // more you'd end up with way too many links since a policy might for example
 // give read access to everything
-func linksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
+func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 	// We want to link all of the resources in the policy document, as long
 	// as they have a valid ARN
 	var arn *sources.ARN
@@ -48,50 +48,84 @@ func linksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 	}
 
 	for _, statement := range document.Statements.Values() {
-		if statement.Resource == nil {
-			continue
+		if statement.Principal != nil {
+			// If we are referencing a specific IAM user or role as the
+			// principal then we should link them here
+			if awsPrincipal := statement.Principal.AWS(); awsPrincipal != nil {
+				for _, value := range awsPrincipal.Values() {
+					// These are in the format of ARN so we'll parse them
+					if arn, err := sources.ParseARN(value); err == nil {
+						var typ string
+						switch arn.Type() {
+						case "role":
+							typ = "iam-role"
+						case "user":
+							typ = "iam-user"
+						}
+
+						if typ != "" {
+							queries = append(queries, &sdp.LinkedItemQuery{
+								Query: &sdp.Query{
+									Type:   "iam-role",
+									Method: sdp.QueryMethod_SEARCH,
+									Query:  arn.String(),
+									Scope:  sources.FormatScope(arn.AccountID, arn.Region),
+								},
+								BlastPropagation: &sdp.BlastPropagation{
+									// If a user or role iex explicitly
+									// referenced, I think it's reasonable to
+									// assume that they are tightly bound
+									In:  true,
+									Out: true,
+								},
+							})
+						}
+					}
+				}
+			}
 		}
 
-		for _, resource := range statement.Resource.Values() {
-			arn, err = sources.ParseARN(resource)
-			if err != nil {
-				continue
+		if statement.Resource != nil {
+			for _, resource := range statement.Resource.Values() {
+				arn, err = sources.ParseARN(resource)
+				if err != nil {
+					continue
+				}
+
+				// If the ARN contains a wildcard then we want to bail out
+				possibleWildcards := arn.AccountID + arn.Type() + arn.ResourceID()
+				if strings.Contains(possibleWildcards, "*") {
+					continue
+				}
+
+				// Since this could be an ARN to anything we are going to rely
+				// on the fact that we *usually* have a SEARCH method that
+				// accepts ARNs
+				scope := sdp.WILDCARD
+				if arn.AccountID != "aws" {
+					// If we have an account and region, then use those
+					scope = sources.FormatScope(arn.AccountID, arn.Region)
+				}
+
+				// It would be good here if we had a way to definitely know what
+				// type a given ARN is, but I don't think the types are 1:1 so
+				// we are going to have to use a wildcard. This will cause a lot
+				// of failed searches which I don't love, but it will work
+				itemType := sdp.WILDCARD
+
+				queries = append(queries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   itemType,
+						Method: sdp.QueryMethod_SEARCH,
+						Query:  arn.String(),
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						In:  false,
+						Out: true,
+					},
+				})
 			}
-
-			// If the ARN contains a wildcard then we want to bail out
-			possibleWildcards := arn.AccountID + arn.Type() + arn.ResourceID()
-			if strings.Contains(possibleWildcards, "*") {
-				continue
-			}
-
-			// Since this could be an ARN to anything we are going to rely
-			// on the fact that we *usually* have a SEARCH method that
-			// accepts ARNs
-			scope := sdp.WILDCARD
-			if arn.AccountID != "aws" {
-				// If we have an account and region, then use those
-				scope = sources.FormatScope(arn.AccountID, arn.Region)
-			}
-
-			// It would be good here if we had a way to definitely know what
-			// type a given ARN is, but I don't think the types are 1:1 so
-			// we are going to have to use a wildcard. This will cause a lot
-			// of failed searches which I don't love, but it will work
-			itemType := sdp.WILDCARD
-
-			queries = append(queries, &sdp.LinkedItemQuery{
-				Query: &sdp.Query{
-					Type:   itemType,
-					Method: sdp.QueryMethod_SEARCH,
-					Query:  arn.String(),
-					Scope:  scope,
-				},
-				BlastPropagation: &sdp.BlastPropagation{
-					In:  false,
-					Out: true,
-				},
-			})
-
 		}
 	}
 
