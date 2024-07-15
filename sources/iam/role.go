@@ -120,7 +120,7 @@ func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string
 		return nil, errors.New("policy document not found")
 	}
 
-	policyDoc, err := parsePolicyDocument(*policy.PolicyDocument)
+	policyDoc, err := ParsePolicyDocument(*policy.PolicyDocument)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing policy document: %w", err)
 	}
@@ -212,7 +212,7 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 
 	// Parse the encoded policy document
 	if awsItem.Role.AssumeRolePolicyDocument != nil {
-		policyDoc, err := parsePolicyDocument(*awsItem.Role.AssumeRolePolicyDocument)
+		policyDoc, err := ParsePolicyDocument(*awsItem.Role.AssumeRolePolicyDocument)
 		if err != nil {
 			return nil, err
 		}

@@ -88,7 +88,7 @@ func addPolicyDocument(ctx context.Context, client IAMClient, pol *PolicyDetails
 	}
 
 	// Save to the pointer
-	pol.Document, err = parsePolicyDocument(*out.PolicyVersion.Document)
+	pol.Document, err = ParsePolicyDocument(*out.PolicyVersion.Document)
 	if err != nil {
 		return fmt.Errorf("error parsing policy document: %w", err)
 	}
