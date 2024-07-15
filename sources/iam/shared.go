@@ -133,7 +133,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 }
 
 // Parses an IAM policy in it's URL-encoded embedded form
-func parsePolicyDocument(encoded string) (*policy.Policy, error) {
+func ParsePolicyDocument(encoded string) (*policy.Policy, error) {
 	// Decode the policy document which is RFC 3986 URL encoded
 	decoded, err := url.QueryUnescape(encoded)
 	if err != nil {
