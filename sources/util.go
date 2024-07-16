@@ -78,6 +78,10 @@ func (a *ARN) Type() string {
 		return r == '/' || r == ':'
 	})
 
+	if separatorLocation == -1 {
+		return a.Resource
+	}
+
 	// Keep the first field since this is the type, then remove the rest
 	return a.Resource[:separatorLocation]
 }

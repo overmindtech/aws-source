@@ -3,12 +3,14 @@ package iam
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
+	"github.com/micahhausler/aws-iam-policy/policy"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
@@ -19,6 +21,7 @@ import (
 
 type PolicyDetails struct {
 	Policy       *types.Policy
+	Document     *policy.Policy
 	PolicyGroups []types.PolicyGroup
 	PolicyRoles  []types.PolicyRole
 	PolicyUsers  []types.PolicyUser
@@ -38,7 +41,6 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
 		PolicyArn: sources.PtrString(a.String()),
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +51,49 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 
 	if out.Policy != nil {
 		err := addPolicyEntities(ctx, client, &details)
+		if err != nil {
+			return nil, err
+		}
 
+		err = addPolicyDocument(ctx, client, &details)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return &details, nil
+}
+
+// Gets the current policy version and parses it, adds to the policy details
+func addPolicyDocument(ctx context.Context, client IAMClient, pol *PolicyDetails) error {
+	if pol.Policy == nil {
+		return errors.New("policy is nil")
+	}
+	if pol.Policy.Arn == nil || pol.Policy.DefaultVersionId == nil {
+		return errors.New("policy ARN or default version ID is nil")
+	}
+
+	out, err := client.GetPolicyVersion(ctx, &iam.GetPolicyVersionInput{
+		PolicyArn: pol.Policy.Arn,
+		VersionId: pol.Policy.DefaultVersionId,
+	})
+	if err != nil {
+		return err
+	}
+	if out.PolicyVersion == nil {
+		return errors.New("policy version is nil")
+	}
+	if out.PolicyVersion.Document == nil {
+		return nil
+	}
+
+	// Save to the pointer
+	pol.Document, err = ParsePolicyDocument(*out.PolicyVersion.Document)
+	if err != nil {
+		return fmt.Errorf("error parsing policy document: %w", err)
+	}
+
+	return nil
 }
 
 func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDetails) error {
@@ -141,8 +179,16 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 		}
 
 		err := addPolicyEntities(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
 
-		return &details, err
+		err = addPolicyDocument(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
+
+		return &details, nil
 	})
 
 	if err != nil {
@@ -153,7 +199,14 @@ func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*Pol
 }
 
 func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem.Policy)
+	finalAttributes := struct {
+		*types.Policy
+		Document *policy.Policy
+	}{
+		Policy:   awsItem.Policy,
+		Document: awsItem.Document,
+	}
+	attributes, err := sources.ToAttributesCase(finalAttributes)
 
 	if err != nil {
 		return nil, err
@@ -232,6 +285,10 @@ func policyItemMapper(scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 				Out: true,
 			},
 		})
+	}
+
+	if awsItem.Document != nil {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(awsItem.Document)...)
 	}
 
 	return &item, nil

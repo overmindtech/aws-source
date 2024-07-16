@@ -2,13 +2,13 @@ package iam
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"net/url"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
+	"github.com/micahhausler/aws-iam-policy/policy"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -69,7 +69,7 @@ func enrichRole(ctx context.Context, client IAMClient, roleDetails *RoleDetails)
 
 type embeddedPolicy struct {
 	Name     string
-	Document map[string]interface{}
+	Document *policy.Policy
 }
 
 // getEmbeddedPolicies returns a list of inline policies embedded in the role
@@ -120,20 +120,9 @@ func getRolePolicyDetails(ctx context.Context, client IAMClient, roleName string
 		return nil, errors.New("policy document not found")
 	}
 
-	// URL Decode the policy document
-	unescaped, err := url.QueryUnescape(*policy.PolicyDocument)
-
+	policyDoc, err := ParsePolicyDocument(*policy.PolicyDocument)
 	if err != nil {
-		return nil, err
-	}
-
-	// Parse the policy into a map[string]interface{} from JSON
-	var policyDoc map[string]interface{}
-
-	err = json.Unmarshal([]byte(unescaped), &policyDoc)
-
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing policy document: %w", err)
 	}
 
 	return &embeddedPolicy{
@@ -213,9 +202,22 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	enrichedRole := struct {
 		*types.Role
 		EmbeddedPolicies []embeddedPolicy
+		// This is a replacement for the URL-encoded policy document so that the
+		// user can see the policy
+		AssumeRolePolicyDocument *policy.Policy
 	}{
 		Role:             awsItem.Role,
 		EmbeddedPolicies: awsItem.EmbeddedPolicies,
+	}
+
+	// Parse the encoded policy document
+	if awsItem.Role.AssumeRolePolicyDocument != nil {
+		policyDoc, err := ParsePolicyDocument(*awsItem.Role.AssumeRolePolicyDocument)
+		if err != nil {
+			return nil, err
+		}
+
+		enrichedRole.AssumeRolePolicyDocument = policyDoc
 	}
 
 	attributes, err := sources.ToAttributesCase(enrichedRole)
@@ -251,6 +253,16 @@ func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 				})
 			}
 		}
+	}
+
+	// Extract links from policy documents
+	for _, policy := range awsItem.EmbeddedPolicies {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(policy.Document)...)
+	}
+
+	// Extract links from the assume role policy document
+	if enrichedRole.AssumeRolePolicyDocument != nil {
+		item.LinkedItemQueries = append(item.LinkedItemQueries, LinksFromPolicy(enrichedRole.AssumeRolePolicyDocument)...)
 	}
 
 	return &item, nil
