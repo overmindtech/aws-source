@@ -68,6 +68,8 @@ github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3 h1:s8ge2Z8cXlmTDratm
 github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3/go.mod h1:W6Z0po6YDBax7UtxZDv1eqFrH3H7qS9hx/D4y40Mw0s=
 github.com/aws/aws-sdk-go-v2/service/rds v1.81.4 h1:tBtjOMKyEWLvsO6HaX6A+0A0V1gKcU2aSZKQXw6MSCM=
 github.com/aws/aws-sdk-go-v2/service/rds v1.81.4/go.mod h1:j27FNXhbbHXC3ExFsJkoxq2Y+4dQypf8KFX1IkgwVvM=
+github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7 h1:1KTeOEqOwS+eYuiqYhkiWV+4Fmet/vBkPCt/5dxZVsg=
+github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7/go.mod h1:I3uJLgoT83sDh9YRQdcUDoauftf7ySq9hFB7Z6O7p2c=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.42.3 h1:MmLCRqP4U4Cw9gJ4bNrCG0mWqEtBlmAVleyelcHARMU=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.42.3/go.mod h1:AMPjK2YnRh0YgOID3PqhJA1BRNfXDfGOnSsKHtAe8yA=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2 h1:sZXIzO38GZOU+O0C+INqbH7C2yALwfMWpd64tONS/NE=

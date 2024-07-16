@@ -135,17 +135,15 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 // +overmind:type networkmanager-device
 // +overmind:descriptiveType Networkmanager Device
 // +overmind:get Get a Networkmanager Device
-// +overmind:list List all Networkmanager Devices
 // +overmind:search Search for Networkmanager Devices by GlobalNetworkId, or by GlobalNetworkId with SiteId
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_device.arn
 // +overmind:terraform:method SEARCH
 
-func NewDeviceSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewDeviceSource(client *networkmanager.Client, accountID string) *sources.DescribeOnlySource[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
-		Region:    region,
 		ItemType:  "networkmanager-device",
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetDevicesInput) (*networkmanager.GetDevicesOutput, error) {
 			return client.GetDevices(ctx, input)

@@ -102,16 +102,14 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:type networkmanager-site
 // +overmind:descriptiveType Networkmanager Site
 // +overmind:get Get a Networkmanager Site
-// +overmind:list List all Networkmanager Sites
 // +overmind:search Search for Networkmanager Sites by GlobalNetworkId
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_site.arn
 // +overmind:terraform:method SEARCH
 
-func NewSiteSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewSiteSource(client *networkmanager.Client, accountID string) *sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
-		Region:    region,
 		AccountID: accountID,
 		ItemType:  "networkmanager-site",
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetSitesInput) (*networkmanager.GetSitesOutput, error) {

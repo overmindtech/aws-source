@@ -141,17 +141,15 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 // +overmind:type networkmanager-connection
 // +overmind:descriptiveType Networkmanager Connection
 // +overmind:get Get a Networkmanager Connection
-// +overmind:list List all Networkmanager Connections
 // +overmind:search Search for Networkmanager Connections by GlobalNetworkId
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_connection.arn
 // +overmind:terraform:method SEARCH
 
-func NewConnectionSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewConnectionSource(client *networkmanager.Client, accountID string) *sources.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
-		Region:    region,
 		ItemType:  "networkmanager-connection",
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetConnectionsInput) (*networkmanager.GetConnectionsOutput, error) {
 			return client.GetConnections(ctx, input)

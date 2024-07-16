@@ -2,6 +2,7 @@ package networkmanager
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -95,6 +96,17 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			})
 		}
 
+		switch s.State {
+		case types.LinkStatePending:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.LinkStateAvailable:
+			item.Health = sdp.Health_HEALTH_OK.Enum()
+		case types.LinkStateDeleting:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		case types.LinkStateUpdating:
+			item.Health = sdp.Health_HEALTH_PENDING.Enum()
+		}
+
 		items = append(items, &item)
 	}
 
@@ -105,17 +117,15 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:type networkmanager-link
 // +overmind:descriptiveType Networkmanager Link
 // +overmind:get Get a Networkmanager Link
-// +overmind:list List all Networkmanager Links
 // +overmind:search Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_link.arn
 // +overmind:terraform:method SEARCH
 
-func NewLinkSource(client *networkmanager.Client, accountID, region string) *sources.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewLinkSource(client *networkmanager.Client, accountID string) *sources.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &sources.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
-		Region:    region,
 		ItemType:  "networkmanager-link",
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinksInput) (*networkmanager.GetLinksOutput, error) {
 			return client.GetLinks(ctx, input)
