@@ -2,6 +2,7 @@ package ec2
 
 import (
 	"context"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -79,11 +80,7 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 					item.Health = sdp.Health_HEALTH_PENDING.Enum()
 				case codeShuttingDown:
 					item.Health = sdp.Health_HEALTH_PENDING.Enum()
-				case codeTerminated:
-					item.Health = sdp.Health_HEALTH_ERROR.Enum()
 				case codeStopping:
-					item.Health = sdp.Health_HEALTH_PENDING.Enum()
-				case codeStopped:
 					item.Health = sdp.Health_HEALTH_PENDING.Enum()
 				}
 			}

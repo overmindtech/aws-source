@@ -24,6 +24,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.40.3
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3
 	github.com/aws/aws-sdk-go-v2/service/rds v1.81.4
+	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.42.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2
 	github.com/aws/aws-sdk-go-v2/service/sns v1.31.3
@@ -114,7 +115,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-require github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7
-
-require github.com/overmindtech/docgen v0.3.2 // indirect
