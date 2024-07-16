@@ -7,8 +7,12 @@ import (
 	"os"
 	"testing"
 
+	awsnetworkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
+
+var testAWSConfig *integration.AWSCfg
+var testClient *awsnetworkmanager.Client
 
 func TestMain(m *testing.M) {
 	if integration.ShouldRunIntegrationTests() {
@@ -29,13 +33,14 @@ func TestIntegrationNetworkManager(t *testing.T) {
 func Setup(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
-
-	networkmanagerClient, err := createNetworkManagerClient(ctx)
+	var err error
+	testAWSConfig, err = integration.AWSSettings(ctx)
 	if err != nil {
-		t.Fatalf("Failed to create NetworkManager client: %v", err)
+		t.Fatalf("Failed to get AWS settings: %v", err)
 	}
+	testClient = awsnetworkmanager.NewFromConfig(testAWSConfig.Config)
 
-	if err := setup(ctx, logger, networkmanagerClient); err != nil {
+	if err := setup(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to setup NetworkManager integration tests: %v", err)
 	}
 }
@@ -44,12 +49,7 @@ func Teardown(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
-	networkmanagerClient, err := createNetworkManagerClient(ctx)
-	if err != nil {
-		t.Fatalf("Failed to create NetworkManager client: %v", err)
-	}
-
-	if err := teardown(ctx, logger, networkmanagerClient); err != nil {
+	if err := teardown(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to teardown NetworkManager integration tests: %v", err)
 	}
 }

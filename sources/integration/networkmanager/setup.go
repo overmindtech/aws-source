@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
@@ -69,15 +68,4 @@ func setup(ctx context.Context, logger *slog.Logger, networkmanagerClient *netwo
 	}
 
 	return nil
-}
-
-func createNetworkManagerClient(ctx context.Context) (*networkmanager.Client, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	client := networkmanager.NewFromConfig(cfg)
-
-	return client, nil
 }

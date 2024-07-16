@@ -17,47 +17,37 @@ func NetworkManager(t *testing.T) {
 
 	t.Logf("Running NetworkManager integration tests")
 
-	networkManagerCli, err := createNetworkManagerClient(ctx)
-	if err != nil {
-		t.Fatalf("failed to create NetworkManager client: %v", err)
-	}
-
-	awsCfg, err := integration.AWSSettings(ctx)
-	if err != nil {
-		t.Fatalf("failed to get AWS settings: %v", err)
-	}
-
-	globalNetworkSource := networkmanager.NewGlobalNetworkSource(networkManagerCli, awsCfg.AccountID)
-	if globalNetworkSource.Validate() != nil {
+	globalNetworkSource := networkmanager.NewGlobalNetworkSource(testClient, testAWSConfig.AccountID)
+	if err := globalNetworkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager global network source: %v", err)
 	}
 
-	siteSource := networkmanager.NewSiteSource(networkManagerCli, awsCfg.AccountID)
-	if siteSource.Validate() != nil {
+	siteSource := networkmanager.NewSiteSource(testClient, testAWSConfig.AccountID)
+	if err := siteSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager site source: %v", err)
 	}
 
-	linkSource := networkmanager.NewLinkSource(networkManagerCli, awsCfg.AccountID)
-	if linkSource.Validate() != nil {
+	linkSource := networkmanager.NewLinkSource(testClient, testAWSConfig.AccountID)
+	if err := linkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link source: %v", err)
 	}
 
-	linkAssociationSource := networkmanager.NewLinkAssociationSource(networkManagerCli, awsCfg.AccountID)
-	if linkAssociationSource.Validate() != nil {
+	linkAssociationSource := networkmanager.NewLinkAssociationSource(testClient, testAWSConfig.AccountID)
+	if err := linkAssociationSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link association source: %v", err)
 	}
 
-	connectionSource := networkmanager.NewConnectionSource(networkManagerCli, awsCfg.AccountID)
-	if connectionSource.Validate() != nil {
+	connectionSource := networkmanager.NewConnectionSource(testClient, testAWSConfig.AccountID)
+	if err := connectionSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager connection source: %v", err)
 	}
 
-	deviceSource := networkmanager.NewDeviceSource(networkManagerCli, awsCfg.AccountID)
-	if deviceSource.Validate() != nil {
+	deviceSource := networkmanager.NewDeviceSource(testClient, testAWSConfig.AccountID)
+	if err := deviceSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager device source: %v", err)
 	}
 
-	globalScope := sources.FormatScope(awsCfg.AccountID, "")
+	globalScope := sources.FormatScope(testAWSConfig.AccountID, "")
 
 	t.Run("Global Network", func(t *testing.T) {
 		// List global networks
@@ -209,6 +199,9 @@ func NetworkManager(t *testing.T) {
 					[]*sdp.Item{link},
 					integration.ResourceTags(integration.NetworkManager, linkSrc),
 				)
+				if err != nil {
+					t.Fatalf("failed to get link ID from get: %v", err)
+				}
 
 				if compositeLinkID != linkIDFromGet {
 					t.Fatalf("expected link ID %s, got %s", compositeLinkID, linkIDFromGet)
@@ -305,6 +298,9 @@ func NetworkManager(t *testing.T) {
 							[]*sdp.Item{linkAssociation},
 							nil, // we didn't use tags on associations
 						)
+						if err != nil {
+							t.Fatalf("failed to get link association ID from get: %v", err)
+						}
 
 						if compositeLinkAssociationID != compositeLinkAssociationIDFromGet {
 							t.Fatalf("expected link association ID %s, got %s", compositeLinkAssociationID, compositeLinkAssociationIDFromGet)
@@ -362,6 +358,9 @@ func NetworkManager(t *testing.T) {
 							[]*sdp.Item{connection},
 							nil, // we didn't use tags on connections
 						)
+						if err != nil {
+							t.Fatalf("failed to get connection ID from get: %v", err)
+						}
 
 						if compositeConnectionID != compositeConnectionIDFromGet {
 							t.Fatalf("expected connection ID %s, got %s", compositeConnectionID, compositeConnectionIDFromGet)

@@ -7,8 +7,12 @@ import (
 	"os"
 	"testing"
 
+	awsec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
+
+var testAWSConfig *integration.AWSCfg
+var testClient *awsec2.Client
 
 func TestMain(m *testing.M) {
 	if integration.ShouldRunIntegrationTests() {
@@ -29,13 +33,14 @@ func TestIntegrationEC2(t *testing.T) {
 func Setup(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
-
-	ec2Client, err := createEC2Client(ctx)
+	var err error
+	testAWSConfig, err = integration.AWSSettings(ctx)
 	if err != nil {
-		t.Fatalf("Failed to create EC2 client: %v", err)
+		t.Fatalf("Failed to get AWS settings: %v", err)
 	}
+	testClient = awsec2.NewFromConfig(testAWSConfig.Config)
 
-	if err := setup(ctx, logger, ec2Client); err != nil {
+	if err := setup(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to setup EC2 integration tests: %v", err)
 	}
 }
@@ -44,12 +49,7 @@ func Teardown(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
-	ec2Client, err := createEC2Client(ctx)
-	if err != nil {
-		t.Fatalf("Failed to create EC2 client: %v", err)
-	}
-
-	if err := teardown(ctx, logger, ec2Client); err != nil {
+	if err := teardown(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to teardown EC2 integration tests: %v", err)
 	}
 }

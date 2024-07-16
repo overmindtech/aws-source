@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -92,22 +93,26 @@ func TagFilter(resourceGroup resourceGroup) []types.TagFilter {
 type AWSCfg struct {
 	AccountID string
 	Region    string
+	Config    aws.Config
 }
 
 func AWSSettings(ctx context.Context) (*AWSCfg, error) {
-	accountID, found := os.LookupEnv("AWS_ACCOUNT_ID")
-	if !found {
-		return nil, fmt.Errorf("AWS_ACCOUNT_ID not found")
-	}
-
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	callerIdentity, err := sts.NewFromConfig(cfg).GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return nil, err
+	}
+
+	accountID := aws.ToString(callerIdentity.Account)
+
 	return &AWSCfg{
 		AccountID: accountID,
 		Region:    cfg.Region,
+		Config:    cfg,
 	}, nil
 }
 

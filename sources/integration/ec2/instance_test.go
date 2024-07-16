@@ -12,28 +12,16 @@ import (
 )
 
 func EC2(t *testing.T) {
-	ctx := context.Background()
-
 	t.Log("Running EC2 integration test")
 
-	ec2Cli, err := createEC2Client(ctx)
-	if err != nil {
-		t.Fatalf("failed to create EC2 client: %v", err)
-	}
+	instanceSource := ec2.NewInstanceSource(testClient, testAWSConfig.AccountID, testAWSConfig.Region)
 
-	awsCfg, err := integration.AWSSettings(ctx)
-	if err != nil {
-		t.Fatalf("failed to get AWS settings: %v", err)
-	}
-
-	instanceSource := ec2.NewInstanceSource(ec2Cli, awsCfg.AccountID, awsCfg.Region)
-
-	err = instanceSource.Validate()
+	err := instanceSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate EC2 instance source: %v", err)
 	}
 
-	scope := sources.FormatScope(awsCfg.AccountID, awsCfg.Region)
+	scope := sources.FormatScope(testAWSConfig.AccountID, testAWSConfig.Region)
 
 	// List instances
 	sdpListInstances, err := instanceSource.List(context.Background(), scope, true)
@@ -76,7 +64,7 @@ func EC2(t *testing.T) {
 	}
 
 	// Search instances
-	instanceARN := fmt.Sprintf("arn:aws:ec2:%s:%s:instance/%s", awsCfg.Region, awsCfg.AccountID, instanceID)
+	instanceARN := fmt.Sprintf("arn:aws:ec2:%s:%s:instance/%s", testAWSConfig.Region, testAWSConfig.AccountID, instanceID)
 	sdpSearchInstances, err := instanceSource.Search(context.Background(), scope, instanceARN, true)
 	if err != nil {
 		t.Fatalf("failed to search EC2 instances: %v", err)
