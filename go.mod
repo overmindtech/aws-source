@@ -6,14 +6,14 @@ go 1.22.4
 require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go-v2 v1.30.3
-	github.com/aws/aws-sdk-go-v2/config v1.27.26
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.26
+	github.com/aws/aws-sdk-go-v2/config v1.27.27
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.27
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.43.3
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.38.4
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.3
-	github.com/aws/aws-sdk-go-v2/service/directconnect v1.27.4
+	github.com/aws/aws-sdk-go-v2/service/directconnect v1.27.5
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.34.3
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.170.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.171.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.44.3
 	github.com/aws/aws-sdk-go-v2/service/efs v1.31.3
 	github.com/aws/aws-sdk-go-v2/service/eks v1.46.2
@@ -21,10 +21,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.33.3
 	github.com/aws/aws-sdk-go-v2/service/iam v1.34.3
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.56.3
-	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.40.3
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.40.4
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3
-	github.com/aws/aws-sdk-go-v2/service/rds v1.81.4
-	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.21.7
+	github.com/aws/aws-sdk-go-v2/service/rds v1.81.5
+	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.23.3
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.42.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2
 	github.com/aws/aws-sdk-go-v2/service/sns v1.31.3
@@ -72,7 +72,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.9.16 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.15 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.22.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.22.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.26.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
