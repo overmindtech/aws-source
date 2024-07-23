@@ -223,7 +223,7 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 	e.MaxParallelExecutions = maxParallel
 
 	if len(configs) == 0 {
-		log.Fatal("No regions specified")
+		return nil, errors.new("No configs specified")
 	}
 
 	var globalDone atomic.Bool
