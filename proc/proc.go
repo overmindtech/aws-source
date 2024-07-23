@@ -189,7 +189,7 @@ func CreateAWSConfigs(awsAuthConfig AwsAuthConfig) ([]aws.Config, error) {
 
 	configs := make([]aws.Config, 0, len(awsAuthConfig.Regions))
 
-	for i, region := range awsAuthConfig.Regions {
+	for _, region := range awsAuthConfig.Regions {
 		region = strings.Trim(region, " ")
 
 		cfg, err := awsAuthConfig.GetAWSConfig(region)
@@ -202,7 +202,7 @@ func CreateAWSConfigs(awsAuthConfig AwsAuthConfig) ([]aws.Config, error) {
 			Transport: otelhttp.NewTransport(http.DefaultTransport),
 		}
 
-		configs[i] = cfg
+		configs = append(configs, cfg)
 	}
 
 	return configs, nil
