@@ -126,7 +126,13 @@ var rootCmd = &cobra.Command{
 		rateLimitContext, rateLimitCancel := context.WithCancel(context.Background())
 		defer rateLimitCancel()
 
-		e, err := proc.InitializeAwsSourceEngine(rateLimitContext, natsOptions, awsAuthConfig, maxParallel)
+		configs, err := proc.CreateAWSConfigs(awsAuthConfig)
+		if err != nil {
+			log.WithError(err).Fatal("Could not create AWS configs")
+			return
+		}
+
+		e, err := proc.InitializeAwsSourceEngine(rateLimitContext, natsOptions, maxParallel, configs...)
 		if err != nil {
 			log.WithError(err).Error("Could not initialize aws source")
 			return
