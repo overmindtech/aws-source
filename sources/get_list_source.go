@@ -167,7 +167,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 		}
 	}
 
-	s.cache.StoreItem(item, s.CacheDuration, ck)
+	s.cache.StoreItem(item, s.cacheDuration(), ck)
 
 	return item, nil
 }
