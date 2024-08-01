@@ -67,6 +67,42 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 		}
 	}
 
+	for _, record := range awsItem.ResourceRecords {
+		if record.Value != nil {
+			// +overmind:link dns
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "dns",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  *record.Value,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// DNS aliases links
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+	}
+
+	if awsItem.HealthCheckId != nil {
+		// +overmind:link route53-health-check
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "route53-health-check",
+				Method: sdp.QueryMethod_GET,
+				Query:  *awsItem.HealthCheckId,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// Health check links tightly
+				In:  true,
+				Out: true,
+			},
+		})
+	}
+
 	return &item, nil
 }
 
