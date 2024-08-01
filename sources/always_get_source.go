@@ -177,7 +177,10 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 	item, err = s.GetFunc(ctx, s.Client, scope, input)
 
 	if err != nil {
-		err = s.processError(err, ck)
+		err := WrapAWSError(err)
+		if !CanRetry(err) {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+		}
 		return nil, err
 	}
 
@@ -212,7 +215,10 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 	items, err := s.listInternal(ctx, scope, s.ListInput)
 	if err != nil {
-		err = s.processError(err, ck)
+		err := WrapAWSError(err)
+		if !CanRetry(err) {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+		}
 		return nil, err
 	}
 
@@ -327,8 +333,6 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 		}
 	}
 
-	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
-
 	var items []*sdp.Item
 	var err error
 
@@ -340,20 +344,15 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 			if _, err = ParseARN(query); err == nil {
 				items, err = s.SearchARN(ctx, scope, query, ignoreCache)
 			} else {
-				items, err = s.SearchCustom(ctx, scope, query)
+				items, err = s.SearchCustom(ctx, scope, query, ignoreCache)
 			}
 		} else {
-			items, err = s.SearchCustom(ctx, scope, query)
+			items, err = s.SearchCustom(ctx, scope, query, ignoreCache)
 		}
 	}
 
 	if err != nil {
-		err = s.processError(err, ck)
 		return nil, err
-	}
-
-	for _, item := range items {
-		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil
@@ -361,37 +360,50 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 // SearchCustom Searches using custom mapping logic. The SearchInputMapper is
 // used to create an input for ListFunc, at which point the usual logic is used
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string) ([]*sdp.Item, error) {
-	var items []*sdp.Item
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
+	}
 
-	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
+	var items []*sdp.Item
 
 	if s.SearchInputMapper != nil {
 		input, err := s.SearchInputMapper(scope, query)
 
 		if err != nil {
-			err = s.processError(err, ck)
-			return nil, err
+			// Don't bother caching this error since it costs nearly nothing
+			return nil, WrapAWSError(err)
 		}
 
 		items, err = s.listInternal(ctx, scope, input)
 
 		if err != nil {
-			err = s.processError(err, ck)
+			err := WrapAWSError(err)
+			if !CanRetry(err) {
+				s.cache.StoreError(err, s.cacheDuration(), ck)
+			}
 			return nil, err
 		}
 	} else if s.SearchGetInputMapper != nil {
 		input, err := s.SearchGetInputMapper(scope, query)
 
 		if err != nil {
-			err = s.processError(err, ck)
-			return nil, err
+			// Don't cache this as it costs nearly nothing
+			return nil, WrapAWSError(err)
 		}
 
 		item, err := s.GetFunc(ctx, s.Client, scope, input)
 
 		if err != nil {
-			err = s.processError(err, ck)
+			err := WrapAWSError(err)
+			if !CanRetry(err) {
+				s.cache.StoreError(err, s.cacheDuration(), ck)
+			}
 			return nil, err
 		}
 
@@ -436,22 +448,4 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 // seen on, so the one with the higher weight value will win.
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Weight() int {
 	return 100
-}
-
-// Processes an error returned by the AWS API so that it can be handled by
-// Overmind. This includes extracting the correct error type, wrapping in an SDP
-// error, and caching that error if it is non-transient (like a 404)
-func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
-	var sdpErr *sdp.QueryError
-
-	if err != nil {
-		sdpErr = WrapAWSError(err)
-
-		// Only cache the error if is something that won't be fixed by retrying
-		if sdpErr.GetErrorType() == sdp.QueryError_NOTFOUND || sdpErr.GetErrorType() == sdp.QueryError_NOSCOPE {
-			s.cache.StoreError(sdpErr, s.cacheDuration(), cacheKey)
-		}
-	}
-
-	return sdpErr
 }

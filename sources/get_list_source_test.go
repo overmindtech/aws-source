@@ -257,6 +257,10 @@ func TestGetListSourceCaching(t *testing.T) {
 			generation += 1
 			return []string{fmt.Sprintf("%v", generation)}, nil
 		},
+		SearchFunc: func(ctx context.Context, client struct{}, scope, query string) ([]string, error) {
+			generation += 1
+			return []string{fmt.Sprintf("%v", generation)}, nil
+		},
 		ItemMapper: func(scope string, output string) (*sdp.Item, error) {
 			return &sdp.Item{
 				Scope:           "foo.eu-west-2",
@@ -362,6 +366,23 @@ func TestGetListSourceCaching(t *testing.T) {
 		firstGen, err := first[0].Attributes.Get("generation")
 		if err != nil {
 			t.Fatal(err)
+		}
+
+		// Get the result of the search
+		getCachedItem, err := s.Get(ctx, "foo.eu-west-2", "test-item", false)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Check that we get a valid item
+		if err := getCachedItem.Validate(); err != nil {
+			t.Fatal(err)
+		}
+
+		// Check the generation to make sure it was actually served from the cache
+		cachedGeneration, _ := getCachedItem.GetAttributes().Get("generation")
+		if firstGen != cachedGeneration {
+			t.Errorf("expected generation %v, got %v", firstGen, cachedGeneration)
 		}
 
 		// search again

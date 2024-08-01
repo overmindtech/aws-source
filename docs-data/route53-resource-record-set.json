@@ -3,7 +3,7 @@
 	"descriptiveType": "Route53 Record Set",
 	"getDescription": "Get a Route53 record Set by name",
 	"listDescription": "List all record sets",
-	"searchDescription": "Search for a record set by ARN",
+	"searchDescription": "Search for a record set by hosted zone ID",
 	"group": "AWS",
 	"terraformQuery": [
 		"aws_route53_record.arn"
