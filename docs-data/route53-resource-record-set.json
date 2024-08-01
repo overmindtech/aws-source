@@ -11,6 +11,7 @@
 	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
 	"links": [
-		"dns"
+		"dns",
+		"route53-health-check"
 	]
 }
