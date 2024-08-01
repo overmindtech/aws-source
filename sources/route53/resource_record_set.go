@@ -75,7 +75,7 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 // +overmind:descriptiveType Route53 Record Set
 // +overmind:get Get a Route53 record Set by name
 // +overmind:list List all record sets
-// +overmind:search Search for a record set by ARN
+// +overmind:search Search for a record set by hosted zone ID
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_record.arn
 // +overmind:terraform:method SEARCH

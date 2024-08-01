@@ -303,12 +303,10 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 		}
 	}
 
-	ck := sdpcache.CacheKeyFromParts(s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query)
-
 	if s.InputMapperSearch == nil {
 		return s.searchARN(ctx, scope, query, ignoreCache)
 	} else {
-		return s.searchCustom(ctx, scope, query, ck)
+		return s.searchCustom(ctx, scope, query, ignoreCache)
 	}
 }
 
@@ -338,7 +336,17 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx
 }
 
 // searchCustom Runs custom search logic using the `InputMapperSearch` function
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ck sdpcache.CacheKey) ([]*sdp.Item, error) {
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	// We need to cache here since this is the only place it'll be called
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
+	}
+
 	input, err := s.InputMapperSearch(ctx, s.Client, scope, query)
 	if err != nil {
 		return nil, WrapAWSError(err)

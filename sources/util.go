@@ -43,6 +43,18 @@ func ParseScope(scope string) (string, string, error) {
 	return sections[0], sections[1], nil
 }
 
+// Returns whether or not it makes sense to retry the error. This can be used to
+// decide whether we should cache the error or not. Errors such as the item
+// being not found, or the scope not existing should not be retried for example
+func CanRetry(err *sdp.QueryError) bool {
+	switch err.GetErrorType() {
+	case sdp.QueryError_NOTFOUND, sdp.QueryError_NOSCOPE:
+		return false
+	default:
+		return true
+	}
+}
+
 // A parsed representation of the parts of the ARN that Overmind needs to care
 // about
 //

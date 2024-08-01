@@ -127,6 +127,9 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) hasScope(scope string) b
 	return false
 }
 
+// Get retrieves an item from the source based on the provided scope, query, and
+// cache settings. It uses the defined `GetFunc`, `ItemMapper`, and
+// `ListTagsFunc` to retrieve and map the item.
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
@@ -150,14 +153,18 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 
 	awsItem, err := s.GetFunc(ctx, s.Client, scope, query)
 	if err != nil {
-		err = s.processError(err, ck)
+		err := WrapAWSError(err)
+		if !CanRetry(err) {
+			s.cache.StoreError(err, s.cacheDuration(), ck)
+		}
 		return nil, err
 	}
 
 	item, err := s.ItemMapper(scope, awsItem)
 	if err != nil {
-		err = s.processError(err, ck)
-		return nil, err
+		// Don't cache this as wrapping is very cheap and better to just try
+		// again than store in memory
+		return nil, WrapAWSError(err)
 	}
 
 	if s.ListTagsFunc != nil {
@@ -211,8 +218,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 		if s.ListTagsFunc != nil {
 			item.Tags, err = s.ListTagsFunc(ctx, awsItem, s.Client)
 			if err != nil {
-				err = s.processError(err, ck)
-				return nil, err
+				item.Tags = HandleTagsError(ctx, err)
 			}
 		}
 
@@ -223,7 +229,10 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 	return items, nil
 }
 
-// Search Searches for AWS resources by ARN
+// Search Searches for AWS resources, this can be implemented either as a
+// generic ARN search that tries to extract the globally unique name from the
+// ARN and pass this to a Get request, or a custom search function that can be
+// used to search for items in a different, source-specific way
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
@@ -239,6 +248,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Conte
 	}
 }
 
+// Extracts the `ResourceID` and scope from the ARN, then calls `Get` with the
+// extracted `ResourceID`
 func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
@@ -255,6 +266,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 		}
 	}
 
+	// Since this gits the Get method, and this method implements caching, we
+	// don't need to implement it here
 	item, err := s.Get(ctx, scope, a.ResourceID(), ignoreCache)
 
 	if err != nil {
@@ -264,11 +277,25 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 	return []*sdp.Item{item}, nil
 }
 
+// Custom search function that can be used to search for items in a different,
+// source-specific way
 func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	// We need to cache here since this is the only place it'll be called
+	s.ensureCache()
+	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
+	if qErr != nil {
+		return nil, qErr
+	}
+	if cacheHit {
+		return cachedItems, nil
+	}
+
 	awsItems, err := s.SearchFunc(ctx, s.Client, scope, query)
 
 	if err != nil {
-		return nil, WrapAWSError(err)
+		err = WrapAWSError(err)
+		s.cache.StoreError(err, s.cacheDuration(), ck)
+		return nil, err
 	}
 
 	items := make([]*sdp.Item, 0)
@@ -282,6 +309,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 		}
 
 		items = append(items, item)
+		s.cache.StoreItem(item, s.cacheDuration(), ck)
 	}
 
 	return items, nil
@@ -293,22 +321,4 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 // seen on, so the one with the higher weight value will win.
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Weight() int {
 	return 100
-}
-
-// Processes an error returned by the AWS API so that it can be handled by
-// Overmind. This includes extracting the correct error type, wrapping in an SDP
-// error, and caching that error if it is non-transient (like a 404)
-func (s *GetListSource[AWSItem, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
-	var sdpErr *sdp.QueryError
-
-	if err != nil {
-		sdpErr = WrapAWSError(err)
-
-		// Only cache the error if is something that won't be fixed by retrying
-		if sdpErr.GetErrorType() == sdp.QueryError_NOTFOUND || sdpErr.GetErrorType() == sdp.QueryError_NOSCOPE {
-			s.cache.StoreError(sdpErr, s.cacheDuration(), cacheKey)
-		}
-	}
-
-	return sdpErr
 }
