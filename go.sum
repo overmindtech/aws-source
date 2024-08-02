@@ -66,8 +66,8 @@ github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.41.0 h1:mvbaX3/zHNXRHqHN
 github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.41.0/go.mod h1:Y9mINPJv+o9q8Ztr5/PRh2C1Iynik64IhPzwe2ERGqQ=
 github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3 h1:s8ge2Z8cXlmTDratm4m9GJYX0hghJgoFh1rjtqKaYxk=
 github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.3/go.mod h1:W6Z0po6YDBax7UtxZDv1eqFrH3H7qS9hx/D4y40Mw0s=
-github.com/aws/aws-sdk-go-v2/service/rds v1.81.5 h1:0vEV6OFcCInf/G98MIwwNJM21cd0g+8/jcxXNE40pJA=
-github.com/aws/aws-sdk-go-v2/service/rds v1.81.5/go.mod h1:j27FNXhbbHXC3ExFsJkoxq2Y+4dQypf8KFX1IkgwVvM=
+github.com/aws/aws-sdk-go-v2/service/rds v1.82.0 h1:+1qRsLNukmvIDNBjz5Osqy4dvIBLwpCeMhmrh9evOUw=
+github.com/aws/aws-sdk-go-v2/service/rds v1.82.0/go.mod h1:j27FNXhbbHXC3ExFsJkoxq2Y+4dQypf8KFX1IkgwVvM=
 github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.23.3 h1:ByynKMsGZGmpUpnQ99y+lS7VxZrNt3mdagCnHd011Kk=
 github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.23.3/go.mod h1:ZR4h87npHPuVQ2SEeoWMe+CO/HcS9g2iYMLnT5HawW8=
 github.com/aws/aws-sdk-go-v2/service/route53 v1.42.3 h1:MmLCRqP4U4Cw9gJ4bNrCG0mWqEtBlmAVleyelcHARMU=
