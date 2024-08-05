@@ -37,7 +37,7 @@ require (
 	github.com/nats-io/jwt/v2 v2.5.8
 	github.com/nats-io/nkeys v0.4.7
 	github.com/overmindtech/discovery v0.27.6
-	github.com/overmindtech/sdp-go v0.83.0
+	github.com/overmindtech/sdp-go v0.84.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
@@ -77,7 +77,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
