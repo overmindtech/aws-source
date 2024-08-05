@@ -15,39 +15,52 @@ import (
 func NetworkManager(t *testing.T) {
 	ctx := context.Background()
 
+	var err error
+	testClient, err := networkManagerClient(ctx)
+	if err != nil {
+		t.Fatalf("Failed to create NetworkManager client: %v", err)
+	}
+
+	testAWSConfig, err := integration.AWSSettings(ctx)
+	if err != nil {
+		t.Fatalf("Failed to get AWS settings: %v", err)
+	}
+
+	accountID := testAWSConfig.AccountID
+
 	t.Logf("Running NetworkManager integration tests")
 
-	globalNetworkSource := networkmanager.NewGlobalNetworkSource(testClient, testAWSConfig.AccountID)
+	globalNetworkSource := networkmanager.NewGlobalNetworkSource(testClient, accountID)
 	if err := globalNetworkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager global network source: %v", err)
 	}
 
-	siteSource := networkmanager.NewSiteSource(testClient, testAWSConfig.AccountID)
+	siteSource := networkmanager.NewSiteSource(testClient, accountID)
 	if err := siteSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager site source: %v", err)
 	}
 
-	linkSource := networkmanager.NewLinkSource(testClient, testAWSConfig.AccountID)
+	linkSource := networkmanager.NewLinkSource(testClient, accountID)
 	if err := linkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link source: %v", err)
 	}
 
-	linkAssociationSource := networkmanager.NewLinkAssociationSource(testClient, testAWSConfig.AccountID)
+	linkAssociationSource := networkmanager.NewLinkAssociationSource(testClient, accountID)
 	if err := linkAssociationSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link association source: %v", err)
 	}
 
-	connectionSource := networkmanager.NewConnectionSource(testClient, testAWSConfig.AccountID)
+	connectionSource := networkmanager.NewConnectionSource(testClient, accountID)
 	if err := connectionSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager connection source: %v", err)
 	}
 
-	deviceSource := networkmanager.NewDeviceSource(testClient, testAWSConfig.AccountID)
+	deviceSource := networkmanager.NewDeviceSource(testClient, accountID)
 	if err := deviceSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager device source: %v", err)
 	}
 
-	globalScope := sources.FormatScope(testAWSConfig.AccountID, "")
+	globalScope := sources.FormatScope(accountID, "")
 
 	t.Run("Global Network", func(t *testing.T) {
 		// List global networks

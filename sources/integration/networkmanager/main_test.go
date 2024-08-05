@@ -11,9 +11,6 @@ import (
 	"github.com/overmindtech/aws-source/sources/integration"
 )
 
-var testAWSConfig *integration.AWSCfg
-var testClient *awsnetworkmanager.Client
-
 func TestMain(m *testing.M) {
 	if integration.ShouldRunIntegrationTests() {
 		fmt.Println("Running integration tests")
@@ -33,12 +30,12 @@ func TestIntegrationNetworkManager(t *testing.T) {
 func Setup(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
+
 	var err error
-	testAWSConfig, err = integration.AWSSettings(ctx)
+	testClient, err := networkManagerClient(ctx)
 	if err != nil {
-		t.Fatalf("Failed to get AWS settings: %v", err)
+		t.Fatalf("Failed to create NetworkManager client: %v", err)
 	}
-	testClient = awsnetworkmanager.NewFromConfig(testAWSConfig.Config)
 
 	if err := setup(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to setup NetworkManager integration tests: %v", err)
@@ -49,7 +46,22 @@ func Teardown(t *testing.T) {
 	ctx := context.Background()
 	logger := slog.Default()
 
+	var err error
+	testClient, err := networkManagerClient(ctx)
+	if err != nil {
+		t.Fatalf("Failed to create NetworkManager client: %v", err)
+	}
+
 	if err := teardown(ctx, logger, testClient); err != nil {
 		t.Fatalf("Failed to teardown NetworkManager integration tests: %v", err)
 	}
+}
+
+func networkManagerClient(ctx context.Context) (*awsnetworkmanager.Client, error) {
+	testAWSConfig, err := integration.AWSSettings(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get AWS settings: %v", err)
+	}
+
+	return awsnetworkmanager.NewFromConfig(testAWSConfig.Config), nil
 }
