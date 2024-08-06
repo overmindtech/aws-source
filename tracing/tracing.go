@@ -22,7 +22,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
-//go:generate sh -c "echo -n $(git describe --tags --long --all) > commit.txt"
+//go:generate sh -c "echo -n $(git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD) > commit.txt"
 //go:embed commit.txt
 var ServiceVersion string
 
