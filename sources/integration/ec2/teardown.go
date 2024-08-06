@@ -10,7 +10,7 @@ import (
 )
 
 func teardown(ctx context.Context, logger *slog.Logger, client *ec2.Client) error {
-	instanceID, err := findActiveInstanceIDByTags(client)
+	instanceID, err := findActiveInstanceIDByTags(ctx, client)
 	if err != nil {
 		nf := integration.NewNotFoundError(instanceSrc)
 		if errors.As(err, &nf) {

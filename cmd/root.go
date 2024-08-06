@@ -267,10 +267,7 @@ func init() {
 	rootCmd.PersistentFlags().String("run-mode", "release", "Set the run mode for this service, 'release', 'debug' or 'test'. Defaults to 'release'.")
 
 	// Bind these to viper
-	err = viper.BindPFlags(rootCmd.PersistentFlags())
-	if err != nil {
-		log.WithError(err).Fatal("could not bind flags to viper")
-	}
+	cobra.CheckErr(viper.BindPFlags(rootCmd.PersistentFlags()))
 
 	// Run this before we do anything to set up the loglevel
 	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {

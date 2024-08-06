@@ -156,7 +156,7 @@ func CamelCase(i interface{}) interface{} {
 
 	v := reflect.ValueOf(i)
 
-	switch v.Kind() {
+	switch v.Kind() { // nolint:exhaustive // handled by default case
 	case reflect.Map:
 		newMap := make(map[string]interface{})
 

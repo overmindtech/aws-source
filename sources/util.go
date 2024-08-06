@@ -47,7 +47,7 @@ func ParseScope(scope string) (string, string, error) {
 // decide whether we should cache the error or not. Errors such as the item
 // being not found, or the scope not existing should not be retried for example
 func CanRetry(err *sdp.QueryError) bool {
-	switch err.GetErrorType() {
+	switch err.GetErrorType() { // nolint:exhaustive
 	case sdp.QueryError_NOTFOUND, sdp.QueryError_NOSCOPE:
 		return false
 	default:

@@ -93,7 +93,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 		}
 
 		if desc.TargetHealth != nil {
-			switch desc.TargetHealth.State {
+			switch desc.TargetHealth.State { // nolint:exhaustive // handled by default case
 			case types.TargetHealthStateEnumInitial:
 				item.Health = sdp.Health_HEALTH_PENDING.Enum()
 			case types.TargetHealthStateEnumHealthy:
@@ -105,6 +105,8 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			case types.TargetHealthStateEnumDraining:
 				item.Health = sdp.Health_HEALTH_PENDING.Enum()
 			case types.TargetHealthStateEnumUnavailable:
+				item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+			default:
 				item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
 			}
 		}

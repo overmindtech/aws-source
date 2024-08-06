@@ -4,8 +4,8 @@ package lambda
 // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/gov2/iam/actions/policies.go#L21C1-L32C2
 // and represents the structure of an IAM policy document
 type PolicyDocument struct {
-	Version   string
-	Statement []PolicyStatement
+	Version   string            `json:""`
+	Statement []PolicyStatement `json:""`
 }
 
 // PolicyStatement defines a statement in a policy document.

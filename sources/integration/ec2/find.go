@@ -11,8 +11,8 @@ import (
 // findActiveInstanceIDByTags finds an instance by tags
 // additionalAttr is a variadic parameter that allows to specify additional attributes to search for
 // it ignores terminated instances
-func findActiveInstanceIDByTags(client *ec2.Client, additionalAttr ...string) (*string, error) {
-	result, err := client.DescribeInstances(context.Background(), &ec2.DescribeInstancesInput{})
+func findActiveInstanceIDByTags(ctx context.Context, client *ec2.Client, additionalAttr ...string) (*string, error) {
+	result, err := client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
 		return nil, err
 	}

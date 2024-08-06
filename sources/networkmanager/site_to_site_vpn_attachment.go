@@ -57,7 +57,7 @@ func siteToSiteVpnAttachmentItemMapper(scope string, awsItem *types.SiteToSiteVp
 			})
 		}
 
-		switch awsItem.Attachment.State {
+		switch awsItem.Attachment.State { // nolint:exhaustive
 		case types.AttachmentStateCreating:
 			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		case types.AttachmentStateAvailable:
@@ -66,6 +66,8 @@ func siteToSiteVpnAttachmentItemMapper(scope string, awsItem *types.SiteToSiteVp
 			item.Health = sdp.Health_HEALTH_PENDING.Enum()
 		case types.AttachmentStateFailed:
 			item.Health = sdp.Health_HEALTH_ERROR.Enum()
+		default:
+			item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
 		}
 	}
 	if awsItem.VpnConnectionArn != nil {
