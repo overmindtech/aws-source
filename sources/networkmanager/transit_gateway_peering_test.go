@@ -64,8 +64,8 @@ func TestTransitGatewayPeeringOutputMapper(t *testing.T) {
 				t.Fatalf("want %s, got %s", tt.expectedAttr, item.UniqueAttributeValue())
 			}
 
-			if tt.expectedHealth != *item.Health {
-				t.Fatalf("want %d, got %d", tt.expectedHealth, *item.Health)
+			if tt.expectedHealth != item.GetHealth() {
+				t.Fatalf("want %d, got %d", tt.expectedHealth, item.GetHealth())
 			}
 
 			tt.tests.Execute(t, item)

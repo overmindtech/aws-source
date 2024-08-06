@@ -88,7 +88,7 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 
 	tests.Execute(t, item)
 
-	if *item.Health != sdp.Health_HEALTH_ERROR {
-		t.Errorf("expected health to be ERROR, got %v", item.Health.String())
+	if item.GetHealth() != sdp.Health_HEALTH_ERROR {
+		t.Errorf("expected health to be ERROR, got %v", item.GetHealth().String())
 	}
 }

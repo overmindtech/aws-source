@@ -135,7 +135,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			Port:             desc.Target.Port,
 		}
 
-		item.Attributes.Set("uniqueId", id.String())
+		item.GetAttributes().Set("uniqueId", id.String())
 
 		// See if the ID is an ARN
 		a, err := sources.ParseARN(*desc.Target.Id)

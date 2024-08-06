@@ -93,37 +93,37 @@ func TestNodegroupGetFunc(t *testing.T) {
 			ExpectedType:   "ec2-key-pair",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "key",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg1",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet0d1fabfe6794b5543",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "autoscaling-auto-scaling-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "eks-default-2022122213523169820000001f-98c29d0d-b22a-aaa3-445e-ebf71d43f67c",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg2",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-launch-template",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "lt-097e994ce7e14fcdc",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 	}
 

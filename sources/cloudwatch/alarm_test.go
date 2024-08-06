@@ -119,8 +119,8 @@ func TestAlarmOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.Tags["Name"] != "example" {
-		t.Errorf("Expected tag Name to be example, got %s", item.Tags["Name"])
+	if item.GetTags()["Name"] != "example" {
+		t.Errorf("Expected tag Name to be example, got %s", item.GetTags()["Name"])
 	}
 
 	tests := sources.QueryTests{

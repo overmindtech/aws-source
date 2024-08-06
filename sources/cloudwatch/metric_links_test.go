@@ -196,12 +196,12 @@ func TestSuggestedQuery(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if query.Query.Type != c.ExpectedType {
-				t.Fatalf("expected type %q, got %q", c.ExpectedType, query.Query.Type)
+			if query.GetQuery().GetType() != c.ExpectedType {
+				t.Fatalf("expected type %q, got %q", c.ExpectedType, query.GetQuery().GetType())
 			}
 
-			if query.Query.Query != c.ExpectedQuery {
-				t.Fatalf("expected query %q, got %q", c.ExpectedQuery, query.Query.Query)
+			if query.GetQuery().GetType() != c.ExpectedQuery {
+				t.Fatalf("expected query %q, got %q", c.ExpectedQuery, query.GetQuery().GetQuery())
 			}
 		})
 	}

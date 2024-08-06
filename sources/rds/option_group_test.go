@@ -40,7 +40,7 @@ func TestOptionGroupOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.Tags["key"] != "value" {
-		t.Errorf("expected key to be value, got %v", item.Tags["key"])
+	if item.GetTags()["key"] != "value" {
+		t.Errorf("expected key to be value, got %v", item.GetTags()["key"])
 	}
 }

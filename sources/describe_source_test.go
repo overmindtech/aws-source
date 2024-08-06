@@ -672,7 +672,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first.Attributes.Get("generation")
+		firstGen, err := first.GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -682,7 +682,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withCacheGen, err := withCache.Attributes.Get("generation")
+		withCacheGen, err := withCache.GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -696,7 +696,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withoutCacheGen, err := withoutCache.Attributes.Get("generation")
+		withoutCacheGen, err := withoutCache.GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -711,7 +711,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].Attributes.Get("generation")
+		firstGen, err := first[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -721,7 +721,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -735,7 +735,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -751,7 +751,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].Attributes.Get("generation")
+		firstGen, err := first[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -761,7 +761,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withCacheGen, err := withCache[0].Attributes.Get("generation")
+		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -775,7 +775,7 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		withoutCacheGen, err := withoutCache[0].Attributes.Get("generation")
+		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}

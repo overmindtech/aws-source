@@ -245,7 +245,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-image",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "ami-04706e771f950937f",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ip",
@@ -257,13 +257,13 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "subnet-0450a637af9984235",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vpc-0d7892e00e573e701",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "iam-instance-profile",
@@ -275,13 +275,13 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-capacity-reservation",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "cr-0a1b2c3d4e5f6g7h8",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-elastic-gpu",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "egp-0a1b2c3d4e5f6g7h8",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "elastic-inference-accelerator",
@@ -311,7 +311,7 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-spot-instance-request",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sir-0a1b2c3d4e5f6g7h8",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ip",
@@ -323,19 +323,19 @@ func TestInstanceOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "sg-094e151c9fc5da181",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-instance-status",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-04c7b2794f7bc3d6a",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-volume",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "vol-06c7211d9e79a355e",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 		{
 			ExpectedType:   "ec2-placement-group",

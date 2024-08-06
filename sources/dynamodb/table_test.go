@@ -182,8 +182,8 @@ func TestTableGetFunc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if item.Tags["key"] != "value" {
-		t.Errorf("expected tag key to be 'value', got '%s'", item.Tags["key"])
+	if item.GetTags()["key"] != "value" {
+		t.Errorf("expected tag key to be 'value', got '%s'", item.GetTags()["key"])
 	}
 
 	if err = item.Validate(); err != nil {

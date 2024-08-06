@@ -2,7 +2,7 @@ package networkmanager
 
 import (
 	"context"
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -39,7 +39,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 
 		// We need to create a unique attribute for each item so we'll create a
 		// hash to avoid it being too long
-		hasher := sha1.New()
+		hasher := sha256.New()
 		hasher.Write([]byte(fromArn.String()))
 		hasher.Write([]byte(toArn.String()))
 		sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))

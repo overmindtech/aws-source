@@ -72,8 +72,8 @@ func TestRuleOutputMapper(t *testing.T) {
 	}
 
 	for _, item := range items {
-		if item.Tags["foo"] != "bar" {
-			t.Errorf("expected tag foo to be bar, got %v", item.Tags["foo"])
+		if item.GetTags()["foo"] != "bar" {
+			t.Errorf("expected tag foo to be bar, got %v", item.GetTags()["foo"])
 		}
 
 		if err := item.Validate(); err != nil {

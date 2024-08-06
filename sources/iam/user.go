@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -30,7 +31,10 @@ func userGetFunc(ctx context.Context, client IAMClient, _, query string) (*UserD
 	}
 
 	if out.User != nil {
-		enrichUser(ctx, client, &details)
+		err = enrichUser(ctx, client, &details)
+		if err != nil {
+			return nil, fmt.Errorf("failed to enrich user %w", err)
+		}
 	}
 
 	return &details, nil
@@ -97,7 +101,10 @@ func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetai
 			User: &users[i],
 		}
 
-		enrichUser(ctx, client, &details)
+		err := enrichUser(ctx, client, &details)
+		if err != nil {
+			return nil, fmt.Errorf("failed to enrich user %s: %w", *details.User.UserName, err)
+		}
 
 		userDetails = append(userDetails, &details)
 	}

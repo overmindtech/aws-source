@@ -2,8 +2,9 @@ package networkmanager
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"github.com/overmindtech/aws-source/sources"
@@ -85,8 +86,8 @@ func TestTransitGatewayConnectPeerAssociationsOutputMapper(t *testing.T) {
 				t.Fatalf("want %s, got %s", tt.expectedAttr, item.UniqueAttributeValue())
 			}
 
-			if tt.expectedHealth != *item.Health {
-				t.Fatalf("want %d, got %d", tt.expectedHealth, *item.Health)
+			if tt.expectedHealth != item.GetHealth() {
+				t.Fatalf("want %d, got %d", tt.expectedHealth, item.GetHealth())
 			}
 
 			tt.tests.Execute(t, item)
