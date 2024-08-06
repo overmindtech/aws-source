@@ -60,6 +60,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.17 h1:HGErhhrx
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.17/go.mod h1:RkZEx4l0EHYDJpWppMJ3nD9wZJAa8/0lq9aVC+r2UII=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.15 h1:246A4lSTXWJw/rmlQI+TT2OcqeDMKBdyjEQrafMaQdA=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.15/go.mod h1:haVfg3761/WF7YPuJOER2MP0k4UAXyHaLclKXB6usDg=
+github.com/aws/aws-sdk-go-v2/service/kms v1.35.3 h1:UPTdlTOwWUX49fVi7cymEN6hDqCwe3LNv1vi7TXUutk=
+github.com/aws/aws-sdk-go-v2/service/kms v1.35.3/go.mod h1:gjDP16zn+WWalyaUqwCCioQ8gU8lzttCCc9jYsiQI/8=
 github.com/aws/aws-sdk-go-v2/service/lambda v1.56.3 h1:r/y4nQOln25cbjrD8Wmzhhvnvr2ObPjgcPvPdoU9yHs=
 github.com/aws/aws-sdk-go-v2/service/lambda v1.56.3/go.mod h1:/4Vaddp+wJc1AA8ViAqwWKAcYykPV+ZplhmLQuq3RbQ=
 github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.41.0 h1:mvbaX3/zHNXRHqHNuk6NOS3JkaxqxPYLqWC4v7tObTI=

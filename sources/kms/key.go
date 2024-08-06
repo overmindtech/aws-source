@@ -3,6 +3,8 @@ package kms
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/service/kms/types"
+
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/overmindtech/aws-source/sources"
 	"github.com/overmindtech/sdp-go"
@@ -40,15 +42,26 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 		}
 	}
 
-	// TODO: Add health by the state.!!!
-
-	return &sdp.Item{
+	item := &sdp.Item{
 		Type:            "kms-key",
 		UniqueAttribute: "keyId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            resourceTags,
-	}, nil
+	}
+
+	switch output.KeyMetadata.KeyState {
+	case types.KeyStateEnabled:
+		item.Health = sdp.Health_HEALTH_OK.Enum()
+	case types.KeyStateDisabled:
+		item.Health = sdp.Health_HEALTH_ERROR.Enum()
+	case types.KeyStateUnavailable:
+		item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
+	default:
+		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	}
+
+	return item, nil
 }
 
 //go:generate docgen ../../docs-data
