@@ -15,7 +15,7 @@ import (
 
 func createEC2Instance(ctx context.Context, logger *slog.Logger, client *ec2.Client, testID string) error {
 	// check if a resource with the same tags already exists
-	id, err := findActiveInstanceIDByTags(client)
+	id, err := findActiveInstanceIDByTags(ctx, client)
 	if err != nil {
 		if errors.As(err, new(integration.NotFoundError)) {
 			logger.InfoContext(ctx, "Creating EC2 instance")
@@ -76,13 +76,13 @@ func createEC2Instance(ctx context.Context, logger *slog.Logger, client *ec2.Cli
 		},
 	}
 
-	result, err := client.RunInstances(context.Background(), input)
+	result, err := client.RunInstances(ctx, input)
 	if err != nil {
 		return err
 	}
 
 	waiter := ec2.NewInstanceRunningWaiter(client)
-	err = waiter.Wait(context.Background(), &ec2.DescribeInstancesInput{
+	err = waiter.Wait(ctx, &ec2.DescribeInstancesInput{
 		InstanceIds: []string{*result.Instances[0].InstanceId},
 	},
 		5*time.Minute)

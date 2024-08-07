@@ -23,7 +23,10 @@ func TestCamelCase(t *testing.T) {
 
 	camel := CamelCase(i)
 
-	b, _ := json.Marshal(camel)
+	b, err := json.Marshal(camel)
+	if err != nil {
+		t.Fatalf("error marshalling: %v", err)
+	}
 
 	expected := `{"name":"Dylan","nested":{"nestedAWSAcronym":"Wow","nestedArray":[{"fooBar":"Baz"}],"nestedKeyName":"Value"}}`
 

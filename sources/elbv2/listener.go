@@ -2,7 +2,7 @@ package elbv2
 
 import (
 	"context"
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 
@@ -28,11 +28,11 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 
 	for _, listener := range output.Listeners {
 		// Redact the client secret and replace with the first 12 characters of
-		// the SHA1 hash so that we can at least tell if it has changed
+		// the SHA256 hash so that we can at least tell if it has changed
 		for _, action := range listener.DefaultActions {
 			if action.AuthenticateOidcConfig != nil {
 				if action.AuthenticateOidcConfig.ClientSecret != nil {
-					h := sha1.New()
+					h := sha256.New()
 					h.Write([]byte(*action.AuthenticateOidcConfig.ClientSecret))
 					sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 

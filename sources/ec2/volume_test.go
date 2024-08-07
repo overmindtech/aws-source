@@ -92,7 +92,7 @@ func TestVolumeOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-instance",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "i-0667d3ca802741e30",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 	}
 

@@ -185,8 +185,8 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	if item.Tags["key"] != "value" {
-		t.Errorf("got %v, expected %v", item.Tags["key"], "value")
+	if item.GetTags()["key"] != "value" {
+		t.Errorf("got %v, expected %v", item.GetTags()["key"], "value")
 	}
 
 	tests := sources.QueryTests{

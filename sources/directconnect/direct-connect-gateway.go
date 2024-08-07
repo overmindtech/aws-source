@@ -10,7 +10,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Client, scope string, _ *directconnect.DescribeDirectConnectGatewaysInput, output *directconnect.DescribeDirectConnectGatewaysOutput) ([]*sdp.Item, error) {
+func directConnectGatewayOutputMapper(ctx context.Context, cli *directconnect.Client, scope string, _ *directconnect.DescribeDirectConnectGatewaysInput, output *directconnect.DescribeDirectConnectGatewaysOutput) ([]*sdp.Item, error) {
 	// create a slice of ARNs for the resources
 	resourceARNs := make([]string, 0, len(output.DirectConnectGateways))
 	for _, directConnectGateway := range output.DirectConnectGateways {
@@ -26,7 +26,7 @@ func directConnectGatewayOutputMapper(_ context.Context, cli *directconnect.Clie
 
 	if len(resourceARNs) > 0 {
 		// get tags for the resources in a map by their ARNs
-		tags, err = arnToTags(context.Background(), cli, resourceARNs)
+		tags, err = arnToTags(ctx, cli, resourceARNs)
 		if err != nil {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,

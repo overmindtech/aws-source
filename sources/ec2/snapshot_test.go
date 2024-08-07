@@ -83,7 +83,7 @@ func TestSnapshotOutputMapper(t *testing.T) {
 			ExpectedType:   "ec2-volume",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "volumeId",
-			ExpectedScope:  item.Scope,
+			ExpectedScope:  item.GetScope(),
 		},
 	}
 

@@ -69,8 +69,8 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	if item.Tags["foo"] != "bar" {
-		t.Errorf("expected tag foo to be bar, got %v", item.Tags["foo"])
+	if item.GetTags()["foo"] != "bar" {
+		t.Errorf("expected tag foo to be bar, got %v", item.GetTags()["foo"])
 	}
 
 	// It doesn't really make sense to test anything other than the linked items

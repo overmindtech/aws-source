@@ -141,7 +141,7 @@ func GetUniqueAttributeValue(uniqueAttrKey string, items []*sdp.Item, filterTags
 
 	uniqueAttrValue, err := filteredItems[0].GetAttributes().Get(uniqueAttrKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to get %s: %v", uniqueAttrKey, err)
+		return "", fmt.Errorf("failed to get %s: %w", uniqueAttrKey, err)
 	}
 
 	uniqueAttrValueStr := uniqueAttrValue.(string)
@@ -212,7 +212,7 @@ func uniqueAttributeValueSet(items []*sdp.Item, key string) (map[any]bool, error
 	for _, item := range items {
 		value, err := item.GetAttributes().Get(key)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get %s: %v", key, err)
+			return nil, fmt.Errorf("failed to get %s: %w", key, err)
 		}
 		uniqueValues[value] = true
 	}

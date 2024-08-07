@@ -33,7 +33,7 @@ func createGlobalNetwork(ctx context.Context, logger *slog.Logger, client *netwo
 		Tags:        tags,
 	}
 
-	response, err := client.CreateGlobalNetwork(context.Background(), input)
+	response, err := client.CreateGlobalNetwork(ctx, input)
 	if err != nil {
 		return nil, err
 	}

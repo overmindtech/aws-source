@@ -138,14 +138,14 @@ func (c AwsAuthConfig) GetAWSConfig(region string) (aws.Config, error) {
 			return aws.Config{}, errors.New("with external-id strategy, aws-profile must be blank")
 		}
 
-		assumecnf, err := config.LoadDefaultConfig(ctx)
+		assumeConfig, err := config.LoadDefaultConfig(ctx)
 		if err != nil {
-			return aws.Config{}, fmt.Errorf("could not load default config from environment: %v", err)
+			return aws.Config{}, fmt.Errorf("could not load default config from environment: %w", err)
 		}
 
 		options = append(options, config.WithCredentialsProvider(aws.NewCredentialsCache(
 			stscredsv2.NewAssumeRoleProvider(
-				sts.NewFromConfig(assumecnf),
+				sts.NewFromConfig(assumeConfig),
 				c.TargetRoleARN,
 				func(aro *stscredsv2.AssumeRoleOptions) {
 					aro.ExternalID = &c.ExternalID

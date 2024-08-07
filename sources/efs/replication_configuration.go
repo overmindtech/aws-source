@@ -79,7 +79,7 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 		// Set the health to the worst of the statuses
 		var hasError bool
 		for _, destination := range replication.Destinations {
-			switch destination.Status {
+			switch destination.Status { // nolint:exhaustive // handled by default case
 			case types.ReplicationStatusError:
 				item.Health = sdp.Health_HEALTH_ERROR.Enum()
 				hasError = true
@@ -89,6 +89,8 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 				item.Health = sdp.Health_HEALTH_PENDING.Enum()
 			case types.ReplicationStatusPausing:
 				item.Health = sdp.Health_HEALTH_PENDING.Enum()
+			default:
+				// If there's no error, we don't need to do anything
 			}
 
 			if hasError {

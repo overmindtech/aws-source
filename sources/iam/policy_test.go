@@ -266,7 +266,10 @@ func TestPolicyItemMapper(t *testing.T) {
 			},
 		},
 	}
-	addPolicyDocument(context.Background(), &TestIAMClient{}, details)
+	err := addPolicyDocument(context.Background(), &TestIAMClient{}, details)
+	if err != nil {
+		t.Fatal(err)
+	}
 	item, err := policyItemMapper("foo", details)
 
 	if err != nil {
@@ -376,7 +379,7 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		for _, item := range items {
-			arnString, err := item.Attributes.Get("arn")
+			arnString, err := item.GetAttributes().Get("arn")
 
 			if err != nil {
 				t.Errorf("expected item to have an arn attribute, got %v", err)
@@ -399,7 +402,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].Attributes.Get("arn")
+			arn, _ := items[0].GetAttributes().Get("arn")
 
 			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
@@ -414,7 +417,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].Attributes.Get("arn")
+			arn, _ := items[0].GetAttributes().Get("arn")
 
 			_, err := source.Search(ctx, "aws", arn.(string), false)
 
@@ -438,7 +441,7 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		for _, item := range items {
-			arnString, err := item.Attributes.Get("arn")
+			arnString, err := item.GetAttributes().Get("arn")
 
 			if err != nil {
 				t.Errorf("expected item to have an arn attribute, got %v", err)
@@ -461,7 +464,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].Attributes.Get("arn")
+			arn, _ := items[0].GetAttributes().Get("arn")
 
 			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
@@ -476,7 +479,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].Attributes.Get("arn")
+			arn, _ := items[0].GetAttributes().Get("arn")
 
 			_, err := source.Search(ctx, "aws", arn.(string), false)
 

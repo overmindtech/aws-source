@@ -47,7 +47,7 @@ func ParseScope(scope string) (string, string, error) {
 // decide whether we should cache the error or not. Errors such as the item
 // being not found, or the scope not existing should not be retried for example
 func CanRetry(err *sdp.QueryError) bool {
-	switch err.GetErrorType() {
+	switch err.GetErrorType() { // nolint:exhaustive
 	case sdp.QueryError_NOTFOUND, sdp.QueryError_NOSCOPE:
 		return false
 	default:
@@ -216,8 +216,8 @@ func (e E2ETest) Run(t *testing.T) {
 						t.Error(err)
 					}
 
-					if item.Type != e.Source.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.Type, e.Source.Type())
+					if item.GetType() != e.Source.Type() {
+						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
 					}
 				}
 			})
@@ -250,8 +250,8 @@ func (e E2ETest) Run(t *testing.T) {
 					t.Error(err)
 				}
 
-				if item.Type != e.Source.Type() {
-					t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.Type, e.Source.Type())
+				if item.GetType() != e.Source.Type() {
+					t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
 				}
 			}
 
@@ -277,8 +277,8 @@ func (e E2ETest) Run(t *testing.T) {
 						t.Fatal(err)
 					}
 
-					if item.Type != e.Source.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.Type, e.Source.Type())
+					if item.GetType() != e.Source.Type() {
+						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
 					}
 				})
 			}
@@ -300,9 +300,10 @@ func (e E2ETest) Run(t *testing.T) {
 
 			if !e.SkipNotFoundCheck {
 				// Make sure the error is an SDP error
-				if sdpErr, ok := err.(*sdp.QueryError); ok {
-					if sdpErr.ErrorType != sdp.QueryError_NOTFOUND {
-						t.Errorf("expected error to be NOTFOUND, got %v\nError: %v", sdpErr.ErrorType.String(), sdpErr.ErrorString)
+				var sdpErr *sdp.QueryError
+				if errors.As(err, &sdpErr) {
+					if sdpErr.GetErrorType() != sdp.QueryError_NOTFOUND {
+						t.Errorf("expected error to be NOTFOUND, got %v\nError: %v", sdpErr.GetErrorType().String(), sdpErr.GetErrorString())
 					}
 				} else {
 					t.Errorf("Error (%T) was not (*sdp.QueryError)", err)

@@ -365,8 +365,8 @@ func TestGetEventLinkedItem(t *testing.T) {
 					t.Error(err)
 				}
 
-				if req.Query.Type != test.ExpectedType {
-					t.Errorf("expected request type to be %v, got %v", test.ExpectedType, req.Query.Type)
+				if req.GetQuery().GetType() != test.ExpectedType {
+					t.Errorf("expected request type to be %v, got %v", test.ExpectedType, req.GetQuery().GetType())
 				}
 			}
 		})

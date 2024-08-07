@@ -365,8 +365,8 @@ func TestDistributionGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	if *item.Health != sdp.Health_HEALTH_OK {
-		t.Errorf("expected health to be HEALTH_OK, got %s", item.Health)
+	if item.GetHealth() != sdp.Health_HEALTH_OK {
+		t.Errorf("expected health to be HEALTH_OK, got %s", item.GetHealth())
 	}
 
 	tests := sources.QueryTests{

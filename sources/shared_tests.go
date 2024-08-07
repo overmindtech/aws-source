@@ -206,7 +206,7 @@ func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 			return nil
 		}
 	}
-	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
+	return fmt.Errorf("after %d attempts, last error: %w", attempts, err)
 }
 
 type QueryTest struct {
@@ -222,38 +222,38 @@ func (i QueryTests) Execute(t *testing.T, item *sdp.Item) {
 	for _, test := range i {
 		var found bool
 
-		for _, lir := range item.LinkedItemQueries {
-			if lirMatches(test, lir.Query) {
+		for _, lir := range item.GetLinkedItemQueries() {
+			if lirMatches(test, lir.GetQuery()) {
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\nScope: %v", len(item.LinkedItemQueries), test.ExpectedType, test.ExpectedQuery, test.ExpectedScope)
+			t.Errorf("could not find linked item request in %v requests.\nType: %v\nQuery: %v\nScope: %v", len(item.GetLinkedItemQueries()), test.ExpectedType, test.ExpectedQuery, test.ExpectedScope)
 		}
 	}
 }
 
 func lirMatches(test QueryTest, req *sdp.Query) bool {
-	return (test.ExpectedMethod == req.Method &&
-		test.ExpectedQuery == req.Query &&
-		test.ExpectedScope == req.Scope &&
-		test.ExpectedType == req.Type)
+	return (test.ExpectedMethod == req.GetMethod() &&
+		test.ExpectedQuery == req.GetQuery() &&
+		test.ExpectedScope == req.GetScope() &&
+		test.ExpectedType == req.GetType())
 }
 
 // CheckQuery Checks that an item request matches the expected params
 func CheckQuery(t *testing.T, item *sdp.Query, itemName string, expectedType string, expectedQuery string, expectedScope string) {
-	if item.Type != expectedType {
-		t.Errorf("%s.Type '%v' != '%v'", itemName, item.Type, expectedType)
+	if item.GetType() != expectedType {
+		t.Errorf("%s.Type '%v' != '%v'", itemName, item.GetType(), expectedType)
 	}
-	if item.Method != sdp.QueryMethod_GET {
-		t.Errorf("%s.Method '%v' != '%v'", itemName, item.Method, sdp.QueryMethod_GET)
+	if item.GetMethod() != sdp.QueryMethod_GET {
+		t.Errorf("%s.Method '%v' != '%v'", itemName, item.GetMethod(), sdp.QueryMethod_GET)
 	}
-	if item.Query != expectedQuery {
-		t.Errorf("%s.Query '%v' != '%v'", itemName, item.Query, expectedQuery)
+	if item.GetQuery() != expectedQuery {
+		t.Errorf("%s.Query '%v' != '%v'", itemName, item.GetQuery(), expectedQuery)
 	}
-	if item.Scope != expectedScope {
-		t.Errorf("%s.Scope '%v' != '%v'", itemName, item.Scope, expectedScope)
+	if item.GetScope() != expectedScope {
+		t.Errorf("%s.Scope '%v' != '%v'", itemName, item.GetScope(), expectedScope)
 	}
 }
