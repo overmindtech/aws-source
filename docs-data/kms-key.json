@@ -2,5 +2,7 @@
 	"type": "kms-key",
 	"descriptiveType": "KMS Key",
 	"group": "",
-	"links": []
+	"links": [
+		"kms-custom-key-store"
+	]
 }

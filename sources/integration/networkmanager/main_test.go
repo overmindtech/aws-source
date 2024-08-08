@@ -60,7 +60,7 @@ func Teardown(t *testing.T) {
 func networkManagerClient(ctx context.Context) (*awsnetworkmanager.Client, error) {
 	testAWSConfig, err := integration.AWSSettings(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS settings: %v", err)
+		return nil, fmt.Errorf("failed to get AWS settings: %w", err)
 	}
 
 	return awsnetworkmanager.NewFromConfig(testAWSConfig.Config), nil

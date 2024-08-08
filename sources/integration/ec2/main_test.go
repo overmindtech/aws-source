@@ -60,7 +60,7 @@ func Teardown(t *testing.T) {
 func ec2Client(ctx context.Context) (*awsec2.Client, error) {
 	testAWSConfig, err := integration.AWSSettings(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS settings: %v", err)
+		return nil, fmt.Errorf("failed to get AWS settings: %w", err)
 	}
 
 	return awsec2.NewFromConfig(testAWSConfig.Config), nil

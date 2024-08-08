@@ -50,15 +50,40 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 		Tags:            resourceTags,
 	}
 
+	if output.KeyMetadata.CustomKeyStoreId != nil {
+		// +overmind:link kms-custom-key-store
+		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+			Query: &sdp.Query{
+				Type:   "kms-custom-key-store",
+				Method: sdp.QueryMethod_GET,
+				Query:  *output.KeyMetadata.CustomKeyStoreId,
+				Scope:  scope,
+			},
+			BlastPropagation: &sdp.BlastPropagation{
+				// A keystore cannot be deleted if it contains a key.
+				In: true,
+				// Any change on the key won't affect the keystore.
+				Out: false,
+			},
+		})
+	}
+
 	switch output.KeyMetadata.KeyState {
 	case types.KeyStateEnabled:
 		item.Health = sdp.Health_HEALTH_OK.Enum()
-	case types.KeyStateDisabled:
-		item.Health = sdp.Health_HEALTH_ERROR.Enum()
-	case types.KeyStateUnavailable:
+	case types.KeyStateUnavailable, types.KeyStateDisabled:
 		item.Health = sdp.Health_HEALTH_UNKNOWN.Enum()
-	default:
+	case types.KeyStateCreating,
+		types.KeyStatePendingDeletion,
+		types.KeyStatePendingReplicaDeletion,
+		types.KeyStatePendingImport,
+		types.KeyStateUpdating:
 		item.Health = sdp.Health_HEALTH_PENDING.Enum()
+	default:
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_OTHER,
+			ErrorString: "unknown KeyState",
+		}
 	}
 
 	return item, nil
