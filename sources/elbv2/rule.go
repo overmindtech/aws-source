@@ -49,6 +49,26 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 			item.LinkedItemQueries = append(item.LinkedItemQueries, requests...)
 		}
 
+		for _, condition := range rule.Conditions {
+			if condition.HostHeaderConfig != nil {
+				for _, value := range condition.HostHeaderConfig.Values {
+					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+						Query: &sdp.Query{
+							Type:   "dns",
+							Method: sdp.QueryMethod_SEARCH,
+							Query:  value,
+							Scope:  "global",
+						},
+						BlastPropagation: &sdp.BlastPropagation{
+							// Tightly coupled
+							In:  true,
+							Out: true,
+						},
+					})
+				}
+			}
+		}
+
 		items = append(items, &item)
 	}
 
