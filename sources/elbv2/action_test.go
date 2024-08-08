@@ -50,7 +50,7 @@ func TestActionToRequests(t *testing.T) {
 			},
 			TargetGroups: []types.TargetGroupTuple{
 				{
-					TargetGroupArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"), // link
+					TargetGroupArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id1"), // link
 					Weight:         sources.PtrInt32(1),
 				},
 			},
@@ -63,7 +63,7 @@ func TestActionToRequests(t *testing.T) {
 			Protocol:   sources.PtrString("https"),              // combine and link
 			Query:      sources.PtrString("foo=bar"),            // combine and link
 		},
-		TargetGroupArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"), // link
+		TargetGroupArn: sources.PtrString("arn:partition:service:region:account-id:resource-type:resource-id2"), // link
 	}
 
 	item := sdp.Item{
@@ -102,7 +102,7 @@ func TestActionToRequests(t *testing.T) {
 		{
 			ExpectedType:   "elbv2-target-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id1",
 			ExpectedScope:  "account-id.region",
 		},
 		{
@@ -114,7 +114,7 @@ func TestActionToRequests(t *testing.T) {
 		{
 			ExpectedType:   "elbv2-target-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
-			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id",
+			ExpectedQuery:  "arn:partition:service:region:account-id:resource-type:resource-id2",
 			ExpectedScope:  "account-id.region",
 		},
 	}

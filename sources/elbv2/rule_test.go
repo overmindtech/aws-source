@@ -2,11 +2,15 @@ package elbv2
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 	"github.com/overmindtech/aws-source/sources"
+	"github.com/overmindtech/sdp-go"
 )
 
 func TestRuleOutputMapper(t *testing.T) {
@@ -28,7 +32,7 @@ func TestRuleOutputMapper(t *testing.T) {
 						},
 						HostHeaderConfig: &types.HostHeaderConditionConfig{
 							Values: []string{
-								"foo",
+								"foo.bar.com", // link
 							},
 						},
 						HttpHeaderConfig: &types.HttpHeaderConditionConfig{
@@ -71,17 +75,67 @@ func TestRuleOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	for _, item := range items {
-		if item.GetTags()["foo"] != "bar" {
-			t.Errorf("expected tag foo to be bar, got %v", item.GetTags()["foo"])
-		}
-
-		if err := item.Validate(); err != nil {
-			t.Error(err)
-		}
-	}
-
 	if len(items) != 1 {
-		t.Fatalf("expected 1 item, got %v", len(items))
+		t.Error("expected 1 item")
 	}
+
+	item := items[0]
+
+	tests := sources.QueryTests{
+		{
+			ExpectedType:   "dns",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "foo.bar.com",
+			ExpectedScope:  "global",
+		},
+	}
+
+	tests.Execute(t, item)
+}
+
+func TestNewRuleSource(t *testing.T) {
+	config, account, region := sources.GetAutoConfig(t)
+	client := elasticloadbalancingv2.NewFromConfig(config)
+
+	lbSource := NewLoadBalancerSource(client, account, region)
+	listenerSource := NewListenerSource(client, account, region)
+	ruleSource := NewRuleSource(client, account, region)
+
+	lbs, err := lbSource.List(context.Background(), lbSource.Scopes()[0], false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(lbs) == 0 {
+		t.Skip("no load balancers found")
+	}
+
+	lbARN, err := lbs[0].GetAttributes().Get("loadBalancerArn")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	listeners, err := listenerSource.Search(context.Background(), listenerSource.Scopes()[0], fmt.Sprint(lbARN), false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(listeners) == 0 {
+		t.Skip("no listeners found")
+	}
+
+	listenerARN, err := listeners[0].GetAttributes().Get("listenerArn")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	goodSearch := fmt.Sprint(listenerARN)
+
+	test := sources.E2ETest{
+		Source:          ruleSource,
+		Timeout:         10 * time.Second,
+		GoodSearchQuery: &goodSearch,
+	}
+
+	test.Run(t)
 }
