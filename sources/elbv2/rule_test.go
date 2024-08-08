@@ -135,6 +135,7 @@ func TestNewRuleSource(t *testing.T) {
 		Source:          ruleSource,
 		Timeout:         10 * time.Second,
 		GoodSearchQuery: &goodSearch,
+		SkipList:        true,
 	}
 
 	test.Run(t)
