@@ -34,12 +34,14 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 		return nil, err
 	}
 
-	resourceTags, err := tags(ctx, client, *input.KeyId)
+	// Some keys can be accessed, but not their tags, even if you have full
+	// admin access. No clue how this is possible but seems to be an
+	// inconsistency in the AWS API. In this case, we will ignore the error and
+	// embed it in a tag so that you can see that they are missing
+	var resourceTags map[string]string
+	resourceTags, err = tags(ctx, client, *input.KeyId)
 	if err != nil {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: err.Error(),
-		}
+		resourceTags = sources.HandleTagsError(ctx, err)
 	}
 
 	item := &sdp.Item{

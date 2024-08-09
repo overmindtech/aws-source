@@ -2,9 +2,11 @@ package kms
 
 import (
 	"context"
+	"errors"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
+	"github.com/aws/smithy-go"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
 
@@ -32,6 +34,12 @@ func findActiveKeyIDByTags(ctx context.Context, client *kms.Client, additionalAt
 		tags, err := client.ListResourceTags(ctx, &kms.ListResourceTagsInput{
 			KeyId: keyListEntry.KeyId,
 		})
+		// There are some keys that even admins can't list the tags of. Not sure
+		// why but they seem to exist, we will ignore permissions errors here.
+		var awsErr *smithy.GenericAPIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "AccessDeniedException" {
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
