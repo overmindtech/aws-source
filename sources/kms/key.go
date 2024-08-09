@@ -94,11 +94,11 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 //go:generate docgen ../../docs-data
 // +overmind:type kms-key
 // +overmind:descriptiveType KMS Key
-// +overmind: get Get a KMS Key by its ID
-// +overmind: list List all KMS Keys
-// +overmind: search Search for KMS Keys by ARN
-// +overmind: group AWS
-// +overmind: terraform:queryMap aws_kms_key.key_id
+// +overmind:get Get a KMS Key by its ID
+// +overmind:list List all KMS Keys
+// +overmind:search Search for KMS Keys by ARN
+// +overmind:group AWS
+// +overmind:terraform:queryMap aws_kms_key.key_id
 
 func NewKeySource(client kmsClient, accountID, region string) *sources.AlwaysGetSource[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
 	return &sources.AlwaysGetSource[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{
