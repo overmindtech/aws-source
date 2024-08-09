@@ -1,4 +1,4 @@
-package ec2
+package kms
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	awsec2 "github.com/aws/aws-sdk-go-v2/service/ec2"
+	awskms "github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
 
@@ -21,9 +21,9 @@ func TestMain(m *testing.M) {
 	}
 }
 
-func TestIntegrationEC2(t *testing.T) {
+func TestIntegrationKMS(t *testing.T) {
 	t.Run("Setup", Setup)
-	t.Run("EC2", EC2)
+	t.Run("KMS", KMS)
 	t.Run("Teardown", Teardown)
 }
 
@@ -32,13 +32,13 @@ func Setup(t *testing.T) {
 	logger := slog.Default()
 
 	var err error
-	testClient, err := ec2Client(ctx)
+	testClient, err := kmsClient(ctx)
 	if err != nil {
-		t.Fatalf("Failed to create EC2 client: %v", err)
+		t.Fatalf("Failed to create KMS client: %v", err)
 	}
 
 	if err := setup(ctx, logger, testClient); err != nil {
-		t.Fatalf("Failed to setup EC2 integration tests: %v", err)
+		t.Fatalf("Failed to setup KMS integration tests: %v", err)
 	}
 }
 
@@ -47,21 +47,21 @@ func Teardown(t *testing.T) {
 	logger := slog.Default()
 
 	var err error
-	testClient, err := ec2Client(ctx)
+	testClient, err := kmsClient(ctx)
 	if err != nil {
-		t.Fatalf("Failed to create EC2 client: %v", err)
+		t.Fatalf("Failed to create KMS client: %v", err)
 	}
 
 	if err := teardown(ctx, logger, testClient); err != nil {
-		t.Fatalf("Failed to teardown EC2 integration tests: %v", err)
+		t.Fatalf("Failed to teardown KMS integration tests: %v", err)
 	}
 }
 
-func ec2Client(ctx context.Context) (*awsec2.Client, error) {
+func kmsClient(ctx context.Context) (*awskms.Client, error) {
 	testAWSConfig, err := integration.AWSSettings(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS settings: %w", err)
 	}
 
-	return awsec2.NewFromConfig(testAWSConfig.Config), nil
+	return awskms.NewFromConfig(testAWSConfig.Config), nil
 }

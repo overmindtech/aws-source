@@ -10,7 +10,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/sdp-go"
 )
@@ -28,6 +27,7 @@ type resourceGroup int
 const (
 	NetworkManager resourceGroup = iota
 	EC2
+	KMS
 )
 
 func (rg resourceGroup) String() string {
@@ -36,6 +36,8 @@ func (rg resourceGroup) String() string {
 		return "network-manager"
 	case EC2:
 		return "ec2"
+	case KMS:
+		return "kms"
 	default:
 		return "unknown"
 	}
@@ -71,23 +73,6 @@ func TestID() string {
 
 func TestName(resourceGroup resourceGroup) string {
 	return fmt.Sprintf("%s-integration-tests", resourceGroup.String())
-}
-
-func TagFilter(resourceGroup resourceGroup) []types.TagFilter {
-	return []types.TagFilter{
-		{
-			Key:    aws.String(TagTestTypeKey),
-			Values: []string{TestName(resourceGroup)},
-		},
-		{
-			Key:    aws.String(TagTestIDKey),
-			Values: []string{TestID()},
-		},
-		{
-			Key:    aws.String(TagTestKey),
-			Values: []string{TagTestValue},
-		},
-	}
 }
 
 type AWSCfg struct {

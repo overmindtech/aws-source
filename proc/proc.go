@@ -21,6 +21,7 @@ import (
 	awselasticloadbalancing "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	awselasticloadbalancingv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	awsiam "github.com/aws/aws-sdk-go-v2/service/iam"
+	awskms "github.com/aws/aws-sdk-go-v2/service/kms"
 	awslambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	awsnetworkfirewall "github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	awsnetworkmanager "github.com/aws/aws-sdk-go-v2/service/networkmanager"
@@ -47,6 +48,7 @@ import (
 	"github.com/overmindtech/aws-source/sources/elb"
 	"github.com/overmindtech/aws-source/sources/elbv2"
 	"github.com/overmindtech/aws-source/sources/iam"
+	"github.com/overmindtech/aws-source/sources/kms"
 	"github.com/overmindtech/aws-source/sources/lambda"
 	"github.com/overmindtech/aws-source/sources/networkfirewall"
 	"github.com/overmindtech/aws-source/sources/networkmanager"
@@ -307,6 +309,9 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 				// Increase this from the default of 3 since IAM as such low rate limits
 				o.RetryMaxAttempts = 5
 			})
+			kmsClient := awskms.NewFromConfig(cfg, func(o *awskms.Options) {
+				o.RetryMode = aws.RetryModeAdaptive
+			})
 
 			sources := []discovery.Source{
 				// EC2
@@ -451,6 +456,9 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 				sns.NewPlatformApplicationSource(snsClient, *callerID.Account, cfg.Region),
 				sns.NewEndpointSource(snsClient, *callerID.Account, cfg.Region),
 				sns.NewDataProtectionPolicySource(snsClient, *callerID.Account, cfg.Region),
+
+				// KMS
+				kms.NewKeySource(kmsClient, *callerID.Account, cfg.Region),
 			}
 
 			e.AddSources(sources...)

@@ -46,7 +46,10 @@ This source requires the following IAM Policy
         "sns:Get*",
         "sns:List*",
         "sqs:Get*",
-        "sqs:List*"
+        "sqs:List*",
+        "kms::ListResourceTags",
+        "kms:ListKeys",
+        "kms:DescribeKey"
       ],
       "Resource": "*"
     }

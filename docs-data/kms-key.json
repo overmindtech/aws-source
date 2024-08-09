@@ -1,0 +1,8 @@
+{
+	"type": "kms-key",
+	"descriptiveType": "KMS Key",
+	"group": "",
+	"links": [
+		"kms-custom-key-store"
+	]
+}
