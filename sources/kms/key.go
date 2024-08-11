@@ -2,6 +2,7 @@ package kms
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
@@ -56,7 +57,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 			Query: &sdp.Query{
 				Type:   "kms-custom-key-store",
 				Method: sdp.QueryMethod_GET,
-				Query:  *output.KeyMetadata.CustomKeyStoreId,
+				Query:  fmt.Sprintf("id|%s", *output.KeyMetadata.CustomKeyStoreId),
 				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{
@@ -82,7 +83,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 	default:
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_OTHER,
-			ErrorString: "unknown KeyState",
+			ErrorString: "unknown Key State",
 		}
 	}
 
