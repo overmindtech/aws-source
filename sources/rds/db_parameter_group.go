@@ -25,7 +25,7 @@ func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Ite
 
 	item := sdp.Item{
 		Type:            "rds-db-parameter-group",
-		UniqueAttribute: "dBParameterGroupName",
+		UniqueAttribute: "dbparameterGroupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

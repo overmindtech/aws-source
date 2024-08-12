@@ -33,7 +33,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 		item := sdp.Item{
 			Type:            "rds-db-subnet-group",
-			UniqueAttribute: "dBSubnetGroupName",
+			UniqueAttribute: "dbsubnetGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,

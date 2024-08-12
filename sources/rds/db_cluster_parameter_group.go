@@ -25,7 +25,7 @@ func dBClusterParameterGroupItemMapper(scope string, awsItem *ClusterParameterGr
 
 	item := sdp.Item{
 		Type:            "rds-db-cluster-parameter-group",
-		UniqueAttribute: "dBClusterParameterGroupName",
+		UniqueAttribute: "dbclusterParameterGroupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

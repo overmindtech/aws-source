@@ -106,7 +106,7 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		item := sdp.Item{
 			Type:            "rds-db-instance",
-			UniqueAttribute: "dBInstanceIdentifier",
+			UniqueAttribute: "dbinstanceIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,
