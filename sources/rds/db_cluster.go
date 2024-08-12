@@ -32,9 +32,8 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		}
 
 		item := sdp.Item{
-			Type: "rds-db-cluster",
-			// UniqueAttribute: "dbclusterIdentifier",
-			UniqueAttribute: "dBClusterIdentifier",
+			Type:            "rds-db-cluster",
+			UniqueAttribute: "dbclusterIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,
