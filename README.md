@@ -151,6 +151,8 @@ Some full examples of this naming convention therefore are:
 * `aws ec2 describe-instances`: ec2-instance
 * `aws elbv2 describe-rules`: elbv2-rule
 
+TEST
+
 ### Running Locally
 
 The source CLI can be interacted with locally by running:
