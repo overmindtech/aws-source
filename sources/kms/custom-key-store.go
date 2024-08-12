@@ -46,6 +46,46 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 			}
 		}
 
+		if customKeyStore.CloudHsmClusterId != nil {
+			// +overmind:link cloudhsmv2-cluster
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "cloudhsmv2-cluster",
+					Method: sdp.QueryMethod_GET,
+					Query:  *customKeyStore.CloudHsmClusterId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the CloudHSM cluster will affect the custom key store
+					In: true,
+					// Updating the custom key store will not affect the CloudHSM cluster
+					Out: false,
+				},
+			})
+		}
+
+		// TODO: Activate this after enabling get vpc by name
+		/*
+			if customKeyStore.XksProxyConfiguration != nil &&
+				customKeyStore.XksProxyConfiguration.VpcEndpointServiceName != nil {
+				// +overmind:link ec2-vpc
+				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+					Query: &sdp.Query{
+						Type:   "ec2-vpc",
+						Method: sdp.QueryMethod_GET,
+						Query:  *customKeyStore.XksProxyConfiguration.VpcEndpointServiceName,
+						Scope:  scope,
+					},
+					BlastPropagation: &sdp.BlastPropagation{
+						// Changing the VPC will affect the custom key store
+						In: true,
+						// Updating the custom key store will not affect the VPC
+						Out: false,
+					},
+				})
+			}
+		*/
+
 		items = append(items, &item)
 	}
 

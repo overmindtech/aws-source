@@ -40,6 +40,19 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 	if len(items) != 1 {
 		t.Fatalf("expected 1 item, got %v", len(items))
 	}
+
+	item := items[0]
+
+	tetsts := sources.QueryTests{
+		{
+			ExpectedType:   "cloudhsmv2-cluster",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "cloud-hsm-cluster-1",
+			ExpectedScope:  "foo",
+		},
+	}
+
+	tetsts.Execute(t, item)
 }
 
 func TestNewCustomKeyStoreSource(t *testing.T) {

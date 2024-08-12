@@ -10,5 +10,7 @@
 	],
 	"terraformMethod": "GET",
 	"terraformScope": "*",
-	"links": []
+	"links": [
+		"cloudhsmv2-cluster"
+	]
 }
