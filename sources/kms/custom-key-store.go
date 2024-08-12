@@ -2,8 +2,6 @@ package kms
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
@@ -95,7 +93,7 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 //go:generate docgen ../../docs-data
 // +overmind:type kms-custom-key-store
 // +overmind:descriptiveType Custom Key Store
-// +overmind:get Get a custom key store by its ID or name
+// +overmind:get Get a custom key store by its ID
 // +overmind:list List all custom key stores
 // +overmind:search Search custom key store by ARN
 // +overmind:group AWS
@@ -111,43 +109,13 @@ func NewCustomKeyStoreSource(client *kms.Client, accountID string, region string
 			return client.DescribeCustomKeyStores(ctx, input)
 		},
 		InputMapperGet: func(_, query string) (*kms.DescribeCustomKeyStoresInput, error) {
-			return describeInput(query)
+			return &kms.DescribeCustomKeyStoresInput{
+				CustomKeyStoreId: &query,
+			}, nil
 		},
 		InputMapperList: func(string) (*kms.DescribeCustomKeyStoresInput, error) {
 			return &kms.DescribeCustomKeyStoresInput{}, nil
 		},
 		OutputMapper: customKeyStoreOutputMapper,
-	}
-}
-
-func describeInput(query string) (*kms.DescribeCustomKeyStoresInput, error) {
-	errMsgFmt := "invalid query format: %s, expected 'id|custom-key-store-id' or 'name|custom-key-store-name'"
-
-	// query can be in the format of:
-	// 1) id|custom-key-store-id
-	// 2) name|custom-key-store-name
-
-	q := strings.Split(query, "|")
-	if len(q) != 2 {
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: fmt.Sprintf(errMsgFmt, query),
-		}
-	}
-
-	switch q[0] {
-	case "id":
-		return &kms.DescribeCustomKeyStoresInput{
-			CustomKeyStoreId: &q[1],
-		}, nil
-	case "name":
-		return &kms.DescribeCustomKeyStoresInput{
-			CustomKeyStoreName: &q[1],
-		}, nil
-	default:
-		return nil, &sdp.QueryError{
-			ErrorType:   sdp.QueryError_NOTFOUND,
-			ErrorString: fmt.Sprintf(errMsgFmt, query),
-		}
 	}
 }

@@ -2,8 +2,6 @@ package kms
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -57,7 +55,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 			Query: &sdp.Query{
 				Type:   "kms-custom-key-store",
 				Method: sdp.QueryMethod_GET,
-				Query:  fmt.Sprintf("id|%s", *output.KeyMetadata.CustomKeyStoreId),
+				Query:  *output.KeyMetadata.CustomKeyStoreId,
 				Scope:  scope,
 			},
 			BlastPropagation: &sdp.BlastPropagation{

@@ -1,7 +1,7 @@
 {
 	"type": "kms-custom-key-store",
 	"descriptiveType": "Custom Key Store",
-	"getDescription": "Get a custom key store by its ID or name",
+	"getDescription": "Get a custom key store by its ID",
 	"listDescription": "List all custom key stores",
 	"searchDescription": "Search custom key store by ARN",
 	"group": "AWS",
