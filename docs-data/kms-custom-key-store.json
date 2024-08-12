@@ -11,6 +11,7 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"cloudhsmv2-cluster"
+		"cloudhsmv2-cluster",
+		"ec2-vpc-endpoint-service"
 	]
 }

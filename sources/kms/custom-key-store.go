@@ -2,6 +2,7 @@ package kms
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
@@ -62,27 +63,24 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 			})
 		}
 
-		// TODO: Activate this after enabling get vpc by name
-		/*
-			if customKeyStore.XksProxyConfiguration != nil &&
-				customKeyStore.XksProxyConfiguration.VpcEndpointServiceName != nil {
-				// +overmind:link ec2-vpc
-				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   "ec2-vpc",
-						Method: sdp.QueryMethod_GET,
-						Query:  *customKeyStore.XksProxyConfiguration.VpcEndpointServiceName,
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						// Changing the VPC will affect the custom key store
-						In: true,
-						// Updating the custom key store will not affect the VPC
-						Out: false,
-					},
-				})
-			}
-		*/
+		if customKeyStore.XksProxyConfiguration != nil &&
+			customKeyStore.XksProxyConfiguration.VpcEndpointServiceName != nil {
+			// +overmind:link ec2-vpc-endpoint-service
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "ec2-vpc-endpoint-service",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  fmt.Sprintf("name|%s", *customKeyStore.XksProxyConfiguration.VpcEndpointServiceName),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// Changing the VPC endpoint service will affect the custom key store
+					In: true,
+					// Updating the custom key store will not affect the VPC endpoint service
+					Out: false,
+				},
+			})
+		}
 
 		items = append(items, &item)
 	}
