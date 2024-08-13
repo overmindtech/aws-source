@@ -43,7 +43,7 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tetsts := sources.QueryTests{
+	tests := sources.QueryTests{
 		{
 			ExpectedType:   "cloudhsmv2-cluster",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -52,7 +52,7 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 		},
 	}
 
-	tetsts.Execute(t, item)
+	tests.Execute(t, item)
 }
 
 func TestNewCustomKeyStoreSource(t *testing.T) {

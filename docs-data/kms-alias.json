@@ -1,0 +1,16 @@
+{
+	"type": "kms-alias",
+	"descriptiveType": "KMS Alias",
+	"getDescription": "Get an alias by keyID/aliasName",
+	"listDescription": "List all aliases",
+	"searchDescription": "Search aliases by keyID",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_kms_alias.arn"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"kms-key"
+	]
+}
