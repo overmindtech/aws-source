@@ -84,7 +84,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 	default:
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_OTHER,
-			ErrorString: "unknown KeyState",
+			ErrorString: "unknown Key State",
 		}
 	}
 
