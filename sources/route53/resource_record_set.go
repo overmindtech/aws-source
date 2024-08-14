@@ -3,6 +3,7 @@ package route53
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
@@ -14,24 +15,40 @@ func resourceRecordSetGetFunc(ctx context.Context, client *route53.Client, scope
 	return nil, errors.New("get is not supported for route53-resource-record-set. Use search")
 }
 
-// ResourceRecordSetSearchFunc Search func that accepts a hosted zone ID as a
-// query
+// ResourceRecordSetSearchFunc Search func that accepts a hosted zone or a
+// terraform ID in the format {hostedZone}_{recordName}_{type}
 func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, scope, query string) ([]*types.ResourceRecordSet, error) {
-	out, err := client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{
-		HostedZoneId: &query,
-	})
+	splits := strings.Split(query, "_")
+
+	var out *route53.ListResourceRecordSetsOutput
+	var err error
+	if len(splits) == 3 {
+		// In this case we have a terraform ID
+		var max int32 = 1
+		out, err = client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{
+			HostedZoneId:    &splits[0],
+			StartRecordName: &splits[1],
+			StartRecordType: types.RRType(splits[2]),
+			MaxItems:        &max,
+		})
+	} else {
+		// In this case we have a hosted zone ID
+		out, err = client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{
+			HostedZoneId: &query,
+		})
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	zones := make([]*types.ResourceRecordSet, 0, len(out.ResourceRecordSets))
+	records := make([]*types.ResourceRecordSet, 0, len(out.ResourceRecordSets))
 
-	for _, zone := range out.ResourceRecordSets {
-		zones = append(zones, &zone)
+	for _, record := range out.ResourceRecordSets {
+		records = append(records, &record)
 	}
 
-	return zones, nil
+	return records, nil
 }
 
 func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
@@ -111,9 +128,10 @@ func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet)
 // +overmind:descriptiveType Route53 Record Set
 // +overmind:get Get a Route53 record Set by name
 // +overmind:list List all record sets
-// +overmind:search Search for a record set by hosted zone ID
+// +overmind:search Search for a record set by hosted zone ID in the format "/hostedzone/JJN928734JH7HV" or "JJN928734JH7HV" or by terraform ID in the format "{hostedZone}_{recordName}_{type}"
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_record.arn
+// +overmind:terraform:queryMap aws_route53_record.id
 // +overmind:terraform:method SEARCH
 
 func NewResourceRecordSetSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {

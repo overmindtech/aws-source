@@ -3,10 +3,11 @@
 	"descriptiveType": "Route53 Record Set",
 	"getDescription": "Get a Route53 record Set by name",
 	"listDescription": "List all record sets",
-	"searchDescription": "Search for a record set by hosted zone ID",
+	"searchDescription": "Search for a record set by hosted zone ID in the format \"/hostedzone/JJN928734JH7HV\" or \"JJN928734JH7HV\" or by terraform ID in the format \"{hostedZone}_{recordName}_{type}\"",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_route53_record.arn"
+		"aws_route53_record.arn",
+		"aws_route53_record.id"
 	],
 	"terraformMethod": "SEARCH",
 	"terraformScope": "*",
