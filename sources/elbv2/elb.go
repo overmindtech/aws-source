@@ -270,6 +270,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:search Search for ELBs by ARN
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_lb.arn
+// +overmind:terraform:queryMap aws_lb.id
 // +overmind:terraform:method SEARCH
 
 func NewLoadBalancerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
@@ -288,6 +289,11 @@ func NewLoadBalancerSource(client elbClient, accountID string, region string) *s
 		},
 		InputMapperList: func(scope string) (*elbv2.DescribeLoadBalancersInput, error) {
 			return &elbv2.DescribeLoadBalancersInput{}, nil
+		},
+		InputMapperSearch: func(ctx context.Context, client elbClient, scope, query string) (*elbv2.DescribeLoadBalancersInput, error) {
+			return &elbv2.DescribeLoadBalancersInput{
+				LoadBalancerArns: []string{query},
+			}, nil
 		},
 		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeLoadBalancersInput) sources.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeLoadBalancersPaginator(client, params)
