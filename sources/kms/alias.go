@@ -34,7 +34,7 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 		}
 
 		// The uniqueAttributeValue for this is the combination of the keyID and aliasName
-		// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/test-key"
+		// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/alias/test-key"
 		err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", *alias.TargetKeyId, *alias.AliasName))
 		if err != nil {
 			return nil, err
@@ -89,8 +89,10 @@ func NewAliasSource(client *kms.Client, accountID string, region string) *source
 		},
 		InputMapperGet: func(_, query string) (*kms.ListAliasesInput, error) {
 			// query must be in the format of: the keyID/aliasName
+			// note that the aliasName will have a forward slash in it
+			// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/alias/test-key"
 			tmp := strings.Split(query, "/")
-			if len(tmp) != 2 {
+			if len(tmp) >= 2 {
 				return nil, &sdp.QueryError{
 					ErrorType:   sdp.QueryError_NOTFOUND,
 					ErrorString: fmt.Sprintf("query must be in the format of: the keyID/aliasName, but found: %s", query),
