@@ -93,7 +93,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 	if err == nil && policyResponse != nil && policyResponse.Policy != nil {
 		// Try to parse the policy
 		policy := PolicyDocument{}
-		err := json.Unmarshal([]byte(*policyResponse.Policy), &policy)
+		err := json.Unmarshal([]byte(*policyResponse.Policy), &policy) //nolint:all
 
 		if err == nil {
 			linkedItemQueries = ExtractLinksFromPolicy(&policy)

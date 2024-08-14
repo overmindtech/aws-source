@@ -6,7 +6,8 @@
 	"searchDescription": "Search for ELBs by ARN",
 	"group": "AWS",
 	"terraformQuery": [
-		"aws_lb.arn"
+		"aws_lb.arn",
+		"aws_lb.id"
 	],
 	"terraformMethod": "SEARCH",
 	"terraformScope": "*",

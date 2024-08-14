@@ -104,7 +104,7 @@ var testPolicyJSON string = `{
 
 func TestParsePolicy(t *testing.T) {
 	policy := PolicyDocument{}
-	err := json.Unmarshal([]byte(testPolicyJSON), &policy)
+	err := json.Unmarshal([]byte(testPolicyJSON), &policy) //nolint:all
 
 	if err != nil {
 		t.Error(err)

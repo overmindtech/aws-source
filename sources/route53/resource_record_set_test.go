@@ -1,6 +1,9 @@
 package route53
 
 import (
+	"context"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -112,13 +115,62 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 func TestNewResourceRecordSetSource(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
+	zoneSource := NewHostedZoneSource(client, account, region)
+
+	zones, err := zoneSource.List(context.Background(), zoneSource.Scopes()[0], true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(zones) == 0 {
+		t.Skip("no zones found")
+	}
+
 	source := NewResourceRecordSetSource(client, account, region)
 
+	search := zones[0].UniqueAttributeValue()
 	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
-		SkipGet: true,
+		Source:          source,
+		Timeout:         10 * time.Second,
+		SkipGet:         true,
+		GoodSearchQuery: &search,
 	}
 
 	test.Run(t)
+
+	items, err := source.Search(context.Background(), zoneSource.Scopes()[0], search, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	numItems := len(items)
+
+	rawZone := strings.TrimPrefix(search, "/hostedzone/")
+
+	items, err = source.Search(context.Background(), zoneSource.Scopes()[0], rawZone, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(items) != numItems {
+		t.Errorf("expected %d items, got %d", numItems, len(items))
+	}
+
+	if len(items) > 0 {
+		item := items[0]
+
+		// Construct a terraform style ID
+		name, _ := item.GetAttributes().Get("name")
+		typ, _ := item.GetAttributes().Get("type")
+		search = fmt.Sprintf("%s_%s_%s", rawZone, name, typ)
+
+		items, err := source.Search(context.Background(), zoneSource.Scopes()[0], search, true)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(items) != 1 {
+			t.Errorf("expected 1 item, got %d", len(items))
+		}
+	}
 }
