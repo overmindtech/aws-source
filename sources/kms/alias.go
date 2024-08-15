@@ -19,17 +19,25 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 			return nil, err
 		}
 
-		if alias.TargetKeyId == nil {
-			return nil, &sdp.QueryError{
-				ErrorType:   sdp.QueryError_OTHER,
-				ErrorString: "TargetKeyId is nil",
-			}
-		}
-
+		// This should never happen.
 		if alias.AliasName == nil {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_OTHER,
-				ErrorString: "AliasName is nil",
+				ErrorString: "aliasName is nil",
+			}
+		}
+
+		// Ignore AWS managed keys, they are predefined and might not have a target key ID
+		if strings.HasPrefix(*alias.AliasName, "alias/aws/") {
+			// AWS managed keys
+			continue
+		}
+
+		// This should never happen except for AWS managed keys.
+		if alias.TargetKeyId == nil {
+			return nil, &sdp.QueryError{
+				ErrorType:   sdp.QueryError_OTHER,
+				ErrorString: "targetKeyId is nil",
 			}
 		}
 
@@ -47,21 +55,23 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 			Scope:           scope,
 		}
 
-		// +overmind:link kms-key
-		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			Query: &sdp.Query{
-				Type:   "kms-key",
-				Method: sdp.QueryMethod_GET,
-				Query:  *alias.TargetKeyId,
-				Scope:  scope,
-			},
-			BlastPropagation: &sdp.BlastPropagation{
-				// These are tightly linked
-				// Adding, deleting, or updating an alias can allow or deny permission to the KMS key.
-				In:  true,
-				Out: true,
-			},
-		})
+		if alias.TargetKeyId == nil {
+			// +overmind:link kms-key
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "kms-key",
+					Method: sdp.QueryMethod_GET,
+					Query:  *alias.TargetKeyId,
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// These are tightly linked
+					// Adding, deleting, or updating an alias can allow or deny permission to the KMS key.
+					In:  true,
+					Out: true,
+				},
+			})
+		}
 
 		items = append(items, &item)
 	}
@@ -92,7 +102,7 @@ func NewAliasSource(client *kms.Client, accountID string, region string) *source
 			// note that the aliasName will have a forward slash in it
 			// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/alias/test-key"
 			tmp := strings.Split(query, "/")
-			if len(tmp) >= 2 {
+			if len(tmp) < 2 {
 				return nil, &sdp.QueryError{
 					ErrorType:   sdp.QueryError_NOTFOUND,
 					ErrorString: fmt.Sprintf("query must be in the format of: the keyID/aliasName, but found: %s", query),

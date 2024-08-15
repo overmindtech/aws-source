@@ -31,6 +31,8 @@ func KMS(t *testing.T) {
 
 	keySource := kms.NewKeySource(testClient, accountID, testAWSConfig.Region)
 
+	aliasSource := kms.NewAliasSource(testClient, accountID, testAWSConfig.Region)
+
 	err = keySource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate KMS key source: %v", err)
@@ -48,10 +50,10 @@ func KMS(t *testing.T) {
 		t.Fatalf("no keys found")
 	}
 
-	uniqueAttribute := sdpListKeys[0].GetUniqueAttribute()
+	keyUniqueAttribute := sdpListKeys[0].GetUniqueAttribute()
 
 	keyID, err := integration.GetUniqueAttributeValue(
-		uniqueAttribute,
+		keyUniqueAttribute,
 		sdpListKeys,
 		integration.ResourceTags(integration.KMS, keySrc),
 	)
@@ -66,7 +68,7 @@ func KMS(t *testing.T) {
 	}
 
 	keyIDFromGet, err := integration.GetUniqueAttributeValue(
-		uniqueAttribute,
+		keyUniqueAttribute,
 		[]*sdp.Item{sdpKey},
 		integration.ResourceTags(integration.KMS, keySrc),
 	)
@@ -90,7 +92,7 @@ func KMS(t *testing.T) {
 	}
 
 	keyIDFromSearch, err := integration.GetUniqueAttributeValue(
-		uniqueAttribute,
+		keyUniqueAttribute,
 		sdpSearchKeys,
 		integration.ResourceTags(integration.KMS, keySrc),
 	)
@@ -100,5 +102,55 @@ func KMS(t *testing.T) {
 
 	if keyIDFromSearch != keyID {
 		t.Fatalf("expected key ID %v, got %v", keyID, keyIDFromSearch)
+	}
+
+	// List aliases
+	sdpListAliases, err := aliasSource.List(context.Background(), scope, true)
+	if err != nil {
+		t.Fatalf("failed to list KMS aliases: %v", err)
+	}
+
+	if len(sdpListAliases) == 0 {
+		t.Fatalf("no aliases found")
+	}
+
+	// Get alias
+	aliasUniqueAttribute := sdpListAliases[0].GetUniqueAttribute()
+	aliasUniqueAttributeValue, err := sdpListAliases[0].GetAttributes().Get(aliasUniqueAttribute)
+	if err != nil {
+		t.Fatalf("failed to get alias unique attribute values: %v", err)
+	}
+
+	sdpAlias, err := aliasSource.Get(context.Background(), scope, aliasUniqueAttributeValue.(string), true)
+	if err != nil {
+		t.Fatalf("failed to get KMS alias: %v", err)
+	}
+
+	aliasName, err := sdpAlias.GetAttributes().Get("aliasName")
+	if err != nil {
+		t.Fatalf("failed to get alias name: %v", err)
+	}
+
+	if aliasName != genAliasName() {
+		t.Fatalf("expected alias %v, got %v", aliasUniqueAttribute, sdpAlias.GetUniqueAttribute())
+	}
+
+	// Search aliases
+	sdpSearchAliases, err := aliasSource.Search(context.Background(), scope, keyID, true)
+	if err != nil {
+		t.Fatalf("failed to search KMS aliases: %v", err)
+	}
+
+	if len(sdpSearchAliases) == 0 {
+		t.Fatalf("no aliases found")
+	}
+
+	searchAliasName, err := sdpSearchAliases[0].GetAttributes().Get("aliasName")
+	if err != nil {
+		t.Fatalf("failed to get alias name: %v", err)
+	}
+
+	if searchAliasName != genAliasName() {
+		t.Fatalf("expected alias %v, got %v", genAliasName(), searchAliasName)
 	}
 }

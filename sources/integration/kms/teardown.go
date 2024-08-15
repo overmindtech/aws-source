@@ -12,11 +12,26 @@ import (
 func teardown(ctx context.Context, logger *slog.Logger, client *kms.Client) error {
 	keyID, err := findActiveKeyIDByTags(ctx, client)
 	if err != nil {
-		nf := integration.NewNotFoundError(keySrc)
-		if errors.As(err, &nf) {
+		if nf := integration.NewNotFoundError(keySrc); errors.As(err, &nf) {
 			logger.WarnContext(ctx, "Key not found")
 			return nil
 		} else {
+			return err
+		}
+	}
+
+	aliasNames, err := findAliasesByTargetKey(ctx, client, *keyID)
+	if err != nil {
+		if nf := integration.NewNotFoundError(aliasSrc); errors.As(err, &nf) {
+			logger.WarnContext(ctx, "Alias not found")
+		} else {
+			return err
+		}
+	}
+
+	for _, aliasName := range aliasNames {
+		err = deleteAlias(ctx, client, aliasName)
+		if err != nil {
 			return err
 		}
 	}
