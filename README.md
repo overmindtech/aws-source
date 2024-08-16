@@ -47,7 +47,7 @@ This source requires the following IAM Policy
         "sns:List*",
         "sqs:Get*",
         "sqs:List*",
-        "kms::ListResourceTags",
+        "kms:ListResourceTags",
         "kms:ListKeys",
         "kms:DescribeKey",
         "kms:DescribeCustomKeyStores",
