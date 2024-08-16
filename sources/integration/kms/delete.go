@@ -14,3 +14,10 @@ func deleteKey(ctx context.Context, client *kms.Client, keyID string) error {
 	})
 	return err
 }
+
+func deleteAlias(ctx context.Context, client *kms.Client, aliasName string) error {
+	_, err := client.DeleteAlias(ctx, &kms.DeleteAliasInput{
+		AliasName: &aliasName,
+	})
+	return err
+}

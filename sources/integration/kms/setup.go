@@ -8,9 +8,20 @@ import (
 	"github.com/overmindtech/aws-source/sources/integration"
 )
 
-const keySrc = "key"
+const (
+	keySrc   = "key"
+	aliasSrc = "alias"
+)
 
 func setup(ctx context.Context, logger *slog.Logger, client *kms.Client) error {
+	testID := integration.TestID()
+
 	// Create KMS key
-	return createKMSKey(ctx, logger, client, integration.TestID())
+	keyID, err := createKey(ctx, logger, client, testID)
+	if err != nil {
+		return err
+	}
+
+	// Create KMS alias
+	return createAlias(ctx, logger, client, *keyID)
 }

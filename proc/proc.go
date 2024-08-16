@@ -459,6 +459,8 @@ func InitializeAwsSourceEngine(ctx context.Context, natsOptions auth.NATSOptions
 
 				// KMS
 				kms.NewKeySource(kmsClient, *callerID.Account, cfg.Region),
+				kms.NewCustomKeyStoreSource(kmsClient, *callerID.Account, cfg.Region),
+				kms.NewAliasSource(kmsClient, *callerID.Account, cfg.Region),
 			}
 
 			e.AddSources(sources...)

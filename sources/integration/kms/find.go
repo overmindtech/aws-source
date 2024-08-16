@@ -51,3 +51,23 @@ func findActiveKeyIDByTags(ctx context.Context, client *kms.Client, additionalAt
 
 	return nil, integration.NewNotFoundError(integration.ResourceName(integration.KMS, keySrc, additionalAttr...))
 }
+
+func findAliasesByTargetKey(ctx context.Context, client *kms.Client, keyID string) ([]string, error) {
+	aliases, err := client.ListAliases(ctx, &kms.ListAliasesInput{
+		KeyId: &keyID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var aliasNames []string
+	for _, alias := range aliases.Aliases {
+		aliasNames = append(aliasNames, *alias.AliasName)
+	}
+
+	if len(aliasNames) == 0 {
+		return nil, integration.NewNotFoundError(integration.ResourceName(integration.KMS, aliasSrc))
+	}
+
+	return aliasNames, nil
+}
