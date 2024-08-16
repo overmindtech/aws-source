@@ -55,7 +55,7 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 			Scope:           scope,
 		}
 
-		if alias.TargetKeyId == nil {
+		if alias.TargetKeyId != nil {
 			// +overmind:link kms-key
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
