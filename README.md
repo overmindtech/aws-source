@@ -30,6 +30,9 @@ This source requires the following IAM Policy
         "elasticloadbalancing:Describe*",
         "iam:Get*",
         "iam:List*",
+        "kms:Describe*",
+        "kms:Get*",
+        "kms:List*",
         "lambda:Get*",
         "lambda:List*",
         "network-firewall:Describe*",
@@ -46,12 +49,7 @@ This source requires the following IAM Policy
         "sns:Get*",
         "sns:List*",
         "sqs:Get*",
-        "sqs:List*",
-        "kms:ListResourceTags",
-        "kms:ListKeys",
-        "kms:DescribeKey",
-        "kms:DescribeCustomKeyStores",
-        "kms:ListAliases"
+        "sqs:List*"
       ],
       "Resource": "*"
     }
