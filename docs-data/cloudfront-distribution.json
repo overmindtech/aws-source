@@ -1,6 +1,9 @@
 {
 	"type": "cloudfront-distribution",
 	"descriptiveType": "CloudFront Distribution",
+	"getDescription": "Get distribution by ID",
+	"listDescription": "List all distributions",
+	"searchDescription": "Search distributions by ARN",
 	"group": "AWS",
 	"terraformQuery": [
 		"aws_cloudfront_distribution.arn"

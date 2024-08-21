@@ -663,9 +663,9 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 //go:generate docgen ../../docs-data
 // +overmind:type cloudfront-distribution
 // +overmind:descriptiveType CloudFront Distribution
-// +overmind:get
-// +overmind:list
-// +overmind:search
+// +overmind:get Get distribution by ID
+// +overmind:list List all distributions
+// +overmind:search Search distributions by ARN
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_distribution.arn
 // +overmind:terraform:method SEARCH
