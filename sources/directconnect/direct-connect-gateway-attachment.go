@@ -88,7 +88,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 // +overmind:type directconnect-direct-connect-gateway-attachment
 // +overmind:descriptiveType Direct Connect Gateway Attachment
 // +overmind:get Get a direct connect gateway attachment by "DirectConnectGatewayId/VirtualInterfaceId"
-// +overmind:list **Not supported**
 // +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
 // +overmind:group AWS
 
