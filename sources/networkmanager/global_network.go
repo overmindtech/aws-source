@@ -170,7 +170,7 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 
 //go:generate docgen ../../docs-data
 // +overmind:type networkmanager-global-network
-// +overmind:descriptiveType Netwotkmanager Global Network
+// +overmind:descriptiveType Network Manager Global Network
 // +overmind:get Get a global network by id
 // +overmind:list List all global networks
 // +overmind:search Search for a global network by ARN
