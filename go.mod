@@ -6,30 +6,30 @@ go 1.22.5
 require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go-v2 v1.30.4
-	github.com/aws/aws-sdk-go-v2/config v1.27.28
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.28
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.43.4
+	github.com/aws/aws-sdk-go-v2/config v1.27.29
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.29
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.43.5
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.38.5
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.4
-	github.com/aws/aws-sdk-go-v2/service/directconnect v1.27.6
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.34.5
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.175.1
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.45.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.5
+	github.com/aws/aws-sdk-go-v2/service/directconnect v1.27.7
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.34.6
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.176.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.45.2
 	github.com/aws/aws-sdk-go-v2/service/efs v1.31.4
-	github.com/aws/aws-sdk-go-v2/service/eks v1.48.1
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.26.4
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.34.1
+	github.com/aws/aws-sdk-go-v2/service/eks v1.48.2
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.26.5
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.34.2
 	github.com/aws/aws-sdk-go-v2/service/iam v1.35.0
-	github.com/aws/aws-sdk-go-v2/service/kms v1.35.4
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.56.4
+	github.com/aws/aws-sdk-go-v2/service/kms v1.35.5
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.58.1
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.41.1
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.29.4
-	github.com/aws/aws-sdk-go-v2/service/rds v1.82.1
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.42.4
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.59.0
-	github.com/aws/aws-sdk-go-v2/service/sns v1.31.4
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.4
-	github.com/aws/aws-sdk-go-v2/service/sts v1.30.4
+	github.com/aws/aws-sdk-go-v2/service/rds v1.82.2
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.43.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.60.1
+	github.com/aws/aws-sdk-go-v2/service/sns v1.31.5
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.5
+	github.com/aws/aws-sdk-go-v2/service/sts v1.30.5
 	github.com/aws/smithy-go v1.20.4
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/iancoleman/strcase v0.2.0
