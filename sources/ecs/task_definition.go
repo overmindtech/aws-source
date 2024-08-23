@@ -78,6 +78,11 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 				}
 			}
 		}
+
+		newQueries, err := sdp.ExtractLinksViaJSON(cd.Environment)
+		if err == nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, newQueries...)
+		}
 	}
 
 	if td.ExecutionRoleArn != nil {
