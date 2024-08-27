@@ -30,10 +30,15 @@ func (t *TestClient) DescribeTaskDefinition(ctx context.Context, params *ecs.Des
 							AppProtocol:   types.ApplicationProtocolHttp,
 						},
 					},
-					Essential:        sources.PtrBool(true),
-					EntryPoint:       []string{},
-					Command:          []string{},
-					Environment:      []types.KeyValuePair{},
+					Essential:  sources.PtrBool(true),
+					EntryPoint: []string{},
+					Command:    []string{},
+					Environment: []types.KeyValuePair{
+						{
+							Name:  sources.PtrString("DATABASE_SERVER"),
+							Value: sources.PtrString("database01.my-company.com"),
+						},
+					},
 					EnvironmentFiles: []types.EnvironmentFile{},
 					MountPoints: []types.MountPoint{
 						{
@@ -236,6 +241,12 @@ func TestTaskDefinitionGetFunc(t *testing.T) {
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:iam:us-east-2:123456789012:role/bar",
 			ExpectedScope:  "123456789012.us-east-2",
+		},
+		{
+			ExpectedType:   "dns",
+			ExpectedMethod: sdp.QueryMethod_SEARCH,
+			ExpectedQuery:  "database01.my-company.com",
+			ExpectedScope:  "global",
 		},
 	}
 
