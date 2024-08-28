@@ -79,7 +79,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 			}
 		}
 
-		newQueries, err := sdp.ExtractLinksViaJSON(cd.Environment)
+		newQueries, err := sdp.ExtractLinksFrom(cd.Environment)
 		if err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, newQueries...)
 		}

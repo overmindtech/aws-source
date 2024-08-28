@@ -220,7 +220,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.Environment != nil {
 			// Automatically extract links from the environment variables
-			newQueries, err := sdp.ExtractLinksViaJSON(function.Configuration.Environment.Variables)
+			newQueries, err := sdp.ExtractLinksFrom(function.Configuration.Environment.Variables)
 			if err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, newQueries...)
 			}
