@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
+	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 	"github.com/overmindtech/aws-source/sources/integration"
 )
 
@@ -67,4 +68,83 @@ func createAlias(ctx context.Context, logger *slog.Logger, client *kms.Client, k
 
 func genAliasName() string {
 	return fmt.Sprintf("alias/%s", integration.TestID())
+}
+
+func createGrant(ctx context.Context, logger *slog.Logger, client *kms.Client, keyID, principal string) error {
+	grantID, err := findGrant(ctx, client, keyID, principal)
+	if err != nil {
+		if nf := integration.NewNotFoundError(grantSrc); errors.As(err, &nf) {
+			logger.WarnContext(ctx, "Creating grant for the key", "keyID", keyID, "principal", principal)
+		} else {
+			return err
+		}
+	}
+
+	if grantID != nil {
+		logger.InfoContext(ctx, "KMS grant already exists", "grantID", *grantID, "keyID", keyID, "principal", principal)
+
+		return nil
+	}
+
+	_, err = client.CreateGrant(ctx, &kms.CreateGrantInput{
+		GranteePrincipal: &principal,
+		KeyId:            &keyID,
+		Operations:       []types.GrantOperation{types.GrantOperationDecrypt},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func putKeyPolicy(ctx context.Context, logger *slog.Logger, client *kms.Client, keyID, principal string) error {
+	keyPolicy, err := findKeyPolicy(ctx, client, keyID)
+	if err != nil {
+		if nf := integration.NewNotFoundError(keyPolicySrc); errors.As(err, &nf) {
+			logger.WarnContext(ctx, "Creating key policy for the key", "keyID", keyID)
+		} else {
+			return err
+		}
+	}
+
+	if keyPolicy != nil {
+		logger.InfoContext(ctx, "KMS key policy already exists", "keyID", keyID)
+		return nil
+	}
+
+	policy := fmt.Sprintf(
+		`{
+		  "Sid": "Allow access for Key Administrators",
+		  "Effect": "Allow",
+		  "Principal": {"AWS":"%s"},
+		  "Action": [
+			"kms:Create*",
+			"kms:Describe*",
+			"kms:Enable*",
+			"kms:List*",
+			"kms:Put*",
+			"kms:Update*",
+			"kms:Revoke*",
+			"kms:Disable*",
+			"kms:Get*",
+			"kms:Delete*",
+			"kms:TagResource",
+			"kms:UntagResource",
+			"kms:ScheduleKeyDeletion",
+			"kms:CancelKeyDeletion",
+			"kms:RotateKeyOnDemand"
+		  ],
+		  "Resource": "*"
+		}`, principal)
+
+	_, err = client.PutKeyPolicy(ctx, &kms.PutKeyPolicyInput{
+		KeyId:  &keyID,
+		Policy: &policy,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

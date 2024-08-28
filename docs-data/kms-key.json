@@ -11,6 +11,8 @@
 	"terraformMethod": "GET",
 	"terraformScope": "*",
 	"links": [
-		"kms-custom-key-store"
+		"kms-custom-key-store",
+		"kms-grant",
+		"kms-key-policy"
 	]
 }

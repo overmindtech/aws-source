@@ -21,3 +21,11 @@ func deleteAlias(ctx context.Context, client *kms.Client, aliasName string) erro
 	})
 	return err
 }
+
+func deleteGrant(ctx context.Context, client *kms.Client, keyID, grantID string) error {
+	_, err := client.RevokeGrant(ctx, &kms.RevokeGrantInput{
+		KeyId:   &keyID,
+		GrantId: &grantID,
+	})
+	return err
+}

@@ -3,6 +3,7 @@ package kms
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -18,6 +19,25 @@ func teardown(ctx context.Context, logger *slog.Logger, client *kms.Client) erro
 		} else {
 			return err
 		}
+	}
+
+	principal, err := integration.GetCallerIdentityARN(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get caller identity: %w", err)
+	}
+
+	grantID, err := findGrant(ctx, client, *keyID, *principal)
+	if err != nil {
+		if nf := integration.NewNotFoundError(grantSrc); errors.As(err, &nf) {
+			logger.WarnContext(ctx, "Grant not found")
+		} else {
+			return err
+		}
+	}
+
+	err = deleteGrant(ctx, client, *keyID, *grantID)
+	if err != nil {
+		return err
 	}
 
 	aliasNames, err := findAliasesByTargetKey(ctx, client, *keyID)

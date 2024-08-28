@@ -2,6 +2,7 @@ package kms
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -9,8 +10,10 @@ import (
 )
 
 const (
-	keySrc   = "key"
-	aliasSrc = "alias"
+	keySrc       = "key"
+	aliasSrc     = "alias"
+	grantSrc     = "grant"
+	keyPolicySrc = "key-policy"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *kms.Client) error {
@@ -23,5 +26,22 @@ func setup(ctx context.Context, logger *slog.Logger, client *kms.Client) error {
 	}
 
 	// Create KMS alias
-	return createAlias(ctx, logger, client, *keyID)
+	err = createAlias(ctx, logger, client, *keyID)
+	if err != nil {
+		return err
+	}
+
+	principal, err := integration.GetCallerIdentityARN(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get caller identity: %w", err)
+	}
+
+	// Create KMS grant
+	err = createGrant(ctx, logger, client, *keyID, *principal)
+	if err != nil {
+		return err
+	}
+
+	// Create KMS key policy
+	return putKeyPolicy(ctx, logger, client, *keyID, *principal)
 }

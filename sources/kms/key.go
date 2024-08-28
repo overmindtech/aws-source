@@ -70,6 +70,36 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 		})
 	}
 
+	// +overmind:link kms-key-policy
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "kms-key-policy",
+			Method: sdp.QueryMethod_SEARCH,
+			Query:  *input.KeyId,
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// These are tightly coupled
+			In:  true,
+			Out: true,
+		},
+	})
+
+	// +overmind:link kms-grant
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "kms-grant",
+			Method: sdp.QueryMethod_SEARCH,
+			Query:  *input.KeyId,
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// These are tightly linked
+			In:  true,
+			Out: true,
+		},
+	})
+
 	switch output.KeyMetadata.KeyState {
 	case types.KeyStateEnabled:
 		item.Health = sdp.Health_HEALTH_OK.Enum()

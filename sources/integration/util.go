@@ -203,3 +203,17 @@ func uniqueAttributeValueSet(items []*sdp.Item, key string) (map[any]bool, error
 	}
 	return uniqueValues, nil
 }
+
+func GetCallerIdentityARN(ctx context.Context) (*string, error) {
+	cfg, err := AWSSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	callerIdentity, err := sts.NewFromConfig(cfg.Config).GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return nil, err
+	}
+
+	return callerIdentity.Arn, nil
+}

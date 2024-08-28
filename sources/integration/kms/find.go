@@ -22,7 +22,6 @@ func findActiveKeyIDByTags(ctx context.Context, client *kms.Client, additionalAt
 		key, err := client.DescribeKey(ctx, &kms.DescribeKeyInput{
 			KeyId: keyListEntry.KeyId,
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -70,4 +69,37 @@ func findAliasesByTargetKey(ctx context.Context, client *kms.Client, keyID strin
 	}
 
 	return aliasNames, nil
+}
+
+func findGrant(ctx context.Context, client *kms.Client, keyID, principal string) (*string, error) {
+	// Get grants for the key
+	grants, err := client.ListGrants(ctx, &kms.ListGrantsInput{
+		KeyId: &keyID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, grant := range grants.Grants {
+		if *grant.GranteePrincipal == principal {
+			return grant.GrantId, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.KMS, grantSrc))
+}
+
+func findKeyPolicy(ctx context.Context, client *kms.Client, keyID string) (*string, error) {
+	policy, err := client.GetKeyPolicy(ctx, &kms.GetKeyPolicyInput{
+		KeyId: &keyID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if policy.Policy == nil {
+		return nil, integration.NewNotFoundError(integration.ResourceName(integration.KMS, keyPolicySrc))
+	}
+
+	return policy.Policy, nil
 }
