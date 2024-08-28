@@ -36,7 +36,7 @@ require (
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/nats-io/jwt/v2 v2.5.8
 	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.27.6
+	github.com/overmindtech/discovery v0.27.7
 	github.com/overmindtech/sdp-go v0.91.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
@@ -86,7 +86,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/nats-io/nats.go v1.37.0 // indirect
