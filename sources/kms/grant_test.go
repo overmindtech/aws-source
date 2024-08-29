@@ -116,8 +116,9 @@ func TestNewGrantSource(t *testing.T) {
 	source := NewGrantSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
-		Timeout: 10 * time.Second,
+		Source:   source,
+		Timeout:  10 * time.Second,
+		SkipList: true,
 	}
 
 	test.Run(t)

@@ -134,11 +134,24 @@ func KMS(t *testing.T) {
 		t.Fatalf("no aliases found")
 	}
 
-	// Get alias
-	aliasUniqueAttribute := sdpListAliases[0].GetUniqueAttribute()
-	aliasUniqueAttributeValue, err := sdpListAliases[0].GetAttributes().Get(aliasUniqueAttribute)
-	if err != nil {
-		t.Fatalf("failed to get alias unique attribute values: %v", err)
+	// Get the alias for this key
+	var aliasUniqueAttributeValue interface{}
+
+	for _, alias := range sdpListAliases {
+		// Check if the alias is for the key
+		for _, query := range alias.GetLinkedItemQueries() {
+			if query.GetQuery().GetQuery() == keyID {
+				aliasUniqueAttributeValue, err = alias.GetAttributes().Get(alias.GetUniqueAttribute())
+				if err != nil {
+					t.Fatalf("failed to get alias unique attribute values: %v", err)
+				}
+				break
+			}
+		}
+	}
+
+	if aliasUniqueAttributeValue == nil {
+		t.Fatalf("no alias found for key %v", keyID)
 	}
 
 	sdpAlias, err := aliasSource.Get(context.Background(), scope, aliasUniqueAttributeValue.(string), true)
@@ -152,7 +165,7 @@ func KMS(t *testing.T) {
 	}
 
 	if aliasName != genAliasName() {
-		t.Fatalf("expected alias %v, got %v", aliasUniqueAttribute, sdpAlias.GetUniqueAttribute())
+		t.Fatalf("expected alias %v, got %v", genAliasName(), aliasName)
 	}
 
 	// Search aliases
