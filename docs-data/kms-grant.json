@@ -1,0 +1,17 @@
+{
+	"type": "kms-grant",
+	"descriptiveType": "KMS Grant",
+	"getDescription": "Get a grant by keyID/grantId",
+	"searchDescription": "Search grants by keyID",
+	"group": "AWS",
+	"terraformQuery": [
+		"aws_kms_grant.grant_id"
+	],
+	"terraformMethod": "GET",
+	"terraformScope": "*",
+	"links": [
+		"iam-role",
+		"iam-user",
+		"kms-key"
+	]
+}

@@ -3,6 +3,7 @@ package kms
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/overmindtech/aws-source/sources"
@@ -33,9 +34,28 @@ func KMS(t *testing.T) {
 
 	aliasSource := kms.NewAliasSource(testClient, accountID, testAWSConfig.Region)
 
+	grantSource := kms.NewGrantSource(testClient, accountID, testAWSConfig.Region)
+
+	keyPolicySource := kms.NewKeyPolicySource(testClient, accountID, testAWSConfig.Region)
+
 	err = keySource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate KMS key source: %v", err)
+	}
+
+	err = aliasSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate KMS alias source: %v", err)
+	}
+
+	err = grantSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate KMS grant source: %v", err)
+	}
+
+	err = keyPolicySource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate KMS key policy source: %v", err)
 	}
 
 	scope := sources.FormatScope(accountID, testAWSConfig.Region)
@@ -152,5 +172,96 @@ func KMS(t *testing.T) {
 
 	if searchAliasName != genAliasName() {
 		t.Fatalf("expected alias %v, got %v", genAliasName(), searchAliasName)
+	}
+
+	// List grants is not supported
+	sdpListGrants, err := grantSource.List(context.Background(), scope, true)
+	if err == nil {
+		t.Fatal("expected error but got nil")
+	}
+
+	if len(sdpListGrants) != 0 {
+		t.Fatalf("expected 0 grants, got %v", len(sdpListGrants))
+	}
+
+	// Search grants
+	sdpSearchGrants, err := grantSource.Search(context.Background(), scope, keyID, true)
+	if err != nil {
+		t.Fatalf("failed to search KMS grants: %v", err)
+	}
+
+	if len(sdpSearchGrants) == 0 {
+		t.Fatal("no grants found")
+	}
+	searchGrantID, err := sdpSearchGrants[0].GetAttributes().Get("grantId")
+	if err != nil {
+		t.Fatalf("failed to get grant ID: %v", err)
+	}
+
+	// Get grant
+	grantUniqueAttribute := sdpSearchGrants[0].GetUniqueAttribute()
+	grantUniqueAttributeValue, err := sdpSearchGrants[0].GetAttributes().Get(grantUniqueAttribute)
+	if err != nil {
+		t.Fatalf("failed to get grant unique attribute values: %v", err)
+	}
+
+	sdpGrant, err := grantSource.Get(context.Background(), scope, grantUniqueAttributeValue.(string), true)
+	if err != nil {
+		t.Fatalf("failed to get KMS grant: %v", err)
+	}
+
+	grantID, err := sdpGrant.GetAttributes().Get("grantId")
+	if err != nil {
+		t.Fatalf("failed to get grant ID: %v", err)
+	}
+
+	expectedGrantID := strings.Split(grantUniqueAttributeValue.(string), "/")[1]
+
+	if grantID != expectedGrantID {
+		t.Fatalf("expected grant ID %v, got %v", expectedGrantID, grantID)
+	}
+
+	if searchGrantID != expectedGrantID {
+		t.Fatalf("expected grant ID %v, got %v", expectedGrantID, searchGrantID)
+	}
+
+	// Search key policy by key ID
+	sdpSearchKeyPolicies, err := keyPolicySource.Search(context.Background(), scope, keyID, true)
+	if err != nil {
+		t.Fatalf("failed to search KMS key policies: %v", err)
+	}
+
+	if len(sdpSearchKeyPolicies) == 0 {
+		t.Fatalf("no key policies found")
+	}
+
+	searchKeyPolicyKeyID, err := sdpSearchKeyPolicies[0].GetAttributes().Get("keyId")
+	if err != nil {
+		t.Fatalf("failed to get key ID: %v", err)
+	}
+
+	if searchKeyPolicyKeyID != keyID {
+		t.Fatalf("expected key ID %v, got %v", keyID, searchKeyPolicyKeyID)
+	}
+
+	// Get key policy
+	keyPolicyUniqueAttribute := sdpSearchKeyPolicies[0].GetUniqueAttribute()
+	keyPolicyUniqueAttributeValue, err := sdpSearchKeyPolicies[0].GetAttributes().Get(keyPolicyUniqueAttribute)
+	if err != nil {
+		t.Fatalf("failed to get key policy unique attribute values: %v", err)
+	}
+
+	sdpKeyPolicy, err := keyPolicySource.Get(context.Background(), scope, keyPolicyUniqueAttributeValue.(string), true)
+	if err != nil {
+		t.Fatalf("failed to get KMS key policy: %v", err)
+	}
+
+	keyPolicyKeyID, err := sdpKeyPolicy.GetAttributes().Get("keyId")
+	if err != nil {
+		t.Fatalf("failed to get key ID: %v", err)
+	}
+
+	if keyPolicyKeyID != keyID {
+		t.Fatalf("expected key ID %v, got %v", keyID, keyPolicyKeyID)
 	}
 }
