@@ -105,12 +105,14 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 // Validate Checks that the source has been set up correctly
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Validate() error {
-	if s.ListFuncPaginatorBuilder == nil {
-		return errors.New("ListFuncPaginatorBuilder is nil")
-	}
+	if !s.DisableList {
+		if s.ListFuncPaginatorBuilder == nil {
+			return errors.New("ListFuncPaginatorBuilder is nil")
+		}
 
-	if s.ListFuncOutputMapper == nil {
-		return errors.New("ListFuncOutputMapper is nil")
+		if s.ListFuncOutputMapper == nil {
+			return errors.New("ListFuncOutputMapper is nil")
+		}
 	}
 
 	if s.GetFunc == nil {

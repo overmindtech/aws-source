@@ -180,6 +180,17 @@ type E2ETest struct {
 // real environment
 func (e E2ETest) Run(t *testing.T) {
 	t.Parallel()
+	t.Helper()
+
+	type Validator interface {
+		Validate() error
+	}
+
+	if v, ok := e.Source.(Validator); ok {
+		if err := v.Validate(); err != nil {
+			t.Fatalf("source failed validation: %v", err)
+		}
+	}
 
 	// Determine the scope so that we can use this for all queries
 	scopes := e.Source.Scopes()
