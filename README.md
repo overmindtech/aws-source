@@ -61,21 +61,19 @@ This source requires the following IAM Policy
 
 Types are named to match the `describe-*`, `get-*` or `list-*` command within the AWS CLI, with the service that they are part of as a prefix. For example to get the details if a security group you would run:
 
-```
+````bash
 aws ec2 describe-security-groups
 ```
 
 Meaning that the type in Overmind should be:
 
-```
-ec2-security-group
-```
+`ec2-security-group`
 
 Note that plurals should be converted to their singular form hence `security-groups` becomes `security-group`
 
 ## Rate limiting
 
-For EC2 APIs this sources uses the [same throttling methods as EC2 does](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/throttling.html), with the bucket size and refill rate set to 50% of the total. This means that the source will never use more than 50% of the available requests, including refil;ls when the bucket is empty.
+For EC2 APIs this sources uses the [same throttling methods as EC2 does](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/throttling.html), with the bucket size and refill rate set to 50% of the total. This means that the source will never use more than 50% of the available requests, including refills when the bucket is empty.
 
 ## Config
 
@@ -205,6 +203,7 @@ Source data for docs is stored in `docs-data` and can be generated using:
 Ensure that [`docgen`](https://github.com/overmindtech/docgen) is installed.
 
 From the root of the project run:
+
 ```shell
 go generate ./...
 ```

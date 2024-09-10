@@ -359,7 +359,7 @@ func (t TerminationLogHook) Levels() []log.Level {
 }
 
 func (t TerminationLogHook) Fire(e *log.Entry) error {
-	tLog, err := os.OpenFile("/dev/termination-log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	tLog, err := os.OpenFile("/log/termination-log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 	if err != nil {
 		return err
