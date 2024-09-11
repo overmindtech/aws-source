@@ -132,13 +132,11 @@ var rootCmd = &cobra.Command{
 		configs, err := proc.CreateAWSConfigs(awsAuthConfig)
 		if err != nil {
 			log.WithError(err).Fatal("Could not create AWS configs")
-			return
 		}
 
 		e, err := proc.InitializeAwsSourceEngine(rateLimitContext, natsOptions, maxParallel, configs...)
 		if err != nil {
-			log.WithError(err).Error("Could not initialize aws source")
-			return
+			log.WithError(err).Fatal("Could not initialize AWS source")
 		}
 
 		// Start HTTP server for status
@@ -165,7 +163,7 @@ var rootCmd = &cobra.Command{
 		go func() {
 			defer sentry.Recover()
 
-			server := &http.Server{ //G114: Use of net/http serve function that has no support for setting timeouts
+			server := &http.Server{
 				Addr:         fmt.Sprintf(":%v", healthCheckPort),
 				Handler:      nil,
 				ReadTimeout:  5 * time.Second,
@@ -183,9 +181,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("Could not start engine")
-
-			os.Exit(1)
+			}).Fatal("Could not start engine")
 		}
 
 		sigs := make(chan os.Signal, 1)
@@ -359,7 +355,9 @@ func (t TerminationLogHook) Levels() []log.Level {
 }
 
 func (t TerminationLogHook) Fire(e *log.Entry) error {
-	tLog, err := os.OpenFile("/log/termination-log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// shutdown tracing first to ensure all spans are flushed
+	tracing.ShutdownTracing()
+	tLog, err := os.OpenFile("/dev/termination-log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 	if err != nil {
 		return err
