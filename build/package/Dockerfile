@@ -29,8 +29,6 @@ RUN --mount=type=cache,target=/go/pkg \
 FROM alpine:3.20
 WORKDIR /
 COPY --from=builder /workspace/source .
-# create our termination log folder
-RUN mkdir -p /log && chown -R nobody:nobody /log
 USER 65534:65534
 
 ENTRYPOINT ["/source"]
