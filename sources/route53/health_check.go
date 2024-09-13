@@ -69,7 +69,7 @@ func healthCheckListFunc(ctx context.Context, client *route53.Client, scope stri
 	return healthChecks, nil
 }
 
-func healthCheckItemMapper(scope string, awsItem *HealthCheck) (*sdp.Item, error) {
+func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

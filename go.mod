@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.30.5
 	github.com/aws/aws-sdk-go-v2/config v1.27.33
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.32
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.6
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.43.7
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.38.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.7

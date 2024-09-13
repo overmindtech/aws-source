@@ -13,6 +13,7 @@ This source requires the following IAM Policy
     {
       "Effect": "Allow",
       "Action": [
+        "apigateway:Get*",
         "autoscaling:Describe*",
         "cloudfront:Get*",
         "cloudfront:List*",

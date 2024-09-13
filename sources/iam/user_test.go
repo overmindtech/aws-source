@@ -194,7 +194,7 @@ func TestUserItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := userItemMapper("foo", &details)
+	item, err := userItemMapper("", "foo", &details)
 
 	if err != nil {
 		t.Error(err)

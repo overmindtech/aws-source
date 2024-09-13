@@ -64,7 +64,7 @@ func NewCachePolicySource(client CloudFrontClient, accountID string) *sources.Ge
 			return out.CachePolicy, nil
 		},
 		ListFunc: cachePolicyListFunc,
-		ItemMapper: func(scope string, awsItem *types.CachePolicy) (*sdp.Item, error) {
+		ItemMapper: func(_, scope string, awsItem *types.CachePolicy) (*sdp.Item, error) {
 			attributes, err := sources.ToAttributesCase(awsItem)
 
 			if err != nil {

@@ -50,10 +50,11 @@ func EC2(t *testing.T) {
 
 	uniqueAttribute := sdpListInstances[0].GetUniqueAttribute()
 
-	instanceID, err := integration.GetUniqueAttributeValue(
+	instanceID, err := integration.GetUniqueAttributeValueByTags(
 		uniqueAttribute,
 		sdpListInstances,
 		integration.ResourceTags(integration.EC2, instanceSrc),
+		false,
 	)
 	if err != nil {
 		t.Fatalf("failed to get instance ID: %v", err)
@@ -65,11 +66,7 @@ func EC2(t *testing.T) {
 		t.Fatalf("failed to get EC2 instance: %v", err)
 	}
 
-	instanceIDFromGet, err := integration.GetUniqueAttributeValue(
-		uniqueAttribute,
-		[]*sdp.Item{sdpInstance},
-		integration.ResourceTags(integration.EC2, instanceSrc),
-	)
+	instanceIDFromGet, err := integration.GetUniqueAttributeValueByTags(uniqueAttribute, []*sdp.Item{sdpInstance}, integration.ResourceTags(integration.EC2, instanceSrc), false)
 	if err != nil {
 		t.Fatalf("failed to get instance ID from get: %v", err)
 	}
@@ -89,11 +86,7 @@ func EC2(t *testing.T) {
 		t.Fatalf("no instances found")
 	}
 
-	instanceIDFromSearch, err := integration.GetUniqueAttributeValue(
-		uniqueAttribute,
-		sdpSearchInstances,
-		integration.ResourceTags(integration.EC2, instanceSrc),
-	)
+	instanceIDFromSearch, err := integration.GetUniqueAttributeValueByTags(uniqueAttribute, sdpSearchInstances, integration.ResourceTags(integration.EC2, instanceSrc), false)
 	if err != nil {
 		t.Fatalf("failed to get instance ID from search: %v", err)
 	}

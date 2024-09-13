@@ -37,7 +37,7 @@ func originAccessControlListFunc(ctx context.Context, client *cloudfront.Client,
 	return originAccessControls, nil
 }
 
-func originAccessControlItemMapper(scope string, awsItem *types.OriginAccessControl) (*sdp.Item, error) {
+func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessControl) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

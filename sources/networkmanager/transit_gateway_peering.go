@@ -20,7 +20,7 @@ func getTransitGatewayPeeringGetFunc(ctx context.Context, client *networkmanager
 	return out.TransitGatewayPeering, nil
 }
 
-func transitGatewayPeeringItemMapper(scope string, awsItem *types.TransitGatewayPeering) (*sdp.Item, error) {
+func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGatewayPeering) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

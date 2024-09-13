@@ -198,7 +198,7 @@ func TestRoleItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := roleItemMapper("foo", &role)
+	item, err := roleItemMapper("", "foo", &role)
 
 	if err != nil {
 		t.Fatal(err)

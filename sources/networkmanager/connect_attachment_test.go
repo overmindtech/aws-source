@@ -11,7 +11,7 @@ import (
 func TestConnectAttachmentItemMapper(t *testing.T) {
 
 	scope := "123456789012.eu-west-2"
-	item, err := connectAttachmentItemMapper(scope, &types.ConnectAttachment{
+	item, err := connectAttachmentItemMapper("", scope, &types.ConnectAttachment{
 		Attachment: &types.Attachment{
 			AttachmentId:   sources.PtrString("att-1"),
 			CoreNetworkId:  sources.PtrString("cn-1"),

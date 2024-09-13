@@ -112,7 +112,7 @@ func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetai
 	return userDetails, nil
 }
 
-func userItemMapper(scope string, awsItem *UserDetails) (*sdp.Item, error) {
+func userItemMapper(_, scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem.User)
 
 	if err != nil {

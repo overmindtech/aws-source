@@ -75,11 +75,7 @@ func NetworkManager(t *testing.T) {
 
 		globalNetworkUniqueAttribute := globalNetworks[0].GetUniqueAttribute()
 
-		globalNetworkID, err := integration.GetUniqueAttributeValue(
-			globalNetworkUniqueAttribute,
-			globalNetworks,
-			integration.ResourceTags(integration.NetworkManager, globalNetworkSrc),
-		)
+		globalNetworkID, err := integration.GetUniqueAttributeValueByTags(globalNetworkUniqueAttribute, globalNetworks, integration.ResourceTags(integration.NetworkManager, globalNetworkSrc), false)
 		if err != nil {
 			t.Fatalf("failed to get global network ID: %v", err)
 		}
@@ -90,11 +86,7 @@ func NetworkManager(t *testing.T) {
 			t.Fatalf("failed to get NetworkManager global network: %v", err)
 		}
 
-		globalNetworkIDFromGet, err := integration.GetUniqueAttributeValue(
-			globalNetworkUniqueAttribute,
-			[]*sdp.Item{globalNetwork},
-			integration.ResourceTags(integration.NetworkManager, globalNetworkSrc),
-		)
+		globalNetworkIDFromGet, err := integration.GetUniqueAttributeValueByTags(globalNetworkUniqueAttribute, []*sdp.Item{globalNetwork}, integration.ResourceTags(integration.NetworkManager, globalNetworkSrc), false)
 		if err != nil {
 			t.Fatalf("failed to get global network ID from get: %v", err)
 		}
@@ -122,11 +114,7 @@ func NetworkManager(t *testing.T) {
 			t.Fatalf("no global networks found")
 		}
 
-		globalNetworkIDFromSearch, err := integration.GetUniqueAttributeValue(
-			globalNetworkUniqueAttribute,
-			globalNetworks,
-			integration.ResourceTags(integration.NetworkManager, globalNetworkSrc),
-		)
+		globalNetworkIDFromSearch, err := integration.GetUniqueAttributeValueByTags(globalNetworkUniqueAttribute, globalNetworks, integration.ResourceTags(integration.NetworkManager, globalNetworkSrc), false)
 		if err != nil {
 			t.Fatalf("failed to get global network ID from search: %v", err)
 		}
@@ -149,11 +137,7 @@ func NetworkManager(t *testing.T) {
 			siteUniqueAttribute := sites[0].GetUniqueAttribute()
 
 			// composite site id is in the format of {globalNetworkID}|{siteID}
-			compositeSiteID, err := integration.GetUniqueAttributeValue(
-				siteUniqueAttribute,
-				sites,
-				integration.ResourceTags(integration.NetworkManager, siteSrc),
-			)
+			compositeSiteID, err := integration.GetUniqueAttributeValueByTags(siteUniqueAttribute, sites, integration.ResourceTags(integration.NetworkManager, siteSrc), false)
 			if err != nil {
 				t.Fatalf("failed to get site ID from search: %v", err)
 			}
@@ -164,11 +148,7 @@ func NetworkManager(t *testing.T) {
 				t.Fatalf("failed to get site: %v", err)
 			}
 
-			siteIDFromGet, err := integration.GetUniqueAttributeValue(
-				siteUniqueAttribute,
-				[]*sdp.Item{site},
-				integration.ResourceTags(integration.NetworkManager, siteSrc),
-			)
+			siteIDFromGet, err := integration.GetUniqueAttributeValueByTags(siteUniqueAttribute, []*sdp.Item{site}, integration.ResourceTags(integration.NetworkManager, siteSrc), false)
 			if err != nil {
 				t.Fatalf("failed to get site ID from get: %v", err)
 			}
@@ -192,11 +172,7 @@ func NetworkManager(t *testing.T) {
 
 				linkUniqueAttribute := links[0].GetUniqueAttribute()
 
-				compositeLinkID, err := integration.GetUniqueAttributeValue(
-					linkUniqueAttribute,
-					links,
-					integration.ResourceTags(integration.NetworkManager, linkSrc),
-				)
+				compositeLinkID, err := integration.GetUniqueAttributeValueByTags(linkUniqueAttribute, links, integration.ResourceTags(integration.NetworkManager, linkSrc), false)
 				if err != nil {
 					t.Fatalf("failed to get link ID from search: %v", err)
 				}
@@ -207,11 +183,7 @@ func NetworkManager(t *testing.T) {
 					t.Fatalf("failed to get link: %v", err)
 				}
 
-				linkIDFromGet, err := integration.GetUniqueAttributeValue(
-					linkUniqueAttribute,
-					[]*sdp.Item{link},
-					integration.ResourceTags(integration.NetworkManager, linkSrc),
-				)
+				linkIDFromGet, err := integration.GetUniqueAttributeValueByTags(linkUniqueAttribute, []*sdp.Item{link}, integration.ResourceTags(integration.NetworkManager, linkSrc), false)
 				if err != nil {
 					t.Fatalf("failed to get link ID from get: %v", err)
 				}
@@ -238,11 +210,7 @@ func NetworkManager(t *testing.T) {
 					deviceUniqueAttribute := devices[0].GetUniqueAttribute()
 
 					// composite device id is in the format of: {globalNetworkID}|{deviceID}
-					deviceOneCompositeID, err := integration.GetUniqueAttributeValue(
-						deviceUniqueAttribute,
-						devices,
-						integration.ResourceTags(integration.NetworkManager, deviceSrc, deviceOneName),
-					)
+					deviceOneCompositeID, err := integration.GetUniqueAttributeValueByTags(deviceUniqueAttribute, devices, integration.ResourceTags(integration.NetworkManager, deviceSrc, deviceOneName), false)
 					if err != nil {
 						t.Fatalf("failed to get device ID from search: %v", err)
 					}
@@ -253,11 +221,7 @@ func NetworkManager(t *testing.T) {
 						t.Fatalf("failed to get device: %v", err)
 					}
 
-					deviceOneCompositeIDFromGet, err := integration.GetUniqueAttributeValue(
-						deviceUniqueAttribute,
-						[]*sdp.Item{device},
-						integration.ResourceTags(integration.NetworkManager, deviceSrc, deviceOneName),
-					)
+					deviceOneCompositeIDFromGet, err := integration.GetUniqueAttributeValueByTags(deviceUniqueAttribute, []*sdp.Item{device}, integration.ResourceTags(integration.NetworkManager, deviceSrc, deviceOneName), false)
 					if err != nil {
 						t.Fatalf("failed to get device ID from get: %v", err)
 					}
@@ -291,11 +255,7 @@ func NetworkManager(t *testing.T) {
 						linkAssociationUniqueAttribute := linkAssociations[0].GetUniqueAttribute()
 
 						// composite link association id is in the format of: {globalNetworkID}|{linkID}|{deviceID}
-						compositeLinkAssociationID, err := integration.GetUniqueAttributeValue(
-							linkAssociationUniqueAttribute,
-							linkAssociations,
-							nil, // we didn't use tags on associations
-						)
+						compositeLinkAssociationID, err := integration.GetUniqueAttributeValueByTags(linkAssociationUniqueAttribute, linkAssociations, nil, false)
 						if err != nil {
 							t.Fatalf("failed to get link association ID from search: %v", err)
 						}
@@ -306,11 +266,7 @@ func NetworkManager(t *testing.T) {
 							t.Fatalf("failed to get link association: %v", err)
 						}
 
-						compositeLinkAssociationIDFromGet, err := integration.GetUniqueAttributeValue(
-							linkAssociationUniqueAttribute,
-							[]*sdp.Item{linkAssociation},
-							nil, // we didn't use tags on associations
-						)
+						compositeLinkAssociationIDFromGet, err := integration.GetUniqueAttributeValueByTags(linkAssociationUniqueAttribute, []*sdp.Item{linkAssociation}, nil, false)
 						if err != nil {
 							t.Fatalf("failed to get link association ID from get: %v", err)
 						}
@@ -351,11 +307,7 @@ func NetworkManager(t *testing.T) {
 						connectionUniqueAttribute := connections[0].GetUniqueAttribute()
 
 						// composite connection id is in the format of: {globalNetworkID}|{connectionID}
-						compositeConnectionID, err := integration.GetUniqueAttributeValue(
-							connectionUniqueAttribute,
-							connections,
-							nil, // we didn't use tags on connections
-						)
+						compositeConnectionID, err := integration.GetUniqueAttributeValueByTags(connectionUniqueAttribute, connections, nil, false)
 						if err != nil {
 							t.Fatalf("failed to get connection ID from search: %v", err)
 						}
@@ -366,11 +318,7 @@ func NetworkManager(t *testing.T) {
 							t.Fatalf("failed to get connection: %v", err)
 						}
 
-						compositeConnectionIDFromGet, err := integration.GetUniqueAttributeValue(
-							connectionUniqueAttribute,
-							[]*sdp.Item{connection},
-							nil, // we didn't use tags on connections
-						)
+						compositeConnectionIDFromGet, err := integration.GetUniqueAttributeValueByTags(connectionUniqueAttribute, []*sdp.Item{connection}, nil, false)
 						if err != nil {
 							t.Fatalf("failed to get connection ID from get: %v", err)
 						}

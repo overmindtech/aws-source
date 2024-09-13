@@ -28,6 +28,7 @@ const (
 	NetworkManager resourceGroup = iota
 	EC2
 	KMS
+	APIGateway
 )
 
 func (rg resourceGroup) String() string {
@@ -38,6 +39,8 @@ func (rg resourceGroup) String() string {
 		return "ec2"
 	case KMS:
 		return "kms"
+	case APIGateway:
+		return "api-gateway"
 	default:
 		return "unknown"
 	}
@@ -112,9 +115,14 @@ func removeUnhealthy(sdpInstances []*sdp.Item) []*sdp.Item {
 	return filteredInstances
 }
 
-func GetUniqueAttributeValue(uniqueAttrKey string, items []*sdp.Item, filterTags map[string]string) (string, error) {
+func GetUniqueAttributeValueByTags(uniqueAttrKey string, items []*sdp.Item, filterTags map[string]string, ignoreHealthCheck bool) (string, error) {
 	var filteredItems []*sdp.Item
-	for _, item := range removeUnhealthy(items) {
+
+	if !ignoreHealthCheck {
+		items = removeUnhealthy(items)
+	}
+
+	for _, item := range items {
 		if hasTags(item.GetTags(), filterTags) {
 			filteredItems = append(filteredItems, item)
 		}
@@ -132,6 +140,36 @@ func GetUniqueAttributeValue(uniqueAttrKey string, items []*sdp.Item, filterTags
 	uniqueAttrValueStr := uniqueAttrValue.(string)
 	if uniqueAttrValueStr == "" {
 		return "", fmt.Errorf("%s is empty", uniqueAttrKey)
+	}
+
+	return uniqueAttrValueStr, nil
+}
+
+func GetUniqueAttributeValueBySignificantAttribute(uniqueAttrkey, significantAttrKey, significantAttrVal string, items []*sdp.Item, ignoreHealthCheck bool) (string, error) {
+	var filteredItems []*sdp.Item
+
+	if !ignoreHealthCheck {
+		items = removeUnhealthy(items)
+	}
+
+	for _, item := range items {
+		if val, err := item.GetAttributes().Get(significantAttrKey); err == nil && val == significantAttrVal {
+			filteredItems = append(filteredItems, item)
+		}
+	}
+
+	if len(filteredItems) != 1 {
+		return "", fmt.Errorf("expected 1 item, got %v", len(filteredItems))
+	}
+
+	uniqueAttrValue, err := filteredItems[0].GetAttributes().Get(uniqueAttrkey)
+	if err != nil {
+		return "", fmt.Errorf("failed to get %s: %w", uniqueAttrkey, err)
+	}
+
+	uniqueAttrValueStr := uniqueAttrValue.(string)
+	if uniqueAttrValueStr == "" {
+		return "", fmt.Errorf("%s is empty", uniqueAttrkey)
 	}
 
 	return uniqueAttrValueStr, nil

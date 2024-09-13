@@ -21,7 +21,7 @@ func connectAttachmentGetFunc(ctx context.Context, client *networkmanager.Client
 	return out.ConnectAttachment, nil
 }
 
-func connectAttachmentItemMapper(scope string, ca *types.ConnectAttachment) (*sdp.Item, error) {
+func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(ca)
 
 	if err != nil {

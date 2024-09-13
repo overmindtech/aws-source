@@ -20,7 +20,7 @@ func getTransitGatewayRouteTableAttachmentGetFunc(ctx context.Context, client *n
 	return out.TransitGatewayRouteTableAttachment, nil
 }
 
-func transitGatewayRouteTableAttachmentItemMapper(scope string, awsItem *types.TransitGatewayRouteTableAttachment) (*sdp.Item, error) {
+func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *types.TransitGatewayRouteTableAttachment) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

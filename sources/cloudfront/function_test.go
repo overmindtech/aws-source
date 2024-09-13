@@ -24,7 +24,7 @@ func TestFunctionItemMapper(t *testing.T) {
 		Status: sources.PtrString("test-status"),
 	}
 
-	item, err := functionItemMapper("test", &summary)
+	item, err := functionItemMapper("", "test", &summary)
 
 	if err != nil {
 		t.Fatal(err)

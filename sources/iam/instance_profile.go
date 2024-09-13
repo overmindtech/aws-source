@@ -39,7 +39,7 @@ func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) 
 	return zones, nil
 }
 
-func instanceProfileItemMapper(scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
+func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

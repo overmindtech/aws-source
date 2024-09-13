@@ -48,7 +48,7 @@ func TestSiteToSiteVpnAttachmentOutputMapper(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			item, err := siteToSiteVpnAttachmentItemMapper(scope, tt.item)
+			item, err := siteToSiteVpnAttachmentItemMapper("", scope, tt.item)
 			if err != nil {
 				t.Error(err)
 			}
