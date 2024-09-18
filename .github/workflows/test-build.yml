@@ -115,6 +115,41 @@ jobs:
           display_vulnerability_findings: "enabled"
           sbomgen_version: "latest"
 
+  scan-code:
+    name: Scan Code
+    runs-on: depot-ubuntu-24.04
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout@v2
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # also fetch tags and branches for `git describe`
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "eu-west-2"
+          role-to-assume: "${{ secrets.AWS_CODEGURU_ROLE }}"
+          role-session-name: GitHubActionScript
+
+      - name: CodeGuru Security
+        uses: aws-actions/codeguru-security@v1
+        with:
+          source_path: .
+          aws_region: "eu-west-2"
+          fail_on_severity: Critical
+
+      - name: Print findings
+        if: always()
+        run: |
+          ls -l
+          cat codeguru-security-results.sarif.json
+
   build:
     name: Build
     runs-on: ubuntu-latest
