@@ -51,7 +51,7 @@ func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 	return records, nil
 }
 
-func resourceRecordSetItemMapper(scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
+func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

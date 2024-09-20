@@ -11,7 +11,7 @@ import (
 func TestCoreNetworkPolicyItemMapper(t *testing.T) {
 
 	scope := "123456789012.eu-west-2"
-	item, err := coreNetworkPolicyItemMapper(scope, &types.CoreNetworkPolicy{
+	item, err := coreNetworkPolicyItemMapper("", scope, &types.CoreNetworkPolicy{
 		CoreNetworkId:   sources.PtrString("cn-1"),
 		PolicyVersionId: sources.PtrInt32(1),
 	})

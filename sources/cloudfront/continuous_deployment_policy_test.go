@@ -10,7 +10,7 @@ import (
 )
 
 func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
-	item, err := continuousDeploymentPolicyItemMapper("test", &types.ContinuousDeploymentPolicy{
+	item, err := continuousDeploymentPolicyItemMapper("", "test", &types.ContinuousDeploymentPolicy{
 		Id:               sources.PtrString("test-id"),
 		LastModifiedTime: sources.PtrTime(time.Now()),
 		ContinuousDeploymentPolicyConfig: &types.ContinuousDeploymentPolicyConfig{

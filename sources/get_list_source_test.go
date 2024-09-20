@@ -53,7 +53,7 @@ func TestGetListSourceGet(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 			ListTagsFunc: func(ctx context.Context, s1 string, s2 struct{}) (map[string]string, error) {
@@ -64,7 +64,6 @@ func TestGetListSourceGet(t *testing.T) {
 		}
 
 		item, err := s.Get(context.Background(), "12345.eu-west-2", "", false)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -85,7 +84,7 @@ func TestGetListSourceGet(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -106,7 +105,7 @@ func TestGetListSourceGet(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("mapper error")
 			},
 		}
@@ -129,7 +128,7 @@ func TestGetListSourceList(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 			ListTagsFunc: func(ctx context.Context, s1 string, s2 struct{}) (map[string]string, error) {
@@ -163,7 +162,7 @@ func TestGetListSourceList(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, errors.New("list func error")
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -184,7 +183,7 @@ func TestGetListSourceList(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, errors.New("mapper error")
 			},
 		}
@@ -211,7 +210,7 @@ func TestGetListSourceSearch(t *testing.T) {
 			ListFunc: func(ctx context.Context, client struct{}, scope string) ([]string, error) {
 				return []string{"", ""}, nil
 			},
-			ItemMapper: func(scope string, awsItem string) (*sdp.Item, error) {
+			ItemMapper: func(query, scope string, awsItem string) (*sdp.Item, error) {
 				return &sdp.Item{}, nil
 			},
 		}
@@ -234,7 +233,6 @@ func TestGetListSourceSearch(t *testing.T) {
 
 		t.Run("good ARN", func(t *testing.T) {
 			_, err := s.Search(context.Background(), "12345.eu-west-2", "arn:aws:service:eu-west-2:12345:type/id", false)
-
 			if err != nil {
 				t.Error(err)
 			}
@@ -261,7 +259,7 @@ func TestGetListSourceCaching(t *testing.T) {
 			generation += 1
 			return []string{fmt.Sprintf("%v", generation)}, nil
 		},
-		ItemMapper: func(scope string, output string) (*sdp.Item, error) {
+		ItemMapper: func(query, scope string, output string) (*sdp.Item, error) {
 			return &sdp.Item{
 				Scope:           "foo.eu-west-2",
 				Type:            "test-type",

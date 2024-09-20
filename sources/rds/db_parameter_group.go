@@ -16,7 +16,7 @@ type ParameterGroup struct {
 	Parameters []types.Parameter
 }
 
-func dBParameterGroupItemMapper(scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
+func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

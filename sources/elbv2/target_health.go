@@ -67,7 +67,7 @@ func ToTargetHealthUniqueID(id string) (TargetHealthUniqueID, error) {
 			return TargetHealthUniqueID{}, err
 		}
 
-		pint32 := int32(port)
+		pint32 := int32(port) // nolint gosec
 
 		healthId.Port = &pint32
 	}

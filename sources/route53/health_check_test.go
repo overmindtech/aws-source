@@ -48,7 +48,7 @@ func TestHealthCheckItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := healthCheckItemMapper("foo", &hc)
+	item, err := healthCheckItemMapper("", "foo", &hc)
 
 	if err != nil {
 		t.Error(err)

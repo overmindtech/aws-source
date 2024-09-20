@@ -8,3 +8,4 @@ build/compiled
 .idea
 commit.txt
 .envrc
+.golangci.yml

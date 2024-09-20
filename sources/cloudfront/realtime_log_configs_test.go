@@ -28,7 +28,7 @@ func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := realtimeLogConfigsItemMapper("test", &x)
+	item, err := realtimeLogConfigsItemMapper("", "test", &x)
 
 	if err != nil {
 		t.Fatal(err)

@@ -38,7 +38,7 @@ func hostedZoneListFunc(ctx context.Context, client *route53.Client, scope strin
 	return zones, nil
 }
 
-func hostedZoneItemMapper(scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
+func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

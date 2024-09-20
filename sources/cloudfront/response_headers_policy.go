@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func ResponseHeadersPolicyItemMapper(scope string, awsItem *types.ResponseHeadersPolicy) (*sdp.Item, error) {
+func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHeadersPolicy) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

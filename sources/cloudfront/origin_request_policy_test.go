@@ -39,7 +39,7 @@ func TestOriginRequestPolicyItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := originRequestPolicyItemMapper("test", &x)
+	item, err := originRequestPolicyItemMapper("", "test", &x)
 
 	if err != nil {
 		t.Fatal(err)

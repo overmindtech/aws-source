@@ -21,7 +21,7 @@ func TestKeyGroupItemMapper(t *testing.T) {
 		LastModifiedTime: sources.PtrTime(time.Now()),
 	}
 
-	item, err := KeyGroupItemMapper("test", &group)
+	item, err := KeyGroupItemMapper("", "test", &group)
 
 	if err != nil {
 		t.Fatal(err)

@@ -76,7 +76,7 @@ func TestResponseHeadersPolicyItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := ResponseHeadersPolicyItemMapper("test", &x)
+	item, err := ResponseHeadersPolicyItemMapper("", "test", &x)
 
 	if err != nil {
 		t.Fatal(err)
