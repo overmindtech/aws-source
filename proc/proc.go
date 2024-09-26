@@ -226,16 +226,18 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, engineUUID uuid
 
 	var startupErrorMutex sync.Mutex
 	startupError := errors.New("source is starting")
-	heartbeatOptions.HealthCheck = func() error {
-		startupErrorMutex.Lock()
-		defer startupErrorMutex.Unlock()
-		return startupError
+	if heartbeatOptions != nil {
+		heartbeatOptions.HealthCheck = func() error {
+			startupErrorMutex.Lock()
+			defer startupErrorMutex.Unlock()
+			return startupError
+		}
+		e.HeartbeatOptions = heartbeatOptions
 	}
 
 	e.Name = "aws-source"
 	e.NATSOptions = &natsOptions
 	e.MaxParallelExecutions = maxParallel
-	e.HeartbeatOptions = heartbeatOptions
 	e.Version = tracing.ServiceVersion
 	e.Name = name
 	e.UUID = engineUUID
