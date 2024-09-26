@@ -542,6 +542,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, engineUUID uuid
 			startupErrorMutex.Lock()
 			startupError = err
 			startupErrorMutex.Unlock()
+			_ = e.SendHeartbeat(ctx) // Send the error immediately
 
 			if err != nil {
 				log.WithError(err).Debug("Error initializing sources")
