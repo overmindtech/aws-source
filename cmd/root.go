@@ -181,6 +181,7 @@ var rootCmd = &cobra.Command{
 		e, err := proc.InitializeAwsSourceEngine(
 			rateLimitContext,
 			sourceName,
+			tracing.ServiceVersion,
 			sourceUUID,
 			natsOptions,
 			heartbeatOptions,
