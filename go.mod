@@ -36,8 +36,8 @@ require (
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/nats-io/jwt/v2 v2.7.0
 	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.27.7
-	github.com/overmindtech/sdp-go v0.93.1
+	github.com/overmindtech/discovery v0.28.0
+	github.com/overmindtech/sdp-go v0.94.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
@@ -104,7 +104,7 @@ require (
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb // indirect
 	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/oauth2 v0.22.0 // indirect
+	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
