@@ -236,11 +236,12 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, engineUUID uuid
 	e.NATSOptions = &natsOptions
 	e.MaxParallelExecutions = maxParallel
 	e.HeartbeatOptions = heartbeatOptions
-	e.StartSendingHeartbeats(ctx)
 	e.Version = tracing.ServiceVersion
 	e.Name = name
 	e.UUID = engineUUID
 	e.Type = "aws"
+
+	e.StartSendingHeartbeats(ctx)
 
 	if len(configs) == 0 {
 		return nil, errors.New("No configs specified")
