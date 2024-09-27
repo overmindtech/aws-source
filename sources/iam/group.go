@@ -39,7 +39,7 @@ func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.
 	return zones, nil
 }
 
-func groupItemMapper(scope string, awsItem *types.Group) (*sdp.Item, error) {
+func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

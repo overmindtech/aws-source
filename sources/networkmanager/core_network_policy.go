@@ -21,7 +21,7 @@ func coreNetworkPolicyGetFunc(ctx context.Context, client *networkmanager.Client
 	return out.CoreNetworkPolicy, nil
 }
 
-func coreNetworkPolicyItemMapper(scope string, cn *types.CoreNetworkPolicy) (*sdp.Item, error) {
+func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(cn)
 	if err != nil {
 		return nil, err

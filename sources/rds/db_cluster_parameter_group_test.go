@@ -73,7 +73,7 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 		},
 	}
 
-	item, err := dBClusterParameterGroupItemMapper("foo", &group)
+	item, err := dBClusterParameterGroupItemMapper("", "foo", &group)
 
 	if err != nil {
 		t.Fatal(err)

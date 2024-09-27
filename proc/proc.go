@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	awsapigateway "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	awsautoscaling "github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	awscloudfront "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	awscloudwatch "github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -39,6 +40,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	stscredsv2 "github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/overmindtech/aws-source/sources/apigateway"
 	"github.com/overmindtech/aws-source/sources/autoscaling"
 	"github.com/overmindtech/aws-source/sources/cloudfront"
 	"github.com/overmindtech/aws-source/sources/cloudwatch"
@@ -351,6 +353,9 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 					kmsClient := awskms.NewFromConfig(cfg, func(o *awskms.Options) {
 						o.RetryMode = aws.RetryModeAdaptive
 					})
+					apigatewayClient := awsapigateway.NewFromConfig(cfg, func(o *awsapigateway.Options) {
+						o.RetryMode = aws.RetryModeAdaptive
+					})
 
 					sources := []discovery.Source{
 						// EC2
@@ -502,6 +507,10 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						kms.NewAliasSource(kmsClient, *callerID.Account, cfg.Region),
 						kms.NewGrantSource(kmsClient, *callerID.Account, cfg.Region),
 						kms.NewKeyPolicySource(kmsClient, *callerID.Account, cfg.Region),
+
+						// ApiGateway
+						apigateway.NewRestApiSource(apigatewayClient, *callerID.Account, cfg.Region),
+						apigateway.NewResourceSource(apigatewayClient, *callerID.Account, cfg.Region),
 					}
 
 					e.AddSources(sources...)

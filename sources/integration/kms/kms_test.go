@@ -72,11 +72,7 @@ func KMS(t *testing.T) {
 
 	keyUniqueAttribute := sdpListKeys[0].GetUniqueAttribute()
 
-	keyID, err := integration.GetUniqueAttributeValue(
-		keyUniqueAttribute,
-		sdpListKeys,
-		integration.ResourceTags(integration.KMS, keySrc),
-	)
+	keyID, err := integration.GetUniqueAttributeValueByTags(keyUniqueAttribute, sdpListKeys, integration.ResourceTags(integration.KMS, keySrc), false)
 	if err != nil {
 		t.Fatalf("failed to get key ID: %v", err)
 	}
@@ -87,11 +83,7 @@ func KMS(t *testing.T) {
 		t.Fatalf("failed to get KMS key: %v", err)
 	}
 
-	keyIDFromGet, err := integration.GetUniqueAttributeValue(
-		keyUniqueAttribute,
-		[]*sdp.Item{sdpKey},
-		integration.ResourceTags(integration.KMS, keySrc),
-	)
+	keyIDFromGet, err := integration.GetUniqueAttributeValueByTags(keyUniqueAttribute, []*sdp.Item{sdpKey}, integration.ResourceTags(integration.KMS, keySrc), false)
 	if err != nil {
 		t.Fatalf("failed to get key ID from get: %v", err)
 	}
@@ -111,11 +103,7 @@ func KMS(t *testing.T) {
 		t.Fatalf("no keys found")
 	}
 
-	keyIDFromSearch, err := integration.GetUniqueAttributeValue(
-		keyUniqueAttribute,
-		sdpSearchKeys,
-		integration.ResourceTags(integration.KMS, keySrc),
-	)
+	keyIDFromSearch, err := integration.GetUniqueAttributeValueByTags(keyUniqueAttribute, sdpSearchKeys, integration.ResourceTags(integration.KMS, keySrc), false)
 	if err != nil {
 		t.Fatalf("failed to get key ID from search: %v", err)
 	}

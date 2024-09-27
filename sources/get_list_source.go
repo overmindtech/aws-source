@@ -40,7 +40,7 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 	SearchFunc func(ctx context.Context, client ClientStruct, scope string, query string) ([]AWSItem, error)
 
 	// ItemMapper Maps an AWS representation of an item to the SDP version
-	ItemMapper func(scope string, awsItem AWSItem) (*sdp.Item, error)
+	ItemMapper func(query, scope string, awsItem AWSItem) (*sdp.Item, error)
 
 	// ListTagsFunc Optional function that will be used to list tags for a
 	// resource
@@ -160,7 +160,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 		return nil, err
 	}
 
-	item, err := s.ItemMapper(scope, awsItem)
+	item, err := s.ItemMapper(query, scope, awsItem)
 	if err != nil {
 		// Don't cache this as wrapping is very cheap and better to just try
 		// again than store in memory
@@ -209,8 +209,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 
 	items := make([]*sdp.Item, 0)
 	for _, awsItem := range awsItems {
-		item, err := s.ItemMapper(scope, awsItem)
-
+		item, err := s.ItemMapper("", scope, awsItem)
 		if err != nil {
 			continue
 		}
@@ -291,7 +290,6 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 	}
 
 	awsItems, err := s.SearchFunc(ctx, s.Client, scope, query)
-
 	if err != nil {
 		err = WrapAWSError(err)
 		s.cache.StoreError(err, s.cacheDuration(), ck)
@@ -302,8 +300,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 	var item *sdp.Item
 
 	for _, awsItem := range awsItems {
-		item, err = s.ItemMapper(scope, awsItem)
-
+		item, err = s.ItemMapper(query, scope, awsItem)
 		if err != nil {
 			continue
 		}

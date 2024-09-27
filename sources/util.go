@@ -103,7 +103,6 @@ func (a *ARN) Type() string {
 // slashes or colons: https://devopscube.com/aws-arn-guide/
 func ParseARN(arnString string) (*ARN, error) {
 	a, err := arn.Parse(arnString)
-
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +212,6 @@ func (e E2ETest) Run(t *testing.T) {
 				defer cancel()
 
 				items, err := searchSrc.Search(ctx, scope, *e.GoodSearchQuery, false)
-
 				if err != nil {
 					t.Error(err)
 				}
@@ -243,7 +241,6 @@ func (e E2ETest) Run(t *testing.T) {
 			defer cancel()
 
 			items, err := e.Source.List(ctx, scope, false)
-
 			if err != nil {
 				t.Error(err)
 			}
@@ -279,7 +276,6 @@ func (e E2ETest) Run(t *testing.T) {
 					defer cancel()
 
 					item, err := e.Source.Get(ctx, scope, query, false)
-
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -331,7 +327,6 @@ func GetAutoConfig(t *testing.T) (aws.Config, string, string) {
 	t.Helper()
 
 	config, err := config.LoadDefaultConfig(context.Background())
-
 	if err != nil {
 		t.Skip(err.Error())
 	}
@@ -346,7 +341,6 @@ func GetAutoConfig(t *testing.T) (aws.Config, string, string) {
 	var callerID *sts.GetCallerIdentityOutput
 
 	callerID, err = stsClient.GetCallerIdentity(context.Background(), &sts.GetCallerIdentityInput{})
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -20,7 +20,7 @@ func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, _,
 	return out.VpcAttachment, nil
 }
 
-func vpcAttachmentItemMapper(scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
+func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

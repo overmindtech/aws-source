@@ -30,7 +30,7 @@ func layerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]
 	return layers, nil
 }
 
-func layerItemMapper(scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
+func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

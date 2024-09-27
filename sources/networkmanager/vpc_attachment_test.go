@@ -16,7 +16,7 @@ func TestVPCAttachmentItemMapper(t *testing.T) {
 		},
 	}
 	scope := "123456789012.eu-west-2"
-	item, err := vpcAttachmentItemMapper(scope, &input)
+	item, err := vpcAttachmentItemMapper("", scope, &input)
 
 	if err != nil {
 		t.Error(err)

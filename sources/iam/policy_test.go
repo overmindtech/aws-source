@@ -270,7 +270,7 @@ func TestPolicyItemMapper(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	item, err := policyItemMapper("foo", details)
+	item, err := policyItemMapper("", "foo", details)
 
 	if err != nil {
 		t.Error(err)

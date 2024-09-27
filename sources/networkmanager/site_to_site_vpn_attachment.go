@@ -20,7 +20,7 @@ func getSiteToSiteVpnAttachmentGetFunc(ctx context.Context, client *networkmanag
 	return out.SiteToSiteVpnAttachment, nil
 }
 
-func siteToSiteVpnAttachmentItemMapper(scope string, awsItem *types.SiteToSiteVpnAttachment) (*sdp.Item, error) {
+func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSiteVpnAttachment) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

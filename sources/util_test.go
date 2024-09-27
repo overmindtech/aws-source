@@ -9,7 +9,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:partition:service:region:account-id:resource-type:resource-id"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -35,7 +34,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:aws:ecs:eu-west-1:052392120703:task-definition/ecs-template-ecs-demo-app:1"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -65,7 +63,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:aws:ec2:us-east-1:4575734578134:instance/i-054dsfg34gdsfg38"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -87,7 +84,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:aws:eks:eu-west-2:944651592624:nodegroup/dogfood/intel-20230616142016591700000005/6ec4624a-05ef-bdad-e69a-fe9832885421"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -109,7 +105,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:aws:iam::942836531449:policy/OvermindReadonly"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}
@@ -123,7 +118,6 @@ func TestParseARN(t *testing.T) {
 		arn := "arn:aws:elasticloadbalancing:eu-west-2:540044833068:targetgroup/lambda-rvaaio9n3auuhnvvvjmp/6f23de9c63bd4653"
 
 		a, err := ParseARN(arn)
-
 		if err != nil {
 			t.Error(err)
 		}

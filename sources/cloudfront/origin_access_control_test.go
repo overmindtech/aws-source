@@ -20,7 +20,7 @@ func TestOriginAccessControlItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := originAccessControlItemMapper("test", &x)
+	item, err := originAccessControlItemMapper("", "test", &x)
 
 	if err != nil {
 		t.Fatal(err)

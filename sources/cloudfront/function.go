@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-func functionItemMapper(scope string, awsItem *types.FunctionSummary) (*sdp.Item, error) {
+func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.Item, error) {
 	attributes, err := sources.ToAttributesCase(awsItem)
 
 	if err != nil {

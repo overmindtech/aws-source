@@ -198,7 +198,7 @@ func roleListFunc(ctx context.Context, client IAMClient, _ string) ([]*RoleDetai
 	return roles, nil
 }
 
-func roleItemMapper(scope string, awsItem *RoleDetails) (*sdp.Item, error) {
+func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	enrichedRole := struct {
 		*types.Role
 		EmbeddedPolicies []embeddedPolicy

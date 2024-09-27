@@ -60,7 +60,7 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 		Weight:                  sources.PtrInt64(100),
 	}
 
-	item, err := resourceRecordSetItemMapper("foo", &recordSet)
+	item, err := resourceRecordSetItemMapper("", "foo", &recordSet)
 
 	if err != nil {
 		t.Error(err)
