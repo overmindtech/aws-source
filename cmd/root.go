@@ -12,16 +12,22 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/google/uuid"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/proc"
 	"github.com/overmindtech/aws-source/tracing"
+	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdp-go/auth"
+	"github.com/overmindtech/sdp-go/sdpconnect"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"golang.org/x/oauth2"
 )
 
 var cfgFile string
@@ -47,18 +53,15 @@ var rootCmd = &cobra.Command{
 
 		// Get srcman supplied config
 		natsServers := viper.GetStringSlice("nats-servers")
-		natsNamePrefix := viper.GetString("nats-name-prefix")
 		natsJWT := viper.GetString("nats-jwt")
 		natsNKeySeed := viper.GetString("nats-nkey-seed")
 		maxParallel := viper.GetInt("max-parallel")
 		apiKey := viper.GetString("api-key")
-		apiPath := viper.GetString("api-path")
+		app := viper.GetString("app")
 		healthCheckPort := viper.GetInt("health-check-port")
-
-		hostname, err := os.Hostname()
-		if err != nil {
-			log.WithError(err).Fatal("Could not determine hostname for use in NATS connection name")
-		}
+		natsConnectionName := viper.GetString("nats-connection-name")
+		sourceName := viper.GetString("source-name")
+		sourceUUIDString := viper.GetString("source-uuid")
 
 		awsAuthConfig := proc.AwsAuthConfig{
 			Strategy:        viper.GetString("aws-access-strategy"),
@@ -81,33 +84,74 @@ var rootCmd = &cobra.Command{
 		}
 
 		log.WithFields(log.Fields{
-			"nats-servers":        natsServers,
-			"nats-name-prefix":    natsNamePrefix,
-			"nats-jwt":            natsJWT,
-			"nats-nkey-seed":      natsNKeySeedLog,
-			"max-parallel":        maxParallel,
-			"aws-regions":         awsAuthConfig.Regions,
-			"aws-access-strategy": awsAuthConfig.Strategy,
-			"aws-external-id":     awsAuthConfig.ExternalID,
-			"aws-target-role-arn": awsAuthConfig.TargetRoleARN,
-			"aws-profile":         awsAuthConfig.Profile,
-			"auto-config":         awsAuthConfig.AutoConfig,
-			"health-check-port":   healthCheckPort,
+			"nats-servers":         natsServers,
+			"nats-jwt":             natsJWT,
+			"nats-nkey-seed":       natsNKeySeedLog,
+			"nats-connection-name": natsConnectionName,
+			"max-parallel":         maxParallel,
+			"aws-regions":          awsAuthConfig.Regions,
+			"aws-access-strategy":  awsAuthConfig.Strategy,
+			"aws-external-id":      awsAuthConfig.ExternalID,
+			"aws-target-role-arn":  awsAuthConfig.TargetRoleARN,
+			"aws-profile":          awsAuthConfig.Profile,
+			"auto-config":          awsAuthConfig.AutoConfig,
+			"health-check-port":    healthCheckPort,
+			"app":                  app,
+			"source-name":          sourceName,
+			"source-uuid":          sourceUUIDString,
 		}).Info("Got config")
+
+		var sourceUUID uuid.UUID
+		if sourceUUIDString == "" {
+			sourceUUID = uuid.New()
+		} else {
+			sourceUUID, err = uuid.Parse(sourceUUIDString)
+
+			if err != nil {
+				log.WithError(err).Fatal("Could not parse source UUID")
+			}
+		}
+
+		// Determine the required Overmind URLs
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		oi, err := sdp.NewOvermindInstance(ctx, app)
+		if err != nil {
+			log.WithError(err).Fatal("Could not determine Overmind instance URLs")
+		}
 
 		// Validate the auth params and create a token client if we are using
 		// auth
-		var tokenClient auth.TokenClient
+		var natsTokenClient auth.TokenClient
+		var authenticatedClient http.Client
+		var heartbeatOptions *discovery.HeartbeatOptions
 		if apiKey != "" {
-			tokenClient, err = auth.NewAPIKeyClient(apiPath, apiKey)
+			natsTokenClient, err = auth.NewAPIKeyClient(oi.ApiUrl.String(), apiKey)
 
 			if err != nil {
 				sentry.CaptureException(err)
 
 				log.WithError(err).Fatal("Could not create API key client")
 			}
+
+			tokenSource := auth.NewAPIKeyTokenSource(apiKey, oi.ApiUrl.String())
+			transport := oauth2.Transport{
+				Source: tokenSource,
+				Base:   http.DefaultTransport,
+			}
+			authenticatedClient = http.Client{
+				Transport: otelhttp.NewTransport(&transport),
+			}
+
+			heartbeatOptions = &discovery.HeartbeatOptions{
+				ManagementClient: sdpconnect.NewManagementServiceClient(
+					&authenticatedClient,
+					oi.ApiUrl.String(),
+				),
+				Frequency: time.Second * 30,
+			}
 		} else if natsJWT != "" || natsNKeySeed != "" {
-			tokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
+			natsTokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
 
 			if err != nil {
 				log.WithError(err).Fatal("Error validating NATS authentication info")
@@ -118,12 +162,12 @@ var rootCmd = &cobra.Command{
 			NumRetries:        -1,
 			RetryDelay:        5 * time.Second,
 			Servers:           natsServers,
-			ConnectionName:    fmt.Sprintf("%v.%v", natsNamePrefix, hostname),
+			ConnectionName:    natsConnectionName,
 			ConnectionTimeout: (10 * time.Second), // TODO: Make configurable
 			MaxReconnects:     -1,
 			ReconnectWait:     1 * time.Second,
 			ReconnectJitter:   1 * time.Second,
-			TokenClient:       tokenClient,
+			TokenClient:       natsTokenClient,
 		}
 
 		rateLimitContext, rateLimitCancel := context.WithCancel(context.Background())
@@ -134,7 +178,17 @@ var rootCmd = &cobra.Command{
 			log.WithError(err).Fatal("Could not create AWS configs")
 		}
 
-		e, err := proc.InitializeAwsSourceEngine(rateLimitContext, natsOptions, maxParallel, configs...)
+		e, err := proc.InitializeAwsSourceEngine(
+			rateLimitContext,
+			sourceName,
+			tracing.ServiceVersion,
+			sourceUUID,
+			natsOptions,
+			heartbeatOptions,
+			maxParallel,
+			999_999, // Very high max retries as it'll time out after 15min anyway
+			configs...,
+		)
 		if err != nil {
 			log.WithError(err).Fatal("Could not initialize AWS source")
 		}
@@ -225,6 +279,11 @@ func init() {
 	// will be global for your application.
 	var logLevel string
 
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.WithError(err).Fatal("Could not determine hostname for use in NATS connection name and source name")
+	}
+
 	// General config options
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "/etc/srcman/config/source.yaml", "config file path")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log", "info", "Set the log level. Valid values: panic, fatal, error, warn, info, debug, trace")
@@ -232,18 +291,18 @@ func init() {
 	// Config required by all sources in order to connect to NATS. You shouldn't
 	// need to change these
 	rootCmd.PersistentFlags().StringArray("nats-servers", []string{"nats://localhost:4222", "nats://nats:4222"}, "A list of NATS servers to connect to")
-	rootCmd.PersistentFlags().String("nats-name-prefix", "", "A name label prefix. Sources should append a dot and their hostname .{hostname} to this, then set this is the NATS connection name which will be sent to the server on CONNECT to identify the client")
 	rootCmd.PersistentFlags().String("nats-jwt", "", "The JWT token that should be used to authenticate to NATS, provided in raw format e.g. eyJ0eXAiOiJKV1Q...")
 	rootCmd.PersistentFlags().String("nats-nkey-seed", "", "The NKey seed which corresponds to the NATS JWT e.g. SUAFK6QUC...")
+	rootCmd.PersistentFlags().String("nats-connection-name", hostname, "The name that the source should use to connect to NATS")
 
 	rootCmd.PersistentFlags().String("api-key", "", "The API key to use to authenticate to the Overmind API")
 	// Support API Keys in the environment
-	err := viper.BindEnv("api-key", "OVM_API_KEY", "API_KEY")
+	err = viper.BindEnv("api-key", "OVM_API_KEY", "API_KEY")
 	if err != nil {
 		log.WithError(err).Fatal("could not bind api key to env")
 	}
 
-	rootCmd.PersistentFlags().String("api-path", "https://api.app.overmind.tech", "The URL of the Overmind API")
+	rootCmd.PersistentFlags().String("app", "https://app.overmind.tech", "The URL of the Overmind app to use")
 	rootCmd.PersistentFlags().Int("max-parallel", 2_000, "Max number of requests to run in parallel")
 
 	// Custom flags for this source
@@ -256,6 +315,8 @@ func init() {
 	rootCmd.PersistentFlags().String("aws-regions", "", "Comma-separated list of AWS regions that this source should operate in")
 	rootCmd.PersistentFlags().BoolP("auto-config", "a", false, "Use the local AWS config, the same as the AWS CLI could use. This can be set up with \"aws configure\"")
 	rootCmd.PersistentFlags().IntP("health-check-port", "", 8080, "The port that the health check should run on")
+	rootCmd.PersistentFlags().String("source-name", fmt.Sprintf("aws-source-%v", hostname), "The name of the source")
+	rootCmd.PersistentFlags().String("source-uuid", "", "The UUID of the source, is this is blank it will be auto-generated. This is used in heartbeats and shouldn't be supplied usually")
 
 	// tracing
 	rootCmd.PersistentFlags().String("honeycomb-api-key", "", "If specified, configures opentelemetry libraries to submit traces to honeycomb")
