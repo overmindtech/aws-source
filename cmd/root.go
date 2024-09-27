@@ -152,6 +152,7 @@ var rootCmd = &cobra.Command{
 			}
 		} else if natsJWT != "" || natsNKeySeed != "" {
 			natsTokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
+			log.Info("Using NATS authentication, no heartbeat will be sent")
 
 			if err != nil {
 				log.WithError(err).Fatal("Error validating NATS authentication info")
