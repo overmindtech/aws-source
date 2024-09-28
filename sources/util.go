@@ -359,7 +359,7 @@ func ToAttributesWithExclude(i interface{}, exclusions ...string) (*sdp.ItemAttr
 
 	for _, exclusion := range exclusions {
 		if s := attrs.GetAttrStruct(); s != nil {
-			delete(s.Fields, exclusion)
+			delete(s.GetFields(), exclusion)
 		}
 	}
 
