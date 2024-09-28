@@ -32,7 +32,7 @@ func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 	for _, snapshot := range output.Snapshots {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(snapshot, "tags")
+		attrs, err = sources.ToAttributesWithExclude(snapshot, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -44,7 +44,7 @@ func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 
 		item := sdp.Item{
 			Type:            "ec2-snapshot",
-			UniqueAttribute: "snapshotId",
+			UniqueAttribute: "SnapshotId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(snapshot.Tags),

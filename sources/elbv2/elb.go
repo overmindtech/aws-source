@@ -24,7 +24,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 	tagsMap := getTagsMap(ctx, client, arns)
 
 	for _, lb := range output.LoadBalancers {
-		attrs, err := sources.ToAttributesCase(lb)
+		attrs, err := sources.ToAttributesWithExclude(lb)
 
 		if err != nil {
 			return nil, err
@@ -38,7 +38,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 
 		item := sdp.Item{
 			Type:            "elbv2-load-balancer",
-			UniqueAttribute: "loadBalancerName",
+			UniqueAttribute: "LoadBalancerName",
 			Attributes:      attrs,
 			Scope:           scope,
 			Tags:            tags,

@@ -48,7 +48,7 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	service.TaskSets = []types.TaskSet{}
 
-	attributes, err := sources.ToAttributesCase(service, "tags")
+	attributes, err := sources.ToAttributesWithExclude(service, "tags")
 
 	if err != nil {
 		return nil, err
@@ -56,13 +56,13 @@ func serviceGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	if service.ServiceArn != nil {
 		if a, err := sources.ParseARN(*service.ServiceArn); err == nil {
-			attributes.Set("serviceFullName", a.Resource)
+			attributes.Set("ServiceFullName", a.Resource)
 		}
 	}
 
 	item := sdp.Item{
 		Type:            "ecs-service",
-		UniqueAttribute: "serviceFullName",
+		UniqueAttribute: "ServiceFullName",
 		Scope:           scope,
 		Attributes:      attributes,
 		Tags:            tagsToMap(service.Tags),

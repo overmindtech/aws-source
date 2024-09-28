@@ -27,17 +27,17 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 
 	// ResourceArn is the topic ARN that the policy is associated with
 	attr := map[string]interface{}{
-		"topicArn": *input.ResourceArn,
+		"TopicArn": *input.ResourceArn,
 	}
 
-	attributes, err := sources.ToAttributesCase(attr)
+	attributes, err := sources.ToAttributesWithExclude(attr)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "sns-data-protection-policy",
-		UniqueAttribute: "topicArn",
+		UniqueAttribute: "TopicArn",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

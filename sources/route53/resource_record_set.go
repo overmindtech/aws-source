@@ -52,7 +52,7 @@ func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 }
 
 func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	item := sdp.Item{
 		Type:            "route53-resource-record-set",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

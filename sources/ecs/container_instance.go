@@ -30,7 +30,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 
 	containerInstance := out.ContainerInstances[0]
 
-	attributes, err := sources.ToAttributesCase(containerInstance, "tags")
+	attributes, err := sources.ToAttributesWithExclude(containerInstance, "tags")
 
 	if err != nil {
 		return nil, err
@@ -40,12 +40,12 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	// identifies them. This is {clusterName}/{id}
 	// ecs-template-ECSCluster-8nS0WOLbs3nZ/50e9bf71ed57450ca56293cc5a042886
 	if a, err := sources.ParseARN(*containerInstance.ContainerInstanceArn); err == nil {
-		attributes.Set("id", a.Resource)
+		attributes.Set("Id", a.Resource)
 	}
 
 	item := sdp.Item{
 		Type:            "ecs-container-instance",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Scope:           scope,
 		Attributes:      attributes,
 		Tags:            tagsToMap(containerInstance.Tags),

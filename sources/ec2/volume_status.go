@@ -27,7 +27,7 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 	for _, volume := range output.VolumeStatuses {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(volume)
+		attrs, err = sources.ToAttributesWithExclude(volume)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -39,7 +39,7 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 
 		item := sdp.Item{
 			Type:            "ec2-volume-status",
-			UniqueAttribute: "volumeId",
+			UniqueAttribute: "VolumeId",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

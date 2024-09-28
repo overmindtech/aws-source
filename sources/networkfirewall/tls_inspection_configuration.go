@@ -38,7 +38,7 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 		TLSInspectionConfiguration: resp.TLSInspectionConfiguration,
 	}
 
-	attributes, err := sources.ToAttributesCase(utic)
+	attributes, err := sources.ToAttributesWithExclude(utic)
 
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 
 	item := sdp.Item{
 		Type:            "network-firewall-tls-inspection-configuration",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

@@ -29,7 +29,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.KeyMetadata)
+	attributes, err := sources.ToAttributesWithExclude(output.KeyMetadata)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 
 	item := &sdp.Item{
 		Type:            "kms-key",
-		UniqueAttribute: "keyId",
+		UniqueAttribute: "KeyId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            resourceTags,

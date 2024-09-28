@@ -33,7 +33,7 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 		RuleGroup:  resp.RuleGroup,
 	}
 
-	attributes, err := sources.ToAttributesCase(urg)
+	attributes, err := sources.ToAttributesWithExclude(urg)
 
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 
 	item := sdp.Item{
 		Type:            "network-firewall-rule-group",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

@@ -79,7 +79,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, desc := range output.TargetHealthDescriptions {
-		attrs, err := sources.ToAttributesCase(desc)
+		attrs, err := sources.ToAttributesWithExclude(desc)
 
 		if err != nil {
 			return nil, err
@@ -87,7 +87,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 
 		item := sdp.Item{
 			Type:            "elbv2-target-health",
-			UniqueAttribute: "uniqueId",
+			UniqueAttribute: "UniqueId",
 			Attributes:      attrs,
 			Scope:           scope,
 		}
@@ -137,7 +137,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			Port:             desc.Target.Port,
 		}
 
-		item.GetAttributes().Set("uniqueId", id.String())
+		item.GetAttributes().Set("UniqueId", id.String())
 
 		// See if the ID is an ARN
 		a, err := sources.ParseARN(*desc.Target.Id)

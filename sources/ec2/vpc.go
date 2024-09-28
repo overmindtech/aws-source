@@ -26,7 +26,7 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 	for _, vpc := range output.Vpcs {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(vpc, "tags")
+		attrs, err = sources.ToAttributesWithExclude(vpc, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 
 		item := sdp.Item{
 			Type:            "ec2-vpc",
-			UniqueAttribute: "vpcId",
+			UniqueAttribute: "VpcId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(vpc.Tags),

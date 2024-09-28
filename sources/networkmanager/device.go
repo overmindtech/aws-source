@@ -17,7 +17,7 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 	for _, s := range output.Devices {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(s, "tags")
+		attrs, err = sources.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -31,11 +31,11 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId or deviceId is nil for device"))
 		}
 
-		attrs.Set("globalNetworkIdDeviceId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId))
+		attrs.Set("GlobalNetworkIdDeviceId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-device",
-			UniqueAttribute: "globalNetworkIdDeviceId",
+			UniqueAttribute: "GlobalNetworkIdDeviceId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(s.Tags),

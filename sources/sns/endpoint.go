@@ -27,19 +27,19 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.Attributes)
+	attributes, err := sources.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("endpointArn", *input.EndpointArn)
+	err = attributes.Set("EndpointArn", *input.EndpointArn)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "sns-endpoint",
-		UniqueAttribute: "endpointArn",
+		UniqueAttribute: "EndpointArn",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

@@ -12,14 +12,14 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 	items := make([]*sdp.Item, 0)
 
 	for _, location := range output.Locations {
-		attributes, err := sources.ToAttributesCase(location, "tags")
+		attributes, err := sources.ToAttributesWithExclude(location, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-location",
-			UniqueAttribute: "locationCode",
+			UniqueAttribute: "LocationCode",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

@@ -10,7 +10,7 @@ import (
 )
 
 func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHeadersPolicy) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 
 	item := sdp.Item{
 		Type:            "cloudfront-response-headers-policy",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

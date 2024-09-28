@@ -12,14 +12,14 @@ func customerMetadataOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	items := make([]*sdp.Item, 0)
 
 	for _, agreement := range output.Agreements {
-		attributes, err := sources.ToAttributesCase(agreement, "tags")
+		attributes, err := sources.ToAttributesWithExclude(agreement, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-customer-metadata",
-			UniqueAttribute: "agreementName",
+			UniqueAttribute: "AgreementName",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

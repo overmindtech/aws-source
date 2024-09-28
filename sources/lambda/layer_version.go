@@ -46,13 +46,13 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 		return nil, err
 	}
 
-	attributes, err := sources.ToAttributesCase(out, "resultMetadata")
+	attributes, err := sources.ToAttributesWithExclude(out, "resultMetadata")
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("fullName", fmt.Sprintf("%v:%v", *input.LayerName, input.VersionNumber))
+	err = attributes.Set("FullName", fmt.Sprintf("%v:%v", *input.LayerName, input.VersionNumber))
 
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 	item := sdp.Item{
 		Type:            "lambda-layer-version",
-		UniqueAttribute: "fullName",
+		UniqueAttribute: "FullName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

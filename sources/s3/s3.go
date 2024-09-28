@@ -378,7 +378,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	// Wait for all requests to complete
 	wg.Wait()
 
-	attributes, err := sources.ToAttributesCase(bucket)
+	attributes, err := sources.ToAttributesWithExclude(bucket)
 
 	if err != nil {
 		err = &sdp.QueryError{
@@ -403,7 +403,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 
 	item := sdp.Item{
 		Type:            "s3-bucket",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

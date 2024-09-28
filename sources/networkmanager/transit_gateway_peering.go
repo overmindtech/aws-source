@@ -21,7 +21,7 @@ func getTransitGatewayPeeringGetFunc(ctx context.Context, client *networkmanager
 }
 
 func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGatewayPeering) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -29,12 +29,12 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 
 	// The uniqueAttributeValue for this is a nested value of peeringId:
 	if awsItem != nil && awsItem.Peering != nil {
-		attributes.Set("peeringId", *awsItem.Peering.PeeringId)
+		attributes.Set("PeeringId", *awsItem.Peering.PeeringId)
 	}
 
 	item := sdp.Item{
 		Type:            "networkmanager-transit-gateway-peering",
-		UniqueAttribute: "peeringId",
+		UniqueAttribute: "PeeringId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(awsItem.Peering.Tags),

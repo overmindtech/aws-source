@@ -13,14 +13,14 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 		return nil, nil
 	}
 
-	attributes, err := sources.ToAttributesCase(output, "tags")
+	attributes, err := sources.ToAttributesWithExclude(output, "tags")
 	if err != nil {
 		return nil, err
 	}
 
 	item := sdp.Item{
 		Type:            "directconnect-router-configuration",
-		UniqueAttribute: "virtualInterfaceId",
+		UniqueAttribute: "VirtualInterfaceId",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

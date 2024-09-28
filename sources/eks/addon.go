@@ -23,7 +23,7 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(out.Addon)
+	attributes, err := sources.ToAttributesWithExclude(out.Addon)
 
 	if err != nil {
 		return nil, err
@@ -31,11 +31,11 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 
 	// The uniqueAttributeValue for this is a custom field:
 	// {clusterName}/{addonName}
-	attributes.Set("uniqueName", (*out.Addon.ClusterName + "/" + *out.Addon.AddonName))
+	attributes.Set("UniqueName", (*out.Addon.ClusterName + "/" + *out.Addon.AddonName))
 
 	item := sdp.Item{
 		Type:            "eks-addon",
-		UniqueAttribute: "uniqueName",
+		UniqueAttribute: "UniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

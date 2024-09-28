@@ -18,7 +18,7 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	cn := out.ConnectPeer
 
-	attributes, err := sources.ToAttributesCase(cn, "tags")
+	attributes, err := sources.ToAttributesWithExclude(cn, "tags")
 
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	item := sdp.Item{
 		Type:            "networkmanager-connect-peer",
-		UniqueAttribute: "connectPeerId",
+		UniqueAttribute: "ConnectPeerId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(cn.Tags),

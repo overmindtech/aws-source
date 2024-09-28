@@ -23,7 +23,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(out.Nodegroup)
+	attributes, err := sources.ToAttributesWithExclude(out.Nodegroup)
 
 	if err != nil {
 		return nil, err
@@ -33,11 +33,11 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	// The uniqueAttributeValue for this is a custom field:
 	// {clusterName}/{NodegroupName}
-	attributes.Set("uniqueName", (*out.Nodegroup.ClusterName + "/" + *out.Nodegroup.NodegroupName))
+	attributes.Set("UniqueName", (*out.Nodegroup.ClusterName + "/" + *out.Nodegroup.NodegroupName))
 
 	item := sdp.Item{
 		Type:            "eks-nodegroup",
-		UniqueAttribute: "uniqueName",
+		UniqueAttribute: "UniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            out.Nodegroup.Tags,

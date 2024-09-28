@@ -96,7 +96,7 @@ func NetworkManager(t *testing.T) {
 		}
 
 		// Search global network by ARN
-		globalNetworkARN, err := globalNetwork.GetAttributes().Get("globalNetworkArn")
+		globalNetworkARN, err := globalNetwork.GetAttributes().Get("GlobalNetworkArn")
 		if err != nil {
 			t.Fatalf("failed to get global network ARN: %v", err)
 		}

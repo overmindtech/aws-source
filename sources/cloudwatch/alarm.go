@@ -73,11 +73,11 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 		var arn *string
 
 		if alarm.Metric != nil {
-			attrs, err = sources.ToAttributesCase(alarm.Metric)
+			attrs, err = sources.ToAttributesWithExclude(alarm.Metric)
 			arn = alarm.Metric.AlarmArn
 		}
 		if alarm.Composite != nil {
-			attrs, err = sources.ToAttributesCase(alarm.Composite)
+			attrs, err = sources.ToAttributesWithExclude(alarm.Composite)
 			arn = alarm.Composite.AlarmArn
 		}
 
@@ -104,7 +104,7 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 
 		item := sdp.Item{
 			Type:            "cloudwatch-alarm",
-			UniqueAttribute: "alarmName",
+			UniqueAttribute: "AlarmName",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tags,

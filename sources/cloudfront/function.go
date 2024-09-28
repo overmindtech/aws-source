@@ -10,7 +10,7 @@ import (
 )
 
 func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 
 	item := sdp.Item{
 		Type:            "cloudfront-function",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

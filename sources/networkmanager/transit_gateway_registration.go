@@ -16,7 +16,7 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 	for _, r := range output.TransitGatewayRegistrations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(r)
+		attrs, err = sources.ToAttributesWithExclude(r)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -30,11 +30,11 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId or transitGatewayArn is nil for transit gateway registration"))
 		}
 
-		attrs.Set("globalNetworkIdWithTransitGatewayARN", idWithGlobalNetwork(*r.GlobalNetworkId, *r.TransitGatewayArn))
+		attrs.Set("GlobalNetworkIdWithTransitGatewayARN", idWithGlobalNetwork(*r.GlobalNetworkId, *r.TransitGatewayArn))
 
 		item := sdp.Item{
 			Type:            "networkmanager-transit-gateway-registration",
-			UniqueAttribute: "globalNetworkIdWithTransitGatewayARN",
+			UniqueAttribute: "GlobalNetworkIdWithTransitGatewayARN",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

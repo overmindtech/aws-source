@@ -15,14 +15,14 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, customKeyStore := range output.CustomKeyStores {
-		attributes, err := sources.ToAttributesCase(customKeyStore, "tags")
+		attributes, err := sources.ToAttributesWithExclude(customKeyStore, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "kms-custom-key-store",
-			UniqueAttribute: "customKeyStoreId",
+			UniqueAttribute: "CustomKeyStoreId",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

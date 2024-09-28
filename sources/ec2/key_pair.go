@@ -26,7 +26,7 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	for _, gw := range output.KeyPairs {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(gw, "tags")
+		attrs, err = sources.ToAttributesWithExclude(gw, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 
 		item := sdp.Item{
 			Type:            "ec2-key-pair",
-			UniqueAttribute: "keyName",
+			UniqueAttribute: "KeyName",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(gw.Tags),

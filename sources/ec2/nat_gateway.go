@@ -26,7 +26,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, ng := range output.NatGateways {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ng, "tags")
+		attrs, err = sources.ToAttributesWithExclude(ng, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		item := sdp.Item{
 			Type:            "ec2-nat-gateway",
-			UniqueAttribute: "natGatewayId",
+			UniqueAttribute: "NatGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(ng.Tags),

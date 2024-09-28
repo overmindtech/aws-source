@@ -17,7 +17,7 @@ type ParameterGroup struct {
 }
 
 func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.
 
 	item := sdp.Item{
 		Type:            "rds-db-parameter-group",
-		UniqueAttribute: "dBParameterGroupName",
+		UniqueAttribute: "DBParameterGroupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

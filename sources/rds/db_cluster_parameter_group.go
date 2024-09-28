@@ -17,7 +17,7 @@ type ClusterParameterGroup struct {
 }
 
 func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParameterGroup) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 
 	item := sdp.Item{
 		Type:            "rds-db-cluster-parameter-group",
-		UniqueAttribute: "dBClusterParameterGroupName",
+		UniqueAttribute: "DBClusterParameterGroupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

@@ -30,7 +30,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	task := out.Tasks[0]
 
-	attributes, err := sources.ToAttributesCase(task, "tags")
+	attributes, err := sources.ToAttributesWithExclude(task, "tags")
 
 	if err != nil {
 		return nil, err
@@ -48,11 +48,11 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	// Create unique attribute in the format {clusterName}/{id}
 	// test-ECSCluster-Bt4SqcM3CURk/2ffd7ed376c841bcb0e6795ddb6e72e2
-	attributes.Set("id", a.ResourceID())
+	attributes.Set("Id", a.ResourceID())
 
 	item := sdp.Item{
 		Type:            "ecs-task",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(task.Tags),

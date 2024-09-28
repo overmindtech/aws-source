@@ -220,7 +220,7 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 		enrichedRole.AssumeRolePolicyDocument = policyDoc
 	}
 
-	attributes, err := sources.ToAttributesCase(enrichedRole)
+	attributes, err := sources.ToAttributesWithExclude(enrichedRole)
 
 	if err != nil {
 		return nil, err
@@ -228,7 +228,7 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 
 	item := sdp.Item{
 		Type:            "iam-role",
-		UniqueAttribute: "roleName",
+		UniqueAttribute: "RoleName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

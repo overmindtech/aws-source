@@ -13,7 +13,7 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 	items := make([]*sdp.Item, 0)
 
 	for _, cr := range output.CapacityReservationFleets {
-		attributes, err := sources.ToAttributesCase(cr, "tags")
+		attributes, err := sources.ToAttributesWithExclude(cr, "tags")
 
 		if err != nil {
 			return nil, err
@@ -21,7 +21,7 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 
 		item := sdp.Item{
 			Type:            "ec2-capacity-reservation-fleet",
-			UniqueAttribute: "capacityReservationFleetId",
+			UniqueAttribute: "CapacityReservationFleetId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(cr.Tags),

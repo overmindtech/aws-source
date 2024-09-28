@@ -25,7 +25,7 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	cluster := output.Cluster
 
-	attributes, err := sources.ToAttributesCase(cluster, "clientRequestToken")
+	attributes, err := sources.ToAttributesWithExclude(cluster, "clientRequestToken")
 
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	item := sdp.Item{
 		Type:            "eks-cluster",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            cluster.Tags,

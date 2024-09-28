@@ -28,14 +28,14 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.Attributes)
+	attributes, err := sources.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "sns-subscription",
-		UniqueAttribute: "subscriptionArn",
+		UniqueAttribute: "SubscriptionArn",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

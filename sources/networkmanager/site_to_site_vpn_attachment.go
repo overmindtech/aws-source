@@ -21,7 +21,7 @@ func getSiteToSiteVpnAttachmentGetFunc(ctx context.Context, client *networkmanag
 }
 
 func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSiteVpnAttachment) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -29,12 +29,12 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 
 	// The uniqueAttributeValue for this is a nested value of peeringId:
 	if awsItem != nil && awsItem.Attachment != nil {
-		attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
+		attributes.Set("AttachmentId", *awsItem.Attachment.AttachmentId)
 	}
 
 	item := sdp.Item{
 		Type:            "networkmanager-site-to-site-vpn-attachment",
-		UniqueAttribute: "attachmentId",
+		UniqueAttribute: "AttachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

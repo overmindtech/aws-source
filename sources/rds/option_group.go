@@ -25,7 +25,7 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 			tags = sources.HandleTagsError(ctx, err)
 		}
 
-		attributes, err := sources.ToAttributesCase(group)
+		attributes, err := sources.ToAttributesWithExclude(group)
 
 		if err != nil {
 			return nil, err
@@ -33,7 +33,7 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 
 		item := sdp.Item{
 			Type:            "rds-option-group",
-			UniqueAttribute: "optionGroupName",
+			UniqueAttribute: "OptionGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,

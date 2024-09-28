@@ -23,7 +23,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 	tagsMap := getTagsMap(ctx, client, tgArns)
 
 	for _, tg := range output.TargetGroups {
-		attrs, err := sources.ToAttributesCase(tg)
+		attrs, err := sources.ToAttributesWithExclude(tg)
 
 		if err != nil {
 			return nil, err
@@ -37,7 +37,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 
 		item := sdp.Item{
 			Type:            "elbv2-target-group",
-			UniqueAttribute: "targetGroupName",
+			UniqueAttribute: "TargetGroupName",
 			Attributes:      attrs,
 			Scope:           scope,
 			Tags:            tags,

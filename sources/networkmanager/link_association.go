@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/overmindtech/aws-source/sources"
@@ -18,7 +19,7 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 	for _, s := range output.LinkAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(s, "tags")
+		attrs, err = sources.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -32,11 +33,11 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId, linkId or deviceId is nil for link association"))
 		}
 
-		attrs.Set("globalNetworkIdLinkIdDeviceId", fmt.Sprintf("%s|%s|%s", *s.GlobalNetworkId, *s.LinkId, *s.DeviceId))
+		attrs.Set("GlobalNetworkIdLinkIdDeviceId", fmt.Sprintf("%s|%s|%s", *s.GlobalNetworkId, *s.LinkId, *s.DeviceId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-link-association",
-			UniqueAttribute: "globalNetworkIdLinkIdDeviceId",
+			UniqueAttribute: "GlobalNetworkIdLinkIdDeviceId",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

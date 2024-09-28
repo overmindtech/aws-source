@@ -19,7 +19,7 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 	items := make([]*sdp.Item, 0)
 
 	for _, replication := range output.Replications {
-		attrs, err := sources.ToAttributesCase(replication)
+		attrs, err := sources.ToAttributesWithExclude(replication)
 
 		if err != nil {
 			return nil, err
@@ -41,7 +41,7 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 
 		item := sdp.Item{
 			Type:            "efs-replication-configuration",
-			UniqueAttribute: "sourceFileSystemId",
+			UniqueAttribute: "SourceFileSystemId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          sdp.Health_HEALTH_OK.Enum(), // Default to OK

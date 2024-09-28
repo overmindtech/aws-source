@@ -42,7 +42,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		return nil, fmt.Errorf("failed to get tags for streaming distribution %v: %w", *d.Id, err)
 	}
 
-	attributes, err := sources.ToAttributesCase(d)
+	attributes, err := sources.ToAttributesWithExclude(d)
 
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 
 	item := sdp.Item{
 		Type:            "cloudfront-streaming-distribution",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

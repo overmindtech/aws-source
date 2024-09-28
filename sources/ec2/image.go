@@ -37,7 +37,7 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 	for _, image := range output.Images {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(image, "tags")
+		attrs, err = sources.ToAttributesWithExclude(image, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -49,7 +49,7 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 
 		item := sdp.Item{
 			Type:            "ec2-image",
-			UniqueAttribute: "imageId",
+			UniqueAttribute: "ImageId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(image.Tags),

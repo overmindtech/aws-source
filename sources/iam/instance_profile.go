@@ -40,7 +40,7 @@ func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) 
 }
 
 func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 
 	item := sdp.Item{
 		Type:            "iam-instance-profile",
-		UniqueAttribute: "instanceProfileName",
+		UniqueAttribute: "InstanceProfileName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

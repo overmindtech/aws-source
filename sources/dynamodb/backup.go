@@ -32,7 +32,7 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 
 	details := out.BackupDescription.BackupDetails
 
-	attributes, err := sources.ToAttributesCase(details)
+	attributes, err := sources.ToAttributesWithExclude(details)
 
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 
 	item := sdp.Item{
 		Type:            "dynamodb-backup",
-		UniqueAttribute: "backupName",
+		UniqueAttribute: "BackupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

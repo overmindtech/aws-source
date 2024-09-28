@@ -28,14 +28,14 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.Attributes)
+	attributes, err := sources.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "sns-topic",
-		UniqueAttribute: "topicArn",
+		UniqueAttribute: "TopicArn",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

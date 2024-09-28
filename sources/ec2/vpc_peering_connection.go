@@ -13,7 +13,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 	items := make([]*sdp.Item, 0)
 
 	for _, connection := range output.VpcPeeringConnections {
-		attributes, err := sources.ToAttributesCase(connection, "tags")
+		attributes, err := sources.ToAttributesWithExclude(connection, "tags")
 
 		if err != nil {
 			return nil, err
@@ -21,7 +21,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 
 		item := sdp.Item{
 			Type:            "ec2-vpc-peering-connection",
-			UniqueAttribute: "vpcPeeringConnectionId",
+			UniqueAttribute: "VpcPeeringConnectionId",
 			Scope:           scope,
 			Attributes:      attributes,
 			Tags:            tagsToMap(connection.Tags),

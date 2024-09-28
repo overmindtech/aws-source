@@ -18,7 +18,7 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 	items := make([]*sdp.Item, 0)
 
 	for _, fs := range output.FileSystems {
-		attrs, err := sources.ToAttributesCase(fs, "tags")
+		attrs, err := sources.ToAttributesWithExclude(fs, "tags")
 
 		if err != nil {
 			return nil, err
@@ -30,7 +30,7 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 
 		item := sdp.Item{
 			Type:            "efs-file-system",
-			UniqueAttribute: "fileSystemId",
+			UniqueAttribute: "FileSystemId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(fs.LifeCycleState),

@@ -110,7 +110,7 @@ func TestNewRuleSource(t *testing.T) {
 		t.Skip("no load balancers found")
 	}
 
-	lbARN, err := lbs[0].GetAttributes().Get("loadBalancerArn")
+	lbARN, err := lbs[0].GetAttributes().Get("LoadBalancerArn")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestNewRuleSource(t *testing.T) {
 		t.Skip("no listeners found")
 	}
 
-	listenerARN, err := listeners[0].GetAttributes().Get("listenerArn")
+	listenerARN, err := listeners[0].GetAttributes().Get("ListenerArn")
 	if err != nil {
 		t.Fatal(err)
 	}

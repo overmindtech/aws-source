@@ -45,9 +45,9 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		sha := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 
 		attrs, err := sdp.ToAttributes(map[string]interface{}{
-			"hash": sha,
-			"from": fromArn.String(),
-			"to":   toArn.String(),
+			"Hash": sha,
+			"From": fromArn.String(),
+			"To":   toArn.String(),
 		})
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 
 		item := sdp.Item{
 			Type:              "networkmanager-network-resource-relationship",
-			UniqueAttribute:   "hash",
+			UniqueAttribute:   "Hash",
 			Scope:             scope,
 			Attributes:        attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{},

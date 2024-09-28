@@ -26,7 +26,7 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 	for _, subnet := range output.Subnets {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(subnet, "tags")
+		attrs, err = sources.ToAttributesWithExclude(subnet, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 
 		item := sdp.Item{
 			Type:            "ec2-subnet",
-			UniqueAttribute: "subnetId",
+			UniqueAttribute: "SubnetId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(subnet.Tags),

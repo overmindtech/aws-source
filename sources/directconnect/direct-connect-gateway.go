@@ -37,7 +37,7 @@ func directConnectGatewayOutputMapper(ctx context.Context, cli *directconnect.Cl
 
 	items := make([]*sdp.Item, 0)
 	for _, directConnectGateway := range output.DirectConnectGateways {
-		attributes, err := sources.ToAttributesCase(directConnectGateway, "tags")
+		attributes, err := sources.ToAttributesWithExclude(directConnectGateway, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +46,7 @@ func directConnectGatewayOutputMapper(ctx context.Context, cli *directconnect.Cl
 
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway",
-			UniqueAttribute: "directConnectGatewayId",
+			UniqueAttribute: "DirectConnectGatewayId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(relevantTags),

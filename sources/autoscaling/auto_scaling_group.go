@@ -16,7 +16,7 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 	var err error
 
 	for _, asg := range output.AutoScalingGroups {
-		attributes, err = sources.ToAttributesCase(asg)
+		attributes, err = sources.ToAttributesWithExclude(asg)
 
 		if err != nil {
 			return nil, err
@@ -24,7 +24,7 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 		item = sdp.Item{
 			Type:            "autoscaling-auto-scaling-group",
-			UniqueAttribute: "autoScalingGroupName",
+			UniqueAttribute: "AutoScalingGroupName",
 			Scope:           scope,
 			Attributes:      attributes,
 		}

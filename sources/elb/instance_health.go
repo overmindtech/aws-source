@@ -42,7 +42,7 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, is := range output.InstanceStates {
-		attrs, err := sources.ToAttributesCase(is)
+		attrs, err := sources.ToAttributesWithExclude(is)
 
 		if err != nil {
 			return nil, err
@@ -50,7 +50,7 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 
 		item := sdp.Item{
 			Type:            "elb-instance-health",
-			UniqueAttribute: "instanceId",
+			UniqueAttribute: "InstanceId",
 			Attributes:      attrs,
 			Scope:           scope,
 		}

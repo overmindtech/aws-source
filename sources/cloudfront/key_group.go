@@ -10,7 +10,7 @@ import (
 )
 
 func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, er
 
 	item := sdp.Item{
 		Type:            "cloudfront-key-group",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

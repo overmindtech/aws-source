@@ -26,7 +26,7 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 		FirewallPolicy:         resp.FirewallPolicy,
 	}
 
-	attributes, err := sources.ToAttributesCase(ufp)
+	attributes, err := sources.ToAttributesWithExclude(ufp)
 
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 
 	item := sdp.Item{
 		Type:            "network-firewall-firewall-policy",
-		UniqueAttribute: "firewallPolicyName",
+		UniqueAttribute: "FirewallPolicyName",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

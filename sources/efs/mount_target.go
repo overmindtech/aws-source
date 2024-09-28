@@ -18,7 +18,7 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	items := make([]*sdp.Item, 0)
 
 	for _, mt := range output.MountTargets {
-		attrs, err := sources.ToAttributesCase(mt)
+		attrs, err := sources.ToAttributesWithExclude(mt)
 
 		if err != nil {
 			return nil, err
@@ -34,7 +34,7 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 
 		item := sdp.Item{
 			Type:            "efs-mount-target",
-			UniqueAttribute: "mountTargetId",
+			UniqueAttribute: "MountTargetId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(mt.LifeCycleState),

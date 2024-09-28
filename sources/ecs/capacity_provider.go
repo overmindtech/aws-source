@@ -18,7 +18,7 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, provider := range output.CapacityProviders {
-		attributes, err := sources.ToAttributesCase(provider, "tags")
+		attributes, err := sources.ToAttributesWithExclude(provider, "tags")
 
 		if err != nil {
 			return nil, err
@@ -26,7 +26,7 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 
 		item := sdp.Item{
 			Type:            "ecs-capacity-provider",
-			UniqueAttribute: "name",
+			UniqueAttribute: "Name",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(provider.Tags),

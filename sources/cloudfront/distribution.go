@@ -40,7 +40,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		tags = sources.HandleTagsError(ctx, err)
 	}
 
-	attributes, err := sources.ToAttributesCase(d)
+	attributes, err := sources.ToAttributesWithExclude(d)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 	item := sdp.Item{
 		Type:            "cloudfront-distribution",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tags,

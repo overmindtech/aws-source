@@ -16,7 +16,7 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 	for _, a := range output.TransitGatewayConnectPeerAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(a, "tags")
+		attrs, err = sources.ToAttributesWithExclude(a, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -26,11 +26,11 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 			}
 		}
 
-		attrs.Set("globalNetworkIdWithTransitGatewayConnectPeerArn", idWithGlobalNetwork(*a.GlobalNetworkId, *a.TransitGatewayConnectPeerArn))
+		attrs.Set("GlobalNetworkIdWithTransitGatewayConnectPeerArn", idWithGlobalNetwork(*a.GlobalNetworkId, *a.TransitGatewayConnectPeerArn))
 
 		item := sdp.Item{
 			Type:            "networkmanager-transit-gateway-connect-peer-association",
-			UniqueAttribute: "globalNetworkIdWithTransitGatewayConnectPeerArn",
+			UniqueAttribute: "GlobalNetworkIdWithTransitGatewayConnectPeerArn",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

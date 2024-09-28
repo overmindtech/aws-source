@@ -24,7 +24,7 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {
-		attrs, err := sources.ToAttributesCase(ew, "tags")
+		attrs, err := sources.ToAttributesWithExclude(ew, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -36,7 +36,7 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		item := sdp.Item{
 			Type:            "ec2-instance-event-window",
-			UniqueAttribute: "instanceEventWindowId",
+			UniqueAttribute: "InstanceEventWindowId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(ew.Tags),

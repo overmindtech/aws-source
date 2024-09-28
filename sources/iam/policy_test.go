@@ -379,7 +379,7 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		for _, item := range items {
-			arnString, err := item.GetAttributes().Get("arn")
+			arnString, err := item.GetAttributes().Get("Arn")
 
 			if err != nil {
 				t.Errorf("expected item to have an arn attribute, got %v", err)
@@ -402,7 +402,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].GetAttributes().Get("arn")
+			arn, _ := items[0].GetAttributes().Get("Arn")
 
 			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
@@ -417,7 +417,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].GetAttributes().Get("arn")
+			arn, _ := items[0].GetAttributes().Get("Arn")
 
 			_, err := source.Search(ctx, "aws", arn.(string), false)
 
@@ -441,7 +441,7 @@ func TestNewPolicySource(t *testing.T) {
 		}
 
 		for _, item := range items {
-			arnString, err := item.GetAttributes().Get("arn")
+			arnString, err := item.GetAttributes().Get("Arn")
 
 			if err != nil {
 				t.Errorf("expected item to have an arn attribute, got %v", err)
@@ -464,7 +464,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].GetAttributes().Get("arn")
+			arn, _ := items[0].GetAttributes().Get("Arn")
 
 			_, err := source.Search(ctx, sources.FormatScope(account, ""), arn.(string), false)
 
@@ -479,7 +479,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			t.Parallel()
 
-			arn, _ := items[0].GetAttributes().Get("arn")
+			arn, _ := items[0].GetAttributes().Get("Arn")
 
 			_, err := source.Search(ctx, "aws", arn.(string), false)
 

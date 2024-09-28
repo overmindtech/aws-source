@@ -206,7 +206,7 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 		Policy:   awsItem.Policy,
 		Document: awsItem.Document,
 	}
-	attributes, err := sources.ToAttributesCase(finalAttributes)
+	attributes, err := sources.ToAttributesWithExclude(finalAttributes)
 
 	if err != nil {
 		return nil, err
@@ -224,11 +224,11 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 
 	// Create a new attribute which is a combination of `path` and `policyName`,
 	// this can then be constructed into an ARN when a user calls GET
-	attributes.Set("policyFullName", policyFullName)
+	attributes.Set("PolicyFullName", policyFullName)
 
 	item := sdp.Item{
 		Type:            "iam-policy",
-		UniqueAttribute: "policyFullName",
+		UniqueAttribute: "PolicyFullName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

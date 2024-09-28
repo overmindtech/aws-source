@@ -22,7 +22,7 @@ func connectAttachmentGetFunc(ctx context.Context, client *networkmanager.Client
 }
 
 func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(ca)
+	attributes, err := sources.ToAttributesWithExclude(ca)
 
 	if err != nil {
 		return nil, err
@@ -33,11 +33,11 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 	}
 
 	// The uniqueAttributeValue for this is a nested value of AttachmentId:
-	attributes.Set("attachmentId", *ca.Attachment.AttachmentId)
+	attributes.Set("AttachmentId", *ca.Attachment.AttachmentId)
 
 	item := sdp.Item{
 		Type:            "networkmanager-connect-attachment",
-		UniqueAttribute: "attachmentId",
+		UniqueAttribute: "AttachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

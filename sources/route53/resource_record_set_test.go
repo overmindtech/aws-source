@@ -160,8 +160,8 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 		item := items[0]
 
 		// Construct a terraform style ID
-		name, _ := item.GetAttributes().Get("name")
-		typ, _ := item.GetAttributes().Get("type")
+		name, _ := item.GetAttributes().Get("Name")
+		typ, _ := item.GetAttributes().Get("Type")
 		search = fmt.Sprintf("%s_%s_%s", rawZone, name, typ)
 
 		items, err := source.Search(context.Background(), zoneSource.Scopes()[0], search, true)
