@@ -553,7 +553,10 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 			startupErrorMutex.Lock()
 			startupError = err
 			startupErrorMutex.Unlock()
-			_ = e.SendHeartbeat(ctx) // Send the error immediately
+			brokenHeart := e.SendHeartbeat(ctx) // Send the error immediately
+			if brokenHeart != nil {
+				log.WithError(brokenHeart).Error("Error sending heartbeat")
+			}
 
 			if err != nil {
 				log.WithError(err).Debug("Error initializing sources")
