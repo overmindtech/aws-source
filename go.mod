@@ -37,7 +37,7 @@ require (
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/nats-io/jwt/v2 v2.7.0
 	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.28.1
+	github.com/overmindtech/discovery v0.28.2
 	github.com/overmindtech/sdp-go v0.94.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
@@ -59,7 +59,7 @@ require (
 
 // Transitive dependencies
 require (
-	connectrpc.com/connect v1.16.2 // indirect
+	connectrpc.com/connect v1.17.0 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/auth0/go-jwt-middleware/v2 v2.2.2 // indirect
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
