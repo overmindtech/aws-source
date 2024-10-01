@@ -14,7 +14,7 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 	items := make([]*sdp.Item, 0)
 
 	for _, attachment := range output.DirectConnectGatewayAttachments {
-		attributes, err := sources.ToAttributesCase(attachment, "tags")
+		attributes, err := sources.ToAttributesWithExclude(attachment, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -22,14 +22,14 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		// The uniqueAttributeValue for this is a custom field:
 		// {gatewayId}/{virtualInterfaceId}
 		// i.e., "cf68415c-f4ae-48f2-87a7-3b52cexample/dxvif-ffhhk74f"
-		err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", *attachment.DirectConnectGatewayId, *attachment.VirtualInterfaceId))
+		err = attributes.Set("UniqueName", fmt.Sprintf("%s/%s", *attachment.DirectConnectGatewayId, *attachment.VirtualInterfaceId))
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway-attachment",
-			UniqueAttribute: "uniqueName",
+			UniqueAttribute: "UniqueName",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

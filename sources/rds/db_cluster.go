@@ -25,7 +25,7 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 			tags = sources.HandleTagsError(ctx, err)
 		}
 
-		attributes, err := sources.ToAttributesCase(cluster)
+		attributes, err := sources.ToAttributesWithExclude(cluster)
 
 		if err != nil {
 			return nil, err
@@ -33,7 +33,7 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		item := sdp.Item{
 			Type:            "rds-db-cluster",
-			UniqueAttribute: "dBClusterIdentifier",
+			UniqueAttribute: "DBClusterIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,

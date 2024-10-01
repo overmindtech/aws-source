@@ -12,14 +12,14 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 	items := make([]*sdp.Item, 0)
 
 	for _, virtualGateway := range output.VirtualGateways {
-		attributes, err := sources.ToAttributesCase(virtualGateway, "tags")
+		attributes, err := sources.ToAttributesWithExclude(virtualGateway, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-virtual-gateway",
-			UniqueAttribute: "virtualGatewayId",
+			UniqueAttribute: "VirtualGatewayId",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

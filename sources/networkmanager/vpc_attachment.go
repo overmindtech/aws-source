@@ -21,7 +21,7 @@ func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, _,
 }
 
 func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -29,12 +29,12 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 
 	// The uniqueAttributeValue for this is a nested value of AttachmentId:
 	if awsItem != nil && awsItem.Attachment != nil {
-		attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
+		attributes.Set("AttachmentId", *awsItem.Attachment.AttachmentId)
 	}
 
 	item := sdp.Item{
 		Type:            "networkmanager-vpc-attachment",
-		UniqueAttribute: "attachmentId",
+		UniqueAttribute: "AttachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(awsItem.Attachment.Tags),

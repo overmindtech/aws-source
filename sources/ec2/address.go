@@ -42,7 +42,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	}
 
 	for _, address := range output.Addresses {
-		attrs, err = sources.ToAttributesCase(address, "tags")
+		attrs, err = sources.ToAttributesWithExclude(address, "tags")
 
 		if err != nil {
 			return nil, err
@@ -50,7 +50,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 
 		item := sdp.Item{
 			Type:            "ec2-address",
-			UniqueAttribute: "publicIp",
+			UniqueAttribute: "PublicIp",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

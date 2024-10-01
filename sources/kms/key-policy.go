@@ -50,19 +50,19 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 		return nil, nil //nolint:nilerr
 	}
 
-	attributes, err := sources.ToAttributesCase(parsedPolicy)
+	attributes, err := sources.ToAttributesWithExclude(parsedPolicy)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("keyId", *input.KeyId)
+	err = attributes.Set("KeyId", *input.KeyId)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "kms-key-policy",
-		UniqueAttribute: "keyId",
+		UniqueAttribute: "KeyId",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

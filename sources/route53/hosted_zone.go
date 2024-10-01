@@ -39,7 +39,7 @@ func hostedZoneListFunc(ctx context.Context, client *route53.Client, scope strin
 }
 
 func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item
 
 	item := sdp.Item{
 		Type:            "route53-hosted-zone",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 		LinkedItemQueries: []*sdp.LinkedItemQuery{

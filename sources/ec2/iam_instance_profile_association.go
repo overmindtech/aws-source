@@ -12,7 +12,7 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 	items := make([]*sdp.Item, 0)
 
 	for _, assoc := range output.IamInstanceProfileAssociations {
-		attributes, err := sources.ToAttributesCase(assoc)
+		attributes, err := sources.ToAttributesWithExclude(assoc)
 
 		if err != nil {
 			return nil, err
@@ -20,7 +20,7 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 
 		item := sdp.Item{
 			Type:            "ec2-iam-instance-profile-association",
-			UniqueAttribute: "associationId",
+			UniqueAttribute: "AssociationId",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

@@ -2,8 +2,9 @@ package networkmanager
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/overmindtech/aws-source/sources"
@@ -16,7 +17,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 	for _, s := range output.Links {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(s, "tags")
+		attrs, err = sources.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -26,11 +27,11 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			}
 		}
 
-		attrs.Set("globalNetworkIdLinkId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId))
+		attrs.Set("GlobalNetworkIdLinkId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-link",
-			UniqueAttribute: "globalNetworkIdLinkId",
+			UniqueAttribute: "GlobalNetworkIdLinkId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(s.Tags),

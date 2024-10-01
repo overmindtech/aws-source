@@ -42,7 +42,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 	for _, ltv := range output.LaunchTemplateVersions {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ltv)
+		attrs, err = sources.ToAttributesWithExclude(ltv)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -55,14 +55,14 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 		if ltv.LaunchTemplateId != nil && ltv.VersionNumber != nil {
 			// Create a custom UAV here since there is no one unique attribute.
 			// The new UAV will be {templateId}.{version}
-			attrs.Set("versionIdCombo", fmt.Sprintf("%v.%v", *ltv.LaunchTemplateId, *ltv.VersionNumber))
+			attrs.Set("VersionIdCombo", fmt.Sprintf("%v.%v", *ltv.LaunchTemplateId, *ltv.VersionNumber))
 		} else {
 			return nil, errors.New("ec2-launch-template-version must have LaunchTemplateId and VersionNumber populated")
 		}
 
 		item := sdp.Item{
 			Type:            "ec2-launch-template-version",
-			UniqueAttribute: "versionIdCombo",
+			UniqueAttribute: "VersionIdCombo",
 			Scope:           scope,
 			Attributes:      attrs,
 		}

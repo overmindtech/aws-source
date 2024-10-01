@@ -28,12 +28,12 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.Attributes)
+	attributes, err := sources.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("queueURL", input.QueueUrl)
+	err = attributes.Set("QueueURL", input.QueueUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 
 	return &sdp.Item{
 		Type:            "sqs-queue",
-		UniqueAttribute: "queueURL",
+		UniqueAttribute: "QueueURL",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            resourceTags,

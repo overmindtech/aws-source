@@ -22,7 +22,7 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 	tagsMap := getTagsMap(ctx, client, ruleArns)
 
 	for _, rule := range output.Rules {
-		attrs, err := sources.ToAttributesCase(rule)
+		attrs, err := sources.ToAttributesWithExclude(rule)
 
 		if err != nil {
 			return nil, err
@@ -36,7 +36,7 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 
 		item := sdp.Item{
 			Type:            "elbv2-rule",
-			UniqueAttribute: "ruleArn",
+			UniqueAttribute: "RuleArn",
 			Attributes:      attrs,
 			Scope:           scope,
 			Tags:            tags,

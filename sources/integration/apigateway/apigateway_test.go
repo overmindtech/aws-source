@@ -99,7 +99,7 @@ func APIGateway(t *testing.T) {
 
 	restApiIDFromSearch, err := integration.GetUniqueAttributeValueBySignificantAttribute(
 		restApiUniqueAttribute,
-		"name",
+		"Name",
 		integration.ResourceName(integration.APIGateway, restAPISrc, integration.TestID()),
 		restApisFromSearch,
 		true,
@@ -126,7 +126,7 @@ func APIGateway(t *testing.T) {
 
 	resourceUniqueAttrFromSearch, err := integration.GetUniqueAttributeValueBySignificantAttribute(
 		resourceUniqueAttribute,
-		"path",
+		"Path",
 		"/test",
 		resources,
 		true,
@@ -143,7 +143,7 @@ func APIGateway(t *testing.T) {
 
 	resourceUniqueAttrFromGet, err := integration.GetUniqueAttributeValueBySignificantAttribute(
 		resourceUniqueAttribute,
-		"path",
+		"Path",
 		"/test",
 		[]*sdp.Item{resource},
 		true,

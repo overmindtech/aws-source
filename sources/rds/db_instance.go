@@ -98,7 +98,7 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			instance.DBSubnetGroup = nil
 		}
 
-		attributes, err := sources.ToAttributesCase(instance)
+		attributes, err := sources.ToAttributesWithExclude(instance)
 
 		if err != nil {
 			return nil, err
@@ -106,7 +106,7 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		item := sdp.Item{
 			Type:            "rds-db-instance",
-			UniqueAttribute: "dBInstanceIdentifier",
+			UniqueAttribute: "DBInstanceIdentifier",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,

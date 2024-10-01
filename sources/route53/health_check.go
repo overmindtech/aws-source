@@ -70,7 +70,7 @@ func healthCheckListFunc(ctx context.Context, client *route53.Client, scope stri
 }
 
 func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 
 	item := sdp.Item{
 		Type:            "route53-health-check",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

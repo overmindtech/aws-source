@@ -19,14 +19,14 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 	items := make([]*sdp.Item, 0)
 
 	for _, association := range output.DirectConnectGatewayAssociations {
-		attributes, err := sources.ToAttributesCase(association, "tags")
+		attributes, err := sources.ToAttributesWithExclude(association, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway-association",
-			UniqueAttribute: "associationId",
+			UniqueAttribute: "AssociationId",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

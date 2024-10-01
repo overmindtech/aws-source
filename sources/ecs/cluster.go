@@ -53,7 +53,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	cluster := out.Clusters[0]
 
-	attributes, err := sources.ToAttributesCase(cluster, "tags")
+	attributes, err := sources.ToAttributesWithExclude(cluster, "tags")
 
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	item := sdp.Item{
 		Type:            "ecs-cluster",
-		UniqueAttribute: "clusterName",
+		UniqueAttribute: "ClusterName",
 		Scope:           scope,
 		Attributes:      attributes,
 		Tags:            tagsToMap(cluster.Tags),

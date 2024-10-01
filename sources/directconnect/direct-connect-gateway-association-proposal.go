@@ -13,14 +13,14 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 	items := make([]*sdp.Item, 0)
 
 	for _, associationProposal := range output.DirectConnectGatewayAssociationProposals {
-		attributes, err := sources.ToAttributesCase(associationProposal, "tags")
+		attributes, err := sources.ToAttributesWithExclude(associationProposal, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-direct-connect-gateway-association-proposal",
-			UniqueAttribute: "proposalId",
+			UniqueAttribute: "ProposalId",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

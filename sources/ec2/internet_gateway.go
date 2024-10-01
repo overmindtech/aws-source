@@ -26,7 +26,7 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 	for _, gw := range output.InternetGateways {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(gw, "tags")
+		attrs, err = sources.ToAttributesWithExclude(gw, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 
 		item := sdp.Item{
 			Type:            "ec2-internet-gateway",
-			UniqueAttribute: "internetGatewayId",
+			UniqueAttribute: "InternetGatewayId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(gw.Tags),

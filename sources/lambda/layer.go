@@ -31,7 +31,7 @@ func layerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]
 }
 
 func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item,
 
 	item := sdp.Item{
 		Type:            "lambda-layer",
-		UniqueAttribute: "layerName",
+		UniqueAttribute: "LayerName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

@@ -23,7 +23,7 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	cn := out.CoreNetwork
 
-	attributes, err := sources.ToAttributesCase(cn)
+	attributes, err := sources.ToAttributesWithExclude(cn)
 
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	item := sdp.Item{
 		Type:            "networkmanager-core-network",
-		UniqueAttribute: "coreNetworkId",
+		UniqueAttribute: "CoreNetworkId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(cn.Tags),

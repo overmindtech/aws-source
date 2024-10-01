@@ -49,7 +49,7 @@ func restApiListFunc(ctx context.Context, client *apigateway.Client, _ string) (
 }
 
 func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem, "tags")
+	attributes, err := sources.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 			return nil, nil //nolint:nilerr
 		}
 
-		attributes, err = sources.ToAttributesCase(restApi, "tags")
+		attributes, err = sources.ToAttributesWithExclude(restApi, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 	item := sdp.Item{
 		Type:            "apigateway-rest-api",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            awsItem.Tags,

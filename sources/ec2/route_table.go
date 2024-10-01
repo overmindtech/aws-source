@@ -27,7 +27,7 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, rt := range output.RouteTables {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(rt, "tags")
+		attrs, err = sources.ToAttributesWithExclude(rt, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -39,7 +39,7 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		item := sdp.Item{
 			Type:            "ec2-route-table",
-			UniqueAttribute: "routeTableId",
+			UniqueAttribute: "RouteTableId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(rt.Tags),

@@ -12,14 +12,14 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	items := make([]*sdp.Item, 0)
 
 	for _, connection := range output.Connections {
-		attributes, err := sources.ToAttributesCase(connection, "tags")
+		attributes, err := sources.ToAttributesWithExclude(connection, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-hosted-connection",
-			UniqueAttribute: "connectionId",
+			UniqueAttribute: "ConnectionId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(connection.Tags),

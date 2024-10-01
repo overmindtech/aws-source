@@ -18,7 +18,7 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	items := make([]*sdp.Item, 0)
 
 	for _, ap := range output.AccessPoints {
-		attrs, err := sources.ToAttributesCase(ap, "tags")
+		attrs, err := sources.ToAttributesWithExclude(ap, "tags")
 
 		if err != nil {
 			return nil, err
@@ -26,7 +26,7 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 
 		item := sdp.Item{
 			Type:            "efs-access-point",
-			UniqueAttribute: "accessPointId",
+			UniqueAttribute: "AccessPointId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Health:          lifeCycleStateToHealth(ap.LifeCycleState),

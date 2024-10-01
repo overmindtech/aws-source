@@ -17,7 +17,7 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 	for _, s := range output.Connections {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(s, "tags")
+		attrs, err = sources.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -31,11 +31,11 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId or connectionId is nil for connection"))
 		}
 
-		attrs.Set("globalNetworkIdConnectionId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectionId))
+		attrs.Set("GlobalNetworkIdConnectionId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectionId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-connection",
-			UniqueAttribute: "globalNetworkIdConnectionId",
+			UniqueAttribute: "GlobalNetworkIdConnectionId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(s.Tags),

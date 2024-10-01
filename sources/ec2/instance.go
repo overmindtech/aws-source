@@ -36,7 +36,7 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 
 	for _, reservation := range output.Reservations {
 		for _, instance := range reservation.Instances {
-			attrs, err := sources.ToAttributesCase(instance, "tags")
+			attrs, err := sources.ToAttributesWithExclude(instance, "tags")
 
 			if err != nil {
 				return nil, &sdp.QueryError{
@@ -48,7 +48,7 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 
 			item := sdp.Item{
 				Type:            "ec2-instance",
-				UniqueAttribute: "instanceId",
+				UniqueAttribute: "InstanceId",
 				Scope:           scope,
 				Attributes:      attrs,
 				Tags:            tagsToMap(instance.Tags),

@@ -100,13 +100,13 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(function, "resultMetadata")
+	attributes, err := sources.ToAttributesWithExclude(function, "resultMetadata")
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("name", *out.Configuration.FunctionName)
+	err = attributes.Set("Name", *out.Configuration.FunctionName)
 
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 	item := sdp.Item{
 		Type:              "lambda-function",
-		UniqueAttribute:   "name",
+		UniqueAttribute:   "Name",
 		Attributes:        attributes,
 		Scope:             scope,
 		Tags:              out.Tags,

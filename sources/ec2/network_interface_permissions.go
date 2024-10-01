@@ -26,7 +26,7 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 	for _, ni := range output.NetworkInterfacePermissions {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(ni)
+		attrs, err = sources.ToAttributesWithExclude(ni)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 
 		item := sdp.Item{
 			Type:            "ec2-network-interface-permission",
-			UniqueAttribute: "networkInterfacePermissionId",
+			UniqueAttribute: "NetworkInterfacePermissionId",
 			Scope:           scope,
 			Attributes:      attrs,
 		}

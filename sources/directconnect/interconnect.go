@@ -14,14 +14,14 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 	items := make([]*sdp.Item, 0)
 
 	for _, interconnect := range output.Interconnects {
-		attributes, err := sources.ToAttributesCase(interconnect, "tags")
+		attributes, err := sources.ToAttributesWithExclude(interconnect, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-interconnect",
-			UniqueAttribute: "interconnectId",
+			UniqueAttribute: "InterconnectId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(interconnect.Tags),

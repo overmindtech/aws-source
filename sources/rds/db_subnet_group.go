@@ -25,7 +25,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 			tags = sources.HandleTagsError(ctx, err)
 		}
 
-		attributes, err := sources.ToAttributesCase(sg)
+		attributes, err := sources.ToAttributesWithExclude(sg)
 
 		if err != nil {
 			return nil, err
@@ -33,7 +33,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 		item := sdp.Item{
 			Type:            "rds-db-subnet-group",
-			UniqueAttribute: "dBSubnetGroupName",
+			UniqueAttribute: "DBSubnetGroupName",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tags,

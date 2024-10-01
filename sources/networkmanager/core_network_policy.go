@@ -22,7 +22,7 @@ func coreNetworkPolicyGetFunc(ctx context.Context, client *networkmanager.Client
 }
 
 func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(cn)
+	attributes, err := sources.ToAttributesWithExclude(cn)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 
 	item := sdp.Item{
 		Type:            "networkmanager-core-network-policy",
-		UniqueAttribute: "coreNetworkId",
+		UniqueAttribute: "CoreNetworkId",
 		Attributes:      attributes,
 		Scope:           scope,
 		LinkedItemQueries: []*sdp.LinkedItemQuery{

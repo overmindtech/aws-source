@@ -23,7 +23,7 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(out.FargateProfile)
+	attributes, err := sources.ToAttributesWithExclude(out.FargateProfile)
 
 	if err != nil {
 		return nil, err
@@ -31,11 +31,11 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 
 	// The uniqueAttributeValue for this is a custom field:
 	// {clusterName}/{FargateProfileName}
-	attributes.Set("uniqueName", (*out.FargateProfile.ClusterName + "/" + *out.FargateProfile.FargateProfileName))
+	attributes.Set("UniqueName", (*out.FargateProfile.ClusterName + "/" + *out.FargateProfile.FargateProfileName))
 
 	item := sdp.Item{
 		Type:            "eks-fargate-profile",
-		UniqueAttribute: "uniqueName",
+		UniqueAttribute: "UniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            out.FargateProfile.Tags,

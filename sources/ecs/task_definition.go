@@ -28,7 +28,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	td := out.TaskDefinition
 
-	attributes, err := sources.ToAttributesCase(td)
+	attributes, err := sources.ToAttributesWithExclude(td)
 
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	item := sdp.Item{
 		Type:            "ecs-task-definition",
-		UniqueAttribute: "family",
+		UniqueAttribute: "Family",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(out.Tags),

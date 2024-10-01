@@ -40,7 +40,7 @@ func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.
 }
 
 func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 
 	item := sdp.Item{
 		Type:            "iam-group",
-		UniqueAttribute: "groupName",
+		UniqueAttribute: "GroupName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

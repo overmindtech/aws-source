@@ -10,7 +10,7 @@ import (
 )
 
 func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogConfig) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 	item := sdp.Item{
 		Type:            "cloudfront-realtime-log-config",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

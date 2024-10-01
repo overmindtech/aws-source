@@ -16,7 +16,7 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 	for _, gn := range output.GlobalNetworks {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(gn, "tags")
+		attrs, err = sources.ToAttributesWithExclude(gn, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -28,7 +28,7 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 
 		item := sdp.Item{
 			Type:            "networkmanager-global-network",
-			UniqueAttribute: "globalNetworkId",
+			UniqueAttribute: "GlobalNetworkId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(gn.Tags),

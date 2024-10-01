@@ -26,7 +26,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, networkAcl := range output.NetworkAcls {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(networkAcl, "tags")
+		attrs, err = sources.ToAttributesWithExclude(networkAcl, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -38,7 +38,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		item := sdp.Item{
 			Type:            "ec2-network-acl",
-			UniqueAttribute: "networkAclId",
+			UniqueAttribute: "NetworkAclId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(networkAcl.Tags),

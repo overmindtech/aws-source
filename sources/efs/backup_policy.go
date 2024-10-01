@@ -27,14 +27,14 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 		return nil, errors.New("nil filesystem ID on input")
 	}
 
-	attrs, err := sources.ToAttributesCase(output)
+	attrs, err := sources.ToAttributesWithExclude(output)
 
 	if err != nil {
 		return nil, err
 	}
 
 	// Add the filesystem ID as an attribute
-	err = attrs.Set("fileSystemId", *input.FileSystemId)
+	err = attrs.Set("FileSystemId", *input.FileSystemId)
 
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 
 	item := sdp.Item{
 		Type:            "efs-backup-policy",
-		UniqueAttribute: "fileSystemId",
+		UniqueAttribute: "FileSystemId",
 		Scope:           scope,
 		Attributes:      attrs,
 	}

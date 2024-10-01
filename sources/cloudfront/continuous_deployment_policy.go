@@ -10,7 +10,7 @@ import (
 )
 
 func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.ContinuousDeploymentPolicy) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 	item := sdp.Item{
 		Type:            "cloudfront-continuous-deployment-policy",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

@@ -47,7 +47,7 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 			endpointWithPolicy.PolicyDocument = parsedPolicy
 		}
 
-		attrs, err = sources.ToAttributesCase(endpointWithPolicy, "tags")
+		attrs, err = sources.ToAttributesWithExclude(endpointWithPolicy, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -59,7 +59,7 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 
 		item := sdp.Item{
 			Type:            "ec2-vpc-endpoint",
-			UniqueAttribute: "vpcEndpointId",
+			UniqueAttribute: "VpcEndpointId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(endpoint.Tags),

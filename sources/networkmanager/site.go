@@ -17,7 +17,7 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 	for _, s := range output.Sites {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(s, "tags")
+		attrs, err = sources.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -31,11 +31,11 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId or siteId is nil for site"))
 		}
 
-		attrs.Set("globalNetworkIdSiteId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId))
+		attrs.Set("GlobalNetworkIdSiteId", idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-site",
-			UniqueAttribute: "globalNetworkIdSiteId",
+			UniqueAttribute: "GlobalNetworkIdSiteId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(s.Tags),

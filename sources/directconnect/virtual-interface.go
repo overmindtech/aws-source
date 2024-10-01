@@ -15,14 +15,14 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	items := make([]*sdp.Item, 0)
 
 	for _, virtualInterface := range output.VirtualInterfaces {
-		attributes, err := sources.ToAttributesCase(virtualInterface, "tags")
+		attributes, err := sources.ToAttributesWithExclude(virtualInterface, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-virtual-interface",
-			UniqueAttribute: "virtualInterfaceId",
+			UniqueAttribute: "VirtualInterfaceId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(virtualInterface.Tags),

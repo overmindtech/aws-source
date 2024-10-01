@@ -51,7 +51,7 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(table)
+	attributes, err := sources.ToAttributesWithExclude(table)
 
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 	item := sdp.Item{
 		Type:            "dynamodb-table",
-		UniqueAttribute: "tableName",
+		UniqueAttribute: "TableName",
 		Scope:           scope,
 		Attributes:      attributes,
 		Tags:            tagsMap,

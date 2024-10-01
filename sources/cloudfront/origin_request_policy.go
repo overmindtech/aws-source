@@ -10,7 +10,7 @@ import (
 )
 
 func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequestPolicy) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequest
 
 	item := sdp.Item{
 		Type:            "cloudfront-origin-request-policy",
-		UniqueAttribute: "id",
+		UniqueAttribute: "Id",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

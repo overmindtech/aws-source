@@ -67,7 +67,7 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 
 	wg.Wait()
 
-	attributes, err := sources.ToAttributesCase(uf)
+	attributes, err := sources.ToAttributesWithExclude(uf)
 
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 
 	item := sdp.Item{
 		Type:            "network-firewall-firewall",
-		UniqueAttribute: "name",
+		UniqueAttribute: "Name",
 		Scope:           scope,
 		Attributes:      attributes,
 		Health:          health,

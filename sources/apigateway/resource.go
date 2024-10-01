@@ -38,19 +38,19 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(awsItem, "tags")
+	attributes, err := sources.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", restApiID, *awsItem.Id))
+	err = attributes.Set("UniqueName", fmt.Sprintf("%s/%s", restApiID, *awsItem.Id))
 	if err != nil {
 		return nil, err
 	}
 
 	item := sdp.Item{
 		Type:            "apigateway-resource",
-		UniqueAttribute: "uniqueName",
+		UniqueAttribute: "UniqueName",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

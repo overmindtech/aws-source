@@ -27,7 +27,7 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 	for _, securityGroup := range output.SecurityGroups {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(securityGroup, "tags")
+		attrs, err = sources.ToAttributesWithExclude(securityGroup, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -39,7 +39,7 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 		item := sdp.Item{
 			Type:            "ec2-security-group",
-			UniqueAttribute: "groupId",
+			UniqueAttribute: "GroupId",
 			Scope:           scope,
 			Attributes:      attrs,
 			Tags:            tagsToMap(securityGroup.Tags),

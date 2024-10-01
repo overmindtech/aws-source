@@ -14,7 +14,7 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 	items := make([]*sdp.Item, 0)
 
 	for _, alias := range output.Aliases {
-		attributes, err := sources.ToAttributesCase(alias, "tags")
+		attributes, err := sources.ToAttributesWithExclude(alias, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -43,14 +43,14 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 
 		// The uniqueAttributeValue for this is the combination of the keyID and aliasName
 		// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/alias/test-key"
-		err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", *alias.TargetKeyId, *alias.AliasName))
+		err = attributes.Set("UniqueName", fmt.Sprintf("%s/%s", *alias.TargetKeyId, *alias.AliasName))
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "kms-alias",
-			UniqueAttribute: "uniqueName",
+			UniqueAttribute: "UniqueName",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

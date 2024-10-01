@@ -21,7 +21,7 @@ func getTransitGatewayRouteTableAttachmentGetFunc(ctx context.Context, client *n
 }
 
 func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *types.TransitGatewayRouteTableAttachment) (*sdp.Item, error) {
-	attributes, err := sources.ToAttributesCase(awsItem)
+	attributes, err := sources.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -29,12 +29,12 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 
 	// The uniqueAttributeValue for this is a nested value of AttachmentId:
 	if awsItem != nil && awsItem.Attachment != nil {
-		attributes.Set("attachmentId", *awsItem.Attachment.AttachmentId)
+		attributes.Set("AttachmentId", *awsItem.Attachment.AttachmentId)
 	}
 
 	item := sdp.Item{
 		Type:            "networkmanager-transit-gateway-route-table-attachment",
-		UniqueAttribute: "attachmentId",
+		UniqueAttribute: "AttachmentId",
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            tagsToMap(awsItem.Attachment.Tags),

@@ -16,7 +16,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 	items := make([]*sdp.Item, 0)
 
 	for _, grant := range output.Grants {
-		attributes, err := sources.ToAttributesCase(grant, "tags")
+		attributes, err := sources.ToAttributesWithExclude(grant, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -41,14 +41,14 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 		// The uniqueAttributeValue for this is the combination of the keyID and grantId
 		// i.e., "cf68415c-f4ae-48f2-87a7-3b52ce/grant-id"
-		err = attributes.Set("uniqueName", fmt.Sprintf("%s/%s", keyID, *grant.GrantId))
+		err = attributes.Set("UniqueName", fmt.Sprintf("%s/%s", keyID, *grant.GrantId))
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "kms-grant",
-			UniqueAttribute: "uniqueName",
+			UniqueAttribute: "UniqueName",
 			Attributes:      attributes,
 			Scope:           scope,
 		}

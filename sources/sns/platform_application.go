@@ -27,19 +27,19 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 		}
 	}
 
-	attributes, err := sources.ToAttributesCase(output.Attributes)
+	attributes, err := sources.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attributes.Set("platformApplicationArn", *input.PlatformApplicationArn)
+	err = attributes.Set("PlatformApplicationArn", *input.PlatformApplicationArn)
 	if err != nil {
 		return nil, err
 	}
 
 	item := &sdp.Item{
 		Type:            "sns-platform-application",
-		UniqueAttribute: "platformApplicationArn",
+		UniqueAttribute: "PlatformApplicationArn",
 		Attributes:      attributes,
 		Scope:           scope,
 	}

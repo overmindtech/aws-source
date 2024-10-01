@@ -45,7 +45,7 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 			}
 		}
 
-		attrs, err := sources.ToAttributesCase(listener)
+		attrs, err := sources.ToAttributesWithExclude(listener)
 
 		if err != nil {
 			return nil, err
@@ -59,7 +59,7 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 
 		item := sdp.Item{
 			Type:            "elbv2-listener",
-			UniqueAttribute: "listenerArn",
+			UniqueAttribute: "ListenerArn",
 			Attributes:      attrs,
 			Scope:           scope,
 			Tags:            tags,

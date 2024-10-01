@@ -14,14 +14,14 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 	items := make([]*sdp.Item, 0)
 
 	for _, lag := range output.Lags {
-		attributes, err := sources.ToAttributesCase(lag, "tags")
+		attributes, err := sources.ToAttributesWithExclude(lag, "tags")
 		if err != nil {
 			return nil, err
 		}
 
 		item := sdp.Item{
 			Type:            "directconnect-lag",
-			UniqueAttribute: "lagId",
+			UniqueAttribute: "LagId",
 			Attributes:      attributes,
 			Scope:           scope,
 			Tags:            tagsToMap(lag.Tags),

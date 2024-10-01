@@ -25,7 +25,7 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, instanceStatus := range output.InstanceStatuses {
-		attrs, err := sources.ToAttributesCase(instanceStatus)
+		attrs, err := sources.ToAttributesWithExclude(instanceStatus)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -37,7 +37,7 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 
 		item := sdp.Item{
 			Type:            "ec2-instance-status",
-			UniqueAttribute: "instanceId",
+			UniqueAttribute: "InstanceId",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{

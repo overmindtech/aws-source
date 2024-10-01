@@ -17,7 +17,7 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 	for _, a := range output.ConnectPeerAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = sources.ToAttributesCase(a)
+		attrs, err = sources.ToAttributesWithExclude(a)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -31,11 +31,11 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 			return nil, sdp.NewQueryError(errors.New("globalNetworkId or connectPeerId is nil for connect peer association"))
 		}
 
-		attrs.Set("globalNetworkIdConnectPeerId", idWithGlobalNetwork(*a.GlobalNetworkId, *a.ConnectPeerId))
+		attrs.Set("GlobalNetworkIdConnectPeerId", idWithGlobalNetwork(*a.GlobalNetworkId, *a.ConnectPeerId))
 
 		item := sdp.Item{
 			Type:            "networkmanager-connect-peer-association",
-			UniqueAttribute: "globalNetworkIdConnectPeerId",
+			UniqueAttribute: "GlobalNetworkIdConnectPeerId",
 			Scope:           scope,
 			Attributes:      attrs,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
