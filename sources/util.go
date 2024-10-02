@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	awshttp "github.com/aws/smithy-go/transport/http"
+	awsHttp "github.com/aws/smithy-go/transport/http"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -114,7 +114,7 @@ func ParseARN(arnString string) (*ARN, error) {
 
 // WrapAWSError Wraps an AWS error in the appropriate SDP error
 func WrapAWSError(err error) *sdp.QueryError {
-	var responseErr *awshttp.ResponseError
+	var responseErr *awsHttp.ResponseError
 
 	if errors.As(err, &responseErr) {
 		// If the input is bad, access is denied, or the thing wasn't found then
