@@ -271,7 +271,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 				return nil, err
 			}
 
-			p := pool.New().WithContext(ctx).WithCancelOnError()
+			p := pool.New().WithContext(ctx)
 
 			for _, cfg := range configs {
 				p.Go(func(ctx context.Context) error {
