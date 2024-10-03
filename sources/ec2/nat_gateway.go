@@ -152,10 +152,11 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 func NewNatGatewaySource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-nat-gateway",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-nat-gateway",
+		AdapterMetadata: NatGatewayMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNatGatewaysInput) (*ec2.DescribeNatGatewaysOutput, error) {
 			return client.DescribeNatGateways(ctx, input)
 		},
@@ -165,5 +166,25 @@ func NewNatGatewaySource(client *ec2.Client, accountID string, region string) *s
 			return ec2.NewDescribeNatGatewaysPaginator(client, params)
 		},
 		OutputMapper: natGatewayOutputMapper,
+	}
+}
+
+func NatGatewayMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-nat-gateway",
+		DescriptiveName: "NAT Gateway",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a NAT Gateway by ID",
+			ListDescription:   "List all NAT gateways",
+			SearchDescription: "Search for NAT gateways by ARN",
+		},
+		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-network-interface", "ip"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_nat_gateway.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

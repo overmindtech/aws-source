@@ -104,10 +104,11 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 
 func NewFileSystemSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
-		ItemType:  "efs-file-system",
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
+		ItemType:        "efs-file-system",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: FileSystemMetadata(),
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeFileSystemsInput) (*efs.DescribeFileSystemsOutput, error) {
 			return client.DescribeFileSystems(ctx, input)
 		},
@@ -123,5 +124,22 @@ func NewFileSystemSource(client *efs.Client, accountID string, region string) *s
 			return &efs.DescribeFileSystemsInput{}, nil
 		},
 		OutputMapper: FileSystemOutputMapper,
+	}
+}
+
+func FileSystemMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "efs-file-system",
+		DescriptiveName: "EFS File System",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			List:           true,
+			Search:         true,
+			GetDescription: "Get an file system by ID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_efs_file_system.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

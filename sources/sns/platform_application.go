@@ -78,11 +78,12 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 
 func NewPlatformApplicationSource(client platformApplicationClient, accountID string, region string) *sources.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
-		ItemType:  "sns-platform-application",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &sns.ListPlatformApplicationsInput{},
+		ItemType:        "sns-platform-application",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &sns.ListPlatformApplicationsInput{},
+		AdapterMetadata: PlatformApplicationMetadata(),
 		GetInputMapper: func(scope, query string) *sns.GetPlatformApplicationAttributesInput {
 			return &sns.GetPlatformApplicationAttributesInput{
 				PlatformApplicationArn: &query,
@@ -101,5 +102,25 @@ func NewPlatformApplicationSource(client platformApplicationClient, accountID st
 			return inputs, nil
 		},
 		GetFunc: getPlatformApplicationFunc,
+	}
+}
+
+func PlatformApplicationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "sns-platform-application",
+		DescriptiveName: "SNS Platform Application",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an SNS platform application by its ARN",
+			ListDescription:   "List all SNS platform applications",
+			SearchDescription: "Search SNS platform applications by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_sns_platform_application.id"},
+		},
+		PotentialLinks: []string{"sns-endpoint"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

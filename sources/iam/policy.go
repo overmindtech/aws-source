@@ -327,7 +327,6 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_iam_policy.arn
 // +overmind:terraform:queryMap aws_iam_user_policy_attachment.policy_arn
-// +overmind:terraform:queryMap aws_iam_role_policy_attachment.policy_arn
 // +overmind:terraform:method SEARCH
 
 // NewPolicySource Note that this policy source only support polices that are
@@ -338,12 +337,12 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // https://github.com/overmindtech/aws-source/issues/68
 func NewPolicySource(client *iam.Client, accountID string, _ string) *sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType:      "iam-policy",
-		Client:        client,
-		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:     accountID,
-		Region:        "", // IAM policies aren't tied to a region
-
+		ItemType:        "iam-policy",
+		Client:          client,
+		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:       accountID,
+		Region:          "", // IAM policies aren't tied to a region
+		AdapterMetadata: PolicyMetadata(),
 		// Some IAM policies are global, this means that their ARN doesn't
 		// contain an account name and instead just says "aws". Enabling this
 		// setting means these also work
@@ -356,5 +355,32 @@ func NewPolicySource(client *iam.Client, accountID string, _ string) *sources.Ge
 		},
 		ListTagsFunc: policyListTagsFunc,
 		ItemMapper:   policyItemMapper,
+	}
+}
+
+func PolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "iam-policy",
+		DescriptiveName: "IAM Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an IAM policy by policyFullName ({path} + {policyName})",
+			ListDescription:   "List all IAM policies",
+			SearchDescription: "Search for IAM policies by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_iam_policy.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+			{
+				TerraformQueryMap: "aws_iam_user_policy_attachment.policy_arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"iam-group", "iam-user", "iam-role"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

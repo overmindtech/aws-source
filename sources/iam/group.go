@@ -68,10 +68,11 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 
 func NewGroupSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*types.Group, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.Group, *iam.Client, *iam.Options]{
-		ItemType:      "iam-group",
-		Client:        client,
-		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:     accountID,
+		ItemType:        "iam-group",
+		Client:          client,
+		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:       accountID,
+		AdapterMetadata: GroupMetadata(),
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
 			return groupGetFunc(ctx, client, scope, query)
 		},
@@ -79,5 +80,27 @@ func NewGroupSource(client *iam.Client, accountID string, region string) *source
 			return groupListFunc(ctx, client, scope)
 		},
 		ItemMapper: groupItemMapper,
+	}
+}
+
+func GroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "iam-group",
+		DescriptiveName: "IAM Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a group by name",
+			ListDescription:   "List all IAM groups",
+			SearchDescription: "Search for a group by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_iam_group.arn",
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

@@ -40,10 +40,11 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 
 func NewVirtualGatewaySource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-virtual-gateway",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-virtual-gateway",
+		AdapterMetadata: VirtualGatewayMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualGatewaysInput) (*directconnect.DescribeVirtualGatewaysOutput, error) {
 			return client.DescribeVirtualGateways(ctx, input)
 		},
@@ -56,5 +57,21 @@ func NewVirtualGatewaySource(client *directconnect.Client, accountID string, reg
 			return &directconnect.DescribeVirtualGatewaysInput{}, nil
 		},
 		OutputMapper: virtualGatewayOutputMapper,
+	}
+}
+
+func VirtualGatewayMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-virtual-gateway",
+		DescriptiveName: "Direct Connect Virtual Gateway",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a virtual gateway by ID",
+			ListDescription:   "List all virtual gateways",
+			SearchDescription: "Search virtual gateways by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

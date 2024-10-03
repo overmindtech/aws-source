@@ -90,7 +90,7 @@ func TestNewCachePolicySource(t *testing.T) {
 	source := NewCachePolicySource(client, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

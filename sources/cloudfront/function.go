@@ -37,10 +37,11 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 
 func NewFunctionSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-function",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-function",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: FunctionMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.FunctionSummary, error) {
 			out, err := client.DescribeFunction(ctx, &cloudfront.DescribeFunctionInput{
 				Name: &query,
@@ -70,5 +71,24 @@ func NewFunctionSource(client *cloudfront.Client, accountID string) *sources.Get
 			return summaries, nil
 		},
 		ItemMapper: functionItemMapper,
+	}
+}
+
+func FunctionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-function",
+		DescriptiveName: "CloudFront Function",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a CloudFront Function by name",
+			ListDescription:   "List CloudFront Functions",
+			SearchDescription: "Search CloudFront Functions by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_function.name"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

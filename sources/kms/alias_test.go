@@ -61,7 +61,7 @@ func TestNewAliasSource(t *testing.T) {
 	source := NewAliasSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

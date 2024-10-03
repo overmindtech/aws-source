@@ -70,7 +70,7 @@ func TestNewSubscriptionSource(t *testing.T) {
 	source := NewSubscriptionSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

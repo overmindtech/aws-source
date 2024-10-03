@@ -41,7 +41,7 @@ func TestNewGroupSource(t *testing.T) {
 	source := NewGroupSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 30 * time.Second,
 	}
 

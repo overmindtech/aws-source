@@ -150,10 +150,11 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 
 func NewListenerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elbv2-listener",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elbv2-listener",
+		AdapterMetadata: ListenerMetadata(),
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
 			return client.DescribeListeners(ctx, input)
 		},
@@ -178,5 +179,28 @@ func NewListenerSource(client elbClient, accountID string, region string) *sourc
 			return elbv2.NewDescribeListenersPaginator(client, params)
 		},
 		OutputMapper: listenerOutputMapper,
+	}
+}
+
+func ListenerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elbv2-listener",
+		DescriptiveName: "ELB Listener",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:    true,
+			Search: true,
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_alb_listener.arn",
+			},
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_lb_listener.arn",
+			},
+		},
+		PotentialLinks: []string{"elbv2-load-balancer", "acm-certificate", "elbv2-rule", "cognito-idp-user-pool", "http", "elbv2-target-group"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

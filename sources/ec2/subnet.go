@@ -80,10 +80,11 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 
 func NewSubnetSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-subnet",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-subnet",
+		AdapterMetadata: SubnetMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
 			return client.DescribeSubnets(ctx, input)
 		},
@@ -93,5 +94,26 @@ func NewSubnetSource(client *ec2.Client, accountID string, region string) *sourc
 			return ec2.NewDescribeSubnetsPaginator(client, params)
 		},
 		OutputMapper: subnetOutputMapper,
+	}
+}
+
+func SubnetMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-subnet",
+		DescriptiveName: "EC2 Subnet",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a subnet by ID",
+			ListDescription:   "List all subnets",
+			SearchDescription: "Search for subnets by ARN",
+		},
+		PotentialLinks: []string{"ec2-vpc"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_route_table_association.subnet_id"},
+			{TerraformQueryMap: "aws_subnet.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

@@ -274,10 +274,11 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 func NewRouteTableSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-route-table",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-route-table",
+		AdapterMetadata: RouteTableMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
 			return client.DescribeRouteTables(ctx, input)
 		},
@@ -287,5 +288,28 @@ func NewRouteTableSource(client *ec2.Client, accountID string, region string) *s
 			return ec2.NewDescribeRouteTablesPaginator(client, params)
 		},
 		OutputMapper: routeTableOutputMapper,
+	}
+}
+
+func RouteTableMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-route-table",
+		DescriptiveName: "Route Table",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a route table by ID",
+			ListDescription:   "List all route tables",
+			SearchDescription: "Search route tables by ARN",
+		},
+		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-internet-gateway", "ec2-vpc-endpoint", "ec2-carrier-gateway", "ec2-egress-only-internet-gateway", "ec2-instance", "ec2-local-gateway", "ec2-nat-gateway", "ec2-network-interface", "ec2-transit-gateway", "ec2-vpc-peering-connection"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_route_table.id"},
+			{TerraformQueryMap: "aws_route_table_association.route_table_id"},
+			{TerraformQueryMap: "aws_default_route_table.default_route_table_id"},
+			{TerraformQueryMap: "aws_route.route_table_id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

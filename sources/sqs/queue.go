@@ -66,11 +66,12 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 
 func NewQueueSource(client sqsClient, accountID string, region string) *sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
 	return &sources.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
-		ItemType:  "sqs-queue",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &sqs.ListQueuesInput{},
+		ItemType:        "sqs-queue",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &sqs.ListQueuesInput{},
+		AdapterMetadata: QueueMetadata(),
 		GetInputMapper: func(scope, query string) *sqs.GetQueueAttributesInput {
 			return &sqs.GetQueueAttributesInput{
 				QueueUrl: &query,
@@ -91,5 +92,24 @@ func NewQueueSource(client sqsClient, accountID string, region string) *sources.
 			return inputs, nil
 		},
 		GetFunc: getFunc,
+	}
+}
+
+func QueueMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "sqs-queue",
+		DescriptiveName: "SQS Queue",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an SQS queue attributes by its URL",
+			ListDescription:   "List all SQS queue URLs",
+			SearchDescription: "Search SQS queue by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_sqs_queue.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

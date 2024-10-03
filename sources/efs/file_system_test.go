@@ -97,7 +97,7 @@ func TestNewFileSystemSource(t *testing.T) {
 	source := NewFileSystemSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

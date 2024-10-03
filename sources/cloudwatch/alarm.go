@@ -217,10 +217,11 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 
 func NewAlarmSource(client *cloudwatch.Client, accountID string, region string) *sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
 	return &sources.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
-		ItemType:  "cloudwatch-alarm",
-		Client:    client,
-		Region:    region,
-		AccountID: accountID,
+		ItemType:        "cloudwatch-alarm",
+		Client:          client,
+		Region:          region,
+		AccountID:       accountID,
+		AdapterMetadata: AlarmMetadata(),
 		PaginatorBuilder: func(client CloudwatchClient, params *cloudwatch.DescribeAlarmsInput) sources.Paginator[*cloudwatch.DescribeAlarmsOutput, *cloudwatch.Options] {
 			return cloudwatch.NewDescribeAlarmsPaginator(client, params)
 		},
@@ -263,6 +264,28 @@ func NewAlarmSource(client *cloudwatch.Client, accountID string, region string) 
 			}, nil
 		},
 		OutputMapper: alarmOutputMapper,
+	}
+}
+
+func AlarmMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		DescriptiveName: "CloudWatch Alarm",
+		Type:            "cloudwatch-alarm",
+		PotentialLinks:  []string{"cloudwatch-metric"},
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an alarm by name",
+			ListDescription:   "List all alarms",
+			SearchDescription: "Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_cloudwatch_metric_alarm.alarm_name",
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OTHER,
 	}
 }
 

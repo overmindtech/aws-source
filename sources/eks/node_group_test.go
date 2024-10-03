@@ -136,7 +136,7 @@ func TestNewNodegroupSource(t *testing.T) {
 	source := NewNodegroupSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:            source,
+		Adapter:           source,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

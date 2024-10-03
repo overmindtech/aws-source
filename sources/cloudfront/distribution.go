@@ -672,11 +672,12 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 func NewDistributionSource(client CloudFrontClient, accountID string) *sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &sources.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
-		ItemType:  "cloudfront-distribution",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
-		ListInput: &cloudfront.ListDistributionsInput{},
+		ItemType:        "cloudfront-distribution",
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: DistributionMetadata(),
+		Region:          "", // Cloudfront resources aren't tied to a region
+		ListInput:       &cloudfront.ListDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListDistributionsInput) sources.Paginator[*cloudfront.ListDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListDistributionsPaginator(client, input)
 		},
@@ -697,5 +698,41 @@ func NewDistributionSource(client CloudFrontClient, accountID string) *sources.A
 			return inputs, nil
 		},
 		GetFunc: distributionGetFunc,
+	}
+}
+
+func DistributionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-distribution",
+		DescriptiveName: "CloudFront Distribution",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Search:            true,
+			Get:               true,
+			List:              true,
+			GetDescription:    "Get a distribution by ID",
+			ListDescription:   "List all distributions",
+			SearchDescription: "Search distributions by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_cloudfront_distribution.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{
+			"cloudfront-key-group",
+			"cloudfront-cloud-front-origin-access-identity",
+			"cloudfront-continuous-deployment-policy",
+			"cloudfront-cache-policy",
+			"cloudfront-field-level-encryption",
+			"cloudfront-function",
+			"cloudfront-origin-request-policy",
+			"cloudfront-realtime-log-config",
+			"cloudfront-response-headers-policy",
+			"dns",
+			"lambda-function",
+			"s3-bucket",
+		},
 	}
 }

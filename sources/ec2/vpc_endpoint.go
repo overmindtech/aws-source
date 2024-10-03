@@ -223,10 +223,11 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 
 func NewVpcEndpointSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-vpc-endpoint",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-vpc-endpoint",
+		AdapterMetadata: VpcEndpointMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcEndpointsInput) (*ec2.DescribeVpcEndpointsOutput, error) {
 			return client.DescribeVpcEndpoints(ctx, input)
 		},
@@ -236,5 +237,24 @@ func NewVpcEndpointSource(client *ec2.Client, accountID string, region string) *
 			return ec2.NewDescribeVpcEndpointsPaginator(client, params)
 		},
 		OutputMapper: vpcEndpointOutputMapper,
+	}
+}
+
+func VpcEndpointMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-vpc-endpoint",
+		DescriptiveName: "VPC Endpoint",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a VPC Endpoint by ID",
+			ListDescription:   "List all VPC Endpoints",
+			SearchDescription: "Search VPC Endpoints by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_vpc_endpoint.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

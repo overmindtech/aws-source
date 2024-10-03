@@ -40,10 +40,11 @@ func customerMetadataOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 func NewCustomerMetadataSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-customer-metadata",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-customer-metadata",
+		AdapterMetadata: CustomerMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeCustomerMetadataInput) (*directconnect.DescribeCustomerMetadataOutput, error) {
 			return client.DescribeCustomerMetadata(ctx, input)
 		},
@@ -56,5 +57,20 @@ func NewCustomerMetadataSource(client *directconnect.Client, accountID string, r
 			return &directconnect.DescribeCustomerMetadataInput{}, nil
 		},
 		OutputMapper: customerMetadataOutputMapper,
+	}
+}
+
+func CustomerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-customer-metadata",
+		DescriptiveName: "Customer Metadata",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a customer agreement by name",
+			ListDescription:   "List all customer agreements",
+			SearchDescription: "Search customer agreements by ARN",
+		},
 	}
 }

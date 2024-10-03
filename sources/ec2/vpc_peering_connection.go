@@ -118,10 +118,11 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 
 func NewVpcPeeringConnectionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-vpc-peering-connection",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-vpc-peering-connection",
+		AdapterMetadata: VpcPeeringConnectionMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
 			return client.DescribeVpcPeeringConnections(ctx, input)
 		},
@@ -137,5 +138,26 @@ func NewVpcPeeringConnectionSource(client *ec2.Client, accountID string, region 
 			return ec2.NewDescribeVpcPeeringConnectionsPaginator(client, params)
 		},
 		OutputMapper: vpcPeeringConnectionOutputMapper,
+	}
+}
+
+func VpcPeeringConnectionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-vpc-peering-connection",
+		DescriptiveName: "VPC Peering Connection",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:             true,
+			List:            true,
+			Search:          true,
+			GetDescription:  "Get a VPC Peering Connection by ID",
+			ListDescription: "List all VPC Peering Connections",
+		},
+		PotentialLinks: []string{"ec2-vpc"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_vpc_peering_connection.id"},
+			{TerraformQueryMap: "aws_vpc_peering_connection_accepter.id"},
+			{TerraformQueryMap: "aws_vpc_peering_connection_options.vpc_peering_connection_id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

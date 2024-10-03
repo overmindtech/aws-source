@@ -116,10 +116,11 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 
 func NewTargetGroupSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elbv2-target-group",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elbv2-target-group",
+		AdapterMetadata: TargetGroupMetadata(),
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
 			return client.DescribeTargetGroups(ctx, input)
 		},
@@ -159,5 +160,32 @@ func NewTargetGroupSource(client elbClient, accountID string, region string) *so
 			return elbv2.NewDescribeTargetGroupsPaginator(client, params)
 		},
 		OutputMapper: targetGroupOutputMapper,
+	}
+}
+
+func TargetGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elbv2-target-group",
+		DescriptiveName: "Target Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a target group by name",
+			ListDescription:   "List all target groups",
+			SearchDescription: "Search for target groups by load balancer ARN or target group ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_alb_target_group.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+			{
+				TerraformQueryMap: "aws_lb_target_group.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"ec2-vpc", "elbv2-load-balancer", "elbv2-target-health"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

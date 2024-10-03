@@ -96,10 +96,11 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 func NewInstanceEventWindowSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-instance-event-window",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-instance-event-window",
+		AdapterMetadata: InstanceEventWindowMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput) (*ec2.DescribeInstanceEventWindowsOutput, error) {
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
@@ -109,5 +110,22 @@ func NewInstanceEventWindowSource(client *ec2.Client, accountID string, region s
 			return ec2.NewDescribeInstanceEventWindowsPaginator(client, params)
 		},
 		OutputMapper: instanceEventWindowOutputMapper,
+	}
+}
+
+func InstanceEventWindowMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-instance-event-window",
+		DescriptiveName: "EC2 Instance Event Window",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an event window by ID",
+			ListDescription:   "List all event windows",
+			SearchDescription: "Search for event windows by ARN",
+		},
+		PotentialLinks: []string{"ec2-host", "ec2-instance"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

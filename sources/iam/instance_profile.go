@@ -132,10 +132,11 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 
 func NewInstanceProfileSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &sources.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options]{
-		ItemType:      "iam-instance-profile",
-		Client:        client,
-		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:     accountID,
+		ItemType:        "iam-instance-profile",
+		Client:          client,
+		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:       accountID,
+		AdapterMetadata: InstanceProfileMetadata(),
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
 			return instanceProfileGetFunc(ctx, client, scope, query)
 		},
@@ -146,5 +147,28 @@ func NewInstanceProfileSource(client *iam.Client, accountID string, region strin
 			return instanceProfileListTagsFunc(ctx, ip, c), nil
 		},
 		ItemMapper: instanceProfileItemMapper,
+	}
+}
+
+func InstanceProfileMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "iam-instance-profile",
+		DescriptiveName: "IAM Instance Profile",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an IAM instance profile by name",
+			ListDescription:   "List all IAM instance profiles",
+			SearchDescription: "Search IAM instance profiles by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_iam_instance_profile.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"iam-role", "iam-policy"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

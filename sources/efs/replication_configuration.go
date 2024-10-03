@@ -135,10 +135,11 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 
 func NewReplicationConfigurationSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{
-		ItemType:  "efs-replication-configuration",
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
+		ItemType:        "efs-replication-configuration",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: ReplicationConfigurationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeReplicationConfigurationsInput) (*efs.DescribeReplicationConfigurationsOutput, error) {
 			return client.DescribeReplicationConfigurations(ctx, input)
 		},
@@ -151,5 +152,23 @@ func NewReplicationConfigurationSource(client *efs.Client, accountID string, reg
 			return &efs.DescribeReplicationConfigurationsInput{}, nil
 		},
 		OutputMapper: ReplicationConfigurationOutputMapper,
+	}
+}
+
+func ReplicationConfigurationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "efs-replication-configuration",
+		DescriptiveName: "EFS Replication Configuration",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a replication configuration by file system ID",
+			ListDescription:   "List all replication configurations",
+			SearchDescription: "Search for a replication configuration by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_efs_replication_configuration.source_file_system_id"},
+		},
 	}
 }

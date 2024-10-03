@@ -80,10 +80,11 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 // NewIamInstanceProfileAssociationSource Creates a new source for aws-IamInstanceProfileAssociation resources
 func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-iam-instance-profile-association",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-iam-instance-profile-association",
+		AdapterMetadata: IamInstanceProfileAssociationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeIamInstanceProfileAssociationsInput) (*ec2.DescribeIamInstanceProfileAssociationsOutput, error) {
 			return client.DescribeIamInstanceProfileAssociations(ctx, input)
 		},
@@ -96,5 +97,22 @@ func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string
 			return &ec2.DescribeIamInstanceProfileAssociationsInput{}, nil
 		},
 		OutputMapper: iamInstanceProfileAssociationOutputMapper,
+	}
+}
+
+func IamInstanceProfileAssociationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-iam-instance-profile-association",
+		DescriptiveName: "IAM Instance Profile Association",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an IAM Instance Profile Association by ID",
+			ListDescription:   "List all IAM Instance Profile Associations",
+			SearchDescription: "Search IAM Instance Profile Associations by ARN",
+		},
+		PotentialLinks: []string{"iam-instance-profile", "ec2-instance"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

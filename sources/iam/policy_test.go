@@ -330,7 +330,7 @@ func TestNewPolicySource(t *testing.T) {
 	source := NewPolicySource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 30 * time.Second,
 	}
 

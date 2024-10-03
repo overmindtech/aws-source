@@ -55,11 +55,12 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 
 func NewAddonSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
-		ItemType:    "eks-addon",
-		Client:      client,
-		AccountID:   accountID,
-		Region:      region,
-		DisableList: true,
+		ItemType:        "eks-addon",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: AddonMetadata(),
+		DisableList:     true,
 		SearchInputMapper: func(scope, query string) (*eks.ListAddonsInput, error) {
 			return &eks.ListAddonsInput{
 				ClusterName: &query,
@@ -99,5 +100,27 @@ func NewAddonSource(client EKSClient, accountID string, region string) *sources.
 			return inputs, nil
 		},
 		GetFunc: addonGetFunc,
+	}
+}
+
+func AddonMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "eks-addon",
+		DescriptiveName: "EKS Addon",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an addon by unique name ({clusterName}/{addonName})",
+			ListDescription:   "List all addons",
+			SearchDescription: "Search addons by cluster name",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_eks_addon.arn",
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

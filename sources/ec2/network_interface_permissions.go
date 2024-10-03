@@ -76,10 +76,11 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 
 func NewNetworkInterfacePermissionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-network-interface-permission",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-network-interface-permission",
+		AdapterMetadata: NetworkInterfacePermissionMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
@@ -89,5 +90,22 @@ func NewNetworkInterfacePermissionSource(client *ec2.Client, accountID string, r
 			return ec2.NewDescribeNetworkInterfacePermissionsPaginator(client, params)
 		},
 		OutputMapper: networkInterfacePermissionOutputMapper,
+	}
+}
+
+func NetworkInterfacePermissionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-network-interface-permission",
+		DescriptiveName: "Network Interface Permission",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a network interface permission by ID",
+			ListDescription:   "List all network interface permissions",
+			SearchDescription: "Search network interface permissions by ARN",
+		},
+		PotentialLinks: []string{"ec2-network-interface"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

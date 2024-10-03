@@ -60,10 +60,11 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 
 func NewBackupPolicySource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
-		ItemType:  "efs-backup-policy",
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
+		ItemType:        "efs-backup-policy",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: BackupPolicyMetadata(),
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeBackupPolicyInput) (*efs.DescribeBackupPolicyOutput, error) {
 			return client.DescribeBackupPolicy(ctx, input)
 		},
@@ -73,5 +74,22 @@ func NewBackupPolicySource(client *efs.Client, accountID string, region string) 
 			}, nil
 		},
 		OutputMapper: BackupPolicyOutputMapper,
+	}
+}
+
+func BackupPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "efs-backup-policy",
+		DescriptiveName: "EFS Backup Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get an Backup Policy by file system ID",
+			SearchDescription: "Search for an Backup Policy by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_efs_backup_policy.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

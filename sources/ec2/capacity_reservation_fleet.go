@@ -84,10 +84,11 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 
 func NewCapacityReservationFleetSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-capacity-reservation-fleet",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-capacity-reservation-fleet",
+		AdapterMetadata: CapacityReservationFleetMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationFleetsInput) (*ec2.DescribeCapacityReservationFleetsOutput, error) {
 			return client.DescribeCapacityReservationFleets(ctx, input)
 		},
@@ -103,5 +104,22 @@ func NewCapacityReservationFleetSource(client *ec2.Client, accountID string, reg
 			return ec2.NewDescribeCapacityReservationFleetsPaginator(client, params)
 		},
 		OutputMapper: capacityReservationFleetOutputMapper,
+	}
+}
+
+func CapacityReservationFleetMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-capacity-reservation-fleet",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		DescriptiveName: "Capacity Reservation Fleet",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a capacity reservation fleet by ID",
+			ListDescription:   "List capacity reservation fleets",
+			SearchDescription: "Search capacity reservation fleets by ARN",
+		},
+		PotentialLinks: []string{"ec2-capacity-reservation"},
 	}
 }

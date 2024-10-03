@@ -19,6 +19,7 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 	AccountID              string       // The AWS account ID
 	Region                 string       // The AWS region this is related to
 	SupportGlobalResources bool         // If true, this will also support resources in the "aws" scope which are global
+	AdapterMetadata        sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
 	cache         *sdpcache.Cache // The sdpcache of this source
@@ -94,6 +95,10 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Type() string {
 
 func (s *GetListSource[AWSItem, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
+}
+
+func (s *GetListSource[AWSItem, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
+	return &s.AdapterMetadata
 }
 
 // List of scopes that this source is capable of find items for. This will be

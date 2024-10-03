@@ -81,10 +81,11 @@ func egressOnlyInternetGatewayOutputMapper(_ context.Context, _ *ec2.Client, sco
 
 func NewEgressOnlyInternetGatewaySource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-egress-only-internet-gateway",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-egress-only-internet-gateway",
+		AdapterMetadata: EgressInternetGatewayMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeEgressOnlyInternetGatewaysInput) (*ec2.DescribeEgressOnlyInternetGatewaysOutput, error) {
 			return client.DescribeEgressOnlyInternetGateways(ctx, input)
 		},
@@ -94,5 +95,25 @@ func NewEgressOnlyInternetGatewaySource(client *ec2.Client, accountID string, re
 			return ec2.NewDescribeEgressOnlyInternetGatewaysPaginator(client, params)
 		},
 		OutputMapper: egressOnlyInternetGatewayOutputMapper,
+	}
+}
+
+func EgressInternetGatewayMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-egress-only-internet-gateway",
+		DescriptiveName: "Egress Only Internet Gateway",
+		PotentialLinks:  []string{"ec2-vpc"},
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an egress only internet gateway by ID",
+			ListDescription:   "List all egress only internet gateways",
+			SearchDescription: "Search egress only internet gateways by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "egress_only_internet_gateway.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

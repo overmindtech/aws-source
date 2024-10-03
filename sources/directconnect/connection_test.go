@@ -94,7 +94,7 @@ func TestNewConnectionSource(t *testing.T) {
 	source := NewConnectionSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

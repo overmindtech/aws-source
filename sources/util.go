@@ -151,13 +151,13 @@ func HandleTagsError(ctx context.Context, err error) map[string]string {
 	}
 }
 
-// E2ETest A struct that runs end to end tests on a fully configured source.
+// E2ETest A struct that runs end to end tests on a fully configured adapters.
 // These tests aren't particularly detailed, but they are designed to ensure
 // that there aren't any really obvious error when it's actually configured with
 // AWS credentials
 type E2ETest struct {
-	// The source to test
-	Source discovery.Source
+	// The adapter to test
+	Adapter discovery.Adapter
 
 	// A search query that should return > 0 results
 	GoodSearchQuery *string
@@ -185,25 +185,25 @@ func (e E2ETest) Run(t *testing.T) {
 		Validate() error
 	}
 
-	if v, ok := e.Source.(Validator); ok {
+	if v, ok := e.Adapter.(Validator); ok {
 		if err := v.Validate(); err != nil {
 			t.Fatalf("source failed validation: %v", err)
 		}
 	}
 
 	// Determine the scope so that we can use this for all queries
-	scopes := e.Source.Scopes()
+	scopes := e.Adapter.Scopes()
 	if len(scopes) == 0 {
 		t.Fatalf("some scopes, got %v", len(scopes))
 	}
 	scope := scopes[0]
 
-	t.Run(fmt.Sprintf("Source: %v", e.Source.Name()), func(t *testing.T) {
+	t.Run(fmt.Sprintf("Source: %v", e.Adapter.Name()), func(t *testing.T) {
 		if e.GoodSearchQuery != nil {
-			var searchSrc discovery.SearchableSource
+			var searchSrc discovery.SearchableAdapter
 			var ok bool
 
-			if searchSrc, ok = e.Source.(discovery.SearchableSource); !ok {
+			if searchSrc, ok = e.Adapter.(discovery.SearchableAdapter); !ok {
 				t.Errorf("source is not searchable")
 			}
 
@@ -225,8 +225,8 @@ func (e E2ETest) Run(t *testing.T) {
 						t.Error(err)
 					}
 
-					if item.GetType() != e.Source.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
+					if item.GetType() != e.Adapter.Type() {
+						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
 					}
 				}
 			})
@@ -240,7 +240,7 @@ func (e E2ETest) Run(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
-			items, err := e.Source.List(ctx, scope, false)
+			items, err := e.Adapter.List(ctx, scope, false)
 			if err != nil {
 				t.Error(err)
 			}
@@ -258,8 +258,8 @@ func (e E2ETest) Run(t *testing.T) {
 					t.Error(err)
 				}
 
-				if item.GetType() != e.Source.Type() {
-					t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
+				if item.GetType() != e.Adapter.Type() {
+					t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
 				}
 			}
 
@@ -275,7 +275,7 @@ func (e E2ETest) Run(t *testing.T) {
 					ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 					defer cancel()
 
-					item, err := e.Source.Get(ctx, scope, query, false)
+					item, err := e.Adapter.Get(ctx, scope, query, false)
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -284,8 +284,8 @@ func (e E2ETest) Run(t *testing.T) {
 						t.Fatal(err)
 					}
 
-					if item.GetType() != e.Source.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Source.Type())
+					if item.GetType() != e.Adapter.Type() {
+						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
 					}
 				})
 			}
@@ -299,7 +299,7 @@ func (e E2ETest) Run(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
-			_, err := e.Source.Get(ctx, scope, "this is a known bad get query", false)
+			_, err := e.Adapter.Get(ctx, scope, "this is a known bad get query", false)
 
 			if err == nil {
 				t.Error("expected error, got nil")

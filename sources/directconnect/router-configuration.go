@@ -57,10 +57,11 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 
 func NewRouterConfigurationSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-router-configuration",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-router-configuration",
+		AdapterMetadata: RouterConfigurationSourceMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeRouterConfigurationInput) (*directconnect.DescribeRouterConfigurationOutput, error) {
 			return client.DescribeRouterConfiguration(ctx, input)
 		},
@@ -70,5 +71,23 @@ func NewRouterConfigurationSource(client *directconnect.Client, accountID string
 			}, nil
 		},
 		OutputMapper: routerConfigurationOutputMapper,
+	}
+}
+
+func RouterConfigurationSourceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-router-configuration",
+		DescriptiveName: "Router Configuration",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Router Configuration by Virtual Interface ID",
+			SearchDescription: "Search Router Configuration by ARN",
+		},
+		PotentialLinks: []string{"directconnect-virtual-interface"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_router_configuration.virtual_interface_id"},
+		},
 	}
 }

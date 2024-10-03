@@ -50,7 +50,8 @@ func NewCachePolicySource(client CloudFrontClient, accountID string) *sources.Ge
 		ItemType:               "cloudfront-cache-policy",
 		Client:                 client,
 		AccountID:              accountID,
-		Region:                 "",   // Cloudfront resources aren't tied to a region
+		Region:                 "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata:        CachePolicyMetadata(),
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client CloudFrontClient, scope, query string) (*types.CachePolicy, error) {
 			out, err := client.GetCachePolicy(ctx, &cloudfront.GetCachePolicyInput{
@@ -79,6 +80,25 @@ func NewCachePolicySource(client CloudFrontClient, accountID string) *sources.Ge
 			}
 
 			return &item, nil
+		},
+	}
+}
+
+func CachePolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-cache-policy",
+		DescriptiveName: "CloudFront Cache Policy",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a CloudFront Cache Policy",
+			ListDescription:   "List CloudFront Cache Policies",
+			SearchDescription: "Search CloudFront Cache Policies by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_cache_policy.id"},
 		},
 	}
 }

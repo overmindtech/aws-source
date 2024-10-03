@@ -16,6 +16,22 @@ import (
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/proc"
+	"github.com/overmindtech/aws-source/sources/apigateway"
+	"github.com/overmindtech/aws-source/sources/autoscaling"
+	"github.com/overmindtech/aws-source/sources/cloudfront"
+	"github.com/overmindtech/aws-source/sources/cloudwatch"
+	"github.com/overmindtech/aws-source/sources/directconnect"
+	"github.com/overmindtech/aws-source/sources/dynamodb"
+	"github.com/overmindtech/aws-source/sources/ec2"
+	"github.com/overmindtech/aws-source/sources/efs"
+	"github.com/overmindtech/aws-source/sources/eks"
+	"github.com/overmindtech/aws-source/sources/elb"
+	"github.com/overmindtech/aws-source/sources/elbv2"
+	"github.com/overmindtech/aws-source/sources/iam"
+	"github.com/overmindtech/aws-source/sources/route53"
+	"github.com/overmindtech/aws-source/sources/s3"
+	"github.com/overmindtech/aws-source/sources/sns"
+	"github.com/overmindtech/aws-source/sources/sqs"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
@@ -256,7 +272,6 @@ var rootCmd = &cobra.Command{
 
 			os.Exit(1)
 		}
-
 		log.Info("Stopped")
 
 		os.Exit(0)
@@ -273,6 +288,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(docJSONCmd)
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -436,4 +452,108 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 	_, err = tLog.WriteString(message)
 
 	return err
+}
+
+// documentation subcommand for generating json
+var docJSONCmd = &cobra.Command{
+	Use:   "doc",
+	Short: "Generate JSON documentation",
+	Long:  `Generate JSON documentation for the source`,
+	Run: func(cmd *cobra.Command, args []string) {
+		allMetadata := []sdp.AdapterMetadata{
+			apigateway.APIGatewayMetadata(),
+			apigateway.RestAPIMetadata(),
+			autoscaling.AutoScalingGroupMetadata(),
+			cloudfront.CachePolicyMetadata(),
+			cloudfront.ContinuousDeploymentPolicyMetadata(),
+			cloudfront.DistributionMetadata(),
+			cloudfront.FunctionMetadata(),
+			cloudfront.KeyGroupMetadata(),
+			cloudfront.OriginAccessControlMetadata(),
+			cloudfront.OriginRequestPolicySourceMetadata(),
+			cloudfront.RealtimeLogConfigsMetadata(),
+			cloudfront.ResponseHeadersPolicyMetadata(),
+			cloudfront.StreamingDistributionMetadata(),
+			cloudwatch.AlarmMetadata(),
+			directconnect.ConnectionMetadata(),
+			directconnect.CustomerMetadata(),
+			directconnect.DirectConnectGatewayAssociationMetadata(),
+			directconnect.DirectConnectGatewayAssociationProposalMetadata(),
+			directconnect.DirectConnectGatewayAttachmentMetadata(),
+			directconnect.DirectConnectGatewayMetadata(),
+			directconnect.HostedConnectionMetadata(),
+			directconnect.InterconnectMetadata(),
+			directconnect.LagMetadata(),
+			directconnect.LocationMetadata(),
+			directconnect.RouterConfigurationSourceMetadata(),
+			directconnect.VirtualGatewayMetadata(),
+			directconnect.VirtualInterfaceMetadata(),
+			dynamodb.BackupMetadata(),
+			dynamodb.TableMetadata(),
+			ec2.AddressMetadata(),
+			ec2.CapacityReservationFleetMetadata(),
+			ec2.CapacityReservationMetadata(),
+			ec2.EgressInternetGatewayMetadata(),
+			ec2.IamInstanceProfileAssociationMetadata(),
+			ec2.ImageMetadata(),
+			ec2.InstanceEventWindowMetadata(),
+			ec2.InstanceStatusMetadata(),
+			ec2.InstanceMetadata(),
+			ec2.InternetGatewayMetadata(),
+			ec2.KeyPairMetadata(),
+			ec2.LaunchTemplateVersionMetadata(),
+			ec2.LaunchTemplateMetadata(),
+			ec2.NatGatewayMetadata(),
+			ec2.NetworkAclMetadata(),
+			ec2.NetworkInterfacePermissionMetadata(),
+			ec2.NetworkInterfaceMetadata(),
+			ec2.PlacementGroupMetadata(),
+			ec2.ReservedInstanceMetadata(),
+			ec2.RouteTableMetadata(),
+			ec2.SecurityGroupRuleMetadata(),
+			ec2.SecurityGroupMetadata(),
+			ec2.SnapshotMetadata(),
+			ec2.SubnetMetadata(),
+			ec2.VolumeStatusMetadata(),
+			ec2.VolumeMetadata(),
+			ec2.VpcEndpointMetadata(),
+			ec2.VpcPeeringConnectionMetadata(),
+			ec2.VpcMetadata(),
+			efs.AccessPointMetadata(),
+			efs.BackupPolicyMetadata(),
+			efs.FileSystemMetadata(),
+			efs.MountTargetMetadata(),
+			efs.ReplicationConfigurationMetadata(),
+			eks.AddonMetadata(),
+			eks.ClusterMetadata(),
+			eks.FargateProfileMetadata(),
+			eks.NodeGroupMetadata(),
+			elb.LoadBalancerMetadata(),
+			elb.InstanceHealthMetadata(),
+			elbv2.LoadBalancerMetadata(),
+			elbv2.ListenerMetadata(),
+			elbv2.RuleMetadata(),
+			elbv2.TargetGroupMetadata(),
+			elbv2.TargetHealthMetadata(),
+			iam.GroupMetadata(),
+			iam.InstanceProfileMetadata(),
+			iam.PolicyMetadata(),
+			iam.RoleMetadata(),
+			iam.UserMetadata(),
+			route53.HealthCheckMetadata(),
+			route53.HostedZoneMetadata(),
+			route53.ResourceRecordSetMetadata(),
+			s3.S3Metadata(),
+			sns.DataProtectionPolicyMetadata(),
+			sns.EndpointMetadata(),
+			sns.PlatformApplicationMetadata(),
+			sns.SubscriptionMetadata(),
+			sns.TopicMetadata(),
+			sqs.QueueMetadata(),
+		}
+		err := discovery.AdapterMetadataToJSONFile(allMetadata, "docs-data")
+		if err != nil {
+			log.WithError(err).Fatal("Could not generate JSON documentation")
+		}
+	},
 }

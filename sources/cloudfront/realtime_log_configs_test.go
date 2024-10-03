@@ -62,7 +62,7 @@ func TestNewRealtimeLogConfigsSource(t *testing.T) {
 	source := NewRealtimeLogConfigsSource(client, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

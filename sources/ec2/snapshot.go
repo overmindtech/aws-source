@@ -89,10 +89,11 @@ func snapshotOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 
 func NewSnapshotSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSnapshotsInput, *ec2.DescribeSnapshotsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-snapshot",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-snapshot",
+		AdapterMetadata: SnapshotMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
 			return client.DescribeSnapshots(ctx, input)
 		},
@@ -102,5 +103,22 @@ func NewSnapshotSource(client *ec2.Client, accountID string, region string) *sou
 			return ec2.NewDescribeSnapshotsPaginator(client, params)
 		},
 		OutputMapper: snapshotOutputMapper,
+	}
+}
+
+func SnapshotMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-snapshot",
+		DescriptiveName: "EC2 Snapshot",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a snapshot by ID",
+			ListDescription:   "List all snapshots",
+			SearchDescription: "Search snapshots by ARN",
+		},
+		PotentialLinks: []string{"ec2-volume"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

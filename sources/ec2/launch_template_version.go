@@ -320,10 +320,11 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 func NewLaunchTemplateVersionSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-launch-template-version",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-launch-template-version",
+		AdapterMetadata: LaunchTemplateVersionMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
@@ -333,5 +334,22 @@ func NewLaunchTemplateVersionSource(client *ec2.Client, accountID string, region
 			return ec2.NewDescribeLaunchTemplateVersionsPaginator(client, params)
 		},
 		OutputMapper: launchTemplateVersionOutputMapper,
+	}
+}
+
+func LaunchTemplateVersionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-launch-template-version",
+		DescriptiveName: "Launch Template Version",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a launch template version by {templateId}.{version}",
+			ListDescription:   "List all launch template versions",
+			SearchDescription: "Search launch template versions by ARN",
+		},
+		PotentialLinks: []string{"ec2-network-interface", "ec2-subnet", "ec2-security-group", "ec2-image", "ec2-key-pair", "ec2-snapshot", "ec2-capacity-reservation", "ec2-placement-group", "ec2-host", "ip"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

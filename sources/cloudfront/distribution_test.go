@@ -502,7 +502,7 @@ func TestNewDistributionSource(t *testing.T) {
 	source := NewDistributionSource(client, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

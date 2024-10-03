@@ -56,7 +56,7 @@ func TestNewOriginRequestPolicySource(t *testing.T) {
 	source := NewOriginRequestPolicySource(client, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

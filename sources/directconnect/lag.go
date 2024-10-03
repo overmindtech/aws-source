@@ -118,10 +118,11 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 
 func NewLagSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-lag",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-lag",
+		AdapterMetadata: LagMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLagsInput) (*directconnect.DescribeLagsOutput, error) {
 			return client.DescribeLags(ctx, input)
 		},
@@ -134,5 +135,25 @@ func NewLagSource(client *directconnect.Client, accountID string, region string)
 			return &directconnect.DescribeLagsInput{}, nil
 		},
 		OutputMapper: lagOutputMapper,
+	}
+}
+
+func LagMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-lag",
+		DescriptiveName: "Link Aggregation Group",
+		PotentialLinks:  []string{"directconnect-connection", "directconnect-hosted-connection", "directconnect-location"},
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Link Aggregation Group by ID",
+			ListDescription:   "List all Link Aggregation Groups",
+			SearchDescription: "Search Link Aggregation Group by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_lag.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

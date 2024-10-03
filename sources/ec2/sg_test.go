@@ -118,7 +118,7 @@ func TestNewSecurityGroupSource(t *testing.T) {
 	source := NewSecurityGroupSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

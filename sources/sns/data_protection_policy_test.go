@@ -39,7 +39,7 @@ func TestNewDataProtectionPolicySource(t *testing.T) {
 	source := NewDataProtectionPolicySource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:   source,
+		Adapter:  source,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 		SkipGet:  true,

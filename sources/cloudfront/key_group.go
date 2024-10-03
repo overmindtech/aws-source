@@ -37,10 +37,11 @@ func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, er
 
 func NewKeyGroupSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-key-group",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-key-group",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: KeyGroupMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.KeyGroup, error) {
 			out, err := client.GetKeyGroup(ctx, &cloudfront.GetKeyGroupInput{
 				Id: &query,
@@ -68,5 +69,24 @@ func NewKeyGroupSource(client *cloudfront.Client, accountID string) *sources.Get
 			return keyGroups, nil
 		},
 		ItemMapper: KeyGroupItemMapper,
+	}
+}
+
+func KeyGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-key-group",
+		DescriptiveName: "CloudFront Key Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a CloudFront Key Group by ID",
+			ListDescription:   "List CloudFront Key Groups",
+			SearchDescription: "Search CloudFront Key Groups by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_key_group.id"},
+		},
 	}
 }

@@ -171,7 +171,7 @@ func TestNewLagSource(t *testing.T) {
 	source := NewLagSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

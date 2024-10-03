@@ -60,10 +60,11 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 
 func NewVpcSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-vpc",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-vpc",
+		AdapterMetadata: VpcMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
 			return client.DescribeVpcs(ctx, input)
 		},
@@ -73,5 +74,22 @@ func NewVpcSource(client *ec2.Client, accountID string, region string) *sources.
 			return ec2.NewDescribeVpcsPaginator(client, params)
 		},
 		OutputMapper: vpcOutputMapper,
+	}
+}
+
+func VpcMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		DescriptiveName: "VPC",
+		Type:            "ec2-vpc",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:             true,
+			List:            true,
+			GetDescription:  "Get a VPC by ID",
+			ListDescription: "List all VPCs",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_vpc.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

@@ -180,12 +180,13 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 func NewTableSource(client Client, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
 	return &sources.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{
-		ItemType:  "dynamodb-table",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		GetFunc:   tableGetFunc,
-		ListInput: &dynamodb.ListTablesInput{},
+		ItemType:        "dynamodb-table",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         tableGetFunc,
+		ListInput:       &dynamodb.ListTablesInput{},
+		AdapterMetadata: TableMetadata(),
 		GetInputMapper: func(scope, query string) *dynamodb.DescribeTableInput {
 			return &dynamodb.DescribeTableInput{
 				TableName: &query,
@@ -208,6 +209,26 @@ func NewTableSource(client Client, accountID string, region string) *sources.Alw
 			}
 
 			return inputs, nil
+		},
+	}
+}
+
+func TableMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "dynamodb-table",
+		DescriptiveName: "DynamoDB Table",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a DynamoDB table by name",
+			ListDescription:   "List all DynamoDB tables",
+			SearchDescription: "Search for DynamoDB tables by ARN",
+		},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+		PotentialLinks: []string{"kinesis-stream", "backup-recovery-point", "dynamodb-table", "kms-key"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformMethod: sdp.QueryMethod_SEARCH, TerraformQueryMap: "aws_dynamodb_table.arn"},
 		},
 	}
 }

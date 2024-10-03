@@ -130,7 +130,7 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 
 	search := zones[0].UniqueAttributeValue()
 	test := sources.E2ETest{
-		Source:          source,
+		Adapter:         source,
 		Timeout:         10 * time.Second,
 		SkipGet:         true,
 		GoodSearchQuery: &search,

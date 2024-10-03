@@ -275,10 +275,11 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 
 func NewLoadBalancerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elbv2-load-balancer",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elbv2-load-balancer",
+		AdapterMetadata: LoadBalancerMetadata(),
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
@@ -299,5 +300,32 @@ func NewLoadBalancerSource(client elbClient, accountID string, region string) *s
 			return elbv2.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,
+	}
+}
+
+func LoadBalancerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elbv2-load-balancer",
+		DescriptiveName: "Elastic Load Balancer",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an ELB by name",
+			ListDescription:   "List all ELBs",
+			SearchDescription: "Search for ELBs by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_lb.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+			{
+				TerraformQueryMap: "aws_lb.id",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"elbv2-target-group", "elbv2-listener", "dns", "route53-hosted-zone", "ec2-vpc", "ec2-subnet", "ec2-address", "ip", "ec2-security-group", "ec2-coip-pool"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

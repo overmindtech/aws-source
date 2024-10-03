@@ -68,10 +68,11 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 
 func NewResourceSource(client *apigateway.Client, accountID string, region string) *sources.GetListSource[*types.Resource, *apigateway.Client, *apigateway.Options] {
 	return &sources.GetListSource[*types.Resource, *apigateway.Client, *apigateway.Options]{
-		ItemType:  "apigateway-resource",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "apigateway-resource",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: APIGatewayMetadata(),
 		GetFunc: func(ctx context.Context, client *apigateway.Client, scope, query string) (*types.Resource, error) {
 			f := strings.Split(query, "/")
 			if len(f) != 2 {
@@ -109,6 +110,23 @@ func NewResourceSource(client *apigateway.Client, accountID string, region strin
 		},
 		ItemMapper: func(query, scope string, awsItem *types.Resource) (*sdp.Item, error) {
 			return resourceOutputMapper(query, scope, awsItem)
+		},
+	}
+}
+
+func APIGatewayMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "apigateway",
+		DescriptiveName: "API Gateway",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Resource by rest-api-id/resource-id",
+			SearchDescription: "Search Resources by REST API ID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_api_gateway_resource.id"},
 		},
 	}
 }

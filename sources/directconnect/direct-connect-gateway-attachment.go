@@ -93,10 +93,11 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 
 func NewDirectConnectGatewayAttachmentSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-direct-connect-gateway-attachment",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-direct-connect-gateway-attachment",
+		AdapterMetadata: DirectConnectGatewayAttachmentMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAttachmentsInput) (*directconnect.DescribeDirectConnectGatewayAttachmentsOutput, error) {
 			return client.DescribeDirectConnectGatewayAttachments(ctx, input)
 		},
@@ -125,6 +126,21 @@ func NewDirectConnectGatewayAttachmentSource(client *directconnect.Client, accou
 				VirtualInterfaceId: &query,
 			}, nil
 		},
+	}
+}
+
+func DirectConnectGatewayAttachmentMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-direct-connect-gateway-attachment",
+		DescriptiveName: "Direct Connect Gateway Attachment",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a direct connect gateway attachment by DirectConnectGatewayId/VirtualInterfaceId",
+			SearchDescription: "Search direct connect gateway attachments for given VirtualInterfaceId",
+		},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		PotentialLinks: []string{"directconnect-direct-connect-gateway", "directconnect-virtual-interface"},
 	}
 }
 

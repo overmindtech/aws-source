@@ -96,11 +96,12 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 
 func NewSubscriptionSource(client subsCli, accountID string, region string) *sources.AlwaysGetSource[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{
-		ItemType:  "sns-subscription",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &sns.ListSubscriptionsInput{},
+		ItemType:        "sns-subscription",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &sns.ListSubscriptionsInput{},
+		AdapterMetadata: SubscriptionMetadata(),
 		GetInputMapper: func(scope, query string) *sns.GetSubscriptionAttributesInput {
 			return &sns.GetSubscriptionAttributesInput{
 				SubscriptionArn: &query,
@@ -119,5 +120,25 @@ func NewSubscriptionSource(client subsCli, accountID string, region string) *sou
 			return inputs, nil
 		},
 		GetFunc: getSubsFunc,
+	}
+}
+
+func SubscriptionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "sns-subscription",
+		DescriptiveName: "SNS Subscription",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an SNS subscription by its ARN",
+			SearchDescription: "Search SNS subscription by ARN",
+			ListDescription:   "List all SNS subscriptions",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_sns_topic_subscription.id"},
+		},
+		PotentialLinks: []string{"sns-topic", "iam-role"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

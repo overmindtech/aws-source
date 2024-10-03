@@ -111,10 +111,11 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-hosted-connection",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-hosted-connection",
+		AdapterMetadata: HostedConnectionMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeHostedConnectionsInput) (*directconnect.DescribeHostedConnectionsOutput, error) {
 			return client.DescribeHostedConnections(ctx, input)
 		},
@@ -132,5 +133,23 @@ func NewHostedConnectionSource(client *directconnect.Client, accountID string, r
 		// 	return &directconnect.DescribeHostedConnectionsInput{}, nil
 		// },
 		OutputMapper: hostedConnectionOutputMapper,
+	}
+}
+
+func HostedConnectionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-hosted-connection",
+		DescriptiveName: "Hosted Connection",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Hosted Connection by connection ID",
+			SearchDescription: "Search Hosted Connections by Interconnect or LAG ID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_hosted_connection.id"},
+		},
+		PotentialLinks: []string{"directconnect-lag", "directconnect-location", "directconnect-loa", "directconnect-virtual-interface"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

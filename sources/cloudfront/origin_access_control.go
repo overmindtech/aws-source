@@ -65,10 +65,11 @@ func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessC
 
 func NewOriginAccessControlSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-origin-access-control",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-origin-access-control",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: OriginAccessControlMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginAccessControl, error) {
 			out, err := client.GetOriginAccessControl(ctx, &cloudfront.GetOriginAccessControlInput{
 				Id: &query,
@@ -82,5 +83,24 @@ func NewOriginAccessControlSource(client *cloudfront.Client, accountID string) *
 		},
 		ListFunc:   originAccessControlListFunc,
 		ItemMapper: originAccessControlItemMapper,
+	}
+}
+
+func OriginAccessControlMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-origin-access-control",
+		DescriptiveName: "Cloudfront Origin Access Control",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get Origin Access Control by ID",
+			ListDescription:   "List Origin Access Controls",
+			SearchDescription: "Origin Access Control by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_origin_access_control.id"},
+		},
 	}
 }

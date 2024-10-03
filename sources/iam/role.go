@@ -304,10 +304,11 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 
 func NewRoleSource(client *iam.Client, accountID string, region string) *sources.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
 	return &sources.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
-		ItemType:      "iam-role",
-		Client:        client,
-		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:     accountID,
+		ItemType:        "iam-role",
+		Client:          client,
+		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:       accountID,
+		AdapterMetadata: RoleMetadata(),
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
 			return roleGetFunc(ctx, client, scope, query)
 		},
@@ -316,5 +317,28 @@ func NewRoleSource(client *iam.Client, accountID string, region string) *sources
 		},
 		ListTagsFunc: roleListTagsFunc,
 		ItemMapper:   roleItemMapper,
+	}
+}
+
+func RoleMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "iam-role",
+		DescriptiveName: "IAM Role",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an IAM role by name",
+			ListDescription:   "List all IAM roles",
+			SearchDescription: "Search for IAM roles by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_iam_role.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"iam-policy"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

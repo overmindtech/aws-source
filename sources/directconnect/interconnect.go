@@ -132,10 +132,11 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 
 func NewInterconnectSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-interconnect",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-interconnect",
+		AdapterMetadata: InterconnectMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeInterconnectsInput) (*directconnect.DescribeInterconnectsOutput, error) {
 			return client.DescribeInterconnects(ctx, input)
 		},
@@ -148,5 +149,22 @@ func NewInterconnectSource(client *directconnect.Client, accountID string, regio
 			return &directconnect.DescribeInterconnectsInput{}, nil
 		},
 		OutputMapper: interconnectOutputMapper,
+	}
+}
+
+func InterconnectMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-interconnect",
+		DescriptiveName: "Interconnect",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		PotentialLinks:  []string{"directconnect-hosted-connection", "directconnect-lag", "directconnect-loa", "directconnect-location"},
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Interconnect by InterconnectId",
+			ListDescription:   "List all Interconnects",
+			SearchDescription: "Search Interconnects by ARN",
+		},
 	}
 }

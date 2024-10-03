@@ -66,10 +66,11 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 
 func NewAccessPointSource(client *efs.Client, accountID string, region string) *sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &sources.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
-		ItemType:  "efs-access-point",
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
+		ItemType:        "efs-access-point",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: AccessPointMetadata(),
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeAccessPointsInput) (*efs.DescribeAccessPointsOutput, error) {
 			return client.DescribeAccessPoints(ctx, input)
 		},
@@ -85,5 +86,24 @@ func NewAccessPointSource(client *efs.Client, accountID string, region string) *
 			return &efs.DescribeAccessPointsInput{}, nil
 		},
 		OutputMapper: AccessPointOutputMapper,
+	}
+}
+
+func AccessPointMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "efs-access-point",
+		DescriptiveName: "EFS Access Point",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an access point by ID",
+			ListDescription:   "List all access points",
+			SearchDescription: "Search for an access point by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_efs_access_point.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

@@ -132,7 +132,7 @@ func TestNewRuleSource(t *testing.T) {
 	goodSearch := fmt.Sprint(listenerARN)
 
 	test := sources.E2ETest{
-		Source:          ruleSource,
+		Adapter:         ruleSource,
 		Timeout:         10 * time.Second,
 		GoodSearchQuery: &goodSearch,
 		SkipList:        true,

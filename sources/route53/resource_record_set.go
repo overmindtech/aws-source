@@ -136,13 +136,35 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 func NewResourceRecordSetSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
-		ItemType:    "route53-resource-record-set",
-		Client:      client,
-		DisableList: true,
-		AccountID:   accountID,
-		Region:      region,
-		GetFunc:     resourceRecordSetGetFunc,
-		ItemMapper:  resourceRecordSetItemMapper,
-		SearchFunc:  resourceRecordSetSearchFunc,
+		ItemType:        "route53-resource-record-set",
+		Client:          client,
+		DisableList:     true,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         resourceRecordSetGetFunc,
+		ItemMapper:      resourceRecordSetItemMapper,
+		SearchFunc:      resourceRecordSetSearchFunc,
+		AdapterMetadata: ResourceRecordSetMetadata(),
+	}
+}
+
+func ResourceRecordSetMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "route53-resource-record-set",
+		DescriptiveName: "Route53 Record Set",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Route53 record Set by name",
+			ListDescription:   "List all record sets",
+			SearchDescription: "Search for a record set by hosted zone ID in the format \"/hostedzone/JJN928734JH7HV\" or \"JJN928734JH7HV\" or by terraform ID in the format \"{hostedZone}_{recordName}_{type}\"",
+		},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		PotentialLinks: []string{"dns", "route53-health-check"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_route53_record.arn", TerraformMethod: sdp.QueryMethod_SEARCH},
+			{TerraformQueryMap: "aws_route53_record.id", TerraformMethod: sdp.QueryMethod_SEARCH},
+		},
 	}
 }

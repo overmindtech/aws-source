@@ -85,10 +85,11 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 func NewSecurityGroupSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-security-group",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-security-group",
+		AdapterMetadata: SecurityGroupMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
 			return client.DescribeSecurityGroups(ctx, input)
 		},
@@ -103,6 +104,27 @@ func NewSecurityGroupSource(client *ec2.Client, accountID string, region string)
 				GroupNames: []string{query},
 			}, nil
 		},
+	}
+}
+
+func SecurityGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-security-group",
+		DescriptiveName: "Security Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a security group by ID",
+			ListDescription:   "List all security groups",
+			SearchDescription: "Search for security groups by ARN",
+		},
+		PotentialLinks: []string{"ec2-vpc"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_security_group.id"},
+			{TerraformQueryMap: "aws_security_group_rule.security_group_id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }
 

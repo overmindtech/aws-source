@@ -225,10 +225,11 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 
 func NewTargetHealthSource(client *elasticloadbalancingv2.Client, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elbv2-target-health",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elbv2-target-health",
+		AdapterMetadata: TargetHealthMetadata(),
 		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeTargetHealthInput) (*elbv2.DescribeTargetHealthOutput, error) {
 			return client.DescribeTargetHealth(ctx, input)
 		},
@@ -263,5 +264,20 @@ func NewTargetHealthSource(client *elasticloadbalancingv2.Client, accountID stri
 			}, nil
 		},
 		OutputMapper: targetHealthOutputMapper,
+	}
+}
+
+func TargetHealthMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elbv2-target-health",
+		DescriptiveName: "ELB Target Health",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})",
+			SearchDescription: "Search for target health by target group ARN",
+		},
+		PotentialLinks: []string{"ec2-instance", "lambda-function", "ip", "elbv2-load-balancer"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

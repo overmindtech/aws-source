@@ -93,7 +93,7 @@ func TestNewResponseHeadersPolicySource(t *testing.T) {
 	source := NewResponseHeadersPolicySource(client, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

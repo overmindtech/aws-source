@@ -101,10 +101,11 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 func NewCapacityReservationSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-capacity-reservation",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-capacity-reservation",
+		AdapterMetadata: CapacityReservationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationsInput) (*ec2.DescribeCapacityReservationsOutput, error) {
 			return client.DescribeCapacityReservations(ctx, input)
 		},
@@ -120,5 +121,25 @@ func NewCapacityReservationSource(client *ec2.Client, accountID string, region s
 			return ec2.NewDescribeCapacityReservationsPaginator(client, params)
 		},
 		OutputMapper: capacityReservationOutputMapper,
+	}
+}
+
+func CapacityReservationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-capacity-reservation-fleet",
+		DescriptiveName: "Capacity Reservation Fleet",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a capacity reservation fleet by ID",
+			ListDescription:   "List capacity reservation fleets",
+			SearchDescription: "Search capacity reservation fleets by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_ec2_capacity_reservation_fleet.id"},
+		},
+		PotentialLinks: []string{"outposts-outpost", "ec2-placement-group", "ec2-capacity-reservation-fleet"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

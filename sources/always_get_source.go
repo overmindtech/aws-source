@@ -32,11 +32,12 @@ func (m MaxParallel) Value() int {
 // before returning. An example is the `ListClusters` API in EKS which returns a
 // list of cluster names.
 type AlwaysGetSource[ListInput InputType, ListOutput OutputType, GetInput InputType, GetOutput OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
-	ItemType    string       // The type of items to return
-	Client      ClientStruct // The AWS API client
-	AccountID   string       // The AWS account ID
-	Region      string       // The AWS region this is related to
-	MaxParallel MaxParallel  // How many Get request to run in parallel for a single List request
+	ItemType        string       // The type of items to return
+	Client          ClientStruct // The AWS API client
+	AccountID       string       // The AWS account ID
+	Region          string       // The AWS region this is related to
+	MaxParallel     MaxParallel  // How many Get request to run in parallel for a single List request
+	AdapterMetadata sdp.AdapterMetadata
 
 	// Disables List(), meaning all calls will return empty results. This does
 	// not affect Search()
@@ -136,6 +137,10 @@ func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruc
 
 func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
+}
+
+func (s *AlwaysGetSource[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
+	return &s.AdapterMetadata
 }
 
 // List of scopes that this source is capable of find items for. This will be

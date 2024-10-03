@@ -61,10 +61,11 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 
 func NewLaunchTemplateSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-launch-template",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-launch-template",
+		AdapterMetadata: LaunchTemplateMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
@@ -74,5 +75,24 @@ func NewLaunchTemplateSource(client *ec2.Client, accountID string, region string
 			return ec2.NewDescribeLaunchTemplatesPaginator(client, params)
 		},
 		OutputMapper: launchTemplateOutputMapper,
+	}
+}
+
+func LaunchTemplateMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-launch-template",
+		DescriptiveName: "Launch Template",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a launch template by ID",
+			ListDescription:   "List all launch templates",
+			SearchDescription: "Search for launch templates by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_launch_template.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

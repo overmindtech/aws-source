@@ -87,10 +87,11 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 
 func NewRuleSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
 	return &sources.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elbv2-rule",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elbv2-rule",
+		AdapterMetadata: RuleMetadata(),
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {
 			return client.DescribeRules(ctx, input)
 		},
@@ -112,5 +113,29 @@ func NewRuleSource(client elbClient, accountID string, region string) *sources.D
 			}, nil
 		},
 		OutputMapper: ruleOutputMapper,
+	}
+}
+
+func RuleMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elbv2-rule",
+		DescriptiveName: "ELB Rule",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a rule by ARN",
+			SearchDescription: "Search for rules by listener ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_alb_listener_rule.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+			{
+				TerraformQueryMap: "aws_lb_listener_rule.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

@@ -263,10 +263,11 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 func NewNetworkInterfaceSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-network-interface",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-network-interface",
+		AdapterMetadata: NetworkInterfaceMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
@@ -276,5 +277,25 @@ func NewNetworkInterfaceSource(client *ec2.Client, accountID string, region stri
 			return ec2.NewDescribeNetworkInterfacesPaginator(client, params)
 		},
 		OutputMapper: networkInterfaceOutputMapper,
+	}
+}
+
+func NetworkInterfaceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-network-interface",
+		DescriptiveName: "EC2 Network Interface",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a network interface by ID",
+			ListDescription:   "List all network interfaces",
+			SearchDescription: "Search network interfaces by ARN",
+		},
+		PotentialLinks: []string{"ec2-instance", "ec2-security-group", "ip", "dns", "ec2-subnet", "ec2-vpc"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_network_interface.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

@@ -62,7 +62,7 @@ func TestNewCustomKeyStoreSource(t *testing.T) {
 	source := NewCustomKeyStoreSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

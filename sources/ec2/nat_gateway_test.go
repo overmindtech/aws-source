@@ -154,7 +154,7 @@ func TestNewNatGatewaySource(t *testing.T) {
 	source := NewNatGatewaySource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

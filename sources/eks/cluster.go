@@ -273,11 +273,12 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 func NewClusterSource(client EKSClient, accountID string, region string) *sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &sources.AlwaysGetSource[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
-		ItemType:  "eks-cluster",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &eks.ListClustersInput{},
+		ItemType:        "eks-cluster",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: ClusterMetadata(),
+		ListInput:       &eks.ListClustersInput{},
 		GetInputMapper: func(scope, query string) *eks.DescribeClusterInput {
 			return &eks.DescribeClusterInput{
 				Name: &query,
@@ -298,5 +299,27 @@ func NewClusterSource(client EKSClient, accountID string, region string) *source
 			return inputs, nil
 		},
 		GetFunc: clusterGetFunc,
+	}
+}
+
+func ClusterMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "eks-cluster",
+		DescriptiveName: "EKS Cluster",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a cluster by name",
+			ListDescription:   "List all clusters",
+			SearchDescription: "Search for clusters by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_eks_cluster.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

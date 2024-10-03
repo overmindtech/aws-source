@@ -232,7 +232,7 @@ func TestNewRoleSource(t *testing.T) {
 	source := NewRoleSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 30 * time.Hour,
 	}
 

@@ -72,15 +72,35 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 
 func NewImageSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-image",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-image",
+		AdapterMetadata: ImageMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
 			return client.DescribeImages(ctx, input)
 		},
 		InputMapperGet:  imageInputMapperGet,
 		InputMapperList: imageInputMapperList,
 		OutputMapper:    imageOutputMapper,
+	}
+}
+
+func ImageMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-image",
+		DescriptiveName: "Amazon Machine Image (AMI)",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an AMI by ID",
+			ListDescription:   "List all AMIs",
+			SearchDescription: "Search AMIs by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_ami.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

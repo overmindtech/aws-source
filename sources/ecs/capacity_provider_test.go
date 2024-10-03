@@ -122,10 +122,10 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestCapacityProviderSource(t *testing.T) {
-	src := NewCapacityProviderSource(&TestClient{}, "", "")
+func TestCapacityProviderAdapter(t *testing.T) {
+	adapter := NewCapacityProviderAdapter(&TestClient{}, "", "")
 
-	items, err := src.List(context.Background(), "", false)
+	items, err := adapter.List(context.Background(), "", false)
 
 	if err != nil {
 		t.Error(err)
@@ -140,10 +140,10 @@ func TestNewCapacityProviderSource(t *testing.T) {
 	config, account, region := sources.GetAutoConfig(t)
 	client := ecs.NewFromConfig(config)
 
-	source := NewCapacityProviderSource(client, account, region)
+	source := NewCapacityProviderAdapter(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

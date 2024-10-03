@@ -21,6 +21,7 @@ const DefaultCacheDuration = 1 * time.Hour
 type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
+	AdapterMetadata   sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
 	cache         *sdpcache.Cache // The sdpcache of this source
@@ -134,6 +135,10 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Type() string
 
 func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Name() string {
 	return fmt.Sprintf("%v-source", s.ItemType)
+}
+
+func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
+	return &s.AdapterMetadata
 }
 
 // List of scopes that this source is capable of find items for. This will be

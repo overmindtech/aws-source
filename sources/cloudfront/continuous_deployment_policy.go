@@ -62,6 +62,7 @@ func NewContinuousDeploymentPolicySource(client *cloudfront.Client, accountID st
 		AccountID:              accountID,
 		Region:                 "",   // Cloudfront resources aren't tied to a region
 		SupportGlobalResources: true, // Some policies are global
+		AdapterMetadata:        ContinuousDeploymentPolicyMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ContinuousDeploymentPolicy, error) {
 			out, err := client.GetContinuousDeploymentPolicy(ctx, &cloudfront.GetContinuousDeploymentPolicyInput{
 				Id: &query,
@@ -89,5 +90,21 @@ func NewContinuousDeploymentPolicySource(client *cloudfront.Client, accountID st
 			return policies, nil
 		},
 		ItemMapper: continuousDeploymentPolicyItemMapper,
+	}
+}
+
+func ContinuousDeploymentPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-continuous-deployment-policy",
+		DescriptiveName: "CloudFront Continuous Deployment Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a CloudFront Continuous Deployment Policy by ID",
+			ListDescription:   "List CloudFront Continuous Deployment Policies",
+			SearchDescription: "Search CloudFront Continuous Deployment Policies by ARN",
+		},
+		PotentialLinks: []string{"dns"},
 	}
 }

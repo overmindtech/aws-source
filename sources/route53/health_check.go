@@ -142,13 +142,14 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 
 func NewHealthCheckSource(client *route53.Client, accountID string, region string) *sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options] {
 	return &sources.GetListSource[*HealthCheck, *route53.Client, *route53.Options]{
-		ItemType:   "route53-health-check",
-		Client:     client,
-		AccountID:  accountID,
-		Region:     region,
-		GetFunc:    healthCheckGetFunc,
-		ListFunc:   healthCheckListFunc,
-		ItemMapper: healthCheckItemMapper,
+		ItemType:        "route53-health-check",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         healthCheckGetFunc,
+		ListFunc:        healthCheckListFunc,
+		ItemMapper:      healthCheckItemMapper,
+		AdapterMetadata: HealthCheckMetadata(),
 		ListTagsFunc: func(ctx context.Context, hc *HealthCheck, c *route53.Client) (map[string]string, error) {
 			if hc.Id == nil {
 				return nil, nil
@@ -168,5 +169,25 @@ func NewHealthCheckSource(client *route53.Client, accountID string, region strin
 
 			return tagsToMap(out.ResourceTagSet.Tags), nil
 		},
+	}
+}
+
+func HealthCheckMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "route53-health-check",
+		DescriptiveName: "Route53 Health Check",
+		PotentialLinks:  []string{"cloudwatch-alarm"},
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get health check by ID",
+			ListDescription:   "List all health checks",
+			SearchDescription: "Search for health checks by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_route53_health_check.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OTHER,
 	}
 }

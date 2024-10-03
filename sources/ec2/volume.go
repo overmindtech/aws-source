@@ -78,10 +78,11 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 
 func NewVolumeSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-volume",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-volume",
+		AdapterMetadata: VolumeMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
 			return client.DescribeVolumes(ctx, input)
 		},
@@ -91,5 +92,25 @@ func NewVolumeSource(client *ec2.Client, accountID string, region string) *sourc
 			return ec2.NewDescribeVolumesPaginator(client, params)
 		},
 		OutputMapper: volumeOutputMapper,
+	}
+}
+
+func VolumeMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-volume",
+		DescriptiveName: "EC2 Volume",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a volume by ID",
+			ListDescription:   "List all volumes",
+			SearchDescription: "Search volumes by ARN",
+		},
+		PotentialLinks: []string{"ec2-instance"},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_ebs_volume.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

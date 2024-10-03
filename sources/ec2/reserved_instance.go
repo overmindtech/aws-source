@@ -58,15 +58,32 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 func NewReservedInstanceSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-reserved-instance",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-reserved-instance",
+		AdapterMetadata: ReservedInstanceMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeReservedInstancesInput) (*ec2.DescribeReservedInstancesOutput, error) {
 			return client.DescribeReservedInstances(ctx, input)
 		},
 		InputMapperGet:  reservedInstanceInputMapperGet,
 		InputMapperList: reservedInstanceInputMapperList,
 		OutputMapper:    reservedInstanceOutputMapper,
+	}
+}
+
+func ReservedInstanceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-reserved-instance",
+		DescriptiveName: "Reserved EC2 Instance",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a reserved EC2 instance by ID",
+			ListDescription:   "List all reserved EC2 instances",
+			SearchDescription: "Search reserved EC2 instances by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

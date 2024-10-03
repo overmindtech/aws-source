@@ -201,7 +201,7 @@ func TestNewRouteTableSource(t *testing.T) {
 	source := NewRouteTableSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

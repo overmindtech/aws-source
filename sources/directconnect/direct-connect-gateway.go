@@ -84,10 +84,11 @@ func arn(region, accountID, gatewayID string) string {
 
 func NewDirectConnectGatewaySource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-direct-connect-gateway",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-direct-connect-gateway",
+		AdapterMetadata: DirectConnectGatewayMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewaysInput) (*directconnect.DescribeDirectConnectGatewaysOutput, error) {
 			return client.DescribeDirectConnectGateways(ctx, input)
 		},
@@ -100,5 +101,25 @@ func NewDirectConnectGatewaySource(client *directconnect.Client, accountID strin
 			return &directconnect.DescribeDirectConnectGatewaysInput{}, nil
 		},
 		OutputMapper: directConnectGatewayOutputMapper,
+	}
+}
+
+func DirectConnectGatewayMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-direct-connect-gateway",
+		DescriptiveName: "Direct Connect Gateway",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a direct connect gateway by ID",
+			ListDescription:   "List all direct connect gateways",
+			SearchDescription: "Search direct connect gateway by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_dx_gateway.id",
+			},
+		},
 	}
 }

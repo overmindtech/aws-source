@@ -357,7 +357,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						o.RetryMode = aws.RetryModeAdaptive
 					})
 
-					sources := []discovery.Source{
+					sources := []discovery.Adapter{
 						// EC2
 						ec2.NewAddressSource(ec2Client, *callerID.Account, cfg.Region),
 						ec2.NewCapacityReservationFleetSource(ec2Client, *callerID.Account, cfg.Region),
@@ -423,7 +423,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						lambda.NewLayerVersionSource(lambdaClient, *callerID.Account, cfg.Region),
 
 						// ECS
-						ecs.NewCapacityProviderSource(ecsClient, *callerID.Account, cfg.Region),
+						ecs.NewCapacityProviderAdapter(ecsClient, *callerID.Account, cfg.Region),
 						ecs.NewClusterSource(ecsClient, *callerID.Account, cfg.Region),
 						ecs.NewContainerInstanceSource(ecsClient, *callerID.Account, cfg.Region),
 						ecs.NewServiceSource(ecsClient, *callerID.Account, cfg.Region),
@@ -513,14 +513,14 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						apigateway.NewResourceSource(apigatewayClient, *callerID.Account, cfg.Region),
 					}
 
-					e.AddSources(sources...)
+					e.AddAdapters(sources...)
 
 					// Add "global" sources (those that aren't tied to a region, like
 					// cloudfront). but only do this once for the first region. For
 					// these APIs it doesn't matter which region we call them from, we
 					// get global results
 					if globalDone.CompareAndSwap(false, true) {
-						e.AddSources(
+						e.AddAdapters(
 							// Cloudfront
 							cloudfront.NewCachePolicySource(cloudfrontClient, *callerID.Account),
 							cloudfront.NewContinuousDeploymentPolicySource(cloudfrontClient, *callerID.Account),

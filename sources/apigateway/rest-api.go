@@ -156,10 +156,11 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 func NewRestApiSource(client *apigateway.Client, accountID string, region string) *sources.GetListSource[*types.RestApi, *apigateway.Client, *apigateway.Options] {
 	return &sources.GetListSource[*types.RestApi, *apigateway.Client, *apigateway.Options]{
-		ItemType:  "apigateway-rest-api",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "apigateway-rest-api",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: RestAPIMetadata(),
 		GetFunc: func(ctx context.Context, client *apigateway.Client, scope, query string) (*types.RestApi, error) {
 			out, err := client.GetRestApi(ctx, &apigateway.GetRestApiInput{
 				RestApiId: &query,
@@ -188,5 +189,25 @@ func NewRestApiSource(client *apigateway.Client, accountID string, region string
 		ItemMapper: func(_, scope string, awsItem *types.RestApi) (*sdp.Item, error) {
 			return restApiOutputMapper(scope, awsItem)
 		},
+	}
+}
+
+func RestAPIMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "apigateway-rest-api",
+		DescriptiveName: "REST API",
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a REST API by ID",
+			ListDescription:   "List all REST APIs",
+			SearchDescription: "Search for REST APIs by their name",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_api_gateway_rest_api.id"},
+		},
+		PotentialLinks: []string{"ec2-vpc-endpoint", "apigateway-resource"},
 	}
 }

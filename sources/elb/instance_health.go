@@ -98,10 +98,11 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 
 func NewInstanceHealthSource(client *elasticloadbalancing.Client, accountID string, region string) *sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elb-instance-health",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elb-instance-health",
+		AdapterMetadata: InstanceHealthMetadata(),
 		DescribeFunc: func(ctx context.Context, client *elb.Client, input *elb.DescribeInstanceHealthInput) (*elb.DescribeInstanceHealthOutput, error) {
 			return client.DescribeInstanceHealth(ctx, input)
 		},
@@ -129,5 +130,20 @@ func NewInstanceHealthSource(client *elasticloadbalancing.Client, accountID stri
 			}
 		},
 		OutputMapper: instanceHealthOutputMapper,
+	}
+}
+
+func InstanceHealthMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elb-instance-health",
+		DescriptiveName: "ELB Instance Health",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:             true,
+			List:            true,
+			GetDescription:  "Get instance health by ID ({LoadBalancerName}/{InstanceId})",
+			ListDescription: "List all instance healths",
+		},
+		PotentialLinks: []string{"ec2-instance"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

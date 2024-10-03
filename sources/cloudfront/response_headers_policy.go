@@ -37,10 +37,11 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 
 func NewResponseHeadersPolicySource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-response-headers-policy",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-response-headers-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: ResponseHeadersPolicyMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ResponseHeadersPolicy, error) {
 			out, err := client.GetResponseHeadersPolicy(ctx, &cloudfront.GetResponseHeadersPolicyInput{
 				Id: &query,
@@ -68,5 +69,24 @@ func NewResponseHeadersPolicySource(client *cloudfront.Client, accountID string)
 			return policies, nil
 		},
 		ItemMapper: ResponseHeadersPolicyItemMapper,
+	}
+}
+
+func ResponseHeadersPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-response-headers-policy",
+		DescriptiveName: "CloudFront Response Headers Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get Response Headers Policy by ID",
+			ListDescription:   "List Response Headers Policies",
+			SearchDescription: "Search Response Headers Policy by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_response_headers_policy.id"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

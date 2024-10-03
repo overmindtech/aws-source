@@ -87,10 +87,11 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 
 func NewInstanceStatusSource(client *ec2.Client, accountID string, region string) *sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
 	return &sources.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "ec2-instance-status",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "ec2-instance-status",
+		AdapterMetadata: InstanceStatusMetadata(),
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput) (*ec2.DescribeInstanceStatusOutput, error) {
 			return client.DescribeInstanceStatus(ctx, input)
 		},
@@ -100,5 +101,21 @@ func NewInstanceStatusSource(client *ec2.Client, accountID string, region string
 			return ec2.NewDescribeInstanceStatusPaginator(client, params)
 		},
 		OutputMapper: instanceStatusOutputMapper,
+	}
+}
+
+func InstanceStatusMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ec2-instance-status",
+		DescriptiveName: "EC2 Instance Status",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an EC2 instance status by Instance ID",
+			ListDescription:   "List all EC2 instance statuses",
+			SearchDescription: "Search EC2 instance statuses by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

@@ -82,10 +82,11 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 func NewRealtimeLogConfigsSource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-realtime-log-config",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-realtime-log-config",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: RealtimeLogConfigsMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.RealtimeLogConfig, error) {
 			out, err := client.GetRealtimeLogConfig(ctx, &cloudfront.GetRealtimeLogConfigInput{
 				Name: &query,
@@ -113,5 +114,27 @@ func NewRealtimeLogConfigsSource(client *cloudfront.Client, accountID string) *s
 			return logConfigs, nil
 		},
 		ItemMapper: realtimeLogConfigsItemMapper,
+	}
+}
+
+func RealtimeLogConfigsMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-realtime-log-config",
+		DescriptiveName: "CloudFront Realtime Log Config",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get Realtime Log Config by Name",
+			ListDescription:   "List Realtime Log Configs",
+			SearchDescription: "Search Realtime Log Configs by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_cloudfront_realtime_log_config.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
 	}
 }

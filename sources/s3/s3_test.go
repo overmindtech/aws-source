@@ -668,7 +668,7 @@ func TestNewS3Source(t *testing.T) {
 	source := NewS3Source(config, account)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 	}
 

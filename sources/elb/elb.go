@@ -197,10 +197,11 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 
 func NewLoadBalancerSource(client elbClient, accountID string, region string) *sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
 	return &sources.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "elb-load-balancer",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "elb-load-balancer",
+		AdapterMetadata: LoadBalancerMetadata(),
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
@@ -216,5 +217,28 @@ func NewLoadBalancerSource(client elbClient, accountID string, region string) *s
 			return elb.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,
+	}
+}
+
+func LoadBalancerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "elb-load-balancer",
+		DescriptiveName: "Classic Load Balancer",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a classic load balancer by name",
+			ListDescription:   "List all classic load balancers",
+			SearchDescription: "Search for classic load balancers by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_elb.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-subnet", "ec2-vpc", "ec2-instance", "elb-instance-health", "ec2-security-group"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

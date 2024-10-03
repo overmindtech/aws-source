@@ -90,10 +90,11 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 
 func NewDirectConnectGatewayAssociationSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-direct-connect-gateway-association",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-direct-connect-gateway-association",
+		AdapterMetadata: DirectConnectGatewayAssociationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationsInput) (*directconnect.DescribeDirectConnectGatewayAssociationsOutput, error) {
 			return client.DescribeDirectConnectGatewayAssociations(ctx, input)
 		},
@@ -132,6 +133,24 @@ func NewDirectConnectGatewayAssociationSource(client *directconnect.Client, acco
 				DirectConnectGatewayId: &query,
 			}, nil
 		},
+	}
+}
+
+func DirectConnectGatewayAssociationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		DescriptiveName: "Direct Connect Gateway Association",
+		Type:            "directconnect-direct-connect-gateway-association",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID",
+			SearchDescription: "Search direct connect gateway associations by direct connect gateway ID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_gateway_association.id"},
+		},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		PotentialLinks: []string{"directconnect-direct-connect-gateway"},
 	}
 }
 

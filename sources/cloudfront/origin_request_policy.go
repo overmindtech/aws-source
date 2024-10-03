@@ -37,10 +37,11 @@ func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequest
 
 func NewOriginRequestPolicySource(client *cloudfront.Client, accountID string) *sources.GetListSource[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &sources.GetListSource[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options]{
-		ItemType:  "cloudfront-origin-request-policy",
-		Client:    client,
-		AccountID: accountID,
-		Region:    "", // Cloudfront resources aren't tied to a region
+		ItemType:        "cloudfront-origin-request-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          "", // Cloudfront resources aren't tied to a region
+		AdapterMetadata: OriginRequestPolicySourceMetadata(),
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginRequestPolicy, error) {
 			out, err := client.GetOriginRequestPolicy(ctx, &cloudfront.GetOriginRequestPolicyInput{
 				Id: &query,
@@ -68,5 +69,24 @@ func NewOriginRequestPolicySource(client *cloudfront.Client, accountID string) *
 			return policies, nil
 		},
 		ItemMapper: originRequestPolicyItemMapper,
+	}
+}
+
+func OriginRequestPolicySourceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "cloudfront-origin-request-policy",
+		DescriptiveName: "CloudFront Origin Request Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get Origin Request Policy by ID",
+			ListDescription:   "List Origin Request Policies",
+			SearchDescription: "Origin Request Policy by ARN",
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_cloudfront_origin_request_policy.id"},
+		},
 	}
 }

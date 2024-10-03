@@ -73,16 +73,35 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 
 func NewDataProtectionPolicySource(client dataProtectionPolicyClient, accountID string, region string) *sources.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
 	return &sources.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
-		ItemType:    "sns-data-protection-policy",
-		Client:      client,
-		AccountID:   accountID,
-		Region:      region,
-		DisableList: true,
+		ItemType:        "sns-data-protection-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		DisableList:     true,
+		AdapterMetadata: DataProtectionPolicyMetadata(),
 		GetInputMapper: func(scope, query string) *sns.GetDataProtectionPolicyInput {
 			return &sns.GetDataProtectionPolicyInput{
 				ResourceArn: &query,
 			}
 		},
 		GetFunc: getDataProtectionPolicyFunc,
+	}
+}
+
+func DataProtectionPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "sns-data-protection-policy",
+		DescriptiveName: "SNS Data Protection Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get an SNS data protection policy by associated topic ARN",
+			SearchDescription: "Search SNS data protection policies by its ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_sns_topic_data_protection_policy.arn"},
+		},
+		PotentialLinks: []string{"sns-topic"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

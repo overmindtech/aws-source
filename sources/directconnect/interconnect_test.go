@@ -153,7 +153,7 @@ func TestNewInterconnectSource(t *testing.T) {
 	source := NewInterconnectSource(client, account, region)
 
 	test := sources.E2ETest{
-		Source:  source,
+		Adapter: source,
 		Timeout: 10 * time.Second,
 		// Listing these in our test account gives "An error occurred
 		// (DirectConnectClientException) when calling the DescribeInterconnects

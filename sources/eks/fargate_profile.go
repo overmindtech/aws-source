@@ -100,6 +100,7 @@ func NewFargateProfileSource(client EKSClient, accountID string, region string) 
 		Region:           region,
 		DisableList:      true,
 		AlwaysSearchARNs: true,
+		AdapterMetadata:  FargateProfileMetadata(),
 		SearchInputMapper: func(scope, query string) (*eks.ListFargateProfilesInput, error) {
 			return &eks.ListFargateProfilesInput{
 				ClusterName: &query,
@@ -139,5 +140,28 @@ func NewFargateProfileSource(client EKSClient, accountID string, region string) 
 			return inputs, nil
 		},
 		GetFunc: fargateProfileGetFunc,
+	}
+}
+
+func FargateProfileMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "eks-fargate-profile",
+		DescriptiveName: "Fargate Profile",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a fargate profile by unique name ({clusterName}/{FargateProfileName})",
+			ListDescription:   "List all fargate profiles",
+			SearchDescription: "Search for fargate profiles by cluster name",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_eks_fargate_profile.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"iam-role", "ec2-subnet"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

@@ -83,12 +83,13 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 // table so this is enough for me at the moment
 func NewBackupSource(client Client, accountID string, region string) *sources.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options] {
 	return &sources.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options]{
-		ItemType:  "dynamodb-backup",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		GetFunc:   backupGetFunc,
-		ListInput: &dynamodb.ListBackupsInput{},
+		ItemType:        "dynamodb-backup",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         backupGetFunc,
+		ListInput:       &dynamodb.ListBackupsInput{},
+		AdapterMetadata: BackupMetadata(),
 		GetInputMapper: func(scope, query string) *dynamodb.DescribeBackupInput {
 			// Get is not supported since you can't search by name
 			return nil
@@ -115,6 +116,21 @@ func NewBackupSource(client Client, accountID string, region string) *sources.Al
 				TableName: &query,
 			}, nil
 		},
+	}
+}
+
+func BackupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "dynamodb-backup",
+		DescriptiveName: "DynamoDB Backup",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			List:              true,
+			Search:            true,
+			ListDescription:   "List all DynamoDB backups",
+			SearchDescription: "Search for a DynamoDB backup by table name",
+		},
+		PotentialLinks: []string{"dynamodb-table"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }
 

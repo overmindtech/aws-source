@@ -41,10 +41,11 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 
 func NewLocationSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-location",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "directconnect-location",
+		AdapterMetadata: LocationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLocationsInput) (*directconnect.DescribeLocationsOutput, error) {
 			return client.DescribeLocations(ctx, input)
 		},
@@ -57,5 +58,24 @@ func NewLocationSource(client *directconnect.Client, accountID string, region st
 			return &directconnect.DescribeLocationsInput{}, nil
 		},
 		OutputMapper: locationOutputMapper,
+	}
+}
+
+func LocationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "directconnect-location",
+		DescriptiveName: "Direct Connect Location",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Location by its code",
+			ListDescription:   "List all Direct Connect Locations",
+			SearchDescription: "Search Direct Connect Locations by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_location.location_code"},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

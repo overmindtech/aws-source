@@ -61,10 +61,11 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 
 func NewDirectConnectGatewayAssociationProposalSource(client *directconnect.Client, accountID string, region string) *sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
 	return &sources.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "directconnect-direct-connect-gateway-association-proposal",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: DirectConnectGatewayAssociationProposalMetadata(),
+		ItemType:        "directconnect-direct-connect-gateway-association-proposal",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationProposalsInput) (*directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, error) {
 			return client.DescribeDirectConnectGatewayAssociationProposals(ctx, input)
 		},
@@ -77,5 +78,25 @@ func NewDirectConnectGatewayAssociationProposalSource(client *directconnect.Clie
 			return &directconnect.DescribeDirectConnectGatewayAssociationProposalsInput{}, nil
 		},
 		OutputMapper: directConnectGatewayAssociationProposalOutputMapper,
+	}
+}
+
+func DirectConnectGatewayAssociationProposalMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		DescriptiveName: "Direct Connect Gateway Association Proposal",
+		Type:            "directconnect-direct-connect-gateway-association-proposal",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Direct Connect Gateway Association Proposal by ID",
+			ListDescription:   "List all Direct Connect Gateway Association Proposals",
+			SearchDescription: "Search Direct Connect Gateway Association Proposals by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_dx_gateway_association_proposal.id"},
+		},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		PotentialLinks: []string{"directconnect-direct-connect-gateway-association"},
 	}
 }

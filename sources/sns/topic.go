@@ -76,11 +76,12 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 
 func NewTopicSource(client topicClient, accountID string, region string) *sources.AlwaysGetSource[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
 	return &sources.AlwaysGetSource[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{
-		ItemType:  "sns-topic",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &sns.ListTopicsInput{},
+		ItemType:        "sns-topic",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &sns.ListTopicsInput{},
+		AdapterMetadata: TopicMetadata(),
 		GetInputMapper: func(scope, query string) *sns.GetTopicAttributesInput {
 			return &sns.GetTopicAttributesInput{
 				TopicArn: &query,
@@ -99,5 +100,25 @@ func NewTopicSource(client topicClient, accountID string, region string) *source
 			return inputs, nil
 		},
 		GetFunc: getTopicFunc,
+	}
+}
+
+func TopicMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "sns-topic",
+		DescriptiveName: "SNS Topic",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an SNS topic by its ARN",
+			SearchDescription: "Search SNS topic by ARN",
+			ListDescription:   "List all SNS topics",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_sns_topic.id"},
+		},
+		PotentialLinks: []string{"kms-key"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }
