@@ -32,13 +32,13 @@ func TestKeyGroupItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewKeyGroupSource(t *testing.T) {
+func TestNewKeyGroupAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewKeyGroupSource(client, account)
+	adapter := NewKeyGroupAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

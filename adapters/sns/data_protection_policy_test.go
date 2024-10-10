@@ -33,13 +33,13 @@ func TestGetDataProtectionPolicyFunc(t *testing.T) {
 	}
 }
 
-func TestNewDataProtectionPolicySource(t *testing.T) {
+func TestNewDataProtectionPolicyAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDataProtectionPolicySource(client, account, region)
+	adapter := NewDataProtectionPolicyAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 		SkipGet:  true,

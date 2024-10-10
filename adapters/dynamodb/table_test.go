@@ -220,14 +220,14 @@ func TestTableGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewTableSource(t *testing.T) {
+func TestNewTableAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := dynamodb.NewFromConfig(config)
 
-	source := NewTableSource(client, account, region)
+	adapter := NewTableAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

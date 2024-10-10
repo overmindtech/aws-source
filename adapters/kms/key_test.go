@@ -88,14 +88,14 @@ func TestGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewKeySource(t *testing.T) {
+func TestNewKeyAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	source := NewKeySource(client, account, region)
+	adapter := NewKeyAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

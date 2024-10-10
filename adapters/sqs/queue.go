@@ -64,8 +64,8 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sqs_queue.id
 
-func NewQueueSource(client sqsClient, accountID string, region string) *adapters.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
-	return &adapters.AlwaysGetSource[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
+func NewQueueAdapter(client sqsClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
+	return &adapters.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
 		ItemType:        "sqs-queue",
 		Client:          client,
 		AccountID:       accountID,

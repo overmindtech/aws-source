@@ -133,8 +133,8 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 			switch arn.Service {
 			case "iam":
-				source, query := iamSourceAndQuery(arn.Resource)
-				switch source {
+				adapter, query := iamSourceAndQuery(arn.Resource)
+				switch adapter {
 				case "user":
 					// +overmind:link iam-user
 					lIQ.Query.Type = "iam-user"
@@ -147,7 +147,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 					log.WithFields(log.Fields{
 						"input": principal,
 						"scope": scope,
-					}).Warn("Error unsupported iam source")
+					}).Warn("Error unsupported iam adapter")
 
 					continue
 				}
@@ -177,8 +177,8 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_grant.grant_id
 
-func NewGrantSource(client *kms.Client, accountID string, region string) *adapters.DescribeOnlySource[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
-	return &adapters.DescribeOnlySource[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
+func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
+	return &adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
 		ItemType:  "kms-grant",
 		Client:    client,
 		AccountID: accountID,
@@ -222,8 +222,8 @@ func NewGrantSource(client *kms.Client, accountID string, region string) *adapte
 func iamSourceAndQuery(resource string) (string, string) {
 	tmp := strings.Split(resource, "/") // [user, user-name-with-path]
 
-	source := tmp[0]
+	adapter := tmp[0]
 	query := strings.Join(tmp[1:], "/")
 
-	return source, query // user, user-name-with-path
+	return adapter, query // user, user-name-with-path
 }

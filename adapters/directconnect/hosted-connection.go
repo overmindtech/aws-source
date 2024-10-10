@@ -109,8 +109,8 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_hosted_connection.id
 
-func NewHostedConnectionSource(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlySource[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
+func NewHostedConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

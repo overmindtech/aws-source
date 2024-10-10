@@ -58,8 +58,8 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_backup_policy.id
 
-func NewBackupPolicySource(client *efs.Client, accountID string, region string) *adapters.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlySource[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
+func NewBackupPolicyAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
+	return &adapters.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-backup-policy",
 		Region:          region,
 		Client:          client,

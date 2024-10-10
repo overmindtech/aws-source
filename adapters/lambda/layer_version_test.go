@@ -113,13 +113,13 @@ func TestLayerVersionGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLayerVersionSource(t *testing.T) {
+func TestNewLayerVersionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLayerVersionSource(client, account, region)
+	adapter := NewLayerVersionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

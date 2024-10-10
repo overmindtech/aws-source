@@ -88,8 +88,8 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association.id
 
-func NewDirectConnectGatewayAssociationSource(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{
+func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

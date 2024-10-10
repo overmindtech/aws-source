@@ -91,8 +91,8 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 // +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
 // +overmind:group AWS
 
-func NewDirectConnectGatewayAttachmentSource(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlySource[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
+func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

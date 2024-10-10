@@ -85,8 +85,8 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 // +overmind:terraform:queryMap aws_lb_listener_rule.arn
 // +overmind:terraform:method SEARCH
 
-func NewRuleSource(client elbClient, accountID string, region string) *adapters.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlySource[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
+func NewRuleAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
+	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -102,8 +102,8 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_file_system.id
 
-func NewFileSystemSource(client *efs.Client, accountID string, region string) *adapters.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlySource[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
+func NewFileSystemAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
+	return &adapters.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-file-system",
 		Region:          region,
 		Client:          client,

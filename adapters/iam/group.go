@@ -66,8 +66,8 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:terraform:queryMap aws_iam_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewGroupSource(client *iam.Client, accountID string, region string) *adapters.GetListSource[*types.Group, *iam.Client, *iam.Options] {
-	return &adapters.GetListSource[*types.Group, *iam.Client, *iam.Options]{
+func NewGroupAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
+	return &adapters.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

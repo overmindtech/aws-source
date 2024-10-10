@@ -31,13 +31,13 @@ func TestOriginAccessControlItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewOriginAccessControlSource(t *testing.T) {
+func TestNewOriginAccessControlAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewOriginAccessControlSource(client, account)
+	adapter := NewOriginAccessControlAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

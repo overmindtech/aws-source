@@ -148,13 +148,13 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNatGatewaySource(t *testing.T) {
+func TestNewNatGatewayAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNatGatewaySource(client, account, region)
+	adapter := NewNatGatewayAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

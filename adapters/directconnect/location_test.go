@@ -40,13 +40,13 @@ func TestLocationOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewLocationSource(t *testing.T) {
+func TestNewLocationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLocationSource(client, account, region)
+	adapter := NewLocationAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

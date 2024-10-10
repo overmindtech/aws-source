@@ -38,8 +38,8 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 // +overmind:search Search virtual gateways by ARN
 // +overmind:group AWS
 
-func NewVirtualGatewaySource(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlySource[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
+func NewVirtualGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

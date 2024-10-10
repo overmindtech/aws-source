@@ -204,13 +204,13 @@ func TestClusterGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewClusterSource(t *testing.T) {
+func TestNewClusterAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewClusterSource(client, account, region)
+	adapter := NewClusterAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

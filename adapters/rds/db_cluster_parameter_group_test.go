@@ -84,13 +84,13 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewDBClusterParameterGroupSource(t *testing.T) {
+func TestNewDBClusterParameterGroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDBClusterParameterGroupSource(client, account, region)
+	adapter := NewDBClusterParameterGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

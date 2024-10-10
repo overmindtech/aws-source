@@ -309,13 +309,13 @@ func TestServiceGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewServiceSource(t *testing.T) {
+func TestNewServiceAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewServiceSource(client, account, region)
+	adapter := NewServiceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

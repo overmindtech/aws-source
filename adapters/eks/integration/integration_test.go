@@ -18,7 +18,7 @@ func Teardown(logger *slog.Logger) error {
 	return nil
 }
 
-func TestIntegrationEKSSomeSource(t *testing.T) {
+func TestIntegrationEKSSomeAdapter(t *testing.T) {
 	slog.Info("Running EKS integration test TestSomeSource")
 }
 

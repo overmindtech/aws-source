@@ -107,13 +107,13 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceEventWindowSource(t *testing.T) {
+func TestNewInstanceEventWindowAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInstanceEventWindowSource(client, account, region)
+	adapter := NewInstanceEventWindowAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

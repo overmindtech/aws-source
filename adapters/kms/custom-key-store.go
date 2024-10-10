@@ -97,8 +97,8 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_custom_key_store.id
 
-func NewCustomKeyStoreSource(client *kms.Client, accountID string, region string) *adapters.DescribeOnlySource[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
-	return &adapters.DescribeOnlySource[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
+func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
+	return &adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
 		Region:    region,
 		Client:    client,
 		AccountID: accountID,

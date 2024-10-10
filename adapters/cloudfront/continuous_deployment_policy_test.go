@@ -58,13 +58,13 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewContinuousDeploymentPolicySource(t *testing.T) {
+func TestNewContinuousDeploymentPolicyAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewContinuousDeploymentPolicySource(client, account)
+	adapter := NewContinuousDeploymentPolicyAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

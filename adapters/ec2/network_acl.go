@@ -97,8 +97,8 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_network_acl.id
 
-func NewNetworkAclSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
+func NewNetworkAclAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -203,8 +203,8 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_connect_peer.id
 
-func NewConnectPeerSource(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetSource[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
-	return &adapters.AlwaysGetSource[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{
+func NewConnectPeerAdapter(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
+	return &adapters.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

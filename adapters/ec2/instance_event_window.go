@@ -94,8 +94,8 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:search Search for event windows by ARN
 // +overmind:group AWS
 
-func NewInstanceEventWindowSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
+func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

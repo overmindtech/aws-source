@@ -90,13 +90,13 @@ func TestCapacityReservationOutputMapper(t *testing.T) {
 
 }
 
-func TestNewCapacityReservationSource(t *testing.T) {
+func TestNewCapacityReservationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewCapacityReservationSource(client, account, region)
+	adapter := NewCapacityReservationAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

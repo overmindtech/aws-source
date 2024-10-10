@@ -329,14 +329,14 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // +overmind:terraform:queryMap aws_iam_user_policy_attachment.policy_arn
 // +overmind:terraform:method SEARCH
 
-// NewPolicySource Note that this policy source only support polices that are
+// NewPolicyAdapter Note that this policy adapter only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"
-// in scope. In order to get this to work I'd have to change the way the source
+// in scope. In order to get this to work I'd have to change the way the adapter
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
-// https://github.com/overmindtech/aws-source/issues/68
-func NewPolicySource(client *iam.Client, accountID string, _ string) *adapters.GetListSource[*PolicyDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListSource[*PolicyDetails, IAMClient, *iam.Options]{
+// https://github.com/overmindtech/aws-adapter/issues/68
+func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapters.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
+	return &adapters.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-policy",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

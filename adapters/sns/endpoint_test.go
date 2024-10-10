@@ -55,13 +55,13 @@ func TestGetEndpointFunc(t *testing.T) {
 	}
 }
 
-func TestNewEndpointSource(t *testing.T) {
+func TestNewEndpointAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewEndpointSource(client, account, region)
+	adapter := NewEndpointAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

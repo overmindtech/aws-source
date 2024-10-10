@@ -90,15 +90,15 @@ func TestRestApiOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRestApiSource(t *testing.T) {
+func TestNewRestApiAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 
 	client := apigateway.NewFromConfig(config)
 
-	source := NewRestApiSource(client, account, region)
+	adapter := NewRestApiAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -269,8 +269,8 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_firewall.name
 
-func NewFirewallSource(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetSource[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewFirewallAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-firewall",
 		Client:    client,
 		AccountID: accountID,

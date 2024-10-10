@@ -87,13 +87,13 @@ func TestVirtualInterfaceOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewVirtualInterfaceSource(t *testing.T) {
+func TestNewVirtualInterfaceAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVirtualInterfaceSource(client, account, region)
+	adapter := NewVirtualInterfaceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -130,8 +130,8 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_mount_target.id
 
-func NewMountTargetSource(client *efs.Client, accountID string, region string) *adapters.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlySource[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
+func NewMountTargetAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
+	return &adapters.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-mount-target",
 		Region:          region,
 		Client:          client,

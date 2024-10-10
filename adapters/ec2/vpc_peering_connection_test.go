@@ -101,13 +101,13 @@ func TestVpcPeeringConnectionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewVpcPeeringConnectionSource(t *testing.T) {
+func TestNewVpcPeeringConnectionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVpcPeeringConnectionSource(client, account, region)
+	adapter := NewVpcPeeringConnectionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

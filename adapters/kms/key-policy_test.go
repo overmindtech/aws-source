@@ -105,15 +105,15 @@ func TestGetKeyPolicyFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewKeyPolicySource(t *testing.T) {
+func TestNewKeyPolicyAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 
 	client := kms.NewFromConfig(config)
 
-	source := NewKeyPolicySource(client, account, region)
+	adapter := NewKeyPolicyAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

@@ -215,8 +215,8 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudwatch_metric_alarm.alarm_name
 
-func NewAlarmSource(client *cloudwatch.Client, accountID string, region string) *adapters.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
-	return &adapters.DescribeOnlySource[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
+func NewAlarmAdapter(client *cloudwatch.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
+	return &adapters.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
 		ItemType:        "cloudwatch-alarm",
 		Client:          client,
 		Region:          region,

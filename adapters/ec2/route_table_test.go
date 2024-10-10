@@ -195,13 +195,13 @@ func TestRouteTableOutputMapper(t *testing.T) {
 
 }
 
-func TestNewRouteTableSource(t *testing.T) {
+func TestNewRouteTableAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewRouteTableSource(client, account, region)
+	adapter := NewRouteTableAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

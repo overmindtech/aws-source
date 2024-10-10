@@ -183,8 +183,8 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 // +overmind:terraform:queryMap aws_eks_node_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewNodegroupSource(client EKSClient, accountID string, region string) *adapters.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetSource[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
+func NewNodegroupAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
+	return &adapters.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-nodegroup",
 		Client:           client,
 		AccountID:        accountID,

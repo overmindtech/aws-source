@@ -35,8 +35,8 @@ func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequest
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_origin_request_policy.id
 
-func NewOriginRequestPolicySource(client *cloudfront.Client, accountID string) *adapters.GetListSource[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListSource[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options]{
+func NewOriginRequestPolicyAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options] {
+	return &adapters.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-request-policy",
 		Client:          client,
 		AccountID:       accountID,

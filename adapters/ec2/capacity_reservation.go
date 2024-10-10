@@ -99,8 +99,8 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ec2_capacity_reservation.id
 
-func NewCapacityReservationSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
+func NewCapacityReservationAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

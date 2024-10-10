@@ -35,13 +35,13 @@ func TestFunctionItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewFunctionSource(t *testing.T) {
+func TestNewFunctionAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewFunctionSource(client, account)
+	adapter := NewFunctionAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

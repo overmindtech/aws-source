@@ -116,8 +116,8 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_rule_group.name
 
-func NewRuleGroupSource(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetSource[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetSource[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-rule-group",
 		Client:    client,
 		AccountID: accountID,

@@ -109,14 +109,14 @@ func TestGrantOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewGrantSource(t *testing.T) {
+func TestNewGrantAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	source := NewGrantSource(client, account, region)
+	adapter := NewGrantAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

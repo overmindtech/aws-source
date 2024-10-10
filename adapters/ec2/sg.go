@@ -83,8 +83,8 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 // +overmind:terraform:queryMap aws_security_group.id
 // +overmind:terraform:queryMap aws_security_group_rule.security_group_id
 
-func NewSecurityGroupSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{
+func NewSecurityGroupAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

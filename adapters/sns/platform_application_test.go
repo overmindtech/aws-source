@@ -67,13 +67,13 @@ func TestGetPlatformApplicationFunc(t *testing.T) {
 	}
 }
 
-func TestNewPlatformApplicationSource(t *testing.T) {
+func TestNewPlatformApplicationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewPlatformApplicationSource(client, account, region)
+	adapter := NewPlatformApplicationAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

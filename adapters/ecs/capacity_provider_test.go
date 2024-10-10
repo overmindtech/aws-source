@@ -136,14 +136,14 @@ func TestCapacityProviderAdapter(t *testing.T) {
 	}
 }
 
-func TestNewCapacityProviderSource(t *testing.T) {
+func TestNewCapacityProviderAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := ecs.NewFromConfig(config)
 
-	source := NewCapacityProviderAdapter(client, account, region)
+	adapter := NewCapacityProviderAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -64,14 +64,14 @@ func TestGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewQueueSource(t *testing.T) {
+func TestNewQueueAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := sqs.NewFromConfig(config)
 
-	source := NewQueueSource(client, account, region)
+	adapter := NewQueueAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -170,8 +170,8 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 // +overmind:terraform:queryMap aws_cloudfront_Streamingdistribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewStreamingDistributionSource(client CloudFrontClient, accountID string) *adapters.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
-	return &adapters.AlwaysGetSource[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
+func NewStreamingDistributionAdapter(client CloudFrontClient, accountID string) *adapters.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+	return &adapters.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:        "cloudfront-streaming-distribution",
 		Client:          client,
 		AccountID:       accountID,

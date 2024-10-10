@@ -47,13 +47,13 @@ func TestHostedZoneItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewHostedZoneSource(t *testing.T) {
+func TestNewHostedZoneAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewHostedZoneSource(client, account, region)
+	adapter := NewHostedZoneAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

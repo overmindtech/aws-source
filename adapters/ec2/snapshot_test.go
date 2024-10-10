@@ -91,13 +91,13 @@ func TestSnapshotOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSnapshotSource(t *testing.T) {
+func TestNewSnapshotAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSnapshotSource(client, account, region)
+	adapter := NewSnapshotAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -345,8 +345,8 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_rds_cluster.cluster_identifier
 
-func NewDBClusterSource(client rdsClient, accountID string, region string) *adapters.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
-	return &adapters.DescribeOnlySource[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
+func NewDBClusterAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
+	return &adapters.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-cluster",
 		Region:    region,
 		AccountID: accountID,

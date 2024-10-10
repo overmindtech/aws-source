@@ -87,13 +87,13 @@ func TestEgressOnlyInternetGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewEgressOnlyInternetGatewaySource(t *testing.T) {
+func TestNewEgressOnlyInternetGatewayAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewEgressOnlyInternetGatewaySource(client, account, region)
+	adapter := NewEgressOnlyInternetGatewayAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -130,13 +130,13 @@ func TestNodegroupGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewNodegroupSource(t *testing.T) {
+func TestNewNodegroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNodegroupSource(client, account, region)
+	adapter := NewNodegroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

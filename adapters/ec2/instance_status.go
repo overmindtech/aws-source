@@ -85,8 +85,8 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:search Search EC2 instance statuses by ARN
 // +overmind:group AWS
 
-func NewInstanceStatusSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
+func NewInstanceStatusAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

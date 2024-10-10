@@ -64,13 +64,13 @@ func TestGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewSubscriptionSource(t *testing.T) {
+func TestNewSubscriptionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSubscriptionSource(client, account, region)
+	adapter := NewSubscriptionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

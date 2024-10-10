@@ -65,13 +65,13 @@ func TestFargateProfileGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewFargateProfileSource(t *testing.T) {
+func TestNewFargateProfileAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewFargateProfileSource(client, account, region)
+	adapter := NewFargateProfileAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

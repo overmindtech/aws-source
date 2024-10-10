@@ -130,8 +130,8 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_key.key_id
 
-func NewKeySource(client kmsClient, accountID, region string) *adapters.AlwaysGetSource[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
-	return &adapters.AlwaysGetSource[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{
+func NewKeyAdapter(client kmsClient, accountID, region string) *adapters.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
+	return &adapters.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{
 		ItemType:  "kms-key",
 		Client:    client,
 		AccountID: accountID,

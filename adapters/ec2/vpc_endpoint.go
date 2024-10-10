@@ -221,8 +221,8 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_vpc_endpoint.id
 
-func NewVpcEndpointSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
+func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -130,13 +130,13 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkAclSource(t *testing.T) {
+func TestNewNetworkAclAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkAclSource(client, account, region)
+	adapter := NewNetworkAclAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

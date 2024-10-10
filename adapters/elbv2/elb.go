@@ -273,8 +273,8 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:terraform:queryMap aws_lb.id
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerSource(client elbClient, accountID string, region string) *adapters.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlySource[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
+func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
+	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

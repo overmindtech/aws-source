@@ -123,8 +123,8 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:terraform:queryMap aws_networkmanager_link.arn
 // +overmind:terraform:method SEARCH
 
-func NewLinkSource(client *networkmanager.Client, accountID string) *adapters.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-link",

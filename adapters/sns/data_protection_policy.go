@@ -72,8 +72,8 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic_data_protection_policy.arn
 
-func NewDataProtectionPolicySource(client dataProtectionPolicyClient, accountID string, region string) *adapters.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
-	return &adapters.AlwaysGetSource[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
+func NewDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapters.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
+	return &adapters.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
 		ItemType:        "sns-data-protection-policy",
 		Client:          client,
 		AccountID:       accountID,

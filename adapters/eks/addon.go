@@ -53,8 +53,8 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 // +overmind:terraform:queryMap aws_eks_addon.arn
 // +overmind:terraform:method SEARCH
 
-func NewAddonSource(client EKSClient, accountID string, region string) *adapters.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetSource[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
+func NewAddonAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
+	return &adapters.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-addon",
 		Client:          client,
 		AccountID:       accountID,

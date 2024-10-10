@@ -121,8 +121,8 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 // +overmind:terraform:queryMap aws_lambda_layer_version.arn
 // +overmind:terraform:method SEARCH
 
-func NewLayerVersionSource(client LambdaClient, accountID string, region string) *adapters.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
-	return &adapters.AlwaysGetSource[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
+func NewLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
+	return &adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
 		ItemType:       "lambda-layer-version",
 		Client:         client,
 		AccountID:      accountID,

@@ -36,13 +36,13 @@ func TestVirtualGatewayOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewVirtualGatewaySource(t *testing.T) {
+func TestNewVirtualGatewayAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVirtualGatewaySource(client, account, region)
+	adapter := NewVirtualGatewayAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

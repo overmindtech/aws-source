@@ -83,8 +83,8 @@ func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item
 // +overmind:terraform:queryMap aws_route53_zone.zone_id
 // +overmind:terraform:queryMap aws_route53_zone_association.zone_id
 
-func NewHostedZoneSource(client *route53.Client, accountID string, region string) *adapters.GetListSource[*types.HostedZone, *route53.Client, *route53.Options] {
-	return &adapters.GetListSource[*types.HostedZone, *route53.Client, *route53.Options]{
+func NewHostedZoneAdapter(client *route53.Client, accountID string, region string) *adapters.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options] {
+	return &adapters.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options]{
 		ItemType:        "route53-hosted-zone",
 		Client:          client,
 		AccountID:       accountID,

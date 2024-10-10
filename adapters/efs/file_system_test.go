@@ -91,13 +91,13 @@ func TestFileSystemOutputMapper(t *testing.T) {
 
 }
 
-func TestNewFileSystemSource(t *testing.T) {
+func TestNewFileSystemAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewFileSystemSource(client, account, region)
+	adapter := NewFileSystemAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

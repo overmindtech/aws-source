@@ -94,13 +94,13 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInternetGatewaySource(t *testing.T) {
+func TestNewInternetGatewayAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInternetGatewaySource(client, account, region)
+	adapter := NewInternetGatewayAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

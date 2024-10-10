@@ -114,8 +114,8 @@ func targetGroupOutputMapper(ctx context.Context, client elbClient, scope string
 // +overmind:terraform:queryMap aws_lb_target_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewTargetGroupSource(client elbClient, accountID string, region string) *adapters.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlySource[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options]{
+func NewTargetGroupAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options] {
+	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

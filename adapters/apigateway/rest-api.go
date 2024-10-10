@@ -154,8 +154,8 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_api_gateway_rest_api.id
 
-func NewRestApiSource(client *apigateway.Client, accountID string, region string) *adapters.GetListSource[*types.RestApi, *apigateway.Client, *apigateway.Options] {
-	return &adapters.GetListSource[*types.RestApi, *apigateway.Client, *apigateway.Options]{
+func NewRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapters.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
+	return &adapters.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-rest-api",
 		Client:          client,
 		AccountID:       accountID,

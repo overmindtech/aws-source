@@ -70,8 +70,8 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ami.id
 
-func NewImageSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
+func NewImageAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

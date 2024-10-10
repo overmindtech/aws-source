@@ -112,13 +112,13 @@ func TestSecurityGroupOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSecurityGroupSource(t *testing.T) {
+func TestNewSecurityGroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSecurityGroupSource(client, account, region)
+	adapter := NewSecurityGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

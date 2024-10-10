@@ -109,8 +109,8 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 // +overmind:search Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId
 // +overmind:group AWS
 
-func NewLinkAssociationSource(client *networkmanager.Client, accountID string) *adapters.DescribeOnlySource[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-link-association",

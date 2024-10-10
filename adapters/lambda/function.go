@@ -640,8 +640,8 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 // +overmind:terraform:queryMap aws_lambda_function_url.function_arn
 // +overmind:terraform:method SEARCH
 
-func NewFunctionSource(client LambdaClient, accountID string, region string) *adapters.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
-	return &adapters.AlwaysGetSource[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{
+func NewFunctionAdapter(client LambdaClient, accountID string, region string) *adapters.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
+	return &adapters.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{
 		ItemType:  "lambda-function",
 		Client:    client,
 		AccountID: accountID,

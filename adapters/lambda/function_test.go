@@ -373,13 +373,13 @@ func TestGetEventLinkedItem(t *testing.T) {
 	}
 }
 
-func TestNewFunctionSource(t *testing.T) {
+func TestNewFunctionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewFunctionSource(client, account, region)
+	adapter := NewFunctionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -58,8 +58,8 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 // +overmind:search Search SNS endpoints by associated Platform Application ARN
 // +overmind:group AWS
 
-func NewEndpointSource(client endpointClient, accountID string, region string) *adapters.AlwaysGetSource[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
-	return &adapters.AlwaysGetSource[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options]{
+func NewEndpointAdapter(client endpointClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
+	return &adapters.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options]{
 		ItemType:        "sns-endpoint",
 		Client:          client,
 		AccountID:       accountID,

@@ -83,13 +83,13 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBSubnetGroupSource(t *testing.T) {
+func TestNewDBSubnetGroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDBSubnetGroupSource(client, account, region)
+	adapter := NewDBSubnetGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

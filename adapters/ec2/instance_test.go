@@ -349,13 +349,13 @@ func TestInstanceOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceSource(t *testing.T) {
+func TestNewInstanceAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInstanceSource(client, account, region)
+	adapter := NewInstanceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

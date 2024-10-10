@@ -81,8 +81,8 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 // found so far that can only be queries by ARN for Get. For this reason I'm
 // going to just disable GET. LIST works fine and allows it to be linked to the
 // table so this is enough for me at the moment
-func NewBackupSource(client Client, accountID string, region string) *adapters.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options] {
-	return &adapters.AlwaysGetSource[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options]{
+func NewBackupAdapter(client Client, accountID string, region string) *adapters.AlwaysGetAdapter[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options] {
+	return &adapters.AlwaysGetAdapter[*dynamodb.ListBackupsInput, *dynamodb.ListBackupsOutput, *dynamodb.DescribeBackupInput, *dynamodb.DescribeBackupOutput, Client, *dynamodb.Options]{
 		ItemType:        "dynamodb-backup",
 		Client:          client,
 		AccountID:       accountID,

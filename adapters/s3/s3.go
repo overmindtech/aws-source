@@ -17,8 +17,8 @@ import (
 
 const CacheDuration = 10 * time.Minute
 
-// NewS3Source Creates a new S3 source
-func NewS3Source(config aws.Config, accountID string) *S3Source {
+// NewS3Source Creates a new S3 adapter
+func NewS3Adapter(config aws.Config, accountID string) *S3Source {
 	return &S3Source{
 		config:          config,
 		accountID:       accountID,
@@ -111,7 +111,7 @@ type S3Source struct {
 	AdapterMetadata sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
-	cache         *sdpcache.Cache // The sdpcache of this source
+	cache         *sdpcache.Cache // The sdpcache of this adapter
 	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 }
 
@@ -145,22 +145,22 @@ func (s *S3Source) Client() *s3.Client {
 	return s.client
 }
 
-// Type The type of items that this source is capable of finding
+// Type The type of items that this adapter is capable of finding
 func (s *S3Source) Type() string {
 	// +overmind:type s3-bucket
 	return "s3-bucket"
 }
 
-// Descriptive name for the source, used in logging and metadata
+// Descriptive name for the adapter, used in logging and metadata
 func (s *S3Source) Name() string {
-	return "aws-s3-source"
+	return "aws-s3-adapter"
 }
 
 func (s *S3Source) Metadata() *sdp.AdapterMetadata {
 	return &s.AdapterMetadata
 }
 
-// List of scopes that this source is capable of find items for. This will be
+// List of scopes that this adapter is capable of find items for. This will be
 // in the format {accountID} since S3 endpoint is global
 func (s *S3Source) Scopes() []string {
 	return []string{
@@ -221,13 +221,13 @@ type Bucket struct {
 // Get Get a single item with a given scope and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
-// this source to timeout or be cancelled when executing potentially
+// this adapter to timeout or be cancelled when executing potentially
 // long-running actions
 func (s *S3Source) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
 	}
@@ -237,7 +237,7 @@ func (s *S3Source) Get(ctx context.Context, scope string, query string, ignoreCa
 }
 
 func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
-	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-source", sdp.QueryMethod_GET, scope, "s3-bucket", query, ignoreCache)
+	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-adapter", sdp.QueryMethod_GET, scope, "s3-bucket", query, ignoreCache)
 	if qErr != nil {
 		return nil, qErr
 	}
@@ -634,7 +634,7 @@ func (s *S3Source) List(ctx context.Context, scope string, ignoreCache bool) ([]
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
 	}
@@ -644,7 +644,7 @@ func (s *S3Source) List(ctx context.Context, scope string, ignoreCache bool) ([]
 }
 
 func listImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope string, ignoreCache bool) ([]*sdp.Item, error) {
-	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-source", sdp.QueryMethod_LIST, scope, "s3-bucket", "", ignoreCache)
+	cacheHit, ck, cachedItems, qErr := cache.Lookup(ctx, "aws-s3-adapter", sdp.QueryMethod_LIST, scope, "s3-bucket", "", ignoreCache)
 	if qErr != nil {
 		return nil, qErr
 	}
@@ -687,7 +687,7 @@ func (s *S3Source) Search(ctx context.Context, scope string, query string, ignor
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 			Scope:       scope,
 		}
 	}
@@ -707,7 +707,7 @@ func searchImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, sco
 	if arnScope := adapters.FormatScope(a.AccountID, a.Region); arnScope != scope {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("ARN scope %v does not match source scope %v", arnScope, scope),
+			ErrorString: fmt.Sprintf("ARN scope %v does not match adapters scope %v", arnScope, scope),
 			Scope:       scope,
 		}
 	}
@@ -721,7 +721,7 @@ func searchImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, sco
 	return []*sdp.Item{item}, nil
 }
 
-// Weight Returns the priority weighting of items returned by this source.
+// Weight Returns the priority weighting of items returned by this adapter.
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.

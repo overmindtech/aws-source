@@ -61,13 +61,13 @@ func TestGetTopicFunc(t *testing.T) {
 	}
 }
 
-func TestNewTopicSource(t *testing.T) {
+func TestNewTopicAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewTopicSource(client, account, region)
+	adapter := NewTopicAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

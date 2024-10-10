@@ -63,8 +63,8 @@ func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessC
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_origin_access_control.id
 
-func NewOriginAccessControlSource(client *cloudfront.Client, accountID string) *adapters.GetListSource[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListSource[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
+func NewOriginAccessControlAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
+	return &adapters.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-access-control",
 		Client:          client,
 		AccountID:       accountID,

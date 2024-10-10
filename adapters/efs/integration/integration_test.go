@@ -18,7 +18,7 @@ func Teardown(logger *slog.Logger) error {
 	return nil
 }
 
-func TestIntegrationEFSSomeSource(t *testing.T) {
+func TestIntegrationEFSSomeAdapter(t *testing.T) {
 	slog.Info("Running EFS integration test TestSomeSource")
 }
 

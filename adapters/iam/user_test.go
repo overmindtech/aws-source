@@ -216,17 +216,17 @@ func TestUserItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewUserSource(t *testing.T) {
+func TestNewUserAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	source := NewUserSource(client, account, region)
+	adapter := NewUserAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}
 

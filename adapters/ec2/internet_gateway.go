@@ -80,8 +80,8 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_internet_gateway.id
 
-func NewInternetGatewaySource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
+func NewInternetGatewayAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

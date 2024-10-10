@@ -55,14 +55,14 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewCustomKeyStoreSource(t *testing.T) {
+func TestNewCustomKeyStoreAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	source := NewCustomKeyStoreSource(client, account, region)
+	adapter := NewCustomKeyStoreAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -110,14 +110,14 @@ func TestBackupGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewBackupSource(t *testing.T) {
+func TestNewBackupAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := dynamodb.NewFromConfig(config)
 
-	source := NewBackupSource(client, account, region)
+	adapter := NewBackupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 		SkipGet: true,
 	}

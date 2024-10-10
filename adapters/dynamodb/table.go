@@ -178,8 +178,8 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 // +overmind:terraform:queryMap aws_dynamodb_table.arn
 // +overmind:terraform:method SEARCH
 
-func NewTableSource(client Client, accountID string, region string) *adapters.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
-	return &adapters.AlwaysGetSource[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{
+func NewTableAdapter(client Client, accountID string, region string) *adapters.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
+	return &adapters.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{
 		ItemType:        "dynamodb-table",
 		Client:          client,
 		AccountID:       accountID,

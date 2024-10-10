@@ -67,8 +67,8 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
-func NewVPCAttachmentSource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		Region:    region,
 		AccountID: accountID,

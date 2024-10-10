@@ -118,7 +118,7 @@ func WrapAWSError(err error) *sdp.QueryError {
 
 	if errors.As(err, &responseErr) {
 		// If the input is bad, access is denied, or the thing wasn't found then
-		// we should assume that it is not exist for this source
+		// we should assume that it is not exist for this adapter
 		if slices.Contains([]int{400, 403, 404}, responseErr.HTTPStatusCode()) {
 			return &sdp.QueryError{
 				ErrorType:   sdp.QueryError_NOTFOUND,
@@ -187,7 +187,7 @@ func (e E2ETest) Run(t *testing.T) {
 
 	if v, ok := e.Adapter.(Validator); ok {
 		if err := v.Validate(); err != nil {
-			t.Fatalf("source failed validation: %v", err)
+			t.Fatalf("adapter failed validation: %v", err)
 		}
 	}
 
@@ -198,13 +198,13 @@ func (e E2ETest) Run(t *testing.T) {
 	}
 	scope := scopes[0]
 
-	t.Run(fmt.Sprintf("Source: %v", e.Adapter.Name()), func(t *testing.T) {
+	t.Run(fmt.Sprintf("Adapter: %v", e.Adapter.Name()), func(t *testing.T) {
 		if e.GoodSearchQuery != nil {
 			var searchSrc discovery.SearchableAdapter
 			var ok bool
 
 			if searchSrc, ok = e.Adapter.(discovery.SearchableAdapter); !ok {
-				t.Errorf("source is not searchable")
+				t.Errorf("adapter is not searchable")
 			}
 
 			t.Run(fmt.Sprintf("Good search query: %v", e.GoodSearchQuery), func(t *testing.T) {
@@ -226,7 +226,7 @@ func (e E2ETest) Run(t *testing.T) {
 					}
 
 					if item.GetType() != e.Adapter.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
+						t.Errorf("mismatched item type \"%v\" and adapter type \"%v\"", item.GetType(), e.Adapter.Type())
 					}
 				}
 			})
@@ -259,7 +259,7 @@ func (e E2ETest) Run(t *testing.T) {
 				}
 
 				if item.GetType() != e.Adapter.Type() {
-					t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
+					t.Errorf("mismatched item type \"%v\" and adapter type \"%v\"", item.GetType(), e.Adapter.Type())
 				}
 			}
 
@@ -285,7 +285,7 @@ func (e E2ETest) Run(t *testing.T) {
 					}
 
 					if item.GetType() != e.Adapter.Type() {
-						t.Errorf("mismatched item type \"%v\" and source type \"%v\"", item.GetType(), e.Adapter.Type())
+						t.Errorf("mismatched item type \"%v\" and adapter type \"%v\"", item.GetType(), e.Adapter.Type())
 					}
 				})
 			}

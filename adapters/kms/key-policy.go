@@ -93,13 +93,13 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_key_policy.key_id
 
-func NewKeyPolicySource(client keyPolicyClient, accountID string, region string) *adapters.AlwaysGetSource[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options] {
-	return &adapters.AlwaysGetSource[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options]{
+func NewKeyPolicyAdapter(client keyPolicyClient, accountID string, region string) *adapters.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options] {
+	return &adapters.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options]{
 		ItemType:    "kms-key-policy",
 		Client:      client,
 		AccountID:   accountID,
 		Region:      region,
-		DisableList: true, // This source only supports listing by Key ID
+		DisableList: true, // This adapter only supports listing by Key ID
 		SearchInputMapper: func(scope, query string) (*kms.ListKeyPoliciesInput, error) {
 			return &kms.ListKeyPoliciesInput{
 				KeyId: &query,

@@ -97,13 +97,13 @@ func TestVpcOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewVpcSource(t *testing.T) {
+func TestNewVpcAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVpcSource(client, account, region)
+	adapter := NewVpcAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

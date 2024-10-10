@@ -69,8 +69,8 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 // +overmind:terraform:queryMap aws_ecs_capacity_provider.arn
 // +overmind:terraform:method SEARCH
 
-func NewCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapters.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
-	return &adapters.DescribeOnlySource[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
+func NewCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
+	return &adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-capacity-provider",
 		Region:    region,
 		AccountID: accountID,

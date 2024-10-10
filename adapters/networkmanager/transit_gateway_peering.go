@@ -113,8 +113,8 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_transit_gateway_peering.id
 
-func NewTransitGatewayPeeringSource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

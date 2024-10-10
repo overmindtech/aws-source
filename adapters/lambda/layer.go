@@ -70,8 +70,8 @@ func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item,
 // +overmind:list List all lambda layers
 // +overmind:group AWS
 
-func NewLayerSource(client *lambda.Client, accountID string, region string) *adapters.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options] {
-	return &adapters.GetListSource[*types.LayersListItem, *lambda.Client, *lambda.Options]{
+func NewLayerAdapter(client *lambda.Client, accountID string, region string) *adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options] {
+	return &adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options]{
 		ItemType:  "lambda-layer",
 		Client:    client,
 		AccountID: accountID,

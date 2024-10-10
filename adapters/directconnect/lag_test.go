@@ -165,13 +165,13 @@ func TestLagOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLagSource(t *testing.T) {
+func TestNewLagAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLagSource(client, account, region)
+	adapter := NewLagAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

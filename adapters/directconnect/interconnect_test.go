@@ -147,13 +147,13 @@ func TestInterconnectHealth(t *testing.T) {
 	}
 }
 
-func TestNewInterconnectSource(t *testing.T) {
+func TestNewInterconnectAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInterconnectSource(client, account, region)
+	adapter := NewInterconnectAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 		// Listing these in our test account gives "An error occurred
 		// (DirectConnectClientException) when calling the DescribeInterconnects

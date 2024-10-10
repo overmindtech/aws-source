@@ -19,7 +19,7 @@ func TestMaxParallel(t *testing.T) {
 }
 
 func TestAlwaysGetSourceType(t *testing.T) {
-	lgs := AlwaysGetSource[any, any, any, any, any, any]{
+	lgs := AlwaysGetAdapter[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
@@ -29,17 +29,17 @@ func TestAlwaysGetSourceType(t *testing.T) {
 }
 
 func TestAlwaysGetSourceName(t *testing.T) {
-	lgs := AlwaysGetSource[any, any, any, any, any, any]{
+	lgs := AlwaysGetAdapter[any, any, any, any, any, any]{
 		ItemType: "foo",
 	}
 
-	if lgs.Name() != "foo-source" {
-		t.Errorf("expected name to be foo-source, got %v", lgs.Name())
+	if lgs.Name() != "foo-adapter" {
+		t.Errorf("expected name to be foo-adapter, got %v", lgs.Name())
 	}
 }
 
 func TestAlwaysGetSourceScopes(t *testing.T) {
-	lgs := AlwaysGetSource[any, any, any, any, any, any]{
+	lgs := AlwaysGetAdapter[any, any, any, any, any, any]{
 		AccountID: "foo",
 		Region:    "bar",
 	}
@@ -51,7 +51,7 @@ func TestAlwaysGetSourceScopes(t *testing.T) {
 
 func TestAlwaysGetSourceGet(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -83,7 +83,7 @@ func TestAlwaysGetSourceGet(t *testing.T) {
 	})
 
 	t.Run("with an error", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -117,7 +117,7 @@ func TestAlwaysGetSourceGet(t *testing.T) {
 
 func TestAlwaysGetSourceList(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -154,7 +154,7 @@ func TestAlwaysGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing output mapper", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -196,7 +196,7 @@ func TestAlwaysGetSourceList(t *testing.T) {
 	})
 
 	t.Run("with a failing GetFunc", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -236,7 +236,7 @@ func TestAlwaysGetSourceList(t *testing.T) {
 
 func TestAlwaysGetSourceSearch(t *testing.T) {
 	t.Run("with ARN search", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:    "test",
 			AccountID:   "foo",
 			Region:      "bar",
@@ -291,7 +291,7 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 	})
 
 	t.Run("with Custom & ARN search", func(t *testing.T) {
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:         "test",
 			AccountID:        "foo",
 			Region:           "bar",
@@ -352,7 +352,7 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 	t.Run("with custom search logic", func(t *testing.T) {
 		var searchMapperCalled bool
 
-		lgs := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		lgs := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:  "test",
 			AccountID: "foo",
 			Region:    "bar",
@@ -392,7 +392,7 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 	})
 
 	t.Run("with SearchGetInputMapper", func(t *testing.T) {
-		ags := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+		ags := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 			ItemType:         "test",
 			AccountID:        "foo",
 			Region:           "bar",
@@ -440,7 +440,7 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 func TestAlwaysGetSourceCaching(t *testing.T) {
 	ctx := context.Background()
 	generation := 0
-	s := AlwaysGetSource[string, string, string, string, struct{}, struct{}]{
+	s := AlwaysGetAdapter[string, string, string, string, struct{}, struct{}]{
 		ItemType:  "test",
 		AccountID: "foo",
 		Region:    "eu-west-2",

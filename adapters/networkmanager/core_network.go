@@ -120,8 +120,8 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
-func NewCoreNetworkSource(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetSource[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
-	return &adapters.AlwaysGetSource[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
+func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
+	return &adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

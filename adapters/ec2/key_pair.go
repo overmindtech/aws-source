@@ -59,8 +59,8 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_key_pair.id
 
-func NewKeyPairSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{
+func NewKeyPairAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

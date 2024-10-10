@@ -262,8 +262,8 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 // +overmind:search Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId
 // +overmind:group AWS
 
-func NewNetworkResourceRelationshipsSource(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlySource[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:       client,
 		AccountID:    accountID,
 		Region:       region,

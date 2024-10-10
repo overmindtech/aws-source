@@ -70,13 +70,13 @@ func TestHealthCheckItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewHealthCheckSource(t *testing.T) {
+func TestNewHealthCheckAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewHealthCheckSource(client, account, region)
+	adapter := NewHealthCheckAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

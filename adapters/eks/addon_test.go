@@ -47,13 +47,13 @@ func TestAddonGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewAddonSource(t *testing.T) {
+func TestNewAddonAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewAddonSource(client, account, region)
+	adapter := NewAddonAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

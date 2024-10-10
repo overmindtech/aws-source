@@ -130,8 +130,8 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 // +overmind:terraform:queryMap aws_iam_instance_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewInstanceProfileSource(client *iam.Client, accountID string, region string) *adapters.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options] {
-	return &adapters.GetListSource[*types.InstanceProfile, *iam.Client, *iam.Options]{
+func NewInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
+	return &adapters.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:        "iam-instance-profile",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

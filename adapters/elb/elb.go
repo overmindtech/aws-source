@@ -195,8 +195,8 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:terraform:queryMap aws_elb.arn
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerSource(client elbClient, accountID string, region string) *adapters.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
-	return &adapters.DescribeOnlySource[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
+func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
+	return &adapters.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

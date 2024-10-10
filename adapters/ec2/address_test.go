@@ -119,13 +119,13 @@ func TestAddressOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewAddressSource(t *testing.T) {
+func TestNewAddressAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewAddressSource(client, account, region)
+	adapter := NewAddressAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

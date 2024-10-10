@@ -134,8 +134,8 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 // +overmind:terraform:queryMap aws_route53_record.id
 // +overmind:terraform:method SEARCH
 
-func NewResourceRecordSetSource(client *route53.Client, accountID string, region string) *adapters.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
-	return &adapters.GetListSource[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
+func NewResourceRecordSetAdapter(client *route53.Client, accountID string, region string) *adapters.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
+	return &adapters.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
 		ItemType:        "route53-resource-record-set",
 		Client:          client,
 		DisableList:     true,

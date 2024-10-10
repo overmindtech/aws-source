@@ -101,8 +101,8 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_transit_gateway_route_table_attachment.id
 
-func NewTransitGatewayRouteTableAttachmentSource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-transit-gateway-route-table-attachment",

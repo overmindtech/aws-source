@@ -107,8 +107,8 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:terraform:queryMap aws_networkmanager_site.arn
 // +overmind:terraform:method SEARCH
 
-func NewSiteSource(client *networkmanager.Client, accountID string) *adapters.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewSiteAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-site",

@@ -30,34 +30,34 @@ func NetworkManager(t *testing.T) {
 
 	t.Logf("Running NetworkManager integration tests")
 
-	globalNetworkSource := networkmanager.NewGlobalNetworkSource(testClient, accountID)
+	globalNetworkSource := networkmanager.NewGlobalNetworkAdapter(testClient, accountID)
 	if err := globalNetworkSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager global network source: %v", err)
+		t.Fatalf("failed to validate NetworkManager global network adapter: %v", err)
 	}
 
-	siteSource := networkmanager.NewSiteSource(testClient, accountID)
+	siteSource := networkmanager.NewSiteAdapter(testClient, accountID)
 	if err := siteSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager site source: %v", err)
+		t.Fatalf("failed to validate NetworkManager site adapter: %v", err)
 	}
 
-	linkSource := networkmanager.NewLinkSource(testClient, accountID)
+	linkSource := networkmanager.NewLinkAdapter(testClient, accountID)
 	if err := linkSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager link source: %v", err)
+		t.Fatalf("failed to validate NetworkManager link adapter: %v", err)
 	}
 
-	linkAssociationSource := networkmanager.NewLinkAssociationSource(testClient, accountID)
+	linkAssociationSource := networkmanager.NewLinkAssociationAdapter(testClient, accountID)
 	if err := linkAssociationSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager link association source: %v", err)
+		t.Fatalf("failed to validate NetworkManager link association adapter: %v", err)
 	}
 
-	connectionSource := networkmanager.NewConnectionSource(testClient, accountID)
+	connectionSource := networkmanager.NewConnectionAdapter(testClient, accountID)
 	if err := connectionSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager connection source: %v", err)
+		t.Fatalf("failed to validate NetworkManager connection adapter: %v", err)
 	}
 
-	deviceSource := networkmanager.NewDeviceSource(testClient, accountID)
+	deviceSource := networkmanager.NewDeviceAdapter(testClient, accountID)
 	if err := deviceSource.Validate(); err != nil {
-		t.Fatalf("failed to validate NetworkManager device source: %v", err)
+		t.Fatalf("failed to validate NetworkManager device adapter: %v", err)
 	}
 
 	globalScope := adapters.FormatScope(accountID, "")

@@ -50,13 +50,13 @@ func TestOriginRequestPolicyItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewOriginRequestPolicySource(t *testing.T) {
+func TestNewOriginRequestPolicyAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewOriginRequestPolicySource(client, account)
+	adapter := NewOriginRequestPolicyAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

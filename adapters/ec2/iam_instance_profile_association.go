@@ -77,9 +77,9 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 // +overmind:search Search IAM Instance Profile Associations by ARN
 // +overmind:group AWS
 
-// NewIamInstanceProfileAssociationSource Creates a new source for aws-IamInstanceProfileAssociation resources
-func NewIamInstanceProfileAssociationSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
+// NewIamInstanceProfileAssociationAdapter Creates a new adapter for aws-IamInstanceProfileAssociation resources
+func NewIamInstanceProfileAssociationAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

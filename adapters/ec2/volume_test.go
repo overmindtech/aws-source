@@ -100,13 +100,13 @@ func TestVolumeOutputMapper(t *testing.T) {
 
 }
 
-func TestNewVolumeSource(t *testing.T) {
+func TestNewVolumeAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewVolumeSource(client, account, region)
+	adapter := NewVolumeAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

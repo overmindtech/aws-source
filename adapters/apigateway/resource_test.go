@@ -162,15 +162,15 @@ func TestResourceOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewResourceSource(t *testing.T) {
+func TestNewResourceAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 
 	client := apigateway.NewFromConfig(config)
 
-	source := NewResourceSource(client, account, region)
+	adapter := NewResourceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

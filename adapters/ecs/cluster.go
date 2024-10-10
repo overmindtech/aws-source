@@ -220,8 +220,8 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 // +overmind:terraform:queryMap aws_ecs_cluster.arn
 // +overmind:terraform:method SEARCH
 
-func NewClusterSource(client ECSClient, accountID string, region string) *adapters.AlwaysGetSource[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetSource[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
+func NewClusterAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
+	return &adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-cluster",
 		Client:    client,
 		AccountID: accountID,

@@ -78,13 +78,13 @@ func TestDirectConnectGatewayOutputMapper_Health_ERROR(t *testing.T) {
 	}
 }
 
-func TestNewDirectConnectGatewaySource(t *testing.T) {
+func TestNewDirectConnectGatewayAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewaySource(client, account, region)
+	adapter := NewDirectConnectGatewayAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

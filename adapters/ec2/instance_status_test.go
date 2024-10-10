@@ -104,13 +104,13 @@ func TestInstanceStatusOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceStatusSource(t *testing.T) {
+func TestNewInstanceStatusAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewInstanceStatusSource(client, account, region)
+	adapter := NewInstanceStatusAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

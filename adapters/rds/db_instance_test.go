@@ -309,13 +309,13 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBInstanceSource(t *testing.T) {
+func TestNewDBInstanceAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDBInstanceSource(client, account, region)
+	adapter := NewDBInstanceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

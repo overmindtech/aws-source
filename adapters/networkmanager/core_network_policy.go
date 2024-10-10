@@ -63,8 +63,8 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network_policy.core_network_id
 
-func NewCoreNetworkPolicySource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{
+func NewCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

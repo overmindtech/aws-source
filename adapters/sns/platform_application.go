@@ -76,8 +76,8 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_platform_application.id
 
-func NewPlatformApplicationSource(client platformApplicationClient, accountID string, region string) *adapters.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
-	return &adapters.AlwaysGetSource[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
+func NewPlatformApplicationAdapter(client platformApplicationClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
+	return &adapters.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
 		ItemType:        "sns-platform-application",
 		Client:          client,
 		AccountID:       accountID,

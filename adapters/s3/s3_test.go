@@ -662,13 +662,13 @@ func (t TestS3FailClient) PutObject(ctx context.Context, params *s3.PutObjectInp
 	return nil, errors.New("failed to put object")
 }
 
-func TestNewS3Source(t *testing.T) {
+func TestNewS3Adapter(t *testing.T) {
 	config, account, _ := adapters.GetAutoConfig(t)
 
-	source := NewS3Source(config, account)
+	adapter := NewS3Adapter(config, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

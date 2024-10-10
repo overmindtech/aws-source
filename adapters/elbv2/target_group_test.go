@@ -85,14 +85,14 @@ func TestTargetGroupOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewTargetGroupSource(t *testing.T) {
+func TestNewTargetGroupAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := elasticloadbalancingv2.NewFromConfig(config)
 
-	source := NewTargetGroupSource(client, account, region)
+	adapter := NewTargetGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

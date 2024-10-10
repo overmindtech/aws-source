@@ -88,13 +88,13 @@ func TestConnectionOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewConnectionSource(t *testing.T) {
+func TestNewConnectionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewConnectionSource(client, account, region)
+	adapter := NewConnectionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

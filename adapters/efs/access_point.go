@@ -64,8 +64,8 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_access_point.id
 
-func NewAccessPointSource(client *efs.Client, accountID string, region string) *adapters.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlySource[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
+func NewAccessPointAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
+	return &adapters.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-access-point",
 		Region:          region,
 		Client:          client,

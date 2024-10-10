@@ -111,13 +111,13 @@ func TestSubnetOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSubnetSource(t *testing.T) {
+func TestNewSubnetAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewSubnetSource(client, account, region)
+	adapter := NewSubnetAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

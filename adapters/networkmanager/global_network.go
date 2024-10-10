@@ -178,8 +178,8 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 // +overmind:terraform:queryMap aws_networkmanager_global_network.arn
 // +overmind:terraform:method SEARCH
 
-func NewGlobalNetworkSource(client *networkmanager.Client, accountID string) *adapters.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{
 		ItemType:  "networkmanager-global-network",
 		Client:    client,
 		AccountID: accountID,

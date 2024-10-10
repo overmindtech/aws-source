@@ -87,13 +87,13 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkInterfacePermissionSource(t *testing.T) {
+func TestNewNetworkInterfacePermissionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkInterfacePermissionSource(client, account, region)
+	adapter := NewNetworkInterfacePermissionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

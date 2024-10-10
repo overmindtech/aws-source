@@ -116,13 +116,13 @@ func TestDirectConnectGatewayAssociationOutputMapper_Health_Error(t *testing.T) 
 	tests.Execute(t, item)
 }
 
-func TestNewDirectConnectGatewayAssociationSource(t *testing.T) {
+func TestNewDirectConnectGatewayAssociationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewayAssociationSource(client, account, region)
+	adapter := NewDirectConnectGatewayAssociationAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

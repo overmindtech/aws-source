@@ -105,13 +105,13 @@ func TestImageOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewImageSource(t *testing.T) {
+func TestNewImageAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewImageSource(client, account, region)
+	adapter := NewImageAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

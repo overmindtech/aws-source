@@ -112,10 +112,10 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewResourceRecordSetSource(t *testing.T) {
+func TestNewResourceRecordSetAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	zoneSource := NewHostedZoneSource(client, account, region)
+	zoneSource := NewHostedZoneAdapter(client, account, region)
 
 	zones, err := zoneSource.List(context.Background(), zoneSource.Scopes()[0], true)
 	if err != nil {
@@ -126,11 +126,11 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 		t.Skip("no zones found")
 	}
 
-	source := NewResourceRecordSetSource(client, account, region)
+	adapter := NewResourceRecordSetAdapter(client, account, region)
 
 	search := zones[0].UniqueAttributeValue()
 	test := adapters.E2ETest{
-		Adapter:         source,
+		Adapter:         adapter,
 		Timeout:         10 * time.Second,
 		SkipGet:         true,
 		GoodSearchQuery: &search,
@@ -138,7 +138,7 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 
 	test.Run(t)
 
-	items, err := source.Search(context.Background(), zoneSource.Scopes()[0], search, true)
+	items, err := adapter.Search(context.Background(), zoneSource.Scopes()[0], search, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,7 +147,7 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 
 	rawZone := strings.TrimPrefix(search, "/hostedzone/")
 
-	items, err = source.Search(context.Background(), zoneSource.Scopes()[0], rawZone, true)
+	items, err = adapter.Search(context.Background(), zoneSource.Scopes()[0], rawZone, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,7 +164,7 @@ func TestNewResourceRecordSetSource(t *testing.T) {
 		typ, _ := item.GetAttributes().Get("Type")
 		search = fmt.Sprintf("%s_%s_%s", rawZone, name, typ)
 
-		items, err := source.Search(context.Background(), zoneSource.Scopes()[0], search, true)
+		items, err := adapter.Search(context.Background(), zoneSource.Scopes()[0], search, true)
 		if err != nil {
 			t.Fatal(err)
 		}

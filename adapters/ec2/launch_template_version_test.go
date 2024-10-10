@@ -202,13 +202,13 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewLaunchTemplateVersionSource(t *testing.T) {
+func TestNewLaunchTemplateVersionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLaunchTemplateVersionSource(client, account, region)
+	adapter := NewLaunchTemplateVersionAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

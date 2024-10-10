@@ -51,13 +51,13 @@ func TestLayerItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLayerSource(t *testing.T) {
+func TestNewLayerAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewLayerSource(client, account, region)
+	adapter := NewLayerAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 		SkipGet: true,
 	}

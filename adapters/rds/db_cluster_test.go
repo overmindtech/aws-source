@@ -251,13 +251,13 @@ func TestDBClusterOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBClusterSource(t *testing.T) {
+func TestNewDBClusterAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDBClusterSource(client, account, region)
+	adapter := NewDBClusterAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

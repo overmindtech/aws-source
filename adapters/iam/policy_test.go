@@ -320,17 +320,17 @@ func TestPolicyItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewPolicySource(t *testing.T) {
+func TestNewPolicyAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	source := NewPolicySource(client, account, region)
+	adapter := NewPolicyAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}
 
@@ -344,7 +344,7 @@ func TestNewPolicySource(t *testing.T) {
 
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		_, err := source.Get(ctx, adapters.FormatScope(account, ""), "ReadOnlyAccess", false)
+		_, err := adapter.Get(ctx, adapters.FormatScope(account, ""), "ReadOnlyAccess", false)
 
 		if err == nil {
 			t.Error("expected error, got nil")
@@ -357,7 +357,7 @@ func TestNewPolicySource(t *testing.T) {
 
 		t.Parallel()
 		// This item shouldn't be found since it lives globally
-		item, err := source.Get(ctx, "aws", "ReadOnlyAccess", false)
+		item, err := adapter.Get(ctx, "aws", "ReadOnlyAccess", false)
 
 		if err != nil {
 			t.Error(err)
@@ -372,7 +372,7 @@ func TestNewPolicySource(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := source.List(ctx, adapters.FormatScope(account, ""), false)
+		items, err := adapter.List(ctx, adapters.FormatScope(account, ""), false)
 
 		if err != nil {
 			t.Error(err)
@@ -404,7 +404,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := source.Search(ctx, adapters.FormatScope(account, ""), arn.(string), false)
+			_, err := adapter.Search(ctx, adapters.FormatScope(account, ""), arn.(string), false)
 
 			if err != nil {
 				t.Error(err)
@@ -419,7 +419,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := source.Search(ctx, "aws", arn.(string), false)
+			_, err := adapter.Search(ctx, "aws", arn.(string), false)
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -431,7 +431,7 @@ func TestNewPolicySource(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := source.List(ctx, "aws", false)
+		items, err := adapter.List(ctx, "aws", false)
 		if err != nil {
 			t.Error(err)
 		}
@@ -466,7 +466,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := source.Search(ctx, adapters.FormatScope(account, ""), arn.(string), false)
+			_, err := adapter.Search(ctx, adapters.FormatScope(account, ""), arn.(string), false)
 
 			if err == nil {
 				t.Error("expected error, got nil")
@@ -481,7 +481,7 @@ func TestNewPolicySource(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := source.Search(ctx, "aws", arn.(string), false)
+			_, err := adapter.Search(ctx, "aws", arn.(string), false)
 
 			if err != nil {
 				t.Error(err)

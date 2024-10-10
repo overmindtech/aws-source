@@ -51,17 +51,17 @@ func TestInstanceProfileItemMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceProfileSource(t *testing.T) {
+func TestNewInstanceProfileAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	source := NewInstanceProfileSource(client, account, region)
+	adapter := NewInstanceProfileAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}
 

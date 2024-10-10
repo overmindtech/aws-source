@@ -80,13 +80,13 @@ func TestAccessPointOutputMapper(t *testing.T) {
 
 }
 
-func TestNewAccessPointSource(t *testing.T) {
+func TestNewAccessPointAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewAccessPointSource(client, account, region)
+	adapter := NewAccessPointAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

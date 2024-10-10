@@ -87,8 +87,8 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 // +overmind:search Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId
 // +overmind:group AWS
 
-func NewTransitGatewayRegistrationSource(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlySource[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

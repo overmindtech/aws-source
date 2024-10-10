@@ -88,8 +88,8 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
-func NewConnectAttachmentSource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

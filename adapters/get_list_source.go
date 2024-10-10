@@ -11,9 +11,9 @@ import (
 	"github.com/overmindtech/sdpcache"
 )
 
-// GetListSource A source for AWS APIs where the Get and List functions both
+// GetListAdapter A adapter for AWS APIs where the Get and List functions both
 // return the full item, such as many of the IAM APIs
-type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
+type GetListAdapter[AWSItem AWSItemType, ClientStruct ClientStructType, Options OptionsType] struct {
 	ItemType               string       // The type of items that will be returned
 	Client                 ClientStruct // The AWS API client
 	AccountID              string       // The AWS account ID
@@ -22,7 +22,7 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 	AdapterMetadata        sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
-	cache         *sdpcache.Cache // The sdpcache of this source
+	cache         *sdpcache.Cache // The sdpcache of this adapter
 	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 
 	// Disables List(), meaning all calls will return empty results. This does
@@ -48,7 +48,7 @@ type GetListSource[AWSItem AWSItemType, ClientStruct ClientStructType, Options O
 	ListTagsFunc func(context.Context, AWSItem, ClientStruct) (map[string]string, error)
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) cacheDuration() time.Duration {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) cacheDuration() time.Duration {
 	if s.CacheDuration == 0 {
 		return DefaultCacheDuration
 	}
@@ -56,7 +56,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) cacheDuration() time.Dur
 	return s.CacheDuration
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) ensureCache() {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) ensureCache() {
 	s.cacheInitMu.Lock()
 	defer s.cacheInitMu.Unlock()
 
@@ -65,13 +65,13 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) ensureCache() {
 	}
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Cache() *sdpcache.Cache {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Cache() *sdpcache.Cache {
 	s.ensureCache()
 	return s.cache
 }
 
-// Validate Checks that the source has been set up correctly
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Validate() error {
+// Validate Checks that the adapter has been set up correctly
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Validate() error {
 	if s.GetFunc == nil {
 		return errors.New("GetFunc is nil")
 	}
@@ -89,21 +89,21 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Validate() error {
 	return nil
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Type() string {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Type() string {
 	return s.ItemType
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Name() string {
-	return fmt.Sprintf("%v-source", s.ItemType)
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Name() string {
+	return fmt.Sprintf("%v-adapter", s.ItemType)
 }
 
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
 	return &s.AdapterMetadata
 }
 
-// List of scopes that this source is capable of find items for. This will be
+// List of scopes that this adapter is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Scopes() []string {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Scopes() []string {
 	scopes := make([]string, 0)
 
 	scopes = append(scopes, FormatScope(s.AccountID, s.Region))
@@ -115,8 +115,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Scopes() []string {
 	return scopes
 }
 
-// hasScope Returns whether or not this source has the given scope
-func (s *GetListSource[AWSItem, ClientStruct, Options]) hasScope(scope string) bool {
+// hasScope Returns whether or not this adapter has the given scope
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) hasScope(scope string) bool {
 	if scope == "aws" && s.SupportGlobalResources {
 		// There is a special global "account" that is used for global resources
 		// called "aws"
@@ -132,14 +132,14 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) hasScope(scope string) b
 	return false
 }
 
-// Get retrieves an item from the source based on the provided scope, query, and
+// Get retrieves an item from the adapter based on the provided scope, query, and
 // cache settings. It uses the defined `GetFunc`, `ItemMapper`, and
 // `ListTagsFunc` to retrieve and map the item.
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -186,11 +186,11 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Get(ctx context.Context,
 
 // List Lists all available items. This is done by running the ListFunc, then
 // passing these results to GetFunc in order to get the details
-func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -236,12 +236,12 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) List(ctx context.Context
 // Search Searches for AWS resources, this can be implemented either as a
 // generic ARN search that tries to extract the globally unique name from the
 // ARN and pass this to a Get request, or a custom search function that can be
-// used to search for items in a different, source-specific way
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+// used to search for items in a different, adapter-specific way
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if !s.hasScope(scope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -254,7 +254,7 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) Search(ctx context.Conte
 
 // Extracts the `ResourceID` and scope from the ARN, then calls `Get` with the
 // extracted `ResourceID`
-func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -282,8 +282,8 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchARN(ctx context.Co
 }
 
 // Custom search function that can be used to search for items in a different,
-// source-specific way
-func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+// adapter-specific way
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) SearchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// We need to cache here since this is the only place it'll be called
 	s.ensureCache()
 	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
@@ -317,10 +317,10 @@ func (s *GetListSource[AWSItem, ClientStruct, Options]) SearchCustom(ctx context
 	return items, nil
 }
 
-// Weight Returns the priority weighting of items returned by this source.
-// This is used to resolve conflicts where two sources of the same type
+// Weight Returns the priority weighting of items returned by this adapter.
+// This is used to resolve conflicts where two adapters of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (s *GetListSource[AWSItem, ClientStruct, Options]) Weight() int {
+func (s *GetListAdapter[AWSItem, ClientStruct, Options]) Weight() int {
 	return 100
 }

@@ -163,8 +163,8 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 // +overmind:search Search for Network Firewall TLS Inspection Configurations by ARN
 // +overmind:group AWS
 
-func NewTLSInspectionConfigurationSource(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetSource[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetSource[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewTLSInspectionConfigurationAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapters.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-tls-inspection-configuration",
 		Client:    client,
 		AccountID: accountID,

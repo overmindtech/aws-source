@@ -55,8 +55,8 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 // +overmind:terraform:queryMap aws_db_option_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewOptionGroupSource(client rdsClient, accountID string, region string) *adapters.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
-	return &adapters.DescribeOnlySource[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
+func NewOptionGroupAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
+	return &adapters.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-option-group",
 		Region:    region,
 		AccountID: accountID,

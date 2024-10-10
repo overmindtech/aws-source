@@ -88,8 +88,8 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_alias.arn
 
-func NewAliasSource(client *kms.Client, accountID string, region string) *adapters.DescribeOnlySource[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options] {
-	return &adapters.DescribeOnlySource[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options]{
+func NewAliasAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options] {
+	return &adapters.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options]{
 		ItemType:  "kms-alias",
 		Client:    client,
 		AccountID: accountID,

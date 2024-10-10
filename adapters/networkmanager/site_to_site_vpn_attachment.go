@@ -96,8 +96,8 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_site_to_site_vpn_attachment.id
 
-func NewSiteToSiteVpnAttachmentSource(client *networkmanager.Client, accountID, region string) *adapters.GetListSource[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListSource[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

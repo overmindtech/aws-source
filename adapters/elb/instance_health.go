@@ -96,8 +96,8 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 // +overmind:list List all instance healths
 // +overmind:group AWS
 
-func NewInstanceHealthSource(client *elasticloadbalancing.Client, accountID string, region string) *adapters.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
-	return &adapters.DescribeOnlySource[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
+func NewInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
+	return &adapters.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

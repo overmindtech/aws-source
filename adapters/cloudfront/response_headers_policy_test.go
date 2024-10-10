@@ -87,13 +87,13 @@ func TestResponseHeadersPolicyItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewResponseHeadersPolicySource(t *testing.T) {
+func TestNewResponseHeadersPolicyAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewResponseHeadersPolicySource(client, account)
+	adapter := NewResponseHeadersPolicyAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

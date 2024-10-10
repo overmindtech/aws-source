@@ -84,13 +84,13 @@ func TestCachePolicyListFunc(t *testing.T) {
 	}
 }
 
-func TestNewCachePolicySource(t *testing.T) {
+func TestNewCachePolicyAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewCachePolicySource(client, account)
+	adapter := NewCachePolicyAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -9,7 +9,7 @@ import (
 	"github.com/overmindtech/sdp-go"
 )
 
-// AddressInputMapperGet Maps source calls to the correct input for the AZ API
+// AddressInputMapperGet Maps adapter calls to the correct input for the AZ API
 func addressInputMapperGet(scope, query string) (*ec2.DescribeAddressesInput, error) {
 	return &ec2.DescribeAddressesInput{
 		PublicIps: []string{
@@ -18,7 +18,7 @@ func addressInputMapperGet(scope, query string) (*ec2.DescribeAddressesInput, er
 	}, nil
 }
 
-// AddressInputMapperList Maps source calls to the correct input for the AZ API
+// AddressInputMapperList Maps adapter calls to the correct input for the AZ API
 func addressInputMapperList(scope string) (*ec2.DescribeAddressesInput, error) {
 	return &ec2.DescribeAddressesInput{}, nil
 }
@@ -148,9 +148,9 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 // +overmind:terraform:queryMap aws_eip.public_ip
 // +overmind:terraform:queryMap aws_eip_association.public_ip
 
-// NewAddressSource Creates a new source for aws-Address resources
-func NewAddressSource(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlySource[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
+// NewAddressAdapter Creates a new adapter for aws-Address resources
+func NewAddressAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
+	return &adapters.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

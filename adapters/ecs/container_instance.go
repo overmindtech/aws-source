@@ -123,8 +123,8 @@ func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOut
 // +overmind:search Search for container instances by cluster
 // +overmind:group AWS
 
-func NewContainerInstanceSource(client ECSClient, accountID string, region string) *adapters.AlwaysGetSource[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetSource[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{
+func NewContainerInstanceAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
+	return &adapters.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{
 		ItemType:  "ecs-container-instance",
 		Client:    client,
 		AccountID: accountID,

@@ -72,13 +72,13 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 
 }
 
-func TestNewPlacementGroupSource(t *testing.T) {
+func TestNewPlacementGroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewPlacementGroupSource(client, account, region)
+	adapter := NewPlacementGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

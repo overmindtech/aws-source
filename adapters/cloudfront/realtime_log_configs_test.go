@@ -56,13 +56,13 @@ func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRealtimeLogConfigsSource(t *testing.T) {
+func TestNewRealtimeLogConfigsAdapter(t *testing.T) {
 	client, account, _ := GetAutoConfig(t)
 
-	source := NewRealtimeLogConfigsSource(client, account)
+	adapter := NewRealtimeLogConfigsAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

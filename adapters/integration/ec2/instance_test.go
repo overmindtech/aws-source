@@ -29,17 +29,17 @@ func EC2(t *testing.T) {
 
 	t.Log("Running EC2 integration test")
 
-	instanceSource := ec2.NewInstanceSource(testClient, accountID, testAWSConfig.Region)
+	instanceAdapter := ec2.NewInstanceAdapter(testClient, accountID, testAWSConfig.Region)
 
-	err = instanceSource.Validate()
+	err = instanceAdapter.Validate()
 	if err != nil {
-		t.Fatalf("failed to validate EC2 instance source: %v", err)
+		t.Fatalf("failed to validate EC2 instance adapter: %v", err)
 	}
 
 	scope := adapters.FormatScope(accountID, testAWSConfig.Region)
 
 	// List instances
-	sdpListInstances, err := instanceSource.List(context.Background(), scope, true)
+	sdpListInstances, err := instanceAdapter.List(context.Background(), scope, true)
 	if err != nil {
 		t.Fatalf("failed to list EC2 instances: %v", err)
 	}
@@ -61,7 +61,7 @@ func EC2(t *testing.T) {
 	}
 
 	// Get instance
-	sdpInstance, err := instanceSource.Get(context.Background(), scope, instanceID, true)
+	sdpInstance, err := instanceAdapter.Get(context.Background(), scope, instanceID, true)
 	if err != nil {
 		t.Fatalf("failed to get EC2 instance: %v", err)
 	}
@@ -77,7 +77,7 @@ func EC2(t *testing.T) {
 
 	// Search instances
 	instanceARN := fmt.Sprintf("arn:aws:ec2:%s:%s:instance/%s", testAWSConfig.Region, accountID, instanceID)
-	sdpSearchInstances, err := instanceSource.Search(context.Background(), scope, instanceARN, true)
+	sdpSearchInstances, err := instanceAdapter.Search(context.Background(), scope, instanceARN, true)
 	if err != nil {
 		t.Fatalf("failed to search EC2 instances: %v", err)
 	}

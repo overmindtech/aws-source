@@ -45,8 +45,8 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_cache_policy.id
 
-func NewCachePolicySource(client CloudFrontClient, accountID string) *adapters.GetListSource[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
-	return &adapters.GetListSource[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
+func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapters.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
+	return &adapters.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
 		ItemType:               "cloudfront-cache-policy",
 		Client:                 client,
 		AccountID:              accountID,

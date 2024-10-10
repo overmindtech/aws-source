@@ -72,13 +72,13 @@ func TestDirectConnectGatewayAssociationProposalOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDirectConnectGatewayAssociationProposalSource(t *testing.T) {
+func TestNewDirectConnectGatewayAssociationProposalAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDirectConnectGatewayAssociationProposalSource(client, account, region)
+	adapter := NewDirectConnectGatewayAssociationProposalAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

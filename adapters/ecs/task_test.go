@@ -230,13 +230,13 @@ func TestTaskGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewTaskSource(t *testing.T) {
+func TestNewTaskAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewTaskSource(client, account, region)
+	adapter := NewTaskAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:           source,
+		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,
 	}

@@ -31,17 +31,17 @@ func TestGroupItemMapper(t *testing.T) {
 
 }
 
-func TestNewGroupSource(t *testing.T) {
+func TestNewGroupAdapter(t *testing.T) {
 	config, account, region := adapters.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	source := NewGroupSource(client, account, region)
+	adapter := NewGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}
 

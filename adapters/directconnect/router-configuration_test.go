@@ -55,13 +55,13 @@ func TestRouterConfigurationOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRouterConfigurationSource(t *testing.T) {
+func TestNewRouterConfigurationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewRouterConfigurationSource(client, account, region)
+	adapter := NewRouterConfigurationAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter:  source,
+		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,
 	}

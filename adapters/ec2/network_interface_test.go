@@ -197,13 +197,13 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkInterfaceSource(t *testing.T) {
+func TestNewNetworkInterfaceAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewNetworkInterfaceSource(client, account, region)
+	adapter := NewNetworkInterfaceAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -30,32 +30,32 @@ func KMS(t *testing.T) {
 
 	t.Log("Running KMS integration test")
 
-	keySource := kms.NewKeySource(testClient, accountID, testAWSConfig.Region)
+	keySource := kms.NewKeyAdapter(testClient, accountID, testAWSConfig.Region)
 
-	aliasSource := kms.NewAliasSource(testClient, accountID, testAWSConfig.Region)
+	aliasSource := kms.NewAliasAdapter(testClient, accountID, testAWSConfig.Region)
 
-	grantSource := kms.NewGrantSource(testClient, accountID, testAWSConfig.Region)
+	grantSource := kms.NewGrantAdapter(testClient, accountID, testAWSConfig.Region)
 
-	keyPolicySource := kms.NewKeyPolicySource(testClient, accountID, testAWSConfig.Region)
+	keyPolicySource := kms.NewKeyPolicyAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = keySource.Validate()
 	if err != nil {
-		t.Fatalf("failed to validate KMS key source: %v", err)
+		t.Fatalf("failed to validate KMS key adapter: %v", err)
 	}
 
 	err = aliasSource.Validate()
 	if err != nil {
-		t.Fatalf("failed to validate KMS alias source: %v", err)
+		t.Fatalf("failed to validate KMS alias adapter: %v", err)
 	}
 
 	err = grantSource.Validate()
 	if err != nil {
-		t.Fatalf("failed to validate KMS grant source: %v", err)
+		t.Fatalf("failed to validate KMS grant adapter: %v", err)
 	}
 
 	err = keyPolicySource.Validate()
 	if err != nil {
-		t.Fatalf("failed to validate KMS key policy source: %v", err)
+		t.Fatalf("failed to validate KMS key policy adapter: %v", err)
 	}
 
 	scope := adapters.FormatScope(accountID, testAWSConfig.Region)

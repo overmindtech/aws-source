@@ -71,13 +71,13 @@ func TestKeyPairOutputMapper(t *testing.T) {
 
 }
 
-func TestNewKeyPairSource(t *testing.T) {
+func TestNewKeyPairAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewKeyPairSource(client, account, region)
+	adapter := NewKeyPairAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

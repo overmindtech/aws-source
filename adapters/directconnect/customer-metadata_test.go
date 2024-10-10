@@ -36,13 +36,13 @@ func TestCustomerMetadataOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewCustomerMetadataSource(t *testing.T) {
+func TestNewCustomerMetadataAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewCustomerMetadataSource(client, account, region)
+	adapter := NewCustomerMetadataAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -125,8 +125,8 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 // +overmind:search Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId
 // +overmind:group AWS
 
-func NewConnectPeerAssociationSource(client *networkmanager.Client, accountID string, region string) *adapters.DescribeOnlySource[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		Region:    region,

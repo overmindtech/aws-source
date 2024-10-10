@@ -181,8 +181,8 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_user.arn
 // +overmind:terraform:method SEARCH
 
-func NewUserSource(client *iam.Client, accountID string, region string) *adapters.GetListSource[*UserDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListSource[*UserDetails, IAMClient, *iam.Options]{
+func NewUserAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
+	return &adapters.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-user",
 		Client:          client,
 		AccountID:       accountID,

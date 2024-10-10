@@ -146,8 +146,8 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 // +overmind:terraform:queryMap aws_networkmanager_connection.arn
 // +overmind:terraform:method SEARCH
 
-func NewConnectionSource(client *networkmanager.Client, accountID string) *adapters.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlySource[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapters.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-connection",

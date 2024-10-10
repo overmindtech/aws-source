@@ -117,8 +117,8 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 // +overmind:terraform:queryMap aws_db_subnet_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBSubnetGroupSource(client rdsClient, accountID string, region string) *adapters.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
-	return &adapters.DescribeOnlySource[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
+func NewDBSubnetGroupAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
+	return &adapters.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-subnet-group",
 		Region:    region,
 		AccountID: accountID,

@@ -43,8 +43,8 @@ func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.
 // +overmind:terraform:queryMap aws_db_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBParameterGroupSource(client rdsClient, accountID string, region string) *adapters.GetListSource[*ParameterGroup, rdsClient, *rds.Options] {
-	return &adapters.GetListSource[*ParameterGroup, rdsClient, *rds.Options]{
+func NewDBParameterGroupAdapter(client rdsClient, accountID string, region string) *adapters.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options] {
+	return &adapters.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:  "rds-db-parameter-group",
 		Client:    client,
 		AccountID: accountID,

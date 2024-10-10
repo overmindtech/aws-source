@@ -125,8 +125,8 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_firewall_policy.name
 
-func NewFirewallPolicySource(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetSource[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetSource[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewFirewallPolicyAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:  "network-firewall-firewall-policy",
 		Client:    client,
 		AccountID: accountID,

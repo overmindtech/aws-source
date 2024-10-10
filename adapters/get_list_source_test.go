@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetListSourceType(t *testing.T) {
-	s := GetListSource[string, struct{}, struct{}]{
+	s := GetListAdapter[string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
@@ -21,17 +21,17 @@ func TestGetListSourceType(t *testing.T) {
 }
 
 func TestGetListSourceName(t *testing.T) {
-	s := GetListSource[string, struct{}, struct{}]{
+	s := GetListAdapter[string, struct{}, struct{}]{
 		ItemType: "foo",
 	}
 
-	if s.Name() != "foo-source" {
-		t.Errorf("expected type to be foo-source got %v", s.Name())
+	if s.Name() != "foo-adapter" {
+		t.Errorf("expected type to be foo-adapter got %v", s.Name())
 	}
 }
 
 func TestGetListSourceScopes(t *testing.T) {
-	s := GetListSource[string, struct{}, struct{}]{
+	s := GetListAdapter[string, struct{}, struct{}]{
 		AccountID: "foo",
 		Region:    "bar",
 	}
@@ -43,7 +43,7 @@ func TestGetListSourceScopes(t *testing.T) {
 
 func TestGetListSourceGet(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -74,7 +74,7 @@ func TestGetListSourceGet(t *testing.T) {
 	})
 
 	t.Run("with an error in the GetFunc", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -95,7 +95,7 @@ func TestGetListSourceGet(t *testing.T) {
 	})
 
 	t.Run("with an error in the mapper", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -118,7 +118,7 @@ func TestGetListSourceGet(t *testing.T) {
 
 func TestGetListSourceList(t *testing.T) {
 	t.Run("with no errors", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -152,7 +152,7 @@ func TestGetListSourceList(t *testing.T) {
 	})
 
 	t.Run("with an error in the ListFunc", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -173,7 +173,7 @@ func TestGetListSourceList(t *testing.T) {
 	})
 
 	t.Run("with an error in the mapper", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -200,7 +200,7 @@ func TestGetListSourceList(t *testing.T) {
 
 func TestGetListSourceSearch(t *testing.T) {
 	t.Run("with ARN search", func(t *testing.T) {
-		s := GetListSource[string, struct{}, struct{}]{
+		s := GetListAdapter[string, struct{}, struct{}]{
 			ItemType:  "person",
 			Region:    "eu-west-2",
 			AccountID: "12345",
@@ -243,7 +243,7 @@ func TestGetListSourceSearch(t *testing.T) {
 func TestGetListSourceCaching(t *testing.T) {
 	ctx := context.Background()
 	generation := 0
-	s := GetListSource[string, struct{}, struct{}]{
+	s := GetListAdapter[string, struct{}, struct{}]{
 		ItemType:  "test-type",
 		Region:    "eu-west-2",
 		AccountID: "foo",

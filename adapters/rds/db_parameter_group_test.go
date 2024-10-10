@@ -72,13 +72,13 @@ func TestDBParameterGroupOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewDBParameterGroupSource(t *testing.T) {
+func TestNewDBParameterGroupAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	source := NewDBParameterGroupSource(client, account, region)
+	adapter := NewDBParameterGroupAdapter(client, account, region)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

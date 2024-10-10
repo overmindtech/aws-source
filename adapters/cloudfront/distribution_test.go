@@ -495,14 +495,14 @@ func TestDistributionGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDistributionSource(t *testing.T) {
+func TestNewDistributionAdapter(t *testing.T) {
 	config, account, _ := adapters.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
-	source := NewDistributionSource(client, account)
+	adapter := NewDistributionAdapter(client, account)
 
 	test := adapters.E2ETest{
-		Adapter: source,
+		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
 

@@ -220,8 +220,8 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 // +overmind:terraform:method SEARCH
 //
 //go:generate docgen ../../docs-data
-func NewAutoScalingGroupSource(client *autoscaling.Client, accountID string, region string) *adapters.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
-	return &adapters.DescribeOnlySource[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
+func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
+	return &adapters.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:        "autoscaling-auto-scaling-group",
 		AccountID:       accountID,
 		Region:          region,

@@ -241,8 +241,8 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 // +overmind:search Search for ECS tasks by cluster
 // +overmind:group AWS
 
-func NewTaskSource(client ECSClient, accountID string, region string) *adapters.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetSource[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
+func NewTaskAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
+	return &adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
 		ItemType:       "ecs-task",
 		Client:         client,
 		AccountID:      accountID,

@@ -670,8 +670,8 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:terraform:queryMap aws_cloudfront_distribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewDistributionSource(client CloudFrontClient, accountID string) *adapters.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
-	return &adapters.AlwaysGetSource[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
+func NewDistributionAdapter(client CloudFrontClient, accountID string) *adapters.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+	return &adapters.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:        "cloudfront-distribution",
 		Client:          client,
 		AccountID:       accountID,

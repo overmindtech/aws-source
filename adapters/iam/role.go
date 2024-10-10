@@ -302,8 +302,8 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_role.arn
 // +overmind:terraform:method SEARCH
 
-func NewRoleSource(client *iam.Client, accountID string, region string) *adapters.GetListSource[*RoleDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListSource[*RoleDetails, IAMClient, *iam.Options]{
+func NewRoleAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
+	return &adapters.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-role",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

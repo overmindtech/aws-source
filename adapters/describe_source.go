@@ -14,21 +14,21 @@ import (
 
 const DefaultCacheDuration = 1 * time.Hour
 
-// DescribeOnlySource Generates a source for AWS APIs that only use a `Describe`
+// DescribeOnlyAdapter Generates a adapter for AWS APIs that only use a `Describe`
 // function for both List and Get operations. EC2 is a good example of this,
 // where running Describe with no params returns everything, but params can be
 // supplied to reduce the number of results.
-type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
+type DescribeOnlyAdapter[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
 	AdapterMetadata   sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
-	cache         *sdpcache.Cache // The sdpcache of this source
+	cache         *sdpcache.Cache // The sdpcache of this adapter
 	cacheInitMu   sync.Mutex      // Mutex to ensure cache is only initialised once
 
 	// The function that should be used to describe the resources that this
-	// source is related to
+	// adapter is related to
 	DescribeFunc func(ctx context.Context, client ClientStruct, input Input) (Output, error)
 
 	// A function that returns the input object that will be passed to
@@ -54,9 +54,9 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// create new items for each result
 	OutputMapper func(ctx context.Context, client ClientStruct, scope string, input Input, output Output) ([]*sdp.Item, error)
 
-	// The region that this source is configured in, each source can only be
+	// The region that this adapter is configured in, each adapter can only be
 	// configured for one region. Getting data from many regions requires a
-	// source per region. This is used in the scope of returned resources
+	// adapter per region. This is used in the scope of returned resources
 	Region string
 
 	// AccountID The id of the account that is being used. This is used by
@@ -66,21 +66,21 @@ type DescribeOnlySource[Input InputType, Output OutputType, ClientStruct ClientS
 	// Client The AWS client to use when making requests
 	Client ClientStruct
 
-	// UseListForGet If true, the source will use the List function to get items
+	// UseListForGet If true, the adapter will use the List function to get items
 	// This option should be used when the Describe function does not support
-	// getting a single item by ID. The source will then filter the items
+	// getting a single item by ID. The adapter will then filter the items
 	// itself.
 	// InputMapperGet should still be defined. It will be used to create the
 	// input for the List function. The output of the List function will be
-	// filtered by the source to find the item with the matching ID.
-	// See the directconnect-virtual-gateway source for an example of this.
+	// filtered by the adapter to find the item with the matching ID.
+	// See the directconnect-virtual-gateway adapter for an example of this.
 	UseListForGet bool
 }
 
 // Returns the duration that items should be cached for. This will use the
-// `CacheDuration` for this source if set, otherwise it will use the default
+// `CacheDuration` for this adapter if set, otherwise it will use the default
 // duration of 1 hour
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) cacheDuration() time.Duration {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) cacheDuration() time.Duration {
 	if s.CacheDuration == 0 {
 		return DefaultCacheDuration
 	}
@@ -88,7 +88,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) cacheDuration
 	return s.CacheDuration
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) ensureCache() {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) ensureCache() {
 	s.cacheInitMu.Lock()
 	defer s.cacheInitMu.Unlock()
 
@@ -97,16 +97,16 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) ensureCache()
 	}
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Cache() *sdpcache.Cache {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Cache() *sdpcache.Cache {
 	s.ensureCache()
 	return s.cache
 }
 
-// Validate Checks that the source is correctly set up and returns an error if
+// Validate Checks that the adapter is correctly set up and returns an error if
 // not
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Validate() error {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Validate() error {
 	if s.DescribeFunc == nil {
-		return errors.New("source describe func is nil")
+		return errors.New("adapter describe func is nil")
 	}
 
 	if s.MaxResultsPerPage == 0 {
@@ -114,36 +114,36 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Validate() er
 	}
 
 	if s.InputMapperGet == nil {
-		return errors.New("source get input mapper is nil")
+		return errors.New("adapter get input mapper is nil")
 	}
 
 	if s.OutputMapper == nil {
-		return errors.New("source output mapper is nil")
+		return errors.New("adapter output mapper is nil")
 	}
 
 	return nil
 }
 
-// Paginated returns whether or not this source is using a paginated API
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Paginated() bool {
+// Paginated returns whether or not this adapter is using a paginated API
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Paginated() bool {
 	return s.PaginatorBuilder != nil
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Type() string {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Type() string {
 	return s.ItemType
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Name() string {
-	return fmt.Sprintf("%v-source", s.ItemType)
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Name() string {
+	return fmt.Sprintf("%v-adapter", s.ItemType)
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
 	return &s.AdapterMetadata
 }
 
-// List of scopes that this source is capable of find items for. This will be
+// List of scopes that this adapter is capable of find items for. This will be
 // in the format {accountID}.{region}
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Scopes() []string {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Scopes() []string {
 	return []string{
 		FormatScope(s.AccountID, s.Region),
 	}
@@ -152,13 +152,13 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Scopes() []st
 // Get Get a single item with a given scope and query. The item returned
 // should have a UniqueAttributeValue that matches the `query` parameter. The
 // ctx parameter contains a golang context object which should be used to allow
-// this source to timeout or be cancelled when executing potentially
+// this adapter to timeout or be cancelled when executing potentially
 // long-running actions
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Get(ctx context.Context, scope string, query string, ignoreCache bool) (*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -249,11 +249,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Get(ctx conte
 }
 
 // List Lists all items in a given scope
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -300,11 +300,11 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) List(ctx cont
 }
 
 // Search Searches for AWS resources by ARN
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	if scope != s.Scopes()[0] {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
-			ErrorString: fmt.Sprintf("requested scope %v does not match source scope %v", scope, s.Scopes()[0]),
+			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
 		}
 	}
 
@@ -315,7 +315,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Search(ctx co
 	}
 }
 
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
@@ -341,7 +341,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchARN(ctx
 }
 
 // searchCustom Runs custom search logic using the `InputMapperSearch` function
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
 	// We need to cache here since this is the only place it'll be called
 	s.ensureCache()
 	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
@@ -373,7 +373,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) searchCustom(
 // Processes an error returned by the AWS API so that it can be handled by
 // Overmind. This includes extracting the correct error type, wrapping in an SDP
 // error, and caching that error if it is non-transient (like a 404)
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) processError(err error, cacheKey sdpcache.CacheKey) error {
 	var sdpErr *sdp.QueryError
 
 	if err != nil {
@@ -390,7 +390,7 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) processError(
 
 // describe Runs describe on the given input, intelligently choosing whether to
 // run the paginated or unpaginated query
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx context.Context, input Input, scope string) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) describe(ctx context.Context, input Input, scope string) ([]*sdp.Item, error) {
 	var output Output
 	var err error
 	var newItems []*sdp.Item
@@ -428,10 +428,10 @@ func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) describe(ctx 
 	return items, nil
 }
 
-// Weight Returns the priority weighting of items returned by this source.
+// Weight Returns the priority weighting of items returned by this adapter.
 // This is used to resolve conflicts where two sources of the same type
 // return an item for a GET request. In this instance only one item can be
 // seen on, so the one with the higher weight value will win.
-func (s *DescribeOnlySource[Input, Output, ClientStruct, Options]) Weight() int {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Weight() int {
 	return 100
 }
