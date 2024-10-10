@@ -40,28 +40,28 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	stscredsv2 "github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/overmindtech/aws-source/sources/apigateway"
-	"github.com/overmindtech/aws-source/sources/autoscaling"
-	"github.com/overmindtech/aws-source/sources/cloudfront"
-	"github.com/overmindtech/aws-source/sources/cloudwatch"
-	"github.com/overmindtech/aws-source/sources/directconnect"
-	"github.com/overmindtech/aws-source/sources/dynamodb"
-	"github.com/overmindtech/aws-source/sources/ec2"
-	"github.com/overmindtech/aws-source/sources/ecs"
-	"github.com/overmindtech/aws-source/sources/efs"
-	"github.com/overmindtech/aws-source/sources/eks"
-	"github.com/overmindtech/aws-source/sources/elb"
-	"github.com/overmindtech/aws-source/sources/elbv2"
-	"github.com/overmindtech/aws-source/sources/iam"
-	"github.com/overmindtech/aws-source/sources/kms"
-	"github.com/overmindtech/aws-source/sources/lambda"
-	"github.com/overmindtech/aws-source/sources/networkfirewall"
-	"github.com/overmindtech/aws-source/sources/networkmanager"
-	"github.com/overmindtech/aws-source/sources/rds"
-	"github.com/overmindtech/aws-source/sources/route53"
-	"github.com/overmindtech/aws-source/sources/s3"
-	"github.com/overmindtech/aws-source/sources/sns"
-	"github.com/overmindtech/aws-source/sources/sqs"
+	"github.com/overmindtech/aws-source/adapters/apigateway"
+	"github.com/overmindtech/aws-source/adapters/autoscaling"
+	"github.com/overmindtech/aws-source/adapters/cloudfront"
+	"github.com/overmindtech/aws-source/adapters/cloudwatch"
+	"github.com/overmindtech/aws-source/adapters/directconnect"
+	"github.com/overmindtech/aws-source/adapters/dynamodb"
+	"github.com/overmindtech/aws-source/adapters/ec2"
+	"github.com/overmindtech/aws-source/adapters/ecs"
+	"github.com/overmindtech/aws-source/adapters/efs"
+	"github.com/overmindtech/aws-source/adapters/eks"
+	"github.com/overmindtech/aws-source/adapters/elb"
+	"github.com/overmindtech/aws-source/adapters/elbv2"
+	"github.com/overmindtech/aws-source/adapters/iam"
+	"github.com/overmindtech/aws-source/adapters/kms"
+	"github.com/overmindtech/aws-source/adapters/lambda"
+	"github.com/overmindtech/aws-source/adapters/networkfirewall"
+	"github.com/overmindtech/aws-source/adapters/networkmanager"
+	"github.com/overmindtech/aws-source/adapters/rds"
+	"github.com/overmindtech/aws-source/adapters/route53"
+	"github.com/overmindtech/aws-source/adapters/s3"
+	"github.com/overmindtech/aws-source/adapters/sns"
+	"github.com/overmindtech/aws-source/adapters/sqs"
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go/auth"
 	log "github.com/sirupsen/logrus"
@@ -357,7 +357,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						o.RetryMode = aws.RetryModeAdaptive
 					})
 
-					sources := []discovery.Adapter{
+					adapters := []discovery.Adapter{
 						// EC2
 						ec2.NewAddressSource(ec2Client, *callerID.Account, cfg.Region),
 						ec2.NewCapacityReservationFleetSource(ec2Client, *callerID.Account, cfg.Region),
@@ -513,7 +513,7 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 						apigateway.NewResourceSource(apigatewayClient, *callerID.Account, cfg.Region),
 					}
 
-					e.AddAdapters(sources...)
+					e.AddAdapters(adapters...)
 
 					// Add "global" sources (those that aren't tied to a region, like
 					// cloudfront). but only do this once for the first region. For
