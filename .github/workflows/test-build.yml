@@ -51,7 +51,7 @@ jobs:
           fi
 
       - name: Vet
-        run: go vet
+        run: go vet ./...
 
       # get .golangci.yml from github.com/overmindtech/golangci-lint_config
       - name: Get .golangci.yml from github.com/overmindtech/golangci-lint_configs
