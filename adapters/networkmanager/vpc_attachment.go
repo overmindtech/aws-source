@@ -69,10 +69,11 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 
 func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		Region:    region,
-		AccountID: accountID,
-		ItemType:  "networkmanager-vpc-attachment",
+		Client:          client,
+		Region:          region,
+		AccountID:       accountID,
+		ItemType:        "networkmanager-vpc-attachment",
+		AdapterMetadata: VPCAttachmentMetadata(),
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.VpcAttachment, error) {
 			return vpcAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -83,5 +84,21 @@ func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region st
 				ErrorString: "list not supported for networkmanager-vpc-attachment, use get",
 			}
 		},
+	}
+}
+
+func VPCAttachmentMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-vpc-attachment",
+		DescriptiveName: "Networkmanager VPC Attachment",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager VPC Attachment by id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_vpc_attachment.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

@@ -65,10 +65,11 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 
 func NewCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-core-network-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-core-network-policy",
+		AdapterMetadata: CoreNetworkPolicyMetadata(),
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.CoreNetworkPolicy, error) {
 			return coreNetworkPolicyGetFunc(ctx, client, scope, query)
 		},
@@ -79,5 +80,21 @@ func NewCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, regio
 				ErrorString: "list not supported for networkmanager-core-network-policy, use get",
 			}
 		},
+	}
+}
+
+func CoreNetworkPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-core-network-policy",
+		DescriptiveName: "Networkmanager Core Network Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager Core Network Policy by Core Network id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_core_network_policy.core_network_id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

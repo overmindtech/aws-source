@@ -111,9 +111,10 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 
 func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "networkmanager-link-association",
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "networkmanager-link-association",
+		AdapterMetadata: LinkAssociationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinkAssociationsInput) (*networkmanager.GetLinkAssociationsOutput, error) {
 			return client.GetLinkAssociations(ctx, input)
 		},
@@ -183,5 +184,21 @@ func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) 
 				}
 			}
 		},
+	}
+
+}
+
+func LinkAssociationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-link-association",
+		DescriptiveName: "Networkmanager LinkAssociation",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Networkmanager Link Association",
+			SearchDescription: "Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId",
+		},
+		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

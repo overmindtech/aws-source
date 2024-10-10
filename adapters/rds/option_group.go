@@ -57,10 +57,11 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 
 func NewOptionGroupAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
 	return &adapters.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-option-group",
-		Region:    region,
-		AccountID: accountID,
-		Client:    client,
+		ItemType:        "rds-option-group",
+		Region:          region,
+		AccountID:       accountID,
+		Client:          client,
+		AdapterMetadata: OptionGroupMetadata(),
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeOptionGroupsInput) adapters.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {
 			return rds.NewDescribeOptionGroupsPaginator(client, params)
 		},
@@ -76,5 +77,27 @@ func NewOptionGroupAdapter(client rdsClient, accountID string, region string) *a
 			return &rds.DescribeOptionGroupsInput{}, nil
 		},
 		OutputMapper: optionGroupOutputMapper,
+	}
+}
+
+func OptionGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "rds-option-group",
+		DescriptiveName: "RDS Option Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an option group by name",
+			ListDescription:   "List all RDS option groups",
+			SearchDescription: "Search for an option group by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_db_option_group.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }

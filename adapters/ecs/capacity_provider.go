@@ -71,10 +71,11 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 
 func NewCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
-		ItemType:  "ecs-capacity-provider",
-		Region:    region,
-		AccountID: accountID,
-		Client:    client,
+		ItemType:        "ecs-capacity-provider",
+		Region:          region,
+		AccountID:       accountID,
+		Client:          client,
+		AdapterMetadata: CapacityProviderMetadata(),
 		DescribeFunc: func(ctx context.Context, client ECSClient, input *ecs.DescribeCapacityProvidersInput) (*ecs.DescribeCapacityProvidersOutput, error) {
 			return client.DescribeCapacityProviders(ctx, input)
 		},
@@ -95,6 +96,26 @@ func NewCapacityProviderAdapter(client ECSClient, accountID string, region strin
 			return NewDescribeCapacityProvidersPaginator(client, params)
 		},
 		OutputMapper: capacityProviderOutputMapper,
+	}
+}
+
+func CapacityProviderMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ecs-capacity-provider",
+		DescriptiveName: "Capacity Provider",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:    true,
+			List:   true,
+			Search: true,
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_ecs_capacity_provider.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"autoscaling-auto-scaling-group"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }
 

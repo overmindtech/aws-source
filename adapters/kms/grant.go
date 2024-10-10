@@ -179,10 +179,11 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
 	return &adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
-		ItemType:  "kms-grant",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "kms-grant",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: GrantMetadata(),
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.ListGrantsInput) (*kms.ListGrantsOutput, error) {
 			return client.ListGrants(ctx, input)
 		},
@@ -215,6 +216,26 @@ func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapt
 			}, nil
 		},
 		OutputMapper: grantOutputMapper,
+	}
+}
+
+func GrantMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "kms-grant",
+		DescriptiveName: "KMS Grant",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a grant by keyID/grantId",
+			SearchDescription: "Search grants by keyID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_kms_grant.grant_id",
+			},
+		},
+		PotentialLinks: []string{"kms-key", "iam-user", "iam-role"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }
 

@@ -90,10 +90,11 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 
 func NewAliasAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options] {
 	return &adapters.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options]{
-		ItemType:  "kms-alias",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "kms-alias",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: AliasMetadata(),
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.ListAliasesInput) (*kms.ListAliasesOutput, error) {
 			return client.ListAliases(ctx, input)
 		},
@@ -123,5 +124,27 @@ func NewAliasAdapter(client *kms.Client, accountID string, region string) *adapt
 			}, nil
 		},
 		OutputMapper: aliasOutputMapper,
+	}
+}
+
+func AliasMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "kms-alias",
+		DescriptiveName: "KMS Alias",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an alias by keyID/aliasName",
+			ListDescription:   "List all aliases",
+			SearchDescription: "Search aliases by keyID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_kms_alias.arn",
+			},
+		},
+		PotentialLinks: []string{"kms-key"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

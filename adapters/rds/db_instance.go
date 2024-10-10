@@ -506,10 +506,11 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 func NewDBInstanceAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &adapters.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-db-instance",
-		Region:    region,
-		AccountID: accountID,
-		Client:    client,
+		ItemType:        "rds-db-instance",
+		Region:          region,
+		AccountID:       accountID,
+		Client:          client,
+		AdapterMetadata: DBInstanceMetadata(),
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBInstancesInput) adapters.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {
 			return rds.NewDescribeDBInstancesPaginator(client, params)
 		},
@@ -525,5 +526,26 @@ func NewDBInstanceAdapter(client rdsClient, accountID string, region string) *ad
 			return &rds.DescribeDBInstancesInput{}, nil
 		},
 		OutputMapper: dBInstanceOutputMapper,
+	}
+}
+
+func DBInstanceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "rds-db-instance",
+		DescriptiveName: "RDS Instance",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an instance by ID",
+			ListDescription:   "List all instances",
+			SearchDescription: "Search for instances by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_db_instance.identifier"},
+			{TerraformQueryMap: "aws_db_instance_role_association.db_instance_identifier"},
+		},
+		PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-security-group", "rds-db-parameter-group", "rds-db-subnet-group", "rds-db-cluster", "kms-key", "logs-log-stream", "iam-role", "kinesis-stream", "backup-recovery-point", "iam-instance-profile", "rds-db-instance-automated-backup", "secretsmanager-secret"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }

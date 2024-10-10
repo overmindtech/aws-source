@@ -127,10 +127,11 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 
 func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-connect-peer-association",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-connect-peer-association",
+		AdapterMetadata: ConnectPeerAssociationMetadata(),
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetConnectPeerAssociationsInput) (*networkmanager.GetConnectPeerAssociationsOutput, error) {
 			return client.GetConnectPeerAssociations(ctx, input)
 		},
@@ -167,5 +168,22 @@ func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID s
 				GlobalNetworkId: &query,
 			}, nil
 		},
+	}
+}
+
+func ConnectPeerAssociationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-connect-peer-association",
+		DescriptiveName: "Networkmanager Connect Peer Association",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Networkmanager Connect Peer Association",
+			ListDescription:   "List all Networkmanager Connect Peer Associations",
+			SearchDescription: "Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId",
+		},
+		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-connect-peer", "networkmanager-device", "networkmanager-link"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

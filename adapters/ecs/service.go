@@ -392,12 +392,13 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 
 func NewServiceAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &adapters.AlwaysGetAdapter[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{
-		ItemType:    "ecs-service",
-		Client:      client,
-		AccountID:   accountID,
-		Region:      region,
-		GetFunc:     serviceGetFunc,
-		DisableList: true,
+		ItemType:        "ecs-service",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         serviceGetFunc,
+		DisableList:     true,
+		AdapterMetadata: ServiceMetadata(),
 		GetInputMapper: func(scope, query string) *ecs.DescribeServicesInput {
 			// We are using a custom id of {clusterName}/{id} e.g.
 			// ecs-template-ECSCluster-8nS0WOLbs3nZ/ecs-template-service-i0mQKzkhDI2C
@@ -426,5 +427,28 @@ func NewServiceAdapter(client ECSClient, accountID string, region string) *adapt
 			}, nil
 		},
 		ListFuncOutputMapper: serviceListFuncOutputMapper,
+	}
+}
+
+func ServiceMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ecs-service",
+		DescriptiveName: "ECS Service",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an ECS service by full name ({clusterName}/{id})",
+			ListDescription:   "List all ECS services",
+			SearchDescription: "Search for ECS services by cluster",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_ecs_service.cluster_name",
+			},
+		},
+		PotentialLinks: []string{"ecs-cluster", "elbv2-target-group", "servicediscovery-service", "ecs-task-definition", "ecs-capacity-provider", "ec2-subnet", "ecs-security-group", "dns"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

@@ -165,11 +165,12 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 
 func NewTLSInspectionConfigurationAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapters.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options]{
-		ItemType:  "network-firewall-tls-inspection-configuration",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &networkfirewall.ListTLSInspectionConfigurationsInput{},
+		ItemType:        "network-firewall-tls-inspection-configuration",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &networkfirewall.ListTLSInspectionConfigurationsInput{},
+		AdapterMetadata: TLSInspectionConfigurationMetadata(),
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeTLSInspectionConfigurationInput {
 			return &networkfirewall.DescribeTLSInspectionConfigurationInput{
 				TLSInspectionConfigurationName: &query,
@@ -196,5 +197,22 @@ func NewTLSInspectionConfigurationAdapter(client networkFirewallClient, accountI
 		GetFunc: func(ctx context.Context, client networkFirewallClient, scope string, input *networkfirewall.DescribeTLSInspectionConfigurationInput) (*sdp.Item, error) {
 			return tlsInspectionConfigurationGetFunc(ctx, client, scope, input)
 		},
+	}
+}
+
+func TLSInspectionConfigurationMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "network-firewall-tls-inspection-configuration",
+		DescriptiveName: "Network Firewall TLS Inspection Configuration",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Network Firewall TLS Inspection Configuration by name",
+			ListDescription:   "List Network Firewall TLS Inspection Configurations",
+			SearchDescription: "Search for Network Firewall TLS Inspection Configurations by ARN",
+		},
+		PotentialLinks: []string{"acm-certificate", "acm-pca-certificate-authority", "acm-pca-certificate-authority-certificate", "network-firewall-encryption-configuration"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

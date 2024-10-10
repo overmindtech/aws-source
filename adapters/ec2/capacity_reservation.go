@@ -126,8 +126,8 @@ func NewCapacityReservationAdapter(client *ec2.Client, accountID string, region 
 
 func CapacityReservationMetadata() sdp.AdapterMetadata {
 	return sdp.AdapterMetadata{
-		Type:            "ec2-capacity-reservation-fleet",
-		DescriptiveName: "Capacity Reservation Fleet",
+		Type:            "ec2-capacity-reservation",
+		DescriptiveName: "Capacity Reservation",
 		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
 			Get:               true,
 			List:              true,

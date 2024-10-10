@@ -72,15 +72,29 @@ func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item,
 
 func NewLayerAdapter(client *lambda.Client, accountID string, region string) *adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options] {
 	return &adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options]{
-		ItemType:  "lambda-layer",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "lambda-layer",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: LayerMetadata(),
 		GetFunc: func(_ context.Context, _ *lambda.Client, _, _ string) (*types.LayersListItem, error) {
 			// Layers can only be listed
 			return nil, errors.New("get is not supported for lambda-layers")
 		},
 		ListFunc:   layerListFunc,
 		ItemMapper: layerItemMapper,
+	}
+}
+
+func LayerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "lambda-layer",
+		DescriptiveName: "Lambda Layer",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			List:            true,
+			ListDescription: "List all lambda layers",
+		},
+		PotentialLinks: []string{"lambda-layer-version"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

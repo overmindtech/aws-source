@@ -109,9 +109,10 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 
 func NewSiteAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "networkmanager-site",
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "networkmanager-site",
+		AdapterMetadata: SiteMetadata(),
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetSitesInput) (*networkmanager.GetSitesOutput, error) {
 			return client.GetSites(ctx, input)
 		},
@@ -148,5 +149,26 @@ func NewSiteAdapter(client *networkmanager.Client, accountID string) *adapters.D
 				GlobalNetworkId: &query,
 			}, nil
 		},
+	}
+}
+
+func SiteMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-site",
+		DescriptiveName: "Networkmanager Site",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Networkmanager Site",
+			SearchDescription: "Search for Networkmanager Sites by GlobalNetworkId",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_networkmanager_site.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

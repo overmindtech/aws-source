@@ -77,7 +77,7 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 // +overmind:search Search for a DynamoDB backup by table name
 // +overmind:group AWS
 
-// NewBackupSource This source is a bit strange. This is the only thing I've
+// NewBackupAdapter This adapter is a bit strange. This is the only thing I've
 // found so far that can only be queries by ARN for Get. For this reason I'm
 // going to just disable GET. LIST works fine and allows it to be linked to the
 // table so this is enough for me at the moment

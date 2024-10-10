@@ -123,19 +123,38 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 func NewLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
-		ItemType:       "lambda-layer-version",
-		Client:         client,
-		AccountID:      accountID,
-		Region:         region,
-		DisableList:    true,
-		GetInputMapper: layerVersionGetInputMapper,
-		GetFunc:        layerVersionGetFunc,
-		ListInput:      &lambda.ListLayerVersionsInput{},
+		ItemType:        "lambda-layer-version",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		DisableList:     true,
+		GetInputMapper:  layerVersionGetInputMapper,
+		GetFunc:         layerVersionGetFunc,
+		ListInput:       &lambda.ListLayerVersionsInput{},
+		AdapterMetadata: LayerVersionMetadata(),
 		ListFuncOutputMapper: func(output *lambda.ListLayerVersionsOutput, input *lambda.ListLayerVersionsInput) ([]*lambda.GetLayerVersionInput, error) {
 			return []*lambda.GetLayerVersionInput{}, nil
 		},
 		ListFuncPaginatorBuilder: func(client LambdaClient, input *lambda.ListLayerVersionsInput) adapters.Paginator[*lambda.ListLayerVersionsOutput, *lambda.Options] {
 			return lambda.NewListLayerVersionsPaginator(client, input)
 		},
+	}
+}
+
+func LayerVersionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "lambda-layer-version",
+		DescriptiveName: "Lambda Layer Version",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a layer version by full name ({layerName}:{versionNumber})",
+			SearchDescription: "Search for layer versions by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_lambda_layer_version.arn"},
+		},
+		PotentialLinks: []string{"signer-signing-job", "signer-signing-profile"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

@@ -243,14 +243,15 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 
 func NewTaskAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
 	return &adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
-		ItemType:       "ecs-task",
-		Client:         client,
-		AccountID:      accountID,
-		Region:         region,
-		GetFunc:        taskGetFunc,
-		ListInput:      &ecs.ListTasksInput{},
-		GetInputMapper: taskGetInputMapper,
-		DisableList:    true,
+		ItemType:        "ecs-task",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         taskGetFunc,
+		AdapterMetadata: TaskMetadata(),
+		ListInput:       &ecs.ListTasksInput{},
+		GetInputMapper:  taskGetInputMapper,
+		DisableList:     true,
 		SearchInputMapper: func(scope, query string) (*ecs.ListTasksInput, error) {
 			// Search by cluster
 			return &ecs.ListTasksInput{
@@ -261,5 +262,22 @@ func NewTaskAdapter(client ECSClient, accountID string, region string) *adapters
 			return ecs.NewListTasksPaginator(client, input)
 		},
 		ListFuncOutputMapper: tasksListFuncOutputMapper,
+	}
+}
+
+func TaskMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ecs-task",
+		DescriptiveName: "ECS Task",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get an ECS task by ID",
+			ListDescription:   "List all ECS tasks",
+			SearchDescription: "Search for ECS tasks by cluster",
+		},
+		PotentialLinks: []string{"ecs-cluster", "ecs-container-instance", "ecs-task-definition", "ec2-network-interface", "ip"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

@@ -98,10 +98,11 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 
 func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-site-to-site-vpn-attachment",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-site-to-site-vpn-attachment",
+		AdapterMetadata: SiteToSiteVpnAttachmentMetadata(),
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.SiteToSiteVpnAttachment, error) {
 			return getSiteToSiteVpnAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -112,5 +113,21 @@ func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID,
 				ErrorString: "list not supported for networkmanager-site-to-site-vpn-attachment, use get",
 			}
 		},
+	}
+}
+
+func SiteToSiteVpnAttachmentMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-site-to-site-vpn-attachment",
+		DescriptiveName: "Networkmanager Site To Site Vpn Attachment",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager Site To Site Vpn Attachment by id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_site_to_site_vpn_attachment.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network", "ec2-vpn-connection"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

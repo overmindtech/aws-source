@@ -132,11 +132,12 @@ func getFunc(ctx context.Context, client kmsClient, scope string, input *kms.Des
 
 func NewKeyAdapter(client kmsClient, accountID, region string) *adapters.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
 	return &adapters.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{
-		ItemType:  "kms-key",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &kms.ListKeysInput{},
+		ItemType:        "kms-key",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &kms.ListKeysInput{},
+		AdapterMetadata: KeyMetadata(),
 		GetInputMapper: func(scope, query string) *kms.DescribeKeyInput {
 			return &kms.DescribeKeyInput{
 				KeyId: &query,
@@ -155,5 +156,27 @@ func NewKeyAdapter(client kmsClient, accountID, region string) *adapters.AlwaysG
 			return inputs, nil
 		},
 		GetFunc: getFunc,
+	}
+}
+
+func KeyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "kms-key",
+		DescriptiveName: "KMS Key",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a KMS Key by its ID",
+			ListDescription:   "List all KMS Keys",
+			SearchDescription: "Search for KMS Keys by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_kms_key.key_id",
+			},
+		},
+		PotentialLinks: []string{"kms-custom-key-store", "kms-key-policy", "kms-grant"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

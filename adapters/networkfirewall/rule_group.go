@@ -118,11 +118,12 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 
 func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
-		ItemType:  "network-firewall-rule-group",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &networkfirewall.ListRuleGroupsInput{},
+		ItemType:        "network-firewall-rule-group",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &networkfirewall.ListRuleGroupsInput{},
+		AdapterMetadata: RuleGroupMetadata(),
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeRuleGroupInput {
 			return &networkfirewall.DescribeRuleGroupInput{
 				RuleGroupName: &query,
@@ -149,5 +150,25 @@ func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region 
 		GetFunc: func(ctx context.Context, client networkFirewallClient, scope string, input *networkfirewall.DescribeRuleGroupInput) (*sdp.Item, error) {
 			return ruleGroupGetFunc(ctx, client, scope, input)
 		},
+	}
+}
+
+func RuleGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "network-firewall-rule-group",
+		DescriptiveName: "Network Firewall Rule Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Network Firewall Rule Group by name",
+			ListDescription:   "List Network Firewall Rule Groups",
+			SearchDescription: "Search for Network Firewall Rule Groups by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkfirewall_rule_group.name"},
+		},
+		PotentialLinks: []string{"kms-key", "sns-topic", "network-firewall-rule-group"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

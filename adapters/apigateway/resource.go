@@ -116,7 +116,7 @@ func NewResourceAdapter(client *apigateway.Client, accountID string, region stri
 
 func APIGatewayMetadata() sdp.AdapterMetadata {
 	return sdp.AdapterMetadata{
-		Type:            "apigateway",
+		Type:            "apigateway-resource",
 		DescriptiveName: "API Gateway",
 		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{

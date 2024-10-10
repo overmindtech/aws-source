@@ -205,11 +205,12 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 func NewConnectPeerAdapter(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapters.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-connect-peer",
-		ListInput: &networkmanager.ListConnectPeersInput{},
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-connect-peer",
+		ListInput:       &networkmanager.ListConnectPeersInput{},
+		AdapterMetadata: ConnectPeerMetadata(),
 		SearchInputMapper: func(scope, query string) (*networkmanager.ListConnectPeersInput, error) {
 			// Search by CoreNetworkId
 			return &networkmanager.ListConnectPeersInput{
@@ -237,5 +238,21 @@ func NewConnectPeerAdapter(client NetworkManagerClient, accountID, region string
 
 		},
 		GetFunc: connectPeerGetFunc,
+	}
+}
+
+func ConnectPeerMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-connect-peer",
+		DescriptiveName: "Networkmanager Connect Peer",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager Connect Peer by id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_connect_peer.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network", "networkmanager-connect-attachment", "ip", "rdap-asn", "ec2-subnet"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

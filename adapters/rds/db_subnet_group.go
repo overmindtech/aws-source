@@ -119,10 +119,11 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 func NewDBSubnetGroupAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
 	return &adapters.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-db-subnet-group",
-		Region:    region,
-		AccountID: accountID,
-		Client:    client,
+		ItemType:        "rds-db-subnet-group",
+		Region:          region,
+		AccountID:       accountID,
+		Client:          client,
+		AdapterMetadata: DBSubnetGroupMetadata(),
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBSubnetGroupsInput) adapters.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {
 			return rds.NewDescribeDBSubnetGroupsPaginator(client, params)
 		},
@@ -138,5 +139,28 @@ func NewDBSubnetGroupAdapter(client rdsClient, accountID string, region string) 
 			return &rds.DescribeDBSubnetGroupsInput{}, nil
 		},
 		OutputMapper: dBSubnetGroupOutputMapper,
+	}
+}
+
+func DBSubnetGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "rds-db-subnet-group",
+		DescriptiveName: "RDS Subnet Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a subnet group by name",
+			ListDescription:   "List all subnet groups",
+			SearchDescription: "Search for subnet groups by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_db_subnet_group.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "outposts-outpost"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }

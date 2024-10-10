@@ -122,12 +122,13 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		GetFunc:   coreNetworkGetFunc,
-		ItemType:  "networkmanager-core-network",
-		ListInput: &networkmanager.ListCoreNetworksInput{},
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         coreNetworkGetFunc,
+		ItemType:        "networkmanager-core-network",
+		ListInput:       &networkmanager.ListCoreNetworksInput{},
+		AdapterMetadata: CoreNetworkMetadata(),
 		GetInputMapper: func(scope, query string) *networkmanager.GetCoreNetworkInput {
 			return &networkmanager.GetCoreNetworkInput{
 				CoreNetworkId: &query,
@@ -147,5 +148,21 @@ func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string
 
 			return queries, nil
 		},
+	}
+}
+
+func CoreNetworkMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-core-network",
+		DescriptiveName: "Networkmanager Core Network",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager Core Network by id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_core_network.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network-policy", "networkmanager-connect-peer"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

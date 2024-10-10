@@ -271,11 +271,12 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 
 func NewFirewallAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
-		ItemType:  "network-firewall-firewall",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &networkfirewall.ListFirewallsInput{},
+		ItemType:        "network-firewall-firewall",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &networkfirewall.ListFirewallsInput{},
+		AdapterMetadata: FirewallMetadata(),
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeFirewallInput {
 			return &networkfirewall.DescribeFirewallInput{
 				FirewallName: &query,
@@ -302,5 +303,25 @@ func NewFirewallAdapter(client networkFirewallClient, accountID string, region s
 		GetFunc: func(ctx context.Context, client networkFirewallClient, scope string, input *networkfirewall.DescribeFirewallInput) (*sdp.Item, error) {
 			return firewallGetFunc(ctx, client, scope, input)
 		},
+	}
+}
+
+func FirewallMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "network-firewall-firewall",
+		DescriptiveName: "Network Firewall",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Network Firewall by name",
+			ListDescription:   "List Network Firewalls",
+			SearchDescription: "Search for Network Firewalls by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkfirewall_firewall.name"},
+		},
+		PotentialLinks: []string{"network-firewall-firewall-policy", "ec2-subnet", "ec2-vpc", "logs-log-group", "s3-bucket", "firehose-delivery-stream", "iam-policy", "kms-key"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

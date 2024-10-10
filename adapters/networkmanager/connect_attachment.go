@@ -90,10 +90,11 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 
 func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-connect-attachment",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-connect-attachment",
+		AdapterMetadata: ConnectAttachmentMetadata(),
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.ConnectAttachment, error) {
 			return connectAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -104,5 +105,20 @@ func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, regio
 				ErrorString: "list not supported for networkmanager-connect-attachment, use get",
 			}
 		},
+	}
+}
+
+func ConnectAttachmentMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-connect-attachment",
+		DescriptiveName: "Networkmanager Connect Attachment",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get: true,
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_core_network.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

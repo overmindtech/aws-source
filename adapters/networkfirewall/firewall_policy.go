@@ -127,11 +127,12 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 
 func NewFirewallPolicyAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options]{
-		ItemType:  "network-firewall-firewall-policy",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ListInput: &networkfirewall.ListFirewallPoliciesInput{},
+		ItemType:        "network-firewall-firewall-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ListInput:       &networkfirewall.ListFirewallPoliciesInput{},
+		AdapterMetadata: FirewallPolicyMetadata(),
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeFirewallPolicyInput {
 			return &networkfirewall.DescribeFirewallPolicyInput{
 				FirewallPolicyName: &query,
@@ -158,5 +159,25 @@ func NewFirewallPolicyAdapter(client networkFirewallClient, accountID string, re
 		GetFunc: func(ctx context.Context, client networkFirewallClient, scope string, input *networkfirewall.DescribeFirewallPolicyInput) (*sdp.Item, error) {
 			return firewallPolicyGetFunc(ctx, client, scope, input)
 		},
+	}
+}
+
+func FirewallPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "network-firewall-firewall-policy",
+		DescriptiveName: "Network Firewall Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a Network Firewall Policy by name",
+			ListDescription:   "List Network Firewall Policies",
+			SearchDescription: "Search for Network Firewall Policies by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkfirewall_firewall_policy.name"},
+		},
+		PotentialLinks: []string{"network-firewall-rule-group", "network-firewall-tls-inspection-configuration", "kms-key"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

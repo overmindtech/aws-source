@@ -22,11 +22,17 @@ import (
 	"github.com/overmindtech/aws-source/adapters/directconnect"
 	"github.com/overmindtech/aws-source/adapters/dynamodb"
 	"github.com/overmindtech/aws-source/adapters/ec2"
+	"github.com/overmindtech/aws-source/adapters/ecs"
 	"github.com/overmindtech/aws-source/adapters/efs"
 	"github.com/overmindtech/aws-source/adapters/eks"
 	"github.com/overmindtech/aws-source/adapters/elb"
 	"github.com/overmindtech/aws-source/adapters/elbv2"
 	"github.com/overmindtech/aws-source/adapters/iam"
+	"github.com/overmindtech/aws-source/adapters/kms"
+	"github.com/overmindtech/aws-source/adapters/lambda"
+	"github.com/overmindtech/aws-source/adapters/networkfirewall"
+	"github.com/overmindtech/aws-source/adapters/networkmanager"
+	"github.com/overmindtech/aws-source/adapters/rds"
 	"github.com/overmindtech/aws-source/adapters/route53"
 	"github.com/overmindtech/aws-source/adapters/s3"
 	"github.com/overmindtech/aws-source/adapters/sns"
@@ -456,7 +462,7 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 
 // documentation subcommand for generating json
 var docJSONCmd = &cobra.Command{
-	Use:   "doc",
+	Use:   "docs",
 	Short: "Generate JSON documentation",
 	Long:  `Generate JSON documentation for the source`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -519,6 +525,12 @@ var docJSONCmd = &cobra.Command{
 			ec2.VpcEndpointMetadata(),
 			ec2.VpcPeeringConnectionMetadata(),
 			ec2.VpcMetadata(),
+			ecs.CapacityProviderMetadata(),
+			ecs.ClusterMetadata(),
+			ecs.ContainerInstanceMetadata(),
+			ecs.ServiceMetadata(),
+			ecs.TaskDefinitionMetadata(),
+			ecs.TaskMetadata(),
 			efs.AccessPointMetadata(),
 			efs.BackupPolicyMetadata(),
 			efs.FileSystemMetadata(),
@@ -540,6 +552,42 @@ var docJSONCmd = &cobra.Command{
 			iam.PolicyMetadata(),
 			iam.RoleMetadata(),
 			iam.UserMetadata(),
+			kms.AliasMetadata(),
+			kms.CustomKeyStoreMetadata(),
+			kms.GrantMetadata(),
+			kms.KeyMetadata(),
+			kms.KeyPolicyMetadata(),
+			lambda.FunctionMetadata(),
+			lambda.LayerVersionMetadata(),
+			lambda.LayerMetadata(),
+			networkfirewall.FirewallPolicyMetadata(),
+			networkfirewall.FirewallMetadata(),
+			networkfirewall.RuleGroupMetadata(),
+			networkfirewall.TLSInspectionConfigurationMetadata(),
+			networkmanager.ConnectAttachmentMetadata(),
+			networkmanager.ConnectPeerAssociationMetadata(),
+			networkmanager.ConnectPeerMetadata(),
+			networkmanager.ConnectionMetadata(),
+			networkmanager.CoreNetworkPolicyMetadata(),
+			networkmanager.CoreNetworkMetadata(),
+			networkmanager.DeviceMetadata(),
+			networkmanager.GlobalNetworkMetadata(),
+			networkmanager.LinkAssociationMetadata(),
+			networkmanager.LinkMetadata(),
+			networkmanager.NetworkResourceRelationshipMetadata(),
+			networkmanager.SiteToSiteVpnAttachmentMetadata(),
+			networkmanager.SiteMetadata(),
+			networkmanager.TransitGatewayConnectPeerAssociationMetadata(),
+			networkmanager.TransitGatewayPeeringMetadata(),
+			networkmanager.TransitGatewayRegistrationMetadata(),
+			networkmanager.TransitGatewayRouteTableAttachmentMetadata(),
+			networkmanager.VPCAttachmentMetadata(),
+			rds.DBClusterParameterGroupMetadata(),
+			rds.DBClusterMetadata(),
+			rds.DBInstanceMetadata(),
+			rds.DBParameterGroupMetadata(),
+			rds.DBSubnetGroupMetadata(),
+			rds.OptionGroupMetadata(),
 			route53.HealthCheckMetadata(),
 			route53.HostedZoneMetadata(),
 			route53.ResourceRecordSetMetadata(),

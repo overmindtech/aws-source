@@ -115,10 +115,11 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 
 func NewTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "networkmanager-transit-gateway-peering",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-transit-gateway-peering",
+		AdapterMetadata: TransitGatewayPeeringMetadata(),
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.TransitGatewayPeering, error) {
 			return getTransitGatewayPeeringGetFunc(ctx, client, scope, query)
 		},
@@ -129,5 +130,21 @@ func NewTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, r
 				ErrorString: "list not supported for networkmanager-transit-gateway-peering, use get",
 			}
 		},
+	}
+}
+
+func TransitGatewayPeeringMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-transit-gateway-peering",
+		DescriptiveName: "Networkmanager Transit Gateway Peering",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:            true,
+			GetDescription: "Get a Networkmanager Transit Gateway Peering by id",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_networkmanager_transit_gateway_peering.id"},
+		},
+		PotentialLinks: []string{"networkmanager-core-network", "ec2-transit-gateway-peering-attachment", "ec2-transit-gateway"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

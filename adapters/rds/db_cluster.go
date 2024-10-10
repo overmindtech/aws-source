@@ -347,10 +347,11 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 func NewDBClusterAdapter(client rdsClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
 	return &adapters.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
-		ItemType:  "rds-db-cluster",
-		Region:    region,
-		AccountID: accountID,
-		Client:    client,
+		ItemType:        "rds-db-cluster",
+		Region:          region,
+		AccountID:       accountID,
+		Client:          client,
+		AdapterMetadata: DBClusterMetadata(),
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBClustersInput) adapters.Paginator[*rds.DescribeDBClustersOutput, *rds.Options] {
 			return rds.NewDescribeDBClustersPaginator(client, params)
 		},
@@ -366,5 +367,25 @@ func NewDBClusterAdapter(client rdsClient, accountID string, region string) *ada
 			return &rds.DescribeDBClustersInput{}, nil
 		},
 		OutputMapper: dBClusterOutputMapper,
+	}
+}
+
+func DBClusterMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "rds-db-cluster",
+		DescriptiveName: "RDS Cluster",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a parameter group by name",
+			ListDescription:   "List all RDS parameter groups",
+			SearchDescription: "Search for a parameter group by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_rds_cluster_parameter_group.arn"},
+		},
+		PotentialLinks: []string{"rds-db-subnet-group", "dns", "rds-db-cluster", "ec2-security-group", "route53-hosted-zone", "kms-key", "kinesis-stream", "rds-option-group", "secretsmanager-secret", "iam-role"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }

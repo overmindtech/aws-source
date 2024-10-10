@@ -45,10 +45,11 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 
 func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapters.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
 	return &adapters.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
-		ItemType:  "rds-db-cluster-parameter-group",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
+		ItemType:        "rds-db-cluster-parameter-group",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		AdapterMetadata: DBClusterParameterGroupMetadata(),
 		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ClusterParameterGroup, error) {
 			out, err := client.DescribeDBClusterParameterGroups(ctx, &rds.DescribeDBClusterParameterGroupsInput{
 				DBClusterParameterGroupName: &query,
@@ -113,5 +114,27 @@ func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, regio
 			return tagsToMap(out.TagList), nil
 		},
 		ItemMapper: dBClusterParameterGroupItemMapper,
+	}
+}
+
+func DBClusterParameterGroupMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "rds-db-cluster-parameter-group",
+		DescriptiveName: "RDS Cluster Parameter Group",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a parameter group by name",
+			ListDescription:   "List all RDS parameter groups",
+			SearchDescription: "Search for a parameter group by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_rds_cluster_parameter_group.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
 	}
 }

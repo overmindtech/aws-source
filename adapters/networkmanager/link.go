@@ -125,9 +125,10 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 
 func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "networkmanager-link",
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "networkmanager-link",
+		AdapterMetadata: LinkMetadata(),
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinksInput) (*networkmanager.GetLinksOutput, error) {
 			return client.GetLinks(ctx, input)
 		},
@@ -181,5 +182,26 @@ func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapters.D
 			}
 
 		},
+	}
+}
+
+func LinkMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-link",
+		DescriptiveName: "Networkmanager Link",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a Networkmanager Link",
+			SearchDescription: "Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_networkmanager_link.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link-association", "networkmanager-site", "networkmanager-network-resource-relationship"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

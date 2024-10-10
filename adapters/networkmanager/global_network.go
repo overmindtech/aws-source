@@ -180,9 +180,10 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 
 func NewGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{
-		ItemType:  "networkmanager-global-network",
-		Client:    client,
-		AccountID: accountID,
+		ItemType:        "networkmanager-global-network",
+		Client:          client,
+		AccountID:       accountID,
+		AdapterMetadata: GlobalNetworkMetadata(),
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.DescribeGlobalNetworksInput) (*networkmanager.DescribeGlobalNetworksOutput, error) {
 			return client.DescribeGlobalNetworks(ctx, input)
 		},
@@ -198,6 +199,29 @@ func NewGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *a
 			return networkmanager.NewDescribeGlobalNetworksPaginator(client, params)
 		},
 		OutputMapper: globalNetworkOutputMapper,
+	}
+}
+
+func GlobalNetworkMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-global-network",
+		DescriptiveName: "Network Manager Global Network",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a global network by id",
+			ListDescription:   "List all global networks",
+			SearchDescription: "Search for a global network by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_networkmanager_global_network.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"networkmanager-site", "networkmanager-transit-gateway-registration", "networkmanager-connect-peer-association", "networkmanager-transit-gateway-connect-peer-association", "networkmanager-network-resource", "networkmanager-network-resource-relationship", "networkmanager-link", "networkmanager-device", "networkmanager-connection"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }
 

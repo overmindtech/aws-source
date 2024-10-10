@@ -95,11 +95,12 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 
 func NewKeyPolicyAdapter(client keyPolicyClient, accountID string, region string) *adapters.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options] {
 	return &adapters.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options]{
-		ItemType:    "kms-key-policy",
-		Client:      client,
-		AccountID:   accountID,
-		Region:      region,
-		DisableList: true, // This adapter only supports listing by Key ID
+		ItemType:        "kms-key-policy",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		DisableList:     true, // This adapter only supports listing by Key ID
+		AdapterMetadata: KeyPolicyMetadata(),
 		SearchInputMapper: func(scope, query string) (*kms.ListKeyPoliciesInput, error) {
 			return &kms.ListKeyPoliciesInput{
 				KeyId: &query,
@@ -124,5 +125,23 @@ func NewKeyPolicyAdapter(client keyPolicyClient, accountID string, region string
 			return inputs, nil
 		},
 		GetFunc: getKeyPolicyFunc,
+	}
+}
+
+func KeyPolicyMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "kms-key-policy",
+		DescriptiveName: "KMS Key Policy",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			Search:            true,
+			GetDescription:    "Get a KMS key policy by its Key ID",
+			SearchDescription: "Search KMS key policies by Key ID",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_kms_key_policy.key_id"},
+		},
+		PotentialLinks: []string{"kms-key"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

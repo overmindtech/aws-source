@@ -99,10 +99,11 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 
 func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
 	return &adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
-		Region:    region,
-		Client:    client,
-		AccountID: accountID,
-		ItemType:  "kms-custom-key-store",
+		Region:          region,
+		Client:          client,
+		AccountID:       accountID,
+		ItemType:        "kms-custom-key-store",
+		AdapterMetadata: CustomKeyStoreMetadata(),
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.DescribeCustomKeyStoresInput) (*kms.DescribeCustomKeyStoresOutput, error) {
 			return client.DescribeCustomKeyStores(ctx, input)
 		},
@@ -115,5 +116,28 @@ func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region strin
 			return &kms.DescribeCustomKeyStoresInput{}, nil
 		},
 		OutputMapper: customKeyStoreOutputMapper,
+	}
+}
+
+func CustomKeyStoreMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+
+		Type:            "kms-custom-key-store",
+		DescriptiveName: "Custom Key Store",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a custom key store by its ID",
+			ListDescription:   "List all custom key stores",
+			SearchDescription: "Search custom key store by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_kms_custom_key_store.id",
+			},
+		},
+		PotentialLinks: []string{"cloudhsmv2-cluster", "ec2-vpc-endpoint-service"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

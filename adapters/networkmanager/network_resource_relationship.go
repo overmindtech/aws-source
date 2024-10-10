@@ -264,11 +264,12 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 
 func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:       client,
-		AccountID:    accountID,
-		Region:       region,
-		ItemType:     "networkmanager-network-resource-relationship",
-		OutputMapper: networkResourceRelationshipOutputMapper,
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "networkmanager-network-resource-relationship",
+		AdapterMetadata: NetworkResourceRelationshipMetadata(),
+		OutputMapper:    networkResourceRelationshipOutputMapper,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetNetworkResourceRelationshipsInput) (*networkmanager.GetNetworkResourceRelationshipsOutput, error) {
 			return client.GetNetworkResourceRelationships(ctx, input)
 		},
@@ -290,5 +291,18 @@ func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accou
 				GlobalNetworkId: &query,
 			}, nil
 		},
+	}
+}
+
+func NetworkResourceRelationshipMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "networkmanager-network-resource-relationship",
+		DescriptiveName: "Networkmanager Network Resource Relationships",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Search:            true,
+			SearchDescription: "Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId",
+		},
+		PotentialLinks: []string{"networkmanager-connection", "networkmanager-device", "networkmanager-link", "networkmanager-site", "directconnect-connection", "directconnect-direct-connect-gateway", "directconnect-virtual-interface", "ec2-customer"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

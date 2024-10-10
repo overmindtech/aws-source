@@ -222,11 +222,12 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 func NewClusterAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
 	return &adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
-		ItemType:  "ecs-cluster",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		GetFunc:   clusterGetFunc,
+		ItemType:        "ecs-cluster",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         clusterGetFunc,
+		AdapterMetadata: ClusterMetadata(),
 		GetInputMapper: func(scope, query string) *ecs.DescribeClustersInput {
 			return &ecs.DescribeClustersInput{
 				Clusters: []string{
@@ -262,5 +263,28 @@ func NewClusterAdapter(client ECSClient, accountID string, region string) *adapt
 
 			return inputs, nil
 		},
+	}
+}
+
+func ClusterMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ecs-cluster",
+		DescriptiveName: "ECS Cluster",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a cluster by name",
+			ListDescription:   "List all clusters",
+			SearchDescription: "Search for a cluster by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{
+				TerraformQueryMap: "aws_ecs_cluster.arn",
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+			},
+		},
+		PotentialLinks: []string{"ecs-container-instance", "ecs-service", "ecs-task", "ecs-capacity-provider"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

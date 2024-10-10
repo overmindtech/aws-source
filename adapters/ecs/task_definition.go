@@ -188,12 +188,13 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 
 func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &adapters.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
-		ItemType:  "ecs-task-definition",
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		GetFunc:   taskDefinitionGetFunc,
-		ListInput: &ecs.ListTaskDefinitionsInput{},
+		ItemType:        "ecs-task-definition",
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		GetFunc:         taskDefinitionGetFunc,
+		ListInput:       &ecs.ListTaskDefinitionsInput{},
+		AdapterMetadata: TaskDefinitionMetadata(),
 		GetInputMapper: func(scope, query string) *ecs.DescribeTaskDefinitionInput {
 			// AWS actually supports "family:revision" format as an input here
 			// so we can just push it in directly
@@ -217,5 +218,25 @@ func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string)
 
 			return getInputs, nil
 		},
+	}
+}
+
+func TaskDefinitionMetadata() sdp.AdapterMetadata {
+	return sdp.AdapterMetadata{
+		Type:            "ecs-task-definition",
+		DescriptiveName: "Task Definition",
+		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+			Get:               true,
+			List:              true,
+			Search:            true,
+			GetDescription:    "Get a task definition by revision name ({family}:{revision})",
+			ListDescription:   "List all task definitions",
+			SearchDescription: "Search for task definitions by ARN",
+		},
+		TerraformMappings: []*sdp.TerraformMapping{
+			{TerraformQueryMap: "aws_ecs_task_definition.family"},
+		},
+		PotentialLinks: []string{"iam-role", "secretsmanager-secret", "ssm-parameter"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }
