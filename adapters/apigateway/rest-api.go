@@ -196,7 +196,7 @@ func RestAPIMetadata() sdp.AdapterMetadata {
 	return sdp.AdapterMetadata{
 		Type:            "apigateway-rest-api",
 		DescriptiveName: "REST API",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
 			Get:               true,
 			List:              true,

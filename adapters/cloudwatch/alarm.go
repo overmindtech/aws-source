@@ -285,7 +285,7 @@ func AlarmMetadata() sdp.AdapterMetadata {
 				TerraformQueryMap: "aws_cloudwatch_metric_alarm.alarm_name",
 			},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OTHER,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }
 

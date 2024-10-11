@@ -106,5 +106,6 @@ func ContinuousDeploymentPolicyMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search CloudFront Continuous Deployment Policies by ARN",
 		},
 		PotentialLinks: []string{"dns"},
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

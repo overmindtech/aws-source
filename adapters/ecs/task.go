@@ -278,6 +278,6 @@ func TaskMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search for ECS tasks by cluster",
 		},
 		PotentialLinks: []string{"ecs-cluster", "ecs-container-instance", "ecs-task-definition", "ec2-network-interface", "ip"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

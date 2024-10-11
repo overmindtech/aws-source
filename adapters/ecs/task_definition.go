@@ -237,6 +237,6 @@ func TaskDefinitionMetadata() sdp.AdapterMetadata {
 			{TerraformQueryMap: "aws_ecs_task_definition.family"},
 		},
 		PotentialLinks: []string{"iam-role", "secretsmanager-secret", "ssm-parameter"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

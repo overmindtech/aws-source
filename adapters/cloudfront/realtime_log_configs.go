@@ -129,7 +129,7 @@ func RealtimeLogConfigsMetadata() sdp.AdapterMetadata {
 			ListDescription:   "List Realtime Log Configs",
 			SearchDescription: "Search Realtime Log Configs by ARN",
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 		TerraformMappings: []*sdp.TerraformMapping{
 			{
 				TerraformQueryMap: "aws_cloudfront_realtime_log_config.arn",

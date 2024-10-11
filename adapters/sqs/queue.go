@@ -110,6 +110,6 @@ func QueueMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_sqs_queue.id"},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

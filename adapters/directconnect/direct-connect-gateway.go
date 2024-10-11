@@ -121,5 +121,6 @@ func DirectConnectGatewayMetadata() sdp.AdapterMetadata {
 				TerraformQueryMap: "aws_dx_gateway.id",
 			},
 		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

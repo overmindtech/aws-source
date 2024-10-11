@@ -161,6 +161,6 @@ func DBSubnetGroupMetadata() sdp.AdapterMetadata {
 			},
 		},
 		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "outposts-outpost"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

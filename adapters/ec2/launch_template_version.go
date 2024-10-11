@@ -350,6 +350,6 @@ func LaunchTemplateVersionMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search launch template versions by ARN",
 		},
 		PotentialLinks: []string{"ec2-network-interface", "ec2-subnet", "ec2-security-group", "ec2-image", "ec2-key-pair", "ec2-snapshot", "ec2-capacity-reservation", "ec2-placement-group", "ec2-host", "ip"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

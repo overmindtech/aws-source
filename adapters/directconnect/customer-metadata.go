@@ -72,5 +72,6 @@ func CustomerMetadata() sdp.AdapterMetadata {
 			ListDescription:   "List all customer agreements",
 			SearchDescription: "Search customer agreements by ARN",
 		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
 	}
 }

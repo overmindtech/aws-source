@@ -139,7 +139,7 @@ func DirectConnectGatewayAttachmentMetadata() sdp.AdapterMetadata {
 			GetDescription:    "Get a direct connect gateway attachment by DirectConnectGatewayId/VirtualInterfaceId",
 			SearchDescription: "Search direct connect gateway attachments for given VirtualInterfaceId",
 		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 		PotentialLinks: []string{"directconnect-direct-connect-gateway", "directconnect-virtual-interface"},
 	}
 }

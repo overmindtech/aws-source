@@ -186,6 +186,6 @@ func TargetGroupMetadata() sdp.AdapterMetadata {
 			},
 		},
 		PotentialLinks: []string{"ec2-vpc", "elbv2-load-balancer", "elbv2-target-health"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

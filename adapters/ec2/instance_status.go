@@ -116,6 +116,6 @@ func InstanceStatusMetadata() sdp.AdapterMetadata {
 			ListDescription:   "List all EC2 instance statuses",
 			SearchDescription: "Search EC2 instance statuses by ARN",
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

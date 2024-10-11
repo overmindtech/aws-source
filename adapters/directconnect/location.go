@@ -76,6 +76,6 @@ func LocationMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_dx_location.location_code"},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

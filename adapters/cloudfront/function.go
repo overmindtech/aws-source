@@ -89,6 +89,6 @@ func FunctionMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_cloudfront_function.name"},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 	}
 }

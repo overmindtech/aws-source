@@ -151,5 +151,6 @@ func ConnectionMetadata() sdp.AdapterMetadata {
 				TerraformQueryMap: "aws_dx_connection.id",
 			},
 		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 	}
 }

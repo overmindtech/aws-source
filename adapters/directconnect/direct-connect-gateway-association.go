@@ -149,7 +149,7 @@ func DirectConnectGatewayAssociationMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_dx_gateway_association.id"},
 		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 		PotentialLinks: []string{"directconnect-direct-connect-gateway"},
 	}
 }

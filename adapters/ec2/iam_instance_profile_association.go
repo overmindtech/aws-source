@@ -113,6 +113,6 @@ func IamInstanceProfileAssociationMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search IAM Instance Profile Associations by ARN",
 		},
 		PotentialLinks: []string{"iam-instance-profile", "ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

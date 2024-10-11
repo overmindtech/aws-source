@@ -188,6 +188,6 @@ func HealthCheckMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_route53_health_check.id"},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OTHER,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

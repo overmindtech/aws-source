@@ -383,7 +383,7 @@ func DBClusterMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search for a parameter group by ARN",
 		},
 		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_rds_cluster_parameter_group.arn"},
+			{TerraformQueryMap: "aws_rds_cluster.cluster_identifier"},
 		},
 		PotentialLinks: []string{"rds-db-subnet-group", "dns", "rds-db-cluster", "ec2-security-group", "route53-hosted-zone", "kms-key", "kinesis-stream", "rds-option-group", "secretsmanager-secret", "iam-role"},
 		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,

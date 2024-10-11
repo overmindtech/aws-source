@@ -98,7 +98,7 @@ func OriginAccessControlMetadata() sdp.AdapterMetadata {
 			ListDescription:   "List Origin Access Controls",
 			SearchDescription: "Origin Access Control by ARN",
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_cloudfront_origin_access_control.id"},
 		},

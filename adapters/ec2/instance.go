@@ -524,8 +524,12 @@ func InstanceMetadata() sdp.AdapterMetadata {
 		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
 		TerraformMappings: []*sdp.TerraformMapping{
 			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformMethod:   sdp.QueryMethod_GET,
 				TerraformQueryMap: "aws_instance.id",
+			},
+			{
+				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformQueryMap: "aws_instance.arn",
 			},
 		},
 	}

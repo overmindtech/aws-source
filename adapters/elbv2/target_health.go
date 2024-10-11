@@ -278,6 +278,6 @@ func TargetHealthMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search for target health by target group ARN",
 		},
 		PotentialLinks: []string{"ec2-instance", "lambda-function", "ip", "elbv2-load-balancer"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
 	}
 }

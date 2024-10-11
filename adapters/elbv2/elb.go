@@ -322,7 +322,7 @@ func LoadBalancerMetadata() sdp.AdapterMetadata {
 			},
 			{
 				TerraformQueryMap: "aws_lb.id",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
+				TerraformMethod:   sdp.QueryMethod_GET,
 			},
 		},
 		PotentialLinks: []string{"elbv2-target-group", "elbv2-listener", "dns", "route53-hosted-zone", "ec2-vpc", "ec2-subnet", "ec2-address", "ip", "ec2-security-group", "ec2-coip-pool"},

@@ -106,6 +106,6 @@ func NetworkInterfacePermissionMetadata() sdp.AdapterMetadata {
 			SearchDescription: "Search network interface permissions by ARN",
 		},
 		PotentialLinks: []string{"ec2-network-interface"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }

@@ -170,5 +170,6 @@ func ReplicationConfigurationMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_efs_replication_configuration.source_file_system_id"},
 		},
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 	}
 }

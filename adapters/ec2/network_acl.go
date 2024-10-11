@@ -132,6 +132,6 @@ func NetworkAclMetadata() sdp.AdapterMetadata {
 		TerraformMappings: []*sdp.TerraformMapping{
 			{TerraformQueryMap: "aws_network_acl.id"},
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
 	}
 }
