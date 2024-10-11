@@ -15,6 +15,28 @@ import (
 	"github.com/google/uuid"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
+	"github.com/overmindtech/aws-source/adapters/apigateway"
+	"github.com/overmindtech/aws-source/adapters/autoscaling"
+	"github.com/overmindtech/aws-source/adapters/cloudfront"
+	"github.com/overmindtech/aws-source/adapters/cloudwatch"
+	"github.com/overmindtech/aws-source/adapters/directconnect"
+	"github.com/overmindtech/aws-source/adapters/dynamodb"
+	"github.com/overmindtech/aws-source/adapters/ec2"
+	"github.com/overmindtech/aws-source/adapters/ecs"
+	"github.com/overmindtech/aws-source/adapters/efs"
+	"github.com/overmindtech/aws-source/adapters/eks"
+	"github.com/overmindtech/aws-source/adapters/elb"
+	"github.com/overmindtech/aws-source/adapters/elbv2"
+	"github.com/overmindtech/aws-source/adapters/iam"
+	"github.com/overmindtech/aws-source/adapters/kms"
+	"github.com/overmindtech/aws-source/adapters/lambda"
+	"github.com/overmindtech/aws-source/adapters/networkfirewall"
+	"github.com/overmindtech/aws-source/adapters/networkmanager"
+	"github.com/overmindtech/aws-source/adapters/rds"
+	"github.com/overmindtech/aws-source/adapters/route53"
+	"github.com/overmindtech/aws-source/adapters/s3"
+	"github.com/overmindtech/aws-source/adapters/sns"
+	"github.com/overmindtech/aws-source/adapters/sqs"
 	"github.com/overmindtech/aws-source/proc"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
@@ -256,7 +278,6 @@ var rootCmd = &cobra.Command{
 
 			os.Exit(1)
 		}
-
 		log.Info("Stopped")
 
 		os.Exit(0)
@@ -273,6 +294,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(docJSONCmd)
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -436,4 +458,150 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 	_, err = tLog.WriteString(message)
 
 	return err
+}
+
+// documentation subcommand for generating json
+var docJSONCmd = &cobra.Command{
+	Use:   "docs",
+	Short: "Generate JSON documentation",
+	Long:  `Generate JSON documentation for the source`,
+	Run: func(cmd *cobra.Command, args []string) {
+		allMetadata := []sdp.AdapterMetadata{
+			apigateway.APIGatewayMetadata(),
+			apigateway.RestAPIMetadata(),
+			autoscaling.AutoScalingGroupMetadata(),
+			cloudfront.CachePolicyMetadata(),
+			cloudfront.ContinuousDeploymentPolicyMetadata(),
+			cloudfront.DistributionMetadata(),
+			cloudfront.FunctionMetadata(),
+			cloudfront.KeyGroupMetadata(),
+			cloudfront.OriginAccessControlMetadata(),
+			cloudfront.OriginRequestPolicySourceMetadata(),
+			cloudfront.RealtimeLogConfigsMetadata(),
+			cloudfront.ResponseHeadersPolicyMetadata(),
+			cloudfront.StreamingDistributionMetadata(),
+			cloudwatch.AlarmMetadata(),
+			directconnect.ConnectionMetadata(),
+			directconnect.CustomerMetadata(),
+			directconnect.DirectConnectGatewayAssociationMetadata(),
+			directconnect.DirectConnectGatewayAssociationProposalMetadata(),
+			directconnect.DirectConnectGatewayAttachmentMetadata(),
+			directconnect.DirectConnectGatewayMetadata(),
+			directconnect.HostedConnectionMetadata(),
+			directconnect.InterconnectMetadata(),
+			directconnect.LagMetadata(),
+			directconnect.LocationMetadata(),
+			directconnect.RouterConfigurationSourceMetadata(),
+			directconnect.VirtualGatewayMetadata(),
+			directconnect.VirtualInterfaceMetadata(),
+			dynamodb.BackupMetadata(),
+			dynamodb.TableMetadata(),
+			ec2.AddressMetadata(),
+			ec2.CapacityReservationFleetMetadata(),
+			ec2.CapacityReservationMetadata(),
+			ec2.EgressInternetGatewayMetadata(),
+			ec2.IamInstanceProfileAssociationMetadata(),
+			ec2.ImageMetadata(),
+			ec2.InstanceEventWindowMetadata(),
+			ec2.InstanceStatusMetadata(),
+			ec2.InstanceMetadata(),
+			ec2.InternetGatewayMetadata(),
+			ec2.KeyPairMetadata(),
+			ec2.LaunchTemplateVersionMetadata(),
+			ec2.LaunchTemplateMetadata(),
+			ec2.NatGatewayMetadata(),
+			ec2.NetworkAclMetadata(),
+			ec2.NetworkInterfacePermissionMetadata(),
+			ec2.NetworkInterfaceMetadata(),
+			ec2.PlacementGroupMetadata(),
+			ec2.ReservedInstanceMetadata(),
+			ec2.RouteTableMetadata(),
+			ec2.SecurityGroupRuleMetadata(),
+			ec2.SecurityGroupMetadata(),
+			ec2.SnapshotMetadata(),
+			ec2.SubnetMetadata(),
+			ec2.VolumeStatusMetadata(),
+			ec2.VolumeMetadata(),
+			ec2.VpcEndpointMetadata(),
+			ec2.VpcPeeringConnectionMetadata(),
+			ec2.VpcMetadata(),
+			ecs.CapacityProviderMetadata(),
+			ecs.ClusterMetadata(),
+			ecs.ContainerInstanceMetadata(),
+			ecs.ServiceMetadata(),
+			ecs.TaskDefinitionMetadata(),
+			ecs.TaskMetadata(),
+			efs.AccessPointMetadata(),
+			efs.BackupPolicyMetadata(),
+			efs.FileSystemMetadata(),
+			efs.MountTargetMetadata(),
+			efs.ReplicationConfigurationMetadata(),
+			eks.AddonMetadata(),
+			eks.ClusterMetadata(),
+			eks.FargateProfileMetadata(),
+			eks.NodeGroupMetadata(),
+			elb.LoadBalancerMetadata(),
+			elb.InstanceHealthMetadata(),
+			elbv2.LoadBalancerMetadata(),
+			elbv2.ListenerMetadata(),
+			elbv2.RuleMetadata(),
+			elbv2.TargetGroupMetadata(),
+			elbv2.TargetHealthMetadata(),
+			iam.GroupMetadata(),
+			iam.InstanceProfileMetadata(),
+			iam.PolicyMetadata(),
+			iam.RoleMetadata(),
+			iam.UserMetadata(),
+			kms.AliasMetadata(),
+			kms.CustomKeyStoreMetadata(),
+			kms.GrantMetadata(),
+			kms.KeyMetadata(),
+			kms.KeyPolicyMetadata(),
+			lambda.FunctionMetadata(),
+			lambda.LayerVersionMetadata(),
+			lambda.LayerMetadata(),
+			networkfirewall.FirewallPolicyMetadata(),
+			networkfirewall.FirewallMetadata(),
+			networkfirewall.RuleGroupMetadata(),
+			networkfirewall.TLSInspectionConfigurationMetadata(),
+			networkmanager.ConnectAttachmentMetadata(),
+			networkmanager.ConnectPeerAssociationMetadata(),
+			networkmanager.ConnectPeerMetadata(),
+			networkmanager.ConnectionMetadata(),
+			networkmanager.CoreNetworkPolicyMetadata(),
+			networkmanager.CoreNetworkMetadata(),
+			networkmanager.DeviceMetadata(),
+			networkmanager.GlobalNetworkMetadata(),
+			networkmanager.LinkAssociationMetadata(),
+			networkmanager.LinkMetadata(),
+			networkmanager.NetworkResourceRelationshipMetadata(),
+			networkmanager.SiteToSiteVpnAttachmentMetadata(),
+			networkmanager.SiteMetadata(),
+			networkmanager.TransitGatewayConnectPeerAssociationMetadata(),
+			networkmanager.TransitGatewayPeeringMetadata(),
+			networkmanager.TransitGatewayRegistrationMetadata(),
+			networkmanager.TransitGatewayRouteTableAttachmentMetadata(),
+			networkmanager.VPCAttachmentMetadata(),
+			rds.DBClusterParameterGroupMetadata(),
+			rds.DBClusterMetadata(),
+			rds.DBInstanceMetadata(),
+			rds.DBParameterGroupMetadata(),
+			rds.DBSubnetGroupMetadata(),
+			rds.OptionGroupMetadata(),
+			route53.HealthCheckMetadata(),
+			route53.HostedZoneMetadata(),
+			route53.ResourceRecordSetMetadata(),
+			s3.S3Metadata(),
+			sns.DataProtectionPolicyMetadata(),
+			sns.EndpointMetadata(),
+			sns.PlatformApplicationMetadata(),
+			sns.SubscriptionMetadata(),
+			sns.TopicMetadata(),
+			sqs.QueueMetadata(),
+		}
+		err := discovery.AdapterMetadataToJSONFile(allMetadata, "docs-data")
+		if err != nil {
+			log.WithError(err).Fatal("Could not generate JSON documentation")
+		}
+	},
 }
