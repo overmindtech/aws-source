@@ -196,10 +196,10 @@ func TestRouteTableOutputMapper(t *testing.T) {
 
 }
 
-func TestNewRouteTableAdapter(t *testing.T) {
+func TestNewEC2RouteTableAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewRouteTableAdapter(client, account, region)
+	adapter := NewEC2RouteTableAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

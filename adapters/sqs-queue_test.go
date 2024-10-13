@@ -68,7 +68,7 @@ func TestNewQueueAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := sqs.NewFromConfig(config)
 
-	adapter := NewQueueAdapter(client, account, region)
+	adapter := NewSQSQueueAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

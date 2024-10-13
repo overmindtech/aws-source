@@ -102,10 +102,10 @@ func TestVpcPeeringConnectionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewVpcPeeringConnectionAdapter(t *testing.T) {
+func TestNewEC2VpcPeeringConnectionAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewVpcPeeringConnectionAdapter(client, account, region)
+	adapter := NewEC2VpcPeeringConnectionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

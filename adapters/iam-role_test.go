@@ -223,14 +223,14 @@ func TestRoleItemMapper(t *testing.T) {
 	fmt.Println(item.ToMap())
 }
 
-func TestNewRoleAdapter(t *testing.T) {
+func TestNewIAMRoleAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	adapter := NewRoleAdapter(client, account, region)
+	adapter := NewIAMRoleAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

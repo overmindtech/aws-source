@@ -56,10 +56,10 @@ func TestRouterConfigurationOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRouterConfigurationAdapter(t *testing.T) {
+func TestNewDirectConnectRouterConfigurationAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewRouterConfigurationAdapter(client, account, region)
+	adapter := NewDirectConnectRouterConfigurationAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,

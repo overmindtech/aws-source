@@ -33,10 +33,10 @@ func TestGetDataProtectionPolicyFunc(t *testing.T) {
 	}
 }
 
-func TestNewDataProtectionPolicyAdapter(t *testing.T) {
+func TestNewSNSDataProtectionPolicyAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	adapter := NewDataProtectionPolicyAdapter(client, account, region)
+	adapter := NewSNSDataProtectionPolicyAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,

@@ -92,10 +92,10 @@ func TestSnapshotOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSnapshotAdapter(t *testing.T) {
+func TestNewEC2SnapshotAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewSnapshotAdapter(client, account, region)
+	adapter := NewEC2SnapshotAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

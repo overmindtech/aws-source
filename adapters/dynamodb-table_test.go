@@ -221,11 +221,11 @@ func TestTableGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewTableAdapter(t *testing.T) {
+func TestNewDynamoDBTableAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := dynamodb.NewFromConfig(config)
 
-	adapter := NewTableAdapter(client, account, region)
+	adapter := NewDynamoDBTableAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

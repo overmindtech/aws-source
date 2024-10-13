@@ -32,10 +32,10 @@ func TestKeyGroupItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewKeyGroupAdapter(t *testing.T) {
+func TestNewCloudfrontKeyGroupAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewKeyGroupAdapter(client, account)
+	adapter := NewCloudfrontKeyGroupAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

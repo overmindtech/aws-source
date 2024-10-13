@@ -120,10 +120,10 @@ func TestAddressOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewAddressAdapter(t *testing.T) {
+func TestNewEC2AddressAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewAddressAdapter(client, account, region)
+	adapter := NewEC2AddressAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

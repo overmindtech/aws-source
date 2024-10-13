@@ -57,10 +57,10 @@ func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRealtimeLogConfigsAdapter(t *testing.T) {
+func TestNewCloudfrontRealtimeLogConfigsAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewRealtimeLogConfigsAdapter(client, account)
+	adapter := NewCloudfrontRealtimeLogConfigsAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

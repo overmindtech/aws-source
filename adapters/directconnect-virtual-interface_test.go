@@ -88,10 +88,10 @@ func TestVirtualInterfaceOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewVirtualInterfaceAdapter(t *testing.T) {
+func TestNewDirectConnectVirtualInterfaceAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewVirtualInterfaceAdapter(client, account, region)
+	adapter := NewDirectConnectVirtualInterfaceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

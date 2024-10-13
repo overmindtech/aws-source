@@ -91,10 +91,10 @@ func TestCapacityReservationOutputMapper(t *testing.T) {
 
 }
 
-func TestNewCapacityReservationAdapter(t *testing.T) {
+func TestNewEC2CapacityReservationAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewCapacityReservationAdapter(client, account, region)
+	adapter := NewEC2CapacityReservationAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

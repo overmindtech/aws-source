@@ -131,10 +131,10 @@ func TestNodegroupGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewNodegroupAdapter(t *testing.T) {
+func TestNewEKSNodegroupAdapter(t *testing.T) {
 	client, account, region := eksGetAutoConfig(t)
 
-	adapter := NewNodegroupAdapter(client, account, region)
+	adapter := NewEKSNodegroupAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

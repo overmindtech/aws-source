@@ -59,10 +59,10 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewContinuousDeploymentPolicyAdapter(t *testing.T) {
+func TestNewCloudfrontContinuousDeploymentPolicyAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewContinuousDeploymentPolicyAdapter(client, account)
+	adapter := NewCloudfrontContinuousDeploymentPolicyAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

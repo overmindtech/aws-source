@@ -113,10 +113,10 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewResourceRecordSetAdapter(t *testing.T) {
+func TestNewRoute53ResourceRecordSetAdapter(t *testing.T) {
 	client, account, region := route53GetAutoConfig(t)
 
-	zoneSource := NewHostedZoneAdapter(client, account, region)
+	zoneSource := NewRoute53HostedZoneAdapter(client, account, region)
 
 	zones, err := zoneSource.List(context.Background(), zoneSource.Scopes()[0], true)
 	if err != nil {
@@ -127,7 +127,7 @@ func TestNewResourceRecordSetAdapter(t *testing.T) {
 		t.Skip("no zones found")
 	}
 
-	adapter := NewResourceRecordSetAdapter(client, account, region)
+	adapter := NewRoute53ResourceRecordSetAdapter(client, account, region)
 
 	search := zones[0].UniqueAttributeValue()
 	test := adapterhelpers.E2ETest{

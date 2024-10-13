@@ -114,10 +114,10 @@ func TestLayerVersionGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLayerVersionAdapter(t *testing.T) {
+func TestNewLambdaLayerVersionAdapter(t *testing.T) {
 	client, account, region := lambdaGetAutoConfig(t)
 
-	adapter := NewLayerVersionAdapter(client, account, region)
+	adapter := NewLambdaLayerVersionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -72,10 +72,10 @@ func TestDBParameterGroupOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewDBParameterGroupAdapter(t *testing.T) {
+func TestNewRDSDBParameterGroupAdapter(t *testing.T) {
 	client, account, region := rdsGetAutoConfig(t)
 
-	adapter := NewDBParameterGroupAdapter(client, account, region)
+	adapter := NewRDSDBParameterGroupAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

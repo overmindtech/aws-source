@@ -124,7 +124,7 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 }
 
 func TestCapacityProviderAdapter(t *testing.T) {
-	adapter := NewCapacityProviderAdapter(&ecsTestClient{}, "", "")
+	adapter := NewECSCapacityProviderAdapter(&ecsTestClient{}, "", "")
 
 	items, err := adapter.List(context.Background(), "", false)
 
@@ -137,11 +137,11 @@ func TestCapacityProviderAdapter(t *testing.T) {
 	}
 }
 
-func TestNewCapacityProviderAdapter(t *testing.T) {
+func TestNewECSCapacityProviderAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := ecs.NewFromConfig(config)
 
-	adapter := NewCapacityProviderAdapter(client, account, region)
+	adapter := NewECSCapacityProviderAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

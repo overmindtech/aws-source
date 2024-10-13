@@ -109,10 +109,10 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSecurityGroupRuleAdapter(t *testing.T) {
+func TestNewEC2SecurityGroupRuleAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewSecurityGroupRuleAdapter(client, account, region)
+	adapter := NewEC2SecurityGroupRuleAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

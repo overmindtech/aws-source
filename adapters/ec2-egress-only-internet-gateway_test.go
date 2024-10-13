@@ -88,10 +88,10 @@ func TestEgressOnlyInternetGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewEgressOnlyInternetGatewayAdapter(t *testing.T) {
+func TestNewEC2EgressOnlyInternetGatewayAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewEgressOnlyInternetGatewayAdapter(client, account, region)
+	adapter := NewEC2EgressOnlyInternetGatewayAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

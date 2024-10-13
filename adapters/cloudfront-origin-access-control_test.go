@@ -31,10 +31,10 @@ func TestOriginAccessControlItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewOriginAccessControlAdapter(t *testing.T) {
+func TestNewCloudfrontOriginAccessControlAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewOriginAccessControlAdapter(client, account)
+	adapter := NewCloudfrontOriginAccessControlAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

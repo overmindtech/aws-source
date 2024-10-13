@@ -88,11 +88,11 @@ func TestKMSGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewKeyAdapter(t *testing.T) {
+func TestNewKMSKeyAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	adapter := NewKeyAdapter(client, account, region)
+	adapter := NewKMSKeyAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

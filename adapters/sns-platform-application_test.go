@@ -67,10 +67,10 @@ func TestGetPlatformApplicationFunc(t *testing.T) {
 	}
 }
 
-func TestNewPlatformApplicationAdapter(t *testing.T) {
+func TestNewSNSPlatformApplicationAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	adapter := NewPlatformApplicationAdapter(client, account, region)
+	adapter := NewSNSPlatformApplicationAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

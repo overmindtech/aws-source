@@ -88,10 +88,10 @@ func TestNetworkInterfacePermissionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkInterfacePermissionAdapter(t *testing.T) {
+func TestNewEC2NetworkInterfacePermissionAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewNetworkInterfacePermissionAdapter(client, account, region)
+	adapter := NewEC2NetworkInterfacePermissionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

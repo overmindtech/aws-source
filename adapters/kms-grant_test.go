@@ -110,11 +110,11 @@ func TestGrantOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewGrantAdapter(t *testing.T) {
+func TestNewKMSGrantAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	adapter := NewGrantAdapter(client, account, region)
+	adapter := NewKMSGrantAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,

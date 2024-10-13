@@ -198,10 +198,10 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkInterfaceAdapter(t *testing.T) {
+func TestNewEC2NetworkInterfaceAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewNetworkInterfaceAdapter(client, account, region)
+	adapter := NewEC2NetworkInterfaceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

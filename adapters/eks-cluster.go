@@ -272,7 +272,7 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 // +overmind:terraform:queryMap aws_eks_cluster.arn
 // +overmind:terraform:method SEARCH
 
-func NewClusterAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
+func NewEKSClusterAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-cluster",
 		Client:          client,

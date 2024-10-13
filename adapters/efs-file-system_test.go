@@ -92,10 +92,10 @@ func TestFileSystemOutputMapper(t *testing.T) {
 
 }
 
-func TestNewFileSystemAdapter(t *testing.T) {
+func TestNewEFSFileSystemAdapter(t *testing.T) {
 	client, account, region := efsGetAutoConfig(t)
 
-	adapter := NewFileSystemAdapter(client, account, region)
+	adapter := NewEFSFileSystemAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

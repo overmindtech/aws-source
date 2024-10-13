@@ -56,11 +56,11 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewCustomKeyStoreAdapter(t *testing.T) {
+func TestNewKMSCustomKeyStoreAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	adapter := NewCustomKeyStoreAdapter(client, account, region)
+	adapter := NewKMSCustomKeyStoreAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

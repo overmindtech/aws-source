@@ -133,7 +133,7 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_replication_configuration.source_file_system_id
 
-func NewReplicationConfigurationAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
+func NewEFSReplicationConfigurationAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-replication-configuration",
 		Region:          region,

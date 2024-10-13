@@ -505,7 +505,7 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 // +overmind:terraform:queryMap aws_db_instance.identifier
 // +overmind:terraform:queryMap aws_db_instance_role_association.db_instance_identifier
 
-func NewDBInstanceAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
+func NewRDSDBInstanceAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-instance",
 		Region:          region,

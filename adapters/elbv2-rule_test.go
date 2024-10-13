@@ -94,13 +94,13 @@ func TestRuleOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRuleAdapter(t *testing.T) {
+func TestNewELBv2RuleAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := elasticloadbalancingv2.NewFromConfig(config)
 
-	lbSource := NewLoadBalancerAdapter(client, account, region)
-	listenerSource := NewListenerAdapter(client, account, region)
-	ruleSource := NewRuleAdapter(client, account, region)
+	lbSource := NewELBv2LoadBalancerAdapter(client, account, region)
+	listenerSource := NewELBv2ListenerAdapter(client, account, region)
+	ruleSource := NewELBv2RuleAdapter(client, account, region)
 
 	lbs, err := lbSource.List(context.Background(), lbSource.Scopes()[0], false)
 	if err != nil {

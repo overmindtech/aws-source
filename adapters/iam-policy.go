@@ -336,7 +336,7 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-adapter/issues/68
-func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
+func NewIAMPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-policy",
 		Client:          client,

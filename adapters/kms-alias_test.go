@@ -54,11 +54,11 @@ func TestAliasOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewAliasAdapter(t *testing.T) {
+func TestNewKMSAliasAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
-	adapter := NewAliasAdapter(client, account, region)
+	adapter := NewKMSAliasAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -146,7 +146,7 @@ func TestECSClusterGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestECSNewClusterAdapter(t *testing.T) {
+func TestECSNewECSClusterAdapter(t *testing.T) {
 	client, account, region := ecsGetAutoConfig(t)
 
 	adapter := NewECSClusterAdapter(client, account, region)

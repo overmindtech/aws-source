@@ -263,7 +263,7 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 // +overmind:search Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId
 // +overmind:group AWS
 
-func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
+func NewNetworkManagerNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
@@ -286,7 +286,7 @@ func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accou
 		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetNetworkResourceRelationshipsInput) adapterhelpers.Paginator[*networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetNetworkResourceRelationshipsPaginator(client, params)
 		},
-		InputMapperSearch: func(ctx context.Context, clientå *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
+		InputMapperSearch: func(ctx context.Context, client *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
 			// Search by GlobalNetworkId
 			return &networkmanager.GetNetworkResourceRelationshipsInput{
 				GlobalNetworkId: &query,

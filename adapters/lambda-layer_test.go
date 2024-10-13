@@ -52,10 +52,10 @@ func TestLayerItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLayerAdapter(t *testing.T) {
+func TestNewLambdaLayerAdapter(t *testing.T) {
 	client, account, region := lambdaGetAutoConfig(t)
 
-	adapter := NewLayerAdapter(client, account, region)
+	adapter := NewLambdaLayerAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

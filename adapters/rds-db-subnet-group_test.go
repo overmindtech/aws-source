@@ -84,10 +84,10 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBSubnetGroupAdapter(t *testing.T) {
+func TestNewRDSDBSubnetGroupAdapter(t *testing.T) {
 	client, account, region := rdsGetAutoConfig(t)
 
-	adapter := NewDBSubnetGroupAdapter(client, account, region)
+	adapter := NewRDSDBSubnetGroupAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

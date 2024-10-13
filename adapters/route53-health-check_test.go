@@ -71,10 +71,10 @@ func TestHealthCheckItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewHealthCheckAdapter(t *testing.T) {
+func TestNewRoute53HealthCheckAdapter(t *testing.T) {
 	client, account, region := route53GetAutoConfig(t)
 
-	adapter := NewHealthCheckAdapter(client, account, region)
+	adapter := NewRoute53HealthCheckAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

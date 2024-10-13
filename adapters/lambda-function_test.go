@@ -374,10 +374,10 @@ func TestGetEventLinkedItem(t *testing.T) {
 	}
 }
 
-func TestNewFunctionAdapter(t *testing.T) {
+func TestNewLambdaFunctionAdapter(t *testing.T) {
 	client, account, region := lambdaGetAutoConfig(t)
 
-	adapter := NewFunctionAdapter(client, account, region)
+	adapter := NewLambdaFunctionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -67,7 +67,7 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_api_gateway_resource.id
 
-func NewResourceAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
+func NewAPIGatewayResourceAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-resource",
 		Client:          client,

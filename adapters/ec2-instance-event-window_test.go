@@ -108,10 +108,10 @@ func TestInstanceEventWindowOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceEventWindowAdapter(t *testing.T) {
+func TestNewEC2InstanceEventWindowAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewInstanceEventWindowAdapter(client, account, region)
+	adapter := NewEC2InstanceEventWindowAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

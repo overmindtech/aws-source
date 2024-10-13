@@ -131,10 +131,10 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNetworkAclAdapter(t *testing.T) {
+func TestNewEC2NetworkAclAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewNetworkAclAdapter(client, account, region)
+	adapter := NewEC2NetworkAclAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

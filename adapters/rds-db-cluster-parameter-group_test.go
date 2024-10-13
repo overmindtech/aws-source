@@ -84,10 +84,10 @@ func TestDBClusterParameterGroupOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewDBClusterParameterGroupAdapter(t *testing.T) {
+func TestNewRDSDBClusterParameterGroupAdapter(t *testing.T) {
 	client, account, region := rdsGetAutoConfig(t)
 
-	adapter := NewDBClusterParameterGroupAdapter(client, account, region)
+	adapter := NewRDSDBClusterParameterGroupAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

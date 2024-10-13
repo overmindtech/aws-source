@@ -148,10 +148,10 @@ func TestInterconnectHealth(t *testing.T) {
 	}
 }
 
-func TestNewInterconnectAdapter(t *testing.T) {
+func TestNewDirectConnectInterconnectAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewInterconnectAdapter(client, account, region)
+	adapter := NewDirectConnectInterconnectAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

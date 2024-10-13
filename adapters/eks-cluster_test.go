@@ -205,10 +205,10 @@ func TestClusterGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewClusterAdapter(t *testing.T) {
+func TestNewEKSClusterAdapter(t *testing.T) {
 	client, account, region := eksGetAutoConfig(t)
 
-	adapter := NewClusterAdapter(client, account, region)
+	adapter := NewEKSClusterAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

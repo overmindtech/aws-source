@@ -131,7 +131,7 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 // +overmind:search Search Interconnects by ARN
 // +overmind:group AWS
 
-func NewInterconnectAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
+func NewDirectConnectInterconnectAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,

@@ -252,10 +252,10 @@ func TestDBClusterOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBClusterAdapter(t *testing.T) {
+func TestNewRDSDBClusterAdapter(t *testing.T) {
 	client, account, region := rdsGetAutoConfig(t)
 
-	adapter := NewDBClusterAdapter(client, account, region)
+	adapter := NewRDSDBClusterAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

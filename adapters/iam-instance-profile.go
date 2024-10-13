@@ -130,7 +130,7 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 // +overmind:terraform:queryMap aws_iam_instance_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
+func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:        "iam-instance-profile",
 		Client:          client,

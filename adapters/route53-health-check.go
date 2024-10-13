@@ -140,7 +140,7 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_health_check.id
 
-func NewHealthCheckAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
+func NewRoute53HealthCheckAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options]{
 		ItemType:        "route53-health-check",
 		Client:          client,

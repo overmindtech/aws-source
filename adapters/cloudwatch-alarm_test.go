@@ -153,11 +153,11 @@ func TestAlarmOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewAlarmAdapter(t *testing.T) {
+func TestNewCloudwatchAlarmAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := cloudwatch.NewFromConfig(config)
 
-	adapter := NewAlarmAdapter(client, account, region)
+	adapter := NewCloudwatchAlarmAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

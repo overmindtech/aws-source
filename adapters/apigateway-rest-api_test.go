@@ -91,12 +91,12 @@ func TestRestApiOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewRestApiAdapter(t *testing.T) {
+func TestNewAPIGatewayRestApiAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 
 	client := apigateway.NewFromConfig(config)
 
-	adapter := NewRestApiAdapter(client, account, region)
+	adapter := NewAPIGatewayRestApiAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

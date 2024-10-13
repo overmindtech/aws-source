@@ -149,10 +149,10 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewNatGatewayAdapter(t *testing.T) {
+func TestNewEC2NatGatewayAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewNatGatewayAdapter(client, account, region)
+	adapter := NewEC2NatGatewayAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

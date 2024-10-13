@@ -44,7 +44,7 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 // +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
+func NewRDSDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
 	return &adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-cluster-parameter-group",
 		Client:          client,

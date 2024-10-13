@@ -231,10 +231,10 @@ func TestTaskGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewTaskAdapter(t *testing.T) {
+func TestNewECSTaskAdapter(t *testing.T) {
 	client, account, region := ecsGetAutoConfig(t)
 
-	adapter := NewTaskAdapter(client, account, region)
+	adapter := NewECSTaskAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

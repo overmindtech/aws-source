@@ -165,10 +165,10 @@ func TestLagOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewLagAdapter(t *testing.T) {
+func TestNewDirectConnectLagAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewLagAdapter(client, account, region)
+	adapter := NewDirectConnectLagAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

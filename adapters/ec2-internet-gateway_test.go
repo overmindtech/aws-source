@@ -95,10 +95,10 @@ func TestInternetGatewayOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInternetGatewayAdapter(t *testing.T) {
+func TestNewEC2InternetGatewayAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewInternetGatewayAdapter(client, account, region)
+	adapter := NewEC2InternetGatewayAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

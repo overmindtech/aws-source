@@ -66,7 +66,7 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:terraform:queryMap aws_iam_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
+func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",
 		Client:          client,

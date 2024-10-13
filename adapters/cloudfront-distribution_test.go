@@ -496,11 +496,11 @@ func TestDistributionGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDistributionAdapter(t *testing.T) {
+func TestNewCloudfrontDistributionAdapter(t *testing.T) {
 	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
-	adapter := NewDistributionAdapter(client, account)
+	adapter := NewCloudfrontDistributionAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

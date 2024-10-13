@@ -94,10 +94,10 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 
 }
 
-func TestNewReservedInstanceAdapter(t *testing.T) {
+func TestNewEC2ReservedInstanceAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewReservedInstanceAdapter(client, account, region)
+	adapter := NewEC2ReservedInstanceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

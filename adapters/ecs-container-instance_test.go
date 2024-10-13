@@ -348,10 +348,10 @@ func TestContainerInstanceGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewContainerInstanceAdapter(t *testing.T) {
+func TestNewECSContainerInstanceAdapter(t *testing.T) {
 	client, account, region := ecsGetAutoConfig(t)
 
-	adapter := NewContainerInstanceAdapter(client, account, region)
+	adapter := NewECSContainerInstanceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

@@ -146,10 +146,10 @@ func TestVpcEndpointOutputMapper(t *testing.T) {
 	tests.Execute(t, items[0])
 }
 
-func TestNewVpcEndpointAdapter(t *testing.T) {
+func TestNewEC2VpcEndpointAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewVpcEndpointAdapter(client, account, region)
+	adapter := NewEC2VpcEndpointAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

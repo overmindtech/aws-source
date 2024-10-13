@@ -50,10 +50,10 @@ func TestOriginRequestPolicyItemMapper(t *testing.T) {
 	}
 }
 
-func TestNewOriginRequestPolicyAdapter(t *testing.T) {
+func TestNewCloudfrontOriginRequestPolicyAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewOriginRequestPolicyAdapter(client, account)
+	adapter := NewCloudfrontOriginRequestPolicyAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -36,7 +36,7 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_response_headers_policy.id
 
-func NewResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
+func NewCloudfrontResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-response-headers-policy",
 		Client:          client,

@@ -101,10 +101,10 @@ func TestVolumeOutputMapper(t *testing.T) {
 
 }
 
-func TestNewVolumeAdapter(t *testing.T) {
+func TestNewEC2VolumeAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewVolumeAdapter(client, account, region)
+	adapter := NewEC2VolumeAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

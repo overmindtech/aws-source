@@ -61,10 +61,10 @@ func TestGetTopicFunc(t *testing.T) {
 	}
 }
 
-func TestNewTopicAdapter(t *testing.T) {
+func TestNewSNSTopicAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	adapter := NewTopicAdapter(client, account, region)
+	adapter := NewSNSTopicAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

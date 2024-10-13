@@ -64,10 +64,10 @@ func TestSNSGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewSubscriptionAdapter(t *testing.T) {
+func TestNewSNSSubscriptionAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	adapter := NewSubscriptionAdapter(client, account, region)
+	adapter := NewSNSSubscriptionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

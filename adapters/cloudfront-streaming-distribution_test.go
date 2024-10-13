@@ -108,11 +108,11 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewStreamingDistributionAdapter(t *testing.T) {
+func TestNewCloudfrontStreamingDistributionAdapter(t *testing.T) {
 	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
-	adapter := NewStreamingDistributionAdapter(client, account)
+	adapter := NewCloudfrontStreamingDistributionAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

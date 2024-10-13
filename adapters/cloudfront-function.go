@@ -36,7 +36,7 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_function.name
 
-func NewCloudfrontFunctionAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
+func NewCloudfrontCloudfrontFunctionAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-function",
 		Client:          client,

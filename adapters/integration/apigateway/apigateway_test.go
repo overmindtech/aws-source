@@ -28,14 +28,14 @@ func APIGateway(t *testing.T) {
 
 	t.Log("Running APIGateway integration test")
 
-	restApiSource := adapters.NewRestApiAdapter(testClient, accountID, testAWSConfig.Region)
+	restApiSource := adapters.NewAPIGatewayRestApiAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = restApiSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate APIGateway restApi adapter: %v", err)
 	}
 
-	resourceApiSource := adapters.NewResourceAdapter(testClient, accountID, testAWSConfig.Region)
+	resourceApiSource := adapters.NewAPIGatewayResourceAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = resourceApiSource.Validate()
 	if err != nil {

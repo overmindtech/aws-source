@@ -224,7 +224,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 // +overmind:search Search for target health by target group ARN
 // +overmind:group AWS
 
-func NewTargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
+func NewELBv2TargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{
 		Region:          region,
 		Client:          client,

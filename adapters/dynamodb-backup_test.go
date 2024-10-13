@@ -111,11 +111,11 @@ func TestBackupGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewBackupAdapter(t *testing.T) {
+func TestNewDynamoDBBackupAdapter(t *testing.T) {
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := dynamodb.NewFromConfig(config)
 
-	adapter := NewBackupAdapter(client, account, region)
+	adapter := NewDynamoDBBackupAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

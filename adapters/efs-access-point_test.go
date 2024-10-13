@@ -81,10 +81,10 @@ func TestAccessPointOutputMapper(t *testing.T) {
 
 }
 
-func TestNewAccessPointAdapter(t *testing.T) {
+func TestNewEFSAccessPointAdapter(t *testing.T) {
 	client, account, region := efsGetAutoConfig(t)
 
-	adapter := NewAccessPointAdapter(client, account, region)
+	adapter := NewEFSAccessPointAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

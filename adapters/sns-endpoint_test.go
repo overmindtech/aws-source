@@ -55,10 +55,10 @@ func TestGetEndpointFunc(t *testing.T) {
 	}
 }
 
-func TestNewEndpointAdapter(t *testing.T) {
+func TestNewSNSEndpointAdapter(t *testing.T) {
 	client, account, region := GetAutoConfig(t)
 
-	adapter := NewEndpointAdapter(client, account, region)
+	adapter := NewSNSEndpointAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,

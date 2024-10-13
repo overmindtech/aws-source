@@ -262,7 +262,7 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_network_interface.id
 
-func NewNetworkInterfaceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
+func NewEC2NetworkInterfaceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,

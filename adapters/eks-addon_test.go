@@ -47,10 +47,10 @@ func TestAddonGetFunc(t *testing.T) {
 	}
 }
 
-func TestNewAddonAdapter(t *testing.T) {
+func TestNewEKSAddonAdapter(t *testing.T) {
 	client, account, region := eksGetAutoConfig(t)
 
-	adapter := NewAddonAdapter(client, account, region)
+	adapter := NewEKSAddonAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

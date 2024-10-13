@@ -48,10 +48,10 @@ func TestHostedZoneItemMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewHostedZoneAdapter(t *testing.T) {
+func TestNewRoute53HostedZoneAdapter(t *testing.T) {
 	client, account, region := route53GetAutoConfig(t)
 
-	adapter := NewHostedZoneAdapter(client, account, region)
+	adapter := NewRoute53HostedZoneAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -310,10 +310,10 @@ func TestServiceGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewServiceAdapter(t *testing.T) {
+func TestNewECSServiceAdapter(t *testing.T) {
 	client, account, region := ecsGetAutoConfig(t)
 
-	adapter := NewServiceAdapter(client, account, region)
+	adapter := NewECSServiceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

@@ -66,10 +66,10 @@ func TestIamInstanceProfileAssociationOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewIamInstanceProfileAssociationAdapter(t *testing.T) {
+func TestNewEC2IamInstanceProfileAssociationAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewIamInstanceProfileAssociationAdapter(client, account, region)
+	adapter := NewEC2IamInstanceProfileAssociationAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

@@ -350,10 +350,10 @@ func TestInstanceOutputMapper(t *testing.T) {
 
 }
 
-func TestNewInstanceAdapter(t *testing.T) {
+func TestNewEC2InstanceAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewInstanceAdapter(client, account, region)
+	adapter := NewEC2InstanceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

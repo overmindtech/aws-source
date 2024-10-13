@@ -66,10 +66,10 @@ func TestFargateProfileGetFunc(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewFargateProfileAdapter(t *testing.T) {
+func TestNewEKSFargateProfileAdapter(t *testing.T) {
 	client, account, region := eksGetAutoConfig(t)
 
-	adapter := NewFargateProfileAdapter(client, account, region)
+	adapter := NewEKSFargateProfileAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

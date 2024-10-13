@@ -40,10 +40,10 @@ func TestLocationOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewLocationAdapter(t *testing.T) {
+func TestNewDirectConnectLocationAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewLocationAdapter(client, account, region)
+	adapter := NewDirectConnectLocationAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

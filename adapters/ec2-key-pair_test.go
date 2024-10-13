@@ -71,10 +71,10 @@ func TestKeyPairOutputMapper(t *testing.T) {
 
 }
 
-func TestNewKeyPairAdapter(t *testing.T) {
+func TestNewEC2KeyPairAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewKeyPairAdapter(client, account, region)
+	adapter := NewEC2KeyPairAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

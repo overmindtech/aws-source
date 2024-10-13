@@ -36,10 +36,10 @@ func TestVirtualGatewayOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewVirtualGatewayAdapter(t *testing.T) {
+func TestNewDirectConnectVirtualGatewayAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewVirtualGatewayAdapter(client, account, region)
+	adapter := NewDirectConnectVirtualGatewayAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

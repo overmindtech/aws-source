@@ -112,10 +112,10 @@ func TestSubnetOutputMapper(t *testing.T) {
 
 }
 
-func TestNewSubnetAdapter(t *testing.T) {
+func TestNewEC2SubnetAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewSubnetAdapter(client, account, region)
+	adapter := NewEC2SubnetAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

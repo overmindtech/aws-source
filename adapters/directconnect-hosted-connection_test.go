@@ -89,10 +89,10 @@ func TestHostedConnectionOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewHostedConnectionAdapter(t *testing.T) {
+func TestNewDirectConnectHostedConnectionAdapter(t *testing.T) {
 	client, account, region := directconnectGetAutoConfig(t)
 
-	adapter := NewHostedConnectionAdapter(client, account, region)
+	adapter := NewDirectConnectHostedConnectionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,

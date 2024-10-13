@@ -30,32 +30,32 @@ func NetworkManager(t *testing.T) {
 
 	t.Logf("Running NetworkManager integration tests")
 
-	globalNetworkSource := adapters.NewGlobalNetworkAdapter(testClient, accountID)
+	globalNetworkSource := adapters.NewNetworkManagerGlobalNetworkAdapter(testClient, accountID)
 	if err := globalNetworkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager global network adapter: %v", err)
 	}
 
-	siteSource := adapters.NewSiteAdapter(testClient, accountID)
+	siteSource := adapters.NewNetworkManagerSiteAdapter(testClient, accountID)
 	if err := siteSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager site adapter: %v", err)
 	}
 
-	linkSource := adapters.NewLinkAdapter(testClient, accountID)
+	linkSource := adapters.NewNetworkManagerLinkAdapter(testClient, accountID)
 	if err := linkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link adapter: %v", err)
 	}
 
-	linkAssociationSource := adapters.NewLinkAssociationAdapter(testClient, accountID)
+	linkAssociationSource := adapters.NewNetworkManagerLinkAssociationAdapter(testClient, accountID)
 	if err := linkAssociationSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link association adapter: %v", err)
 	}
 
-	connectionSource := adapters.NewConnectionAdapter(testClient, accountID)
+	connectionSource := adapters.NewNetworkManagerConnectionAdapter(testClient, accountID)
 	if err := connectionSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager connection adapter: %v", err)
 	}
 
-	deviceSource := adapters.NewDeviceAdapter(testClient, accountID)
+	deviceSource := adapters.NewNetworkManagerDeviceAdapter(testClient, accountID)
 	if err := deviceSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager device adapter: %v", err)
 	}

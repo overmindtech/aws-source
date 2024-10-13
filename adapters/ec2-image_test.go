@@ -105,10 +105,10 @@ func TestImageOutputMapper(t *testing.T) {
 	}
 }
 
-func TestNewImageAdapter(t *testing.T) {
+func TestNewEC2ImageAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewImageAdapter(client, account, region)
+	adapter := NewEC2ImageAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

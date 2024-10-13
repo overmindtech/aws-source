@@ -148,7 +148,7 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 // +overmind:terraform:queryMap aws_lb_listener.arn
 // +overmind:terraform:method SEARCH
 
-func NewListenerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options] {
+func NewELBv2ListenerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options]{
 		Region:          region,
 		Client:          client,

@@ -203,10 +203,10 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 
 }
 
-func TestNewLaunchTemplateVersionAdapter(t *testing.T) {
+func TestNewEC2LaunchTemplateVersionAdapter(t *testing.T) {
 	client, account, region := ec2GetAutoConfig(t)
 
-	adapter := NewLaunchTemplateVersionAdapter(client, account, region)
+	adapter := NewEC2LaunchTemplateVersionAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,

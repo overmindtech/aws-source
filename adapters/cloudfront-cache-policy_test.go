@@ -84,10 +84,10 @@ func TestCachePolicyListFunc(t *testing.T) {
 	}
 }
 
-func TestNewCachePolicyAdapter(t *testing.T) {
+func TestNewCloudfrontCachePolicyAdapter(t *testing.T) {
 	client, account, _ := CloudfrontGetAutoConfig(t)
 
-	adapter := NewCachePolicyAdapter(client, account)
+	adapter := NewCloudfrontCachePolicyAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

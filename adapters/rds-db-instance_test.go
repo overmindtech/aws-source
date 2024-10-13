@@ -310,10 +310,10 @@ func TestDBInstanceOutputMapper(t *testing.T) {
 	tests.Execute(t, item)
 }
 
-func TestNewDBInstanceAdapter(t *testing.T) {
+func TestNewRDSDBInstanceAdapter(t *testing.T) {
 	client, account, region := rdsGetAutoConfig(t)
 
-	adapter := NewDBInstanceAdapter(client, account, region)
+	adapter := NewRDSDBInstanceAdapter(client, account, region)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
