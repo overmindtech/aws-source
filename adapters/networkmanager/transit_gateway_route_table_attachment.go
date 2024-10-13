@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -107,7 +108,7 @@ func NewTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client,
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-transit-gateway-route-table-attachment",
-		AdapterMetadata: TransitGatewayRouteTableAttachmentMetadata(),
+		AdapterMetadata: transitGatewayRouteTableAttachmentAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.TransitGatewayRouteTableAttachment, error) {
 			return getTransitGatewayRouteTableAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -121,18 +122,16 @@ func NewTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client,
 	}
 }
 
-func TransitGatewayRouteTableAttachmentMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-transit-gateway-route-table-attachment",
-		DescriptiveName: "Networkmanager Transit Gateway Route Table Attachment",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			GetDescription: "Get a Networkmanager Transit Gateway Route Table Attachment by id",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_transit_gateway_route_table_attachment.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network", "networkmanager-transit-gateway-peering", "ec2-transit-gateway-route-table"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var transitGatewayRouteTableAttachmentAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-transit-gateway-route-table-attachment",
+	DescriptiveName: "Networkmanager Transit Gateway Route Table Attachment",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		GetDescription: "Get a Networkmanager Transit Gateway Route Table Attachment by id",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_transit_gateway_route_table_attachment.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network", "networkmanager-transit-gateway-peering", "ec2-transit-gateway-route-table"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

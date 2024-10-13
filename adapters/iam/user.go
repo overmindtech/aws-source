@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -188,7 +189,7 @@ func NewUserAdapter(client *iam.Client, accountID string, region string) *adapte
 		AccountID:       accountID,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		Region:          region,
-		AdapterMetadata: UserMetadata(),
+		AdapterMetadata: iamUserAdapterMetadata,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 			return userGetFunc(ctx, client, scope, query)
 		},
@@ -200,25 +201,23 @@ func NewUserAdapter(client *iam.Client, accountID string, region string) *adapte
 	}
 }
 
-func UserMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "iam-user",
-		DescriptiveName: "IAM User",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an IAM user by name",
-			ListDescription:   "List all IAM users",
-			SearchDescription: "Search for IAM users by ARN",
+var iamUserAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "iam-user",
+	DescriptiveName: "IAM User",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an IAM user by name",
+		ListDescription:   "List all IAM users",
+		SearchDescription: "Search for IAM users by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_iam_user.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_iam_user.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"iam-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"iam-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

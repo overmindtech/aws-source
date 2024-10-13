@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -66,7 +67,7 @@ func NewLaunchTemplateAdapter(client *ec2.Client, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-launch-template",
-		AdapterMetadata: LaunchTemplateMetadata(),
+		AdapterMetadata: launchTemplateAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
 			return client.DescribeLaunchTemplates(ctx, input)
 		},
@@ -79,21 +80,19 @@ func NewLaunchTemplateAdapter(client *ec2.Client, accountID string, region strin
 	}
 }
 
-func LaunchTemplateMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-launch-template",
-		DescriptiveName: "Launch Template",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a launch template by ID",
-			ListDescription:   "List all launch templates",
-			SearchDescription: "Search for launch templates by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_launch_template.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var launchTemplateAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-launch-template",
+	DescriptiveName: "Launch Template",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a launch template by ID",
+		ListDescription:   "List all launch templates",
+		SearchDescription: "Search for launch templates by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_launch_template.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

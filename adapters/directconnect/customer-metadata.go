@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -45,7 +46,7 @@ func NewCustomerMetadataAdapter(client *directconnect.Client, accountID string, 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-customer-metadata",
-		AdapterMetadata: CustomerMetadata(),
+		AdapterMetadata: customerMetadataAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeCustomerMetadataInput) (*directconnect.DescribeCustomerMetadataOutput, error) {
 			return client.DescribeCustomerMetadata(ctx, input)
 		},
@@ -61,18 +62,16 @@ func NewCustomerMetadataAdapter(client *directconnect.Client, accountID string, 
 	}
 }
 
-func CustomerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-customer-metadata",
-		DescriptiveName: "Customer Metadata",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a customer agreement by name",
-			ListDescription:   "List all customer agreements",
-			SearchDescription: "Search customer agreements by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var customerMetadataAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-customer-metadata",
+	DescriptiveName: "Customer Metadata",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a customer agreement by name",
+		ListDescription:   "List all customer agreements",
+		SearchDescription: "Search customer agreements by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

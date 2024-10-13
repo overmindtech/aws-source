@@ -13,6 +13,7 @@ import (
 	"github.com/micahhausler/aws-iam-policy/policy"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/conc/iter"
@@ -343,7 +344,7 @@ func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhe
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:       accountID,
 		Region:          "", // IAM policies aren't tied to a region
-		AdapterMetadata: PolicyMetadata(),
+		AdapterMetadata: policyAdapterMetadata,
 		// Some IAM policies are global, this means that their ARN doesn't
 		// contain an account name and instead just says "aws". Enabling this
 		// setting means these also work
@@ -359,29 +360,27 @@ func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhe
 	}
 }
 
-func PolicyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "iam-policy",
-		DescriptiveName: "IAM Policy",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an IAM policy by policyFullName ({path} + {policyName})",
-			ListDescription:   "List all IAM policies",
-			SearchDescription: "Search for IAM policies by ARN",
+var policyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "iam-policy",
+	DescriptiveName: "IAM Policy",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an IAM policy by policyFullName ({path} + {policyName})",
+		ListDescription:   "List all IAM policies",
+		SearchDescription: "Search for IAM policies by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_iam_policy.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_iam_policy.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-			{
-				TerraformQueryMap: "aws_iam_user_policy_attachment.policy_arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
+		{
+			TerraformQueryMap: "aws_iam_user_policy_attachment.policy_arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		PotentialLinks: []string{"iam-group", "iam-user", "iam-role"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"iam-group", "iam-user", "iam-role"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

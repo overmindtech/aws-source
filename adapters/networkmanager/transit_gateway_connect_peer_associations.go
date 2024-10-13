@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -114,7 +115,7 @@ func NewTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Clien
 		AccountID:       accountID,
 		Region:          region,
 		ItemType:        "networkmanager-transit-gateway-connect-peer-association",
-		AdapterMetadata: TransitGatewayConnectPeerAssociationMetadata(),
+		AdapterMetadata: transitGatewayConnectPeerAssociationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetTransitGatewayConnectPeerAssociationsInput) (*networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, error) {
 			return client.GetTransitGatewayConnectPeerAssociations(ctx, input)
 		},
@@ -156,19 +157,17 @@ func NewTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Clien
 	}
 }
 
-func TransitGatewayConnectPeerAssociationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-transit-gateway-connect-peer-association",
-		DescriptiveName: "Networkmanager Transit Gateway Connect Peer Association",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Transit Gateway Connect Peer Association by id",
-			ListDescription:   "List all Networkmanager Transit Gateway Connect Peer Associations",
-			SearchDescription: "Search for Networkmanager Transit Gateway Connect Peer Associations by GlobalNetworkId",
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-device", "networkmanager-link"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var transitGatewayConnectPeerAssociationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-transit-gateway-connect-peer-association",
+	DescriptiveName: "Networkmanager Transit Gateway Connect Peer Association",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Transit Gateway Connect Peer Association by id",
+		ListDescription:   "List all Networkmanager Transit Gateway Connect Peer Associations",
+		SearchDescription: "Search for Networkmanager Transit Gateway Connect Peer Associations by GlobalNetworkId",
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "networkmanager-device", "networkmanager-link"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

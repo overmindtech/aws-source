@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -192,7 +193,7 @@ func NewNodegroupAdapter(client EKSClient, accountID string, region string) *ada
 		Region:           region,
 		DisableList:      true,
 		AlwaysSearchARNs: true,
-		AdapterMetadata:  NodeGroupMetadata(),
+		AdapterMetadata:  nodegroupAdapterMetadata,
 		SearchInputMapper: func(scope, query string) (*eks.ListNodegroupsInput, error) {
 			return &eks.ListNodegroupsInput{
 				ClusterName: &query,
@@ -235,25 +236,23 @@ func NewNodegroupAdapter(client EKSClient, accountID string, region string) *ada
 	}
 }
 
-func NodeGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "eks-nodegroup",
-		DescriptiveName: "EKS Nodegroup",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a node group by unique name ({clusterName}/{NodegroupName})",
-			ListDescription:   "List all node groups",
-			SearchDescription: "Search for node groups by cluster name",
+var nodegroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "eks-nodegroup",
+	DescriptiveName: "EKS Nodegroup",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a node group by unique name ({clusterName}/{NodegroupName})",
+		ListDescription:   "List all node groups",
+		SearchDescription: "Search for node groups by cluster name",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_eks_node_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_eks_node_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"ec2-key-pair", "ec2-security-group", "ec2-subnet", "autoscaling-auto-scaling-group", "ec2-launch-template"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+	},
+	PotentialLinks: []string{"ec2-key-pair", "ec2-security-group", "ec2-subnet", "autoscaling-auto-scaling-group", "ec2-launch-template"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -95,7 +96,7 @@ func NewAliasAdapter(client *kms.Client, accountID string, region string) *adapt
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: AliasMetadata(),
+		AdapterMetadata: kmsAliasAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.ListAliasesInput) (*kms.ListAliasesOutput, error) {
 			return client.ListAliases(ctx, input)
 		},
@@ -128,24 +129,22 @@ func NewAliasAdapter(client *kms.Client, accountID string, region string) *adapt
 	}
 }
 
-func AliasMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "kms-alias",
-		DescriptiveName: "KMS Alias",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an alias by keyID/aliasName",
-			ListDescription:   "List all aliases",
-			SearchDescription: "Search aliases by keyID",
+var kmsAliasAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "kms-alias",
+	DescriptiveName: "KMS Alias",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an alias by keyID/aliasName",
+		ListDescription:   "List all aliases",
+		SearchDescription: "Search aliases by keyID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_kms_alias.arn",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_kms_alias.arn",
-			},
-		},
-		PotentialLinks: []string{"kms-key"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"kms-key"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

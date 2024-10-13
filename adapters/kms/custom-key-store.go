@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -104,7 +105,7 @@ func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "kms-custom-key-store",
-		AdapterMetadata: CustomKeyStoreMetadata(),
+		AdapterMetadata: customKeyStoreAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.DescribeCustomKeyStoresInput) (*kms.DescribeCustomKeyStoresOutput, error) {
 			return client.DescribeCustomKeyStores(ctx, input)
 		},
@@ -120,25 +121,22 @@ func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region strin
 	}
 }
 
-func CustomKeyStoreMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-
-		Type:            "kms-custom-key-store",
-		DescriptiveName: "Custom Key Store",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a custom key store by its ID",
-			ListDescription:   "List all custom key stores",
-			SearchDescription: "Search custom key store by ARN",
+var customKeyStoreAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "kms-custom-key-store",
+	DescriptiveName: "Custom Key Store",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a custom key store by its ID",
+		ListDescription:   "List all custom key stores",
+		SearchDescription: "Search custom key store by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_kms_custom_key_store.id",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_kms_custom_key_store.id",
-			},
-		},
-		PotentialLinks: []string{"cloudhsmv2-cluster", "ec2-vpc-endpoint-service"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+	},
+	PotentialLinks: []string{"cloudhsmv2-cluster", "ec2-vpc-endpoint-service"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

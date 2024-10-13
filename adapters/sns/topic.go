@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -82,7 +83,7 @@ func NewTopicAdapter(client topicClient, accountID string, region string) *adapt
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &sns.ListTopicsInput{},
-		AdapterMetadata: TopicMetadata(),
+		AdapterMetadata: snsTopicAdapterMetadata,
 		GetInputMapper: func(scope, query string) *sns.GetTopicAttributesInput {
 			return &sns.GetTopicAttributesInput{
 				TopicArn: &query,
@@ -104,22 +105,20 @@ func NewTopicAdapter(client topicClient, accountID string, region string) *adapt
 	}
 }
 
-func TopicMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sns-topic",
-		DescriptiveName: "SNS Topic",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an SNS topic by its ARN",
-			SearchDescription: "Search SNS topic by ARN",
-			ListDescription:   "List all SNS topics",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_sns_topic.id"},
-		},
-		PotentialLinks: []string{"kms-key"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var snsTopicAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sns-topic",
+	DescriptiveName: "SNS Topic",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an SNS topic by its ARN",
+		SearchDescription: "Search SNS topic by ARN",
+		ListDescription:   "List all SNS topics",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_sns_topic.id"},
+	},
+	PotentialLinks: []string{"kms-key"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

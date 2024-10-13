@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -83,7 +84,7 @@ func NewVolumeAdapter(client *ec2.Client, accountID string, region string) *adap
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-volume",
-		AdapterMetadata: VolumeMetadata(),
+		AdapterMetadata: volumeAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
 			return client.DescribeVolumes(ctx, input)
 		},
@@ -96,22 +97,20 @@ func NewVolumeAdapter(client *ec2.Client, accountID string, region string) *adap
 	}
 }
 
-func VolumeMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-volume",
-		DescriptiveName: "EC2 Volume",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a volume by ID",
-			ListDescription:   "List all volumes",
-			SearchDescription: "Search volumes by ARN",
-		},
-		PotentialLinks: []string{"ec2-instance"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_ebs_volume.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var volumeAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-volume",
+	DescriptiveName: "EC2 Volume",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a volume by ID",
+		ListDescription:   "List all volumes",
+		SearchDescription: "Search volumes by ARN",
+	},
+	PotentialLinks: []string{"ec2-instance"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_ebs_volume.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

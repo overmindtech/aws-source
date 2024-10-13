@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -124,7 +125,7 @@ func NewDBSubnetGroupAdapter(client rdsClient, accountID string, region string) 
 		Region:          region,
 		AccountID:       accountID,
 		Client:          client,
-		AdapterMetadata: DBSubnetGroupMetadata(),
+		AdapterMetadata: dbSubnetGroupAdapterMetadata,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBSubnetGroupsInput) adapterhelpers.Paginator[*rds.DescribeDBSubnetGroupsOutput, *rds.Options] {
 			return rds.NewDescribeDBSubnetGroupsPaginator(client, params)
 		},
@@ -143,25 +144,23 @@ func NewDBSubnetGroupAdapter(client rdsClient, accountID string, region string) 
 	}
 }
 
-func DBSubnetGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-db-subnet-group",
-		DescriptiveName: "RDS Subnet Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a subnet group by name",
-			ListDescription:   "List all subnet groups",
-			SearchDescription: "Search for subnet groups by ARN",
+var dbSubnetGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-db-subnet-group",
+	DescriptiveName: "RDS Subnet Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a subnet group by name",
+		ListDescription:   "List all subnet groups",
+		SearchDescription: "Search for subnet groups by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_db_subnet_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_db_subnet_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "outposts-outpost"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "outposts-outpost"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

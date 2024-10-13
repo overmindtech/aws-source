@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -95,7 +96,7 @@ func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, regio
 		AccountID:       accountID,
 		Region:          region,
 		ItemType:        "networkmanager-connect-attachment",
-		AdapterMetadata: ConnectAttachmentMetadata(),
+		AdapterMetadata: connectAttachmentAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.ConnectAttachment, error) {
 			return connectAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -109,17 +110,15 @@ func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, regio
 	}
 }
 
-func ConnectAttachmentMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-connect-attachment",
-		DescriptiveName: "Networkmanager Connect Attachment",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get: true,
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_core_network.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var connectAttachmentAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-connect-attachment",
+	DescriptiveName: "Networkmanager Connect Attachment",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get: true,
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_core_network.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

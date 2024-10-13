@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -62,7 +63,7 @@ func NewOptionGroupAdapter(client rdsClient, accountID string, region string) *a
 		Region:          region,
 		AccountID:       accountID,
 		Client:          client,
-		AdapterMetadata: OptionGroupMetadata(),
+		AdapterMetadata: optionGroupAdapterMetadata,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeOptionGroupsInput) adapterhelpers.Paginator[*rds.DescribeOptionGroupsOutput, *rds.Options] {
 			return rds.NewDescribeOptionGroupsPaginator(client, params)
 		},
@@ -81,24 +82,22 @@ func NewOptionGroupAdapter(client rdsClient, accountID string, region string) *a
 	}
 }
 
-func OptionGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-option-group",
-		DescriptiveName: "RDS Option Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an option group by name",
-			ListDescription:   "List all RDS option groups",
-			SearchDescription: "Search for an option group by ARN",
+var optionGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-option-group",
+	DescriptiveName: "RDS Option Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an option group by name",
+		ListDescription:   "List all RDS option groups",
+		SearchDescription: "Search for an option group by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_db_option_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_db_option_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})

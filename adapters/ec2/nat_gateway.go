@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -157,7 +158,7 @@ func NewNatGatewayAdapter(client *ec2.Client, accountID string, region string) *
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-nat-gateway",
-		AdapterMetadata: NatGatewayMetadata(),
+		AdapterMetadata: natGatewayAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNatGatewaysInput) (*ec2.DescribeNatGatewaysOutput, error) {
 			return client.DescribeNatGateways(ctx, input)
 		},
@@ -170,22 +171,20 @@ func NewNatGatewayAdapter(client *ec2.Client, accountID string, region string) *
 	}
 }
 
-func NatGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-nat-gateway",
-		DescriptiveName: "NAT Gateway",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a NAT Gateway by ID",
-			ListDescription:   "List all NAT gateways",
-			SearchDescription: "Search for NAT gateways by ARN",
-		},
-		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-network-interface", "ip"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_nat_gateway.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var natGatewayAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-nat-gateway",
+	DescriptiveName: "NAT Gateway",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a NAT Gateway by ID",
+		ListDescription:   "List all NAT gateways",
+		SearchDescription: "Search for NAT gateways by ARN",
+	},
+	PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-network-interface", "ip"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_nat_gateway.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

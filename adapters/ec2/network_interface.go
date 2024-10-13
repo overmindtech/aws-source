@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -268,7 +269,7 @@ func NewNetworkInterfaceAdapter(client *ec2.Client, accountID string, region str
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-network-interface",
-		AdapterMetadata: NetworkInterfaceMetadata(),
+		AdapterMetadata: networkInterfaceAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacesInput) (*ec2.DescribeNetworkInterfacesOutput, error) {
 			return client.DescribeNetworkInterfaces(ctx, input)
 		},
@@ -281,22 +282,20 @@ func NewNetworkInterfaceAdapter(client *ec2.Client, accountID string, region str
 	}
 }
 
-func NetworkInterfaceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-network-interface",
-		DescriptiveName: "EC2 Network Interface",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a network interface by ID",
-			ListDescription:   "List all network interfaces",
-			SearchDescription: "Search network interfaces by ARN",
-		},
-		PotentialLinks: []string{"ec2-instance", "ec2-security-group", "ip", "dns", "ec2-subnet", "ec2-vpc"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_network_interface.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var networkInterfaceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-network-interface",
+	DescriptiveName: "EC2 Network Interface",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a network interface by ID",
+		ListDescription:   "List all network interfaces",
+		SearchDescription: "Search network interfaces by ARN",
+	},
+	PotentialLinks: []string{"ec2-instance", "ec2-security-group", "ip", "dns", "ec2-subnet", "ec2-vpc"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_network_interface.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

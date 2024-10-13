@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -123,7 +124,7 @@ func NewVpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-vpc-peering-connection",
-		AdapterMetadata: VpcPeeringConnectionMetadata(),
+		AdapterMetadata: vpcPeeringConnectionAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
 			return client.DescribeVpcPeeringConnections(ctx, input)
 		},
@@ -142,23 +143,21 @@ func NewVpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region
 	}
 }
 
-func VpcPeeringConnectionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-vpc-peering-connection",
-		DescriptiveName: "VPC Peering Connection",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:             true,
-			List:            true,
-			Search:          true,
-			GetDescription:  "Get a VPC Peering Connection by ID",
-			ListDescription: "List all VPC Peering Connections",
-		},
-		PotentialLinks: []string{"ec2-vpc"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_vpc_peering_connection.id"},
-			{TerraformQueryMap: "aws_vpc_peering_connection_accepter.id"},
-			{TerraformQueryMap: "aws_vpc_peering_connection_options.vpc_peering_connection_id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var vpcPeeringConnectionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-vpc-peering-connection",
+	DescriptiveName: "VPC Peering Connection",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:             true,
+		List:            true,
+		Search:          true,
+		GetDescription:  "Get a VPC Peering Connection by ID",
+		ListDescription: "List all VPC Peering Connections",
+	},
+	PotentialLinks: []string{"ec2-vpc"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_vpc_peering_connection.id"},
+		{TerraformQueryMap: "aws_vpc_peering_connection_accepter.id"},
+		{TerraformQueryMap: "aws_vpc_peering_connection_options.vpc_peering_connection_id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

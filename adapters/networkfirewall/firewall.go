@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -277,7 +278,7 @@ func NewFirewallAdapter(client networkFirewallClient, accountID string, region s
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &networkfirewall.ListFirewallsInput{},
-		AdapterMetadata: FirewallMetadata(),
+		AdapterMetadata: networkFirewallFirewallAdapterMetadata,
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeFirewallInput {
 			return &networkfirewall.DescribeFirewallInput{
 				FirewallName: &query,
@@ -307,22 +308,20 @@ func NewFirewallAdapter(client networkFirewallClient, accountID string, region s
 	}
 }
 
-func FirewallMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "network-firewall-firewall",
-		DescriptiveName: "Network Firewall",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Network Firewall by name",
-			ListDescription:   "List Network Firewalls",
-			SearchDescription: "Search for Network Firewalls by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkfirewall_firewall.name"},
-		},
-		PotentialLinks: []string{"network-firewall-firewall-policy", "ec2-subnet", "ec2-vpc", "logs-log-group", "s3-bucket", "firehose-delivery-stream", "iam-policy", "kms-key"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var networkFirewallFirewallAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "network-firewall-firewall",
+	DescriptiveName: "Network Firewall",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Network Firewall by name",
+		ListDescription:   "List Network Firewalls",
+		SearchDescription: "Search for Network Firewalls by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkfirewall_firewall.name"},
+	},
+	PotentialLinks: []string{"network-firewall-firewall-policy", "ec2-subnet", "ec2-vpc", "logs-log-group", "s3-bucket", "firehose-delivery-stream", "iam-policy", "kms-key"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

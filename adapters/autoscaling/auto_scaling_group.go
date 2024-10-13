@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -227,7 +228,7 @@ func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, re
 		AccountID:       accountID,
 		Region:          region,
 		Client:          client,
-		AdapterMetadata: AutoScalingGroupMetadata(),
+		AdapterMetadata: autoScalingGroupAdapterMetadata,
 		InputMapperGet: func(scope, query string) (*autoscaling.DescribeAutoScalingGroupsInput, error) {
 			return &autoscaling.DescribeAutoScalingGroupsInput{
 				AutoScalingGroupNames: []string{query},
@@ -246,25 +247,23 @@ func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, re
 	}
 }
 
-func AutoScalingGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "autoscaling-auto-scaling-group",
-		DescriptiveName: "Autoscaling Group",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an Autoscaling Group by name",
-			ListDescription:   "List Autoscaling Groups",
-			SearchDescription: "Search for Autoscaling Groups by ARN",
+var autoScalingGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "autoscaling-auto-scaling-group",
+	DescriptiveName: "Autoscaling Group",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an Autoscaling Group by name",
+		ListDescription:   "List Autoscaling Groups",
+		SearchDescription: "Search for Autoscaling Groups by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_autoscaling_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_autoscaling_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"ec2-launch-template", "elbv2-target-group", "ec2-instance", "iam-role", "autoscaling-launch-configuration", "ec2-placement-group"},
-	}
-}
+	},
+	PotentialLinks: []string{"ec2-launch-template", "elbv2-target-group", "ec2-instance", "iam-role", "autoscaling-launch-configuration", "ec2-placement-group"},
+})

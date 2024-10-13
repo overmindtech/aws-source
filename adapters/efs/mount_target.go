@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -136,7 +137,7 @@ func NewMountTargetAdapter(client *efs.Client, accountID string, region string) 
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: MountTargetMetadata(),
+		AdapterMetadata: efsMountTargetAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeMountTargetsInput) (*efs.DescribeMountTargetsOutput, error) {
 			return client.DescribeMountTargets(ctx, input)
 		},
@@ -155,19 +156,17 @@ func NewMountTargetAdapter(client *efs.Client, accountID string, region string) 
 	}
 }
 
-func MountTargetMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "efs-mount-target",
-		DescriptiveName: "EFS Mount Target",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get an mount target by ID",
-			SearchDescription: "Search for mount targets by file system ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_efs_mount_target.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var efsMountTargetAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "efs-mount-target",
+	DescriptiveName: "EFS Mount Target",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get an mount target by ID",
+		SearchDescription: "Search for mount targets by file system ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_efs_mount_target.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

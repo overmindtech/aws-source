@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -676,7 +677,7 @@ func NewDistributionAdapter(client CloudFrontClient, accountID string) *adapterh
 		ItemType:        "cloudfront-distribution",
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: DistributionMetadata(),
+		AdapterMetadata: distributionAdapterMetadata,
 		Region:          "", // Cloudfront resources aren't tied to a region
 		ListInput:       &cloudfront.ListDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListDistributionsInput) adapterhelpers.Paginator[*cloudfront.ListDistributionsOutput, *cloudfront.Options] {
@@ -702,38 +703,36 @@ func NewDistributionAdapter(client CloudFrontClient, accountID string) *adapterh
 	}
 }
 
-func DistributionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-distribution",
-		DescriptiveName: "CloudFront Distribution",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Search:            true,
-			Get:               true,
-			List:              true,
-			GetDescription:    "Get a distribution by ID",
-			ListDescription:   "List all distributions",
-			SearchDescription: "Search distributions by ARN",
+var distributionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-distribution",
+	DescriptiveName: "CloudFront Distribution",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Search:            true,
+		Get:               true,
+		List:              true,
+		GetDescription:    "Get a distribution by ID",
+		ListDescription:   "List all distributions",
+		SearchDescription: "Search distributions by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_cloudfront_distribution.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_cloudfront_distribution.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{
-			"cloudfront-key-group",
-			"cloudfront-cloud-front-origin-access-identity",
-			"cloudfront-continuous-deployment-policy",
-			"cloudfront-cache-policy",
-			"cloudfront-field-level-encryption",
-			"cloudfront-function",
-			"cloudfront-origin-request-policy",
-			"cloudfront-realtime-log-config",
-			"cloudfront-response-headers-policy",
-			"dns",
-			"lambda-function",
-			"s3-bucket",
-		},
-	}
-}
+	},
+	PotentialLinks: []string{
+		"cloudfront-key-group",
+		"cloudfront-cloud-front-origin-access-identity",
+		"cloudfront-continuous-deployment-policy",
+		"cloudfront-cache-policy",
+		"cloudfront-field-level-encryption",
+		"cloudfront-function",
+		"cloudfront-origin-request-policy",
+		"cloudfront-realtime-log-config",
+		"cloudfront-response-headers-policy",
+		"dns",
+		"lambda-function",
+		"s3-bucket",
+	},
+})

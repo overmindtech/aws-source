@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -103,7 +104,7 @@ func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID,
 		AccountID:       accountID,
 		Region:          region,
 		ItemType:        "networkmanager-site-to-site-vpn-attachment",
-		AdapterMetadata: SiteToSiteVpnAttachmentMetadata(),
+		AdapterMetadata: siteToSiteVpnAttachmentAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.SiteToSiteVpnAttachment, error) {
 			return getSiteToSiteVpnAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -117,18 +118,16 @@ func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID,
 	}
 }
 
-func SiteToSiteVpnAttachmentMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-site-to-site-vpn-attachment",
-		DescriptiveName: "Networkmanager Site To Site Vpn Attachment",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			GetDescription: "Get a Networkmanager Site To Site Vpn Attachment by id",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_site_to_site_vpn_attachment.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network", "ec2-vpn-connection"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var siteToSiteVpnAttachmentAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-site-to-site-vpn-attachment",
+	DescriptiveName: "Networkmanager Site To Site Vpn Attachment",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		GetDescription: "Get a Networkmanager Site To Site Vpn Attachment by id",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_site_to_site_vpn_attachment.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network", "ec2-vpn-connection"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

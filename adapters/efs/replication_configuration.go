@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/efs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -139,7 +140,7 @@ func NewReplicationConfigurationAdapter(client *efs.Client, accountID string, re
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: ReplicationConfigurationMetadata(),
+		AdapterMetadata: replicationConfigurationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeReplicationConfigurationsInput) (*efs.DescribeReplicationConfigurationsOutput, error) {
 			return client.DescribeReplicationConfigurations(ctx, input)
 		},
@@ -155,21 +156,19 @@ func NewReplicationConfigurationAdapter(client *efs.Client, accountID string, re
 	}
 }
 
-func ReplicationConfigurationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "efs-replication-configuration",
-		DescriptiveName: "EFS Replication Configuration",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a replication configuration by file system ID",
-			ListDescription:   "List all replication configurations",
-			SearchDescription: "Search for a replication configuration by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_efs_replication_configuration.source_file_system_id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var replicationConfigurationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "efs-replication-configuration",
+	DescriptiveName: "EFS Replication Configuration",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a replication configuration by file system ID",
+		ListDescription:   "List all replication configurations",
+		SearchDescription: "Search for a replication configuration by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_efs_replication_configuration.source_file_system_id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

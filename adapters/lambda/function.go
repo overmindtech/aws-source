@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -649,7 +650,7 @@ func NewFunctionAdapter(client LambdaClient, accountID string, region string) *a
 		Region:          region,
 		ListInput:       &lambda.ListFunctionsInput{},
 		GetFunc:         functionGetFunc,
-		AdapterMetadata: FunctionMetadata(),
+		AdapterMetadata: lambdaFunctionAdapterMetadata,
 		GetInputMapper: func(scope, query string) *lambda.GetFunctionInput {
 			return &lambda.GetFunctionInput{
 				FunctionName: &query,
@@ -672,24 +673,22 @@ func NewFunctionAdapter(client LambdaClient, accountID string, region string) *a
 	}
 }
 
-func FunctionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "lambda-function",
-		DescriptiveName: "Lambda Function",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a lambda function by name",
-			ListDescription:   "List all lambda functions",
-			SearchDescription: "Search for lambda functions by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_lambda_function.arn"},
-			{TerraformQueryMap: "aws_lambda_function_event_invoke_config.id"},
-			{TerraformQueryMap: "aws_lambda_function_url.function_arn"},
-		},
-		PotentialLinks: []string{"iam-role", "s3-bucket", "sns-topic", "sqs-queue", "lambda-function", "events-event-bus", "elbv2-target-group", "vpc-lattice-target-group", "logs-log-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var lambdaFunctionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "lambda-function",
+	DescriptiveName: "Lambda Function",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a lambda function by name",
+		ListDescription:   "List all lambda functions",
+		SearchDescription: "Search for lambda functions by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_lambda_function.arn"},
+		{TerraformQueryMap: "aws_lambda_function_event_invoke_config.id"},
+		{TerraformQueryMap: "aws_lambda_function_url.function_arn"},
+	},
+	PotentialLinks: []string{"iam-role", "s3-bucket", "sns-topic", "sqs-queue", "lambda-function", "events-event-bus", "elbv2-target-group", "vpc-lattice-target-group", "logs-log-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

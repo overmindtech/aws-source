@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -177,7 +178,7 @@ func NewStreamingDistributionAdapter(client CloudFrontClient, accountID string) 
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata: StreamingDistributionMetadata(),
+		AdapterMetadata: streamingDistributionAdapterMetadata,
 		ListInput:       &cloudfront.ListStreamingDistributionsInput{},
 		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListStreamingDistributionsInput) adapterhelpers.Paginator[*cloudfront.ListStreamingDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListStreamingDistributionsPaginator(client, input)
@@ -202,23 +203,21 @@ func NewStreamingDistributionAdapter(client CloudFrontClient, accountID string) 
 	}
 }
 
-func StreamingDistributionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		DescriptiveName: "CloudFront Streaming Distribution",
-		Type:            "cloudfront-streaming-distribution",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Search:         true,
-			Get:            true,
-			List:           true,
-			GetDescription: "Get a Streaming Distribution by ID",
+var streamingDistributionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	DescriptiveName: "CloudFront Streaming Distribution",
+	Type:            "cloudfront-streaming-distribution",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Search:         true,
+		Get:            true,
+		List:           true,
+		GetDescription: "Get a Streaming Distribution by ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_cloudfront_Streamingdistribution.arn",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_cloudfront_Streamingdistribution.arn",
-			},
-		},
-		PotentialLinks: []string{"dns"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"dns"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -92,7 +93,7 @@ func NewInstanceStatusAdapter(client *ec2.Client, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-instance-status",
-		AdapterMetadata: InstanceStatusMetadata(),
+		AdapterMetadata: instanceStatusAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceStatusInput) (*ec2.DescribeInstanceStatusOutput, error) {
 			return client.DescribeInstanceStatus(ctx, input)
 		},
@@ -105,18 +106,16 @@ func NewInstanceStatusAdapter(client *ec2.Client, accountID string, region strin
 	}
 }
 
-func InstanceStatusMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-instance-status",
-		DescriptiveName: "EC2 Instance Status",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an EC2 instance status by Instance ID",
-			ListDescription:   "List all EC2 instance statuses",
-			SearchDescription: "Search EC2 instance statuses by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+var instanceStatusAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-instance-status",
+	DescriptiveName: "EC2 Instance Status",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an EC2 instance status by Instance ID",
+		ListDescription:   "List all EC2 instance statuses",
+		SearchDescription: "Search EC2 instance statuses by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})

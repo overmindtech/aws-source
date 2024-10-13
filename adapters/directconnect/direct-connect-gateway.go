@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -89,7 +90,7 @@ func NewDirectConnectGatewayAdapter(client *directconnect.Client, accountID stri
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-direct-connect-gateway",
-		AdapterMetadata: DirectConnectGatewayMetadata(),
+		AdapterMetadata: directConnectGatewayAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewaysInput) (*directconnect.DescribeDirectConnectGatewaysOutput, error) {
 			return client.DescribeDirectConnectGateways(ctx, input)
 		},
@@ -105,23 +106,21 @@ func NewDirectConnectGatewayAdapter(client *directconnect.Client, accountID stri
 	}
 }
 
-func DirectConnectGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-direct-connect-gateway",
-		DescriptiveName: "Direct Connect Gateway",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a direct connect gateway by ID",
-			ListDescription:   "List all direct connect gateways",
-			SearchDescription: "Search direct connect gateway by ARN",
+var directConnectGatewayAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-direct-connect-gateway",
+	DescriptiveName: "Direct Connect Gateway",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a direct connect gateway by ID",
+		ListDescription:   "List all direct connect gateways",
+		SearchDescription: "Search direct connect gateway by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_dx_gateway.id",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_dx_gateway.id",
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

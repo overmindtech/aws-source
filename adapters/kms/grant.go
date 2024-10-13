@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 
 	log "github.com/sirupsen/logrus"
@@ -184,7 +185,7 @@ func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapt
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: GrantMetadata(),
+		AdapterMetadata: grantAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *kms.Client, input *kms.ListGrantsInput) (*kms.ListGrantsOutput, error) {
 			return client.ListGrants(ctx, input)
 		},
@@ -220,25 +221,23 @@ func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapt
 	}
 }
 
-func GrantMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "kms-grant",
-		DescriptiveName: "KMS Grant",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a grant by keyID/grantId",
-			SearchDescription: "Search grants by keyID",
+var grantAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "kms-grant",
+	DescriptiveName: "KMS Grant",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a grant by keyID/grantId",
+		SearchDescription: "Search grants by keyID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_kms_grant.grant_id",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_kms_grant.grant_id",
-			},
-		},
-		PotentialLinks: []string{"kms-key", "iam-user", "iam-role"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"kms-key", "iam-user", "iam-role"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})
 
 // example: user/user-name-with-path
 func iamSourceAndQuery(resource string) (string, string) {

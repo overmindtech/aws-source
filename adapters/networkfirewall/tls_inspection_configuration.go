@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -171,7 +172,7 @@ func NewTLSInspectionConfigurationAdapter(client networkFirewallClient, accountI
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &networkfirewall.ListTLSInspectionConfigurationsInput{},
-		AdapterMetadata: TLSInspectionConfigurationMetadata(),
+		AdapterMetadata: tlsInspectionConfigurationAdapterMetadata,
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeTLSInspectionConfigurationInput {
 			return &networkfirewall.DescribeTLSInspectionConfigurationInput{
 				TLSInspectionConfigurationName: &query,
@@ -201,19 +202,17 @@ func NewTLSInspectionConfigurationAdapter(client networkFirewallClient, accountI
 	}
 }
 
-func TLSInspectionConfigurationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "network-firewall-tls-inspection-configuration",
-		DescriptiveName: "Network Firewall TLS Inspection Configuration",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Network Firewall TLS Inspection Configuration by name",
-			ListDescription:   "List Network Firewall TLS Inspection Configurations",
-			SearchDescription: "Search for Network Firewall TLS Inspection Configurations by ARN",
-		},
-		PotentialLinks: []string{"acm-certificate", "acm-pca-certificate-authority", "acm-pca-certificate-authority-certificate", "network-firewall-encryption-configuration"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var tlsInspectionConfigurationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "network-firewall-tls-inspection-configuration",
+	DescriptiveName: "Network Firewall TLS Inspection Configuration",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Network Firewall TLS Inspection Configuration by name",
+		ListDescription:   "List Network Firewall TLS Inspection Configurations",
+		SearchDescription: "Search for Network Firewall TLS Inspection Configurations by ARN",
+	},
+	PotentialLinks: []string{"acm-certificate", "acm-pca-certificate-authority", "acm-pca-certificate-authority-certificate", "network-firewall-encryption-configuration"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

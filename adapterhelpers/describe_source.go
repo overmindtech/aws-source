@@ -21,7 +21,7 @@ const DefaultCacheDuration = 1 * time.Hour
 type DescribeOnlyAdapter[Input InputType, Output OutputType, ClientStruct ClientStructType, Options OptionsType] struct {
 	MaxResultsPerPage int32  // Max results per page when making API queries
 	ItemType          string // The type of items that will be returned
-	AdapterMetadata   sdp.AdapterMetadata
+	AdapterMetadata   *sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
 	cache         *sdpcache.Cache // The sdpcache of this adapter
@@ -138,7 +138,7 @@ func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Name() strin
 }
 
 func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
-	return &s.AdapterMetadata
+	return s.AdapterMetadata
 }
 
 // List of scopes that this adapter is capable of find items for. This will be

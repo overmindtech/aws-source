@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -116,7 +117,7 @@ func NewHostedConnectionAdapter(client *directconnect.Client, accountID string, 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-hosted-connection",
-		AdapterMetadata: HostedConnectionMetadata(),
+		AdapterMetadata: hostedConnectionAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeHostedConnectionsInput) (*directconnect.DescribeHostedConnectionsOutput, error) {
 			return client.DescribeHostedConnections(ctx, input)
 		},
@@ -137,20 +138,18 @@ func NewHostedConnectionAdapter(client *directconnect.Client, accountID string, 
 	}
 }
 
-func HostedConnectionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-hosted-connection",
-		DescriptiveName: "Hosted Connection",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Hosted Connection by connection ID",
-			SearchDescription: "Search Hosted Connections by Interconnect or LAG ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_hosted_connection.id"},
-		},
-		PotentialLinks: []string{"directconnect-lag", "directconnect-location", "directconnect-loa", "directconnect-virtual-interface"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var hostedConnectionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-hosted-connection",
+	DescriptiveName: "Hosted Connection",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Hosted Connection by connection ID",
+		SearchDescription: "Search Hosted Connections by Interconnect or LAG ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_hosted_connection.id"},
+	},
+	PotentialLinks: []string{"directconnect-lag", "directconnect-location", "directconnect-loa", "directconnect-virtual-interface"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

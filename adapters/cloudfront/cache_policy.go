@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -52,7 +53,7 @@ func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapterhe
 		Client:                 client,
 		AccountID:              accountID,
 		Region:                 "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata:        CachePolicyMetadata(),
+		AdapterMetadata:        cachePolicyAdapterMetadata,
 		SupportGlobalResources: true, // Some policies are global
 		GetFunc: func(ctx context.Context, client CloudFrontClient, scope, query string) (*types.CachePolicy, error) {
 			out, err := client.GetCachePolicy(ctx, &cloudfront.GetCachePolicyInput{
@@ -85,21 +86,19 @@ func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapterhe
 	}
 }
 
-func CachePolicyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-cache-policy",
-		DescriptiveName: "CloudFront Cache Policy",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a CloudFront Cache Policy",
-			ListDescription:   "List CloudFront Cache Policies",
-			SearchDescription: "Search CloudFront Cache Policies by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_cloudfront_cache_policy.id"},
-		},
-	}
-}
+var cachePolicyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-cache-policy",
+	DescriptiveName: "CloudFront Cache Policy",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a CloudFront Cache Policy",
+		ListDescription:   "List CloudFront Cache Policies",
+		SearchDescription: "Search CloudFront Cache Policies by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_cloudfront_cache_policy.id"},
+	},
+})

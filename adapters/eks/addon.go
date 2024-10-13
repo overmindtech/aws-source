@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -60,7 +61,7 @@ func NewAddonAdapter(client EKSClient, accountID string, region string) *adapter
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: AddonMetadata(),
+		AdapterMetadata: eksAddonAdapterMetadata,
 		DisableList:     true,
 		SearchInputMapper: func(scope, query string) (*eks.ListAddonsInput, error) {
 			return &eks.ListAddonsInput{
@@ -104,24 +105,22 @@ func NewAddonAdapter(client EKSClient, accountID string, region string) *adapter
 	}
 }
 
-func AddonMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "eks-addon",
-		DescriptiveName: "EKS Addon",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an addon by unique name ({clusterName}/{addonName})",
-			ListDescription:   "List all addons",
-			SearchDescription: "Search addons by cluster name",
+var eksAddonAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "eks-addon",
+	DescriptiveName: "EKS Addon",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an addon by unique name ({clusterName}/{addonName})",
+		ListDescription:   "List all addons",
+		SearchDescription: "Search addons by cluster name",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_eks_addon.arn",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_eks_addon.arn",
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

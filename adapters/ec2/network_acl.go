@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -104,7 +105,7 @@ func NewNetworkAclAdapter(client *ec2.Client, accountID string, region string) *
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-network-acl",
-		AdapterMetadata: NetworkAclMetadata(),
+		AdapterMetadata: networkAclAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkAclsInput) (*ec2.DescribeNetworkAclsOutput, error) {
 			return client.DescribeNetworkAcls(ctx, input)
 		},
@@ -117,22 +118,20 @@ func NewNetworkAclAdapter(client *ec2.Client, accountID string, region string) *
 	}
 }
 
-func NetworkAclMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-network-acl",
-		DescriptiveName: "Network ACL",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a network ACL",
-			ListDescription:   "List all network ACLs",
-			SearchDescription: "Search for network ACLs by ARN",
-		},
-		PotentialLinks: []string{"ec2-subnet", "ec2-vpc"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_network_acl.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var networkAclAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-network-acl",
+	DescriptiveName: "Network ACL",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a network ACL",
+		ListDescription:   "List all network ACLs",
+		SearchDescription: "Search for network ACLs by ARN",
+	},
+	PotentialLinks: []string{"ec2-subnet", "ec2-vpc"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_network_acl.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

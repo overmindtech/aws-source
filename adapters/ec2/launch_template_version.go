@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -325,7 +326,7 @@ func NewLaunchTemplateVersionAdapter(client *ec2.Client, accountID string, regio
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-launch-template-version",
-		AdapterMetadata: LaunchTemplateVersionMetadata(),
+		AdapterMetadata: launchTemplateVersionAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeLaunchTemplateVersionsInput) (*ec2.DescribeLaunchTemplateVersionsOutput, error) {
 			return client.DescribeLaunchTemplateVersions(ctx, input)
 		},
@@ -338,19 +339,17 @@ func NewLaunchTemplateVersionAdapter(client *ec2.Client, accountID string, regio
 	}
 }
 
-func LaunchTemplateVersionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-launch-template-version",
-		DescriptiveName: "Launch Template Version",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a launch template version by {templateId}.{version}",
-			ListDescription:   "List all launch template versions",
-			SearchDescription: "Search launch template versions by ARN",
-		},
-		PotentialLinks: []string{"ec2-network-interface", "ec2-subnet", "ec2-security-group", "ec2-image", "ec2-key-pair", "ec2-snapshot", "ec2-capacity-reservation", "ec2-placement-group", "ec2-host", "ip"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var launchTemplateVersionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-launch-template-version",
+	DescriptiveName: "Launch Template Version",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a launch template version by {templateId}.{version}",
+		ListDescription:   "List all launch template versions",
+		SearchDescription: "Search launch template versions by ARN",
+	},
+	PotentialLinks: []string{"ec2-network-interface", "ec2-subnet", "ec2-security-group", "ec2-image", "ec2-key-pair", "ec2-snapshot", "ec2-capacity-reservation", "ec2-placement-group", "ec2-host", "ip"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

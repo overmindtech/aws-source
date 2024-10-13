@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -202,7 +203,7 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elb-load-balancer",
-		AdapterMetadata: LoadBalancerMetadata(),
+		AdapterMetadata: loadBalancerAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
@@ -221,25 +222,23 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 	}
 }
 
-func LoadBalancerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elb-load-balancer",
-		DescriptiveName: "Classic Load Balancer",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a classic load balancer by name",
-			ListDescription:   "List all classic load balancers",
-			SearchDescription: "Search for classic load balancers by ARN",
+var loadBalancerAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elb-load-balancer",
+	DescriptiveName: "Classic Load Balancer",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a classic load balancer by name",
+		ListDescription:   "List all classic load balancers",
+		SearchDescription: "Search for classic load balancers by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_elb.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_elb.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-subnet", "ec2-vpc", "ec2-instance", "elb-instance-health", "ec2-security-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-subnet", "ec2-vpc", "ec2-instance", "elb-instance-health", "ec2-security-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

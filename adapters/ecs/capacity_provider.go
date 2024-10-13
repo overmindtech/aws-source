@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -76,7 +77,7 @@ func NewCapacityProviderAdapter(client ECSClient, accountID string, region strin
 		Region:          region,
 		AccountID:       accountID,
 		Client:          client,
-		AdapterMetadata: CapacityProviderMetadata(),
+		AdapterMetadata: capacityProviderAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client ECSClient, input *ecs.DescribeCapacityProvidersInput) (*ecs.DescribeCapacityProvidersOutput, error) {
 			return client.DescribeCapacityProviders(ctx, input)
 		},
@@ -100,25 +101,23 @@ func NewCapacityProviderAdapter(client ECSClient, accountID string, region strin
 	}
 }
 
-func CapacityProviderMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ecs-capacity-provider",
-		DescriptiveName: "Capacity Provider",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:    true,
-			List:   true,
-			Search: true,
+var capacityProviderAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ecs-capacity-provider",
+	DescriptiveName: "Capacity Provider",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:    true,
+		List:   true,
+		Search: true,
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_ecs_capacity_provider.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_ecs_capacity_provider.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"autoscaling-auto-scaling-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+	},
+	PotentialLinks: []string{"autoscaling-auto-scaling-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})
 
 // Incredibly annoyingly the go package doesn't provide a paginator builder for
 // DescribeCapacityProviders despite the fact that it's paginated, so I'm going

@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -249,7 +250,7 @@ func NewTaskAdapter(client ECSClient, accountID string, region string) *adapterh
 		AccountID:       accountID,
 		Region:          region,
 		GetFunc:         taskGetFunc,
-		AdapterMetadata: TaskMetadata(),
+		AdapterMetadata: ecsTaskAdapterMetadata,
 		ListInput:       &ecs.ListTasksInput{},
 		GetInputMapper:  taskGetInputMapper,
 		DisableList:     true,
@@ -266,19 +267,17 @@ func NewTaskAdapter(client ECSClient, accountID string, region string) *adapterh
 	}
 }
 
-func TaskMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ecs-task",
-		DescriptiveName: "ECS Task",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an ECS task by ID",
-			ListDescription:   "List all ECS tasks",
-			SearchDescription: "Search for ECS tasks by cluster",
-		},
-		PotentialLinks: []string{"ecs-cluster", "ecs-container-instance", "ecs-task-definition", "ec2-network-interface", "ip"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var ecsTaskAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ecs-task",
+	DescriptiveName: "ECS Task",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an ECS task by ID",
+		ListDescription:   "List all ECS tasks",
+		SearchDescription: "Search for ECS tasks by cluster",
+	},
+	PotentialLinks: []string{"ecs-cluster", "ecs-container-instance", "ecs-task-definition", "ec2-network-interface", "ip"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

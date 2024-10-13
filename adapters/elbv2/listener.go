@@ -9,6 +9,7 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -154,7 +155,7 @@ func NewListenerAdapter(client elbClient, accountID string, region string) *adap
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elbv2-listener",
-		AdapterMetadata: ListenerMetadata(),
+		AdapterMetadata: elbv2ListenerAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
 			return client.DescribeListeners(ctx, input)
 		},
@@ -182,25 +183,23 @@ func NewListenerAdapter(client elbClient, accountID string, region string) *adap
 	}
 }
 
-func ListenerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elbv2-listener",
-		DescriptiveName: "ELB Listener",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:    true,
-			Search: true,
+var elbv2ListenerAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elbv2-listener",
+	DescriptiveName: "ELB Listener",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:    true,
+		Search: true,
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_alb_listener.arn",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_alb_listener.arn",
-			},
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_lb_listener.arn",
-			},
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_lb_listener.arn",
 		},
-		PotentialLinks: []string{"elbv2-load-balancer", "acm-certificate", "elbv2-rule", "cognito-idp-user-pool", "http", "elbv2-target-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"elbv2-load-balancer", "acm-certificate", "elbv2-rule", "cognito-idp-user-pool", "http", "elbv2-target-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

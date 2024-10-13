@@ -12,6 +12,7 @@ import (
 	"github.com/getsentry/sentry-go"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
 )
@@ -23,50 +24,48 @@ func NewS3Adapter(config aws.Config, accountID string) *S3Source {
 	return &S3Source{
 		config:          config,
 		accountID:       accountID,
-		AdapterMetadata: S3Metadata(),
+		AdapterMetadata: s3Metadata,
 	}
 }
 
-func S3Metadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "s3-bucket",
-		DescriptiveName: "S3 Bucket",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an S3 bucket by name",
-			ListDescription:   "List all S3 buckets",
-			SearchDescription: "Search for S3 buckets by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_s3_bucket_acl.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_analytics_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_cors_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_intelligent_tiering_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_inventory.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_lifecycle_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_logging.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_metric.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_notification.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_object_lock_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_object.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_ownership_controls.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_policy.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_public_access_block.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_replication_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_request_payment_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_server_side_encryption_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_versioning.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket_website_configuration.bucket"},
-			{TerraformQueryMap: "aws_s3_bucket.id"},
-			{TerraformQueryMap: "aws_s3_object_copy.bucket"},
-			{TerraformQueryMap: "aws_s3_object.bucket"},
-		},
-		PotentialLinks: []string{"lambda-function", "sqs-queue", "sns-topic", "s3-bucket"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var s3Metadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "s3-bucket",
+	DescriptiveName: "S3 Bucket",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an S3 bucket by name",
+		ListDescription:   "List all S3 buckets",
+		SearchDescription: "Search for S3 buckets by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_s3_bucket_acl.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_analytics_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_cors_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_intelligent_tiering_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_inventory.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_lifecycle_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_logging.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_metric.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_notification.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_object_lock_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_object.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_ownership_controls.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_policy.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_public_access_block.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_replication_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_request_payment_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_server_side_encryption_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_versioning.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket_website_configuration.bucket"},
+		{TerraformQueryMap: "aws_s3_bucket.id"},
+		{TerraformQueryMap: "aws_s3_object_copy.bucket"},
+		{TerraformQueryMap: "aws_s3_object.bucket"},
+	},
+	PotentialLinks: []string{"lambda-function", "sqs-queue", "sns-topic", "s3-bucket"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})
 
 //go:generate docgen ../../docs-data
 // +overmind:descriptiveType S3 Bucket
@@ -109,7 +108,7 @@ type S3Source struct {
 	client          *s3.Client
 	clientCreated   bool
 	clientMutex     sync.Mutex
-	AdapterMetadata sdp.AdapterMetadata
+	AdapterMetadata *sdp.AdapterMetadata
 
 	CacheDuration time.Duration   // How long to cache items for
 	cache         *sdpcache.Cache // The sdpcache of this adapter
@@ -158,7 +157,7 @@ func (s *S3Source) Name() string {
 }
 
 func (s *S3Source) Metadata() *sdp.AdapterMetadata {
-	return &s.AdapterMetadata
+	return s.AdapterMetadata
 }
 
 // List of scopes that this adapter is capable of find items for. This will be

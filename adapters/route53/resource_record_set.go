@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -145,27 +146,25 @@ func NewResourceRecordSetAdapter(client *route53.Client, accountID string, regio
 		GetFunc:         resourceRecordSetGetFunc,
 		ItemMapper:      resourceRecordSetItemMapper,
 		SearchFunc:      resourceRecordSetSearchFunc,
-		AdapterMetadata: ResourceRecordSetMetadata(),
+		AdapterMetadata: resourceRecordSetAdapterMetadata,
 	}
 }
 
-func ResourceRecordSetMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "route53-resource-record-set",
-		DescriptiveName: "Route53 Record Set",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Route53 record Set by name",
-			ListDescription:   "List all record sets",
-			SearchDescription: "Search for a record set by hosted zone ID in the format \"/hostedzone/JJN928734JH7HV\" or \"JJN928734JH7HV\" or by terraform ID in the format \"{hostedZone}_{recordName}_{type}\"",
-		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		PotentialLinks: []string{"dns", "route53-health-check"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_route53_record.arn", TerraformMethod: sdp.QueryMethod_SEARCH},
-			{TerraformQueryMap: "aws_route53_record.id", TerraformMethod: sdp.QueryMethod_SEARCH},
-		},
-	}
-}
+var resourceRecordSetAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "route53-resource-record-set",
+	DescriptiveName: "Route53 Record Set",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Route53 record Set by name",
+		ListDescription:   "List all record sets",
+		SearchDescription: "Search for a record set by hosted zone ID in the format \"/hostedzone/JJN928734JH7HV\" or \"JJN928734JH7HV\" or by terraform ID in the format \"{hostedZone}_{recordName}_{type}\"",
+	},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	PotentialLinks: []string{"dns", "route53-health-check"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_route53_record.arn", TerraformMethod: sdp.QueryMethod_SEARCH},
+		{TerraformQueryMap: "aws_route53_record.id", TerraformMethod: sdp.QueryMethod_SEARCH},
+	},
+})

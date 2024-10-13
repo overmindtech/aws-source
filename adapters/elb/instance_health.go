@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -102,7 +103,7 @@ func NewInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID str
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elb-instance-health",
-		AdapterMetadata: InstanceHealthMetadata(),
+		AdapterMetadata: instanceHealthAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *elb.Client, input *elb.DescribeInstanceHealthInput) (*elb.DescribeInstanceHealthOutput, error) {
 			return client.DescribeInstanceHealth(ctx, input)
 		},
@@ -133,17 +134,15 @@ func NewInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID str
 	}
 }
 
-func InstanceHealthMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elb-instance-health",
-		DescriptiveName: "ELB Instance Health",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:             true,
-			List:            true,
-			GetDescription:  "Get instance health by ID ({LoadBalancerName}/{InstanceId})",
-			ListDescription: "List all instance healths",
-		},
-		PotentialLinks: []string{"ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+var instanceHealthAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elb-instance-health",
+	DescriptiveName: "ELB Instance Health",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:             true,
+		List:            true,
+		GetDescription:  "Get instance health by ID ({LoadBalancerName}/{InstanceId})",
+		ListDescription: "List all instance healths",
+	},
+	PotentialLinks: []string{"ec2-instance"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})

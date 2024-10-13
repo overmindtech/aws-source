@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -62,7 +63,7 @@ func NewRouterConfigurationAdapter(client *directconnect.Client, accountID strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-router-configuration",
-		AdapterMetadata: RouterConfigurationSourceMetadata(),
+		AdapterMetadata: routerConfigurationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeRouterConfigurationInput) (*directconnect.DescribeRouterConfigurationOutput, error) {
 			return client.DescribeRouterConfiguration(ctx, input)
 		},
@@ -75,20 +76,18 @@ func NewRouterConfigurationAdapter(client *directconnect.Client, accountID strin
 	}
 }
 
-func RouterConfigurationSourceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-router-configuration",
-		DescriptiveName: "Router Configuration",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Router Configuration by Virtual Interface ID",
-			SearchDescription: "Search Router Configuration by ARN",
-		},
-		PotentialLinks: []string{"directconnect-virtual-interface"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_router_configuration.virtual_interface_id"},
-		},
-	}
-}
+var routerConfigurationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-router-configuration",
+	DescriptiveName: "Router Configuration",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Router Configuration by Virtual Interface ID",
+		SearchDescription: "Search Router Configuration by ARN",
+	},
+	PotentialLinks: []string{"directconnect-virtual-interface"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_router_configuration.virtual_interface_id"},
+	},
+})

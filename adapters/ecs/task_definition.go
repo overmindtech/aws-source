@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -195,7 +196,7 @@ func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string)
 		Region:          region,
 		GetFunc:         taskDefinitionGetFunc,
 		ListInput:       &ecs.ListTaskDefinitionsInput{},
-		AdapterMetadata: TaskDefinitionMetadata(),
+		AdapterMetadata: taskDefinitionAdapterMetadata,
 		GetInputMapper: func(scope, query string) *ecs.DescribeTaskDefinitionInput {
 			// AWS actually supports "family:revision" format as an input here
 			// so we can just push it in directly
@@ -222,22 +223,20 @@ func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string)
 	}
 }
 
-func TaskDefinitionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ecs-task-definition",
-		DescriptiveName: "Task Definition",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a task definition by revision name ({family}:{revision})",
-			ListDescription:   "List all task definitions",
-			SearchDescription: "Search for task definitions by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_ecs_task_definition.family"},
-		},
-		PotentialLinks: []string{"iam-role", "secretsmanager-secret", "ssm-parameter"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var taskDefinitionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ecs-task-definition",
+	DescriptiveName: "Task Definition",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a task definition by revision name ({family}:{revision})",
+		ListDescription:   "List all task definitions",
+		SearchDescription: "Search for task definitions by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_ecs_task_definition.family"},
+	},
+	PotentialLinks: []string{"iam-role", "secretsmanager-secret", "ssm-parameter"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

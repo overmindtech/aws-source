@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -102,7 +103,7 @@ func NewSubscriptionAdapter(client subsCli, accountID string, region string) *ad
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &sns.ListSubscriptionsInput{},
-		AdapterMetadata: SubscriptionMetadata(),
+		AdapterMetadata: snsSubscriptionAdapterMetadata,
 		GetInputMapper: func(scope, query string) *sns.GetSubscriptionAttributesInput {
 			return &sns.GetSubscriptionAttributesInput{
 				SubscriptionArn: &query,
@@ -124,22 +125,20 @@ func NewSubscriptionAdapter(client subsCli, accountID string, region string) *ad
 	}
 }
 
-func SubscriptionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sns-subscription",
-		DescriptiveName: "SNS Subscription",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an SNS subscription by its ARN",
-			SearchDescription: "Search SNS subscription by ARN",
-			ListDescription:   "List all SNS subscriptions",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_sns_topic_subscription.id"},
-		},
-		PotentialLinks: []string{"sns-topic", "iam-role"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var snsSubscriptionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sns-subscription",
+	DescriptiveName: "SNS Subscription",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an SNS subscription by its ARN",
+		SearchDescription: "Search SNS subscription by ARN",
+		ListDescription:   "List all SNS subscriptions",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_sns_topic_subscription.id"},
+	},
+	PotentialLinks: []string{"sns-topic", "iam-role"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

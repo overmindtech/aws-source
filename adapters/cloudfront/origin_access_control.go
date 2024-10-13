@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -70,7 +71,7 @@ func NewOriginAccessControlAdapter(client *cloudfront.Client, accountID string) 
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata: OriginAccessControlMetadata(),
+		AdapterMetadata: originAccessControlAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginAccessControl, error) {
 			out, err := client.GetOriginAccessControl(ctx, &cloudfront.GetOriginAccessControlInput{
 				Id: &query,
@@ -87,21 +88,19 @@ func NewOriginAccessControlAdapter(client *cloudfront.Client, accountID string) 
 	}
 }
 
-func OriginAccessControlMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-origin-access-control",
-		DescriptiveName: "Cloudfront Origin Access Control",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get Origin Access Control by ID",
-			ListDescription:   "List Origin Access Controls",
-			SearchDescription: "Origin Access Control by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_cloudfront_origin_access_control.id"},
-		},
-	}
-}
+var originAccessControlAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-origin-access-control",
+	DescriptiveName: "Cloudfront Origin Access Control",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get Origin Access Control by ID",
+		ListDescription:   "List Origin Access Controls",
+		SearchDescription: "Origin Access Control by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_cloudfront_origin_access_control.id"},
+	},
+})

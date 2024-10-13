@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -131,7 +132,7 @@ func NewContainerInstanceAdapter(client ECSClient, accountID string, region stri
 		AccountID:       accountID,
 		Region:          region,
 		GetFunc:         containerInstanceGetFunc,
-		AdapterMetadata: ContainerInstanceMetadata(),
+		AdapterMetadata: containerInstanceAdapterMetadata,
 		GetInputMapper: func(scope, query string) *ecs.DescribeContainerInstancesInput {
 			// We are using a custom id of {clusterName}/{id} e.g.
 			// ecs-template-ECSCluster-8nS0WOLbs3nZ/50e9bf71ed57450ca56293cc5a042886
@@ -164,19 +165,17 @@ func NewContainerInstanceAdapter(client ECSClient, accountID string, region stri
 	}
 }
 
-func ContainerInstanceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ecs-container-instance",
-		DescriptiveName: "Container Instance",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a container instance by ID which consists of {clusterName}/{id}",
-			ListDescription:   "List all container instances",
-			SearchDescription: "Search for container instances by cluster",
-		},
-		PotentialLinks: []string{"ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var containerInstanceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ecs-container-instance",
+	DescriptiveName: "Container Instance",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a container instance by ID which consists of {clusterName}/{id}",
+		ListDescription:   "List all container instances",
+		SearchDescription: "Search for container instances by cluster",
+	},
+	PotentialLinks: []string{"ec2-instance"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

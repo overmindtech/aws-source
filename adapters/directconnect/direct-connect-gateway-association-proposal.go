@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -65,7 +66,7 @@ func NewDirectConnectGatewayAssociationProposalAdapter(client *directconnect.Cli
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: DirectConnectGatewayAssociationProposalMetadata(),
+		AdapterMetadata: directConnectGatewayAssociationProposalAdapterMetadata,
 		ItemType:        "directconnect-direct-connect-gateway-association-proposal",
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationProposalsInput) (*directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, error) {
 			return client.DescribeDirectConnectGatewayAssociationProposals(ctx, input)
@@ -82,22 +83,20 @@ func NewDirectConnectGatewayAssociationProposalAdapter(client *directconnect.Cli
 	}
 }
 
-func DirectConnectGatewayAssociationProposalMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		DescriptiveName: "Direct Connect Gateway Association Proposal",
-		Type:            "directconnect-direct-connect-gateway-association-proposal",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Direct Connect Gateway Association Proposal by ID",
-			ListDescription:   "List all Direct Connect Gateway Association Proposals",
-			SearchDescription: "Search Direct Connect Gateway Association Proposals by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_gateway_association_proposal.id"},
-		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		PotentialLinks: []string{"directconnect-direct-connect-gateway-association"},
-	}
-}
+var directConnectGatewayAssociationProposalAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	DescriptiveName: "Direct Connect Gateway Association Proposal",
+	Type:            "directconnect-direct-connect-gateway-association-proposal",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Direct Connect Gateway Association Proposal by ID",
+		ListDescription:   "List all Direct Connect Gateway Association Proposals",
+		SearchDescription: "Search Direct Connect Gateway Association Proposals by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_gateway_association_proposal.id"},
+	},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	PotentialLinks: []string{"directconnect-direct-connect-gateway-association"},
+})

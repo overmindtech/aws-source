@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -66,7 +67,7 @@ func NewEndpointAdapter(client endpointClient, accountID string, region string) 
 		AccountID:       accountID,
 		Region:          region,
 		DisableList:     true, // This source only supports listing by platform application ARN
-		AdapterMetadata: EndpointMetadata(),
+		AdapterMetadata: snsEndpointAdapterMetadata,
 		SearchInputMapper: func(scope, query string) (*sns.ListEndpointsByPlatformApplicationInput, error) {
 			return &sns.ListEndpointsByPlatformApplicationInput{
 				PlatformApplicationArn: &query,
@@ -93,16 +94,14 @@ func NewEndpointAdapter(client endpointClient, accountID string, region string) 
 	}
 }
 
-func EndpointMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sns-endpoint",
-		DescriptiveName: "SNS Endpoint",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get an SNS endpoint by its ARN",
-			SearchDescription: "Search SNS endpoints by associated Platform Application ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var snsEndpointAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sns-endpoint",
+	DescriptiveName: "SNS Endpoint",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get an SNS endpoint by its ARN",
+		SearchDescription: "Search SNS endpoints by associated Platform Application ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

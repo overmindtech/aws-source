@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -230,7 +231,7 @@ func NewTargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID str
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elbv2-target-health",
-		AdapterMetadata: TargetHealthMetadata(),
+		AdapterMetadata: targetHealthAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *elbv2.Client, input *elbv2.DescribeTargetHealthInput) (*elbv2.DescribeTargetHealthOutput, error) {
 			return client.DescribeTargetHealth(ctx, input)
 		},
@@ -268,17 +269,15 @@ func NewTargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID str
 	}
 }
 
-func TargetHealthMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elbv2-target-health",
-		DescriptiveName: "ELB Target Health",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})",
-			SearchDescription: "Search for target health by target group ARN",
-		},
-		PotentialLinks: []string{"ec2-instance", "lambda-function", "ip", "elbv2-load-balancer"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+var targetHealthAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elbv2-target-health",
+	DescriptiveName: "ELB Target Health",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})",
+		SearchDescription: "Search for target health by target group ARN",
+	},
+	PotentialLinks: []string{"ec2-instance", "lambda-function", "ip", "elbv2-load-balancer"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})

@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -101,7 +102,7 @@ func NewFargateProfileAdapter(client EKSClient, accountID string, region string)
 		Region:           region,
 		DisableList:      true,
 		AlwaysSearchARNs: true,
-		AdapterMetadata:  FargateProfileMetadata(),
+		AdapterMetadata:  fargateProfileAdapterMetadata,
 		SearchInputMapper: func(scope, query string) (*eks.ListFargateProfilesInput, error) {
 			return &eks.ListFargateProfilesInput{
 				ClusterName: &query,
@@ -144,25 +145,23 @@ func NewFargateProfileAdapter(client EKSClient, accountID string, region string)
 	}
 }
 
-func FargateProfileMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "eks-fargate-profile",
-		DescriptiveName: "Fargate Profile",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a fargate profile by unique name ({clusterName}/{FargateProfileName})",
-			ListDescription:   "List all fargate profiles",
-			SearchDescription: "Search for fargate profiles by cluster name",
+var fargateProfileAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "eks-fargate-profile",
+	DescriptiveName: "Fargate Profile",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a fargate profile by unique name ({clusterName}/{FargateProfileName})",
+		ListDescription:   "List all fargate profiles",
+		SearchDescription: "Search for fargate profiles by cluster name",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_eks_fargate_profile.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_eks_fargate_profile.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"iam-role", "ec2-subnet"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+	},
+	PotentialLinks: []string{"iam-role", "ec2-subnet"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

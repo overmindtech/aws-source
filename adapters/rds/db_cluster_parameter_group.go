@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -50,7 +51,7 @@ func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, regio
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: DBClusterParameterGroupMetadata(),
+		AdapterMetadata: dbClusterParameterGroupAdapterMetadata,
 		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ClusterParameterGroup, error) {
 			out, err := client.DescribeDBClusterParameterGroups(ctx, &rds.DescribeDBClusterParameterGroupsInput{
 				DBClusterParameterGroupName: &query,
@@ -118,24 +119,22 @@ func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, regio
 	}
 }
 
-func DBClusterParameterGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-db-cluster-parameter-group",
-		DescriptiveName: "RDS Cluster Parameter Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a parameter group by name",
-			ListDescription:   "List all RDS parameter groups",
-			SearchDescription: "Search for a parameter group by ARN",
+var dbClusterParameterGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-db-cluster-parameter-group",
+	DescriptiveName: "RDS Cluster Parameter Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a parameter group by name",
+		ListDescription:   "List all RDS parameter groups",
+		SearchDescription: "Search for a parameter group by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_rds_cluster_parameter_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_rds_cluster_parameter_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})

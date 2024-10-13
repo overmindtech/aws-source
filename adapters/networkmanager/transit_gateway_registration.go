@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -94,7 +95,7 @@ func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, account
 		AccountID:       accountID,
 		Region:          region,
 		ItemType:        "networkmanager-transit-gateway-registration",
-		AdapterMetadata: TransitGatewayRegistrationMetadata(),
+		AdapterMetadata: transitGatewayRegistrationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetTransitGatewayRegistrationsInput) (*networkmanager.GetTransitGatewayRegistrationsOutput, error) {
 			return client.GetTransitGatewayRegistrations(ctx, input)
 		},
@@ -133,19 +134,17 @@ func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, account
 	}
 }
 
-func TransitGatewayRegistrationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-transit-gateway-registration",
-		DescriptiveName: "Networkmanager Transit Gateway Registrations",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Transit Gateway Registrations",
-			ListDescription:   "List all Networkmanager Transit Gateway Registrations",
-			SearchDescription: "Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId",
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "ec2-transit-gateway"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var transitGatewayRegistrationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-transit-gateway-registration",
+	DescriptiveName: "Networkmanager Transit Gateway Registrations",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Transit Gateway Registrations",
+		ListDescription:   "List all Networkmanager Transit Gateway Registrations",
+		SearchDescription: "Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId",
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "ec2-transit-gateway"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -124,7 +125,7 @@ func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region 
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &networkfirewall.ListRuleGroupsInput{},
-		AdapterMetadata: RuleGroupMetadata(),
+		AdapterMetadata: ruleGroupAdapterMetadata,
 		GetInputMapper: func(scope, query string) *networkfirewall.DescribeRuleGroupInput {
 			return &networkfirewall.DescribeRuleGroupInput{
 				RuleGroupName: &query,
@@ -154,22 +155,20 @@ func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region 
 	}
 }
 
-func RuleGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "network-firewall-rule-group",
-		DescriptiveName: "Network Firewall Rule Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Network Firewall Rule Group by name",
-			ListDescription:   "List Network Firewall Rule Groups",
-			SearchDescription: "Search for Network Firewall Rule Groups by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkfirewall_rule_group.name"},
-		},
-		PotentialLinks: []string{"kms-key", "sns-topic", "network-firewall-rule-group"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var ruleGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "network-firewall-rule-group",
+	DescriptiveName: "Network Firewall Rule Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Network Firewall Rule Group by name",
+		ListDescription:   "List Network Firewall Rule Groups",
+		SearchDescription: "Search for Network Firewall Rule Groups by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkfirewall_rule_group.name"},
+	},
+	PotentialLinks: []string{"kms-key", "sns-topic", "network-firewall-rule-group"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -132,7 +133,7 @@ func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID s
 		AccountID:       accountID,
 		Region:          region,
 		ItemType:        "networkmanager-connect-peer-association",
-		AdapterMetadata: ConnectPeerAssociationMetadata(),
+		AdapterMetadata: connectPeerAssociationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetConnectPeerAssociationsInput) (*networkmanager.GetConnectPeerAssociationsOutput, error) {
 			return client.GetConnectPeerAssociations(ctx, input)
 		},
@@ -172,19 +173,17 @@ func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID s
 	}
 }
 
-func ConnectPeerAssociationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-connect-peer-association",
-		DescriptiveName: "Networkmanager Connect Peer Association",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Connect Peer Association",
-			ListDescription:   "List all Networkmanager Connect Peer Associations",
-			SearchDescription: "Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId",
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-connect-peer", "networkmanager-device", "networkmanager-link"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var connectPeerAssociationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-connect-peer-association",
+	DescriptiveName: "Networkmanager Connect Peer Association",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Connect Peer Association",
+		ListDescription:   "List all Networkmanager Connect Peer Associations",
+		SearchDescription: "Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId",
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "networkmanager-connect-peer", "networkmanager-device", "networkmanager-link"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -496,7 +497,7 @@ func NewInstanceAdapter(client *ec2.Client, accountID string, region string) *ad
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-instance",
-		AdapterMetadata: InstanceMetadata(),
+		AdapterMetadata: ec2InstanceAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 			return client.DescribeInstances(ctx, input)
 		},
@@ -509,29 +510,27 @@ func NewInstanceAdapter(client *ec2.Client, accountID string, region string) *ad
 	}
 }
 
-func InstanceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-instance",
-		DescriptiveName: "EC2 Instance",
-		PotentialLinks:  []string{"ec2-instance-status", "iam-instance-profile", "ec2-capacity-reservation", "ec2-elastic-gpu", "elastic-inference-accelerator", "license-manager-license-configuration", "outposts-outpost", "ec2-spot-instance-request", "ec2-image", "ec2-key-pair", "ec2-placement-group", "ip", "ec2-subnet", "ec2-vpc", "dns", "ec2-security-group", "ec2-volume"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an EC2 instance by ID",
-			ListDescription:   "List all EC2 instances",
-			SearchDescription: "Search EC2 instances by ARN",
+var ec2InstanceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-instance",
+	DescriptiveName: "EC2 Instance",
+	PotentialLinks:  []string{"ec2-instance-status", "iam-instance-profile", "ec2-capacity-reservation", "ec2-elastic-gpu", "elastic-inference-accelerator", "license-manager-license-configuration", "outposts-outpost", "ec2-spot-instance-request", "ec2-image", "ec2-key-pair", "ec2-placement-group", "ip", "ec2-subnet", "ec2-vpc", "dns", "ec2-security-group", "ec2-volume"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an EC2 instance by ID",
+		ListDescription:   "List all EC2 instances",
+		SearchDescription: "Search EC2 instances by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_GET,
+			TerraformQueryMap: "aws_instance.id",
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformMethod:   sdp.QueryMethod_GET,
-				TerraformQueryMap: "aws_instance.id",
-			},
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_instance.arn",
-			},
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_instance.arn",
 		},
-	}
-}
+	},
+})

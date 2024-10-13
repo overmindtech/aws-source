@@ -9,6 +9,7 @@ import (
 	"github.com/micahhausler/aws-iam-policy/policy"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/iam"
 	"github.com/overmindtech/sdp-go"
 
@@ -161,7 +162,7 @@ func NewRestApiAdapter(client *apigateway.Client, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: RestAPIMetadata(),
+		AdapterMetadata: restApiAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *apigateway.Client, scope, query string) (*types.RestApi, error) {
 			out, err := client.GetRestApi(ctx, &apigateway.GetRestApiInput{
 				RestApiId: &query,
@@ -193,22 +194,20 @@ func NewRestApiAdapter(client *apigateway.Client, accountID string, region strin
 	}
 }
 
-func RestAPIMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "apigateway-rest-api",
-		DescriptiveName: "REST API",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a REST API by ID",
-			ListDescription:   "List all REST APIs",
-			SearchDescription: "Search for REST APIs by their name",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_api_gateway_rest_api.id"},
-		},
-		PotentialLinks: []string{"ec2-vpc-endpoint", "apigateway-resource"},
-	}
-}
+var restApiAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "apigateway-rest-api",
+	DescriptiveName: "REST API",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a REST API by ID",
+		ListDescription:   "List all REST APIs",
+		SearchDescription: "Search for REST APIs by their name",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_rest_api.id"},
+	},
+	PotentialLinks: []string{"ec2-vpc-endpoint", "apigateway-resource"},
+})

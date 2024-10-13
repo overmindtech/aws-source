@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -352,7 +353,7 @@ func NewDBClusterAdapter(client rdsClient, accountID string, region string) *ada
 		Region:          region,
 		AccountID:       accountID,
 		Client:          client,
-		AdapterMetadata: DBClusterMetadata(),
+		AdapterMetadata: dbClusterAdapterMetadata,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBClustersInput) adapterhelpers.Paginator[*rds.DescribeDBClustersOutput, *rds.Options] {
 			return rds.NewDescribeDBClustersPaginator(client, params)
 		},
@@ -371,22 +372,20 @@ func NewDBClusterAdapter(client rdsClient, accountID string, region string) *ada
 	}
 }
 
-func DBClusterMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-db-cluster",
-		DescriptiveName: "RDS Cluster",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a parameter group by name",
-			ListDescription:   "List all RDS parameter groups",
-			SearchDescription: "Search for a parameter group by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_rds_cluster.cluster_identifier"},
-		},
-		PotentialLinks: []string{"rds-db-subnet-group", "dns", "rds-db-cluster", "ec2-security-group", "route53-hosted-zone", "kms-key", "kinesis-stream", "rds-option-group", "secretsmanager-secret", "iam-role"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+var dbClusterAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-db-cluster",
+	DescriptiveName: "RDS Cluster",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a parameter group by name",
+		ListDescription:   "List all RDS parameter groups",
+		SearchDescription: "Search for a parameter group by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_rds_cluster.cluster_identifier"},
+	},
+	PotentialLinks: []string{"rds-db-subnet-group", "dns", "rds-db-cluster", "ec2-security-group", "route53-hosted-zone", "kms-key", "kinesis-stream", "rds-option-group", "secretsmanager-secret", "iam-role"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})

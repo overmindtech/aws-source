@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -86,7 +87,7 @@ func NewEgressOnlyInternetGatewayAdapter(client *ec2.Client, accountID string, r
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-egress-only-internet-gateway",
-		AdapterMetadata: EgressInternetGatewayMetadata(),
+		AdapterMetadata: egressOnlyInternetGatewayAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeEgressOnlyInternetGatewaysInput) (*ec2.DescribeEgressOnlyInternetGatewaysOutput, error) {
 			return client.DescribeEgressOnlyInternetGateways(ctx, input)
 		},
@@ -99,22 +100,20 @@ func NewEgressOnlyInternetGatewayAdapter(client *ec2.Client, accountID string, r
 	}
 }
 
-func EgressInternetGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-egress-only-internet-gateway",
-		DescriptiveName: "Egress Only Internet Gateway",
-		PotentialLinks:  []string{"ec2-vpc"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an egress only internet gateway by ID",
-			ListDescription:   "List all egress only internet gateways",
-			SearchDescription: "Search egress only internet gateways by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "egress_only_internet_gateway.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var egressOnlyInternetGatewayAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-egress-only-internet-gateway",
+	DescriptiveName: "Egress Only Internet Gateway",
+	PotentialLinks:  []string{"ec2-vpc"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an egress only internet gateway by ID",
+		ListDescription:   "List all egress only internet gateways",
+		SearchDescription: "Search egress only internet gateways by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "egress_only_internet_gateway.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -87,7 +88,7 @@ func NewInternetGatewayAdapter(client *ec2.Client, accountID string, region stri
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-internet-gateway",
-		AdapterMetadata: InternetGatewayMetadata(),
+		AdapterMetadata: internetGatewayAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInternetGatewaysInput) (*ec2.DescribeInternetGatewaysOutput, error) {
 			return client.DescribeInternetGateways(ctx, input)
 		},
@@ -100,22 +101,20 @@ func NewInternetGatewayAdapter(client *ec2.Client, accountID string, region stri
 	}
 }
 
-func InternetGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-internet-gateway",
-		DescriptiveName: "Internet Gateway",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an internet gateway by ID",
-			ListDescription:   "List all internet gateways",
-			SearchDescription: "Search internet gateways by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_internet_gateway.id"},
-		},
-		PotentialLinks: []string{"ec2-vpc"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var internetGatewayAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-internet-gateway",
+	DescriptiveName: "Internet Gateway",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an internet gateway by ID",
+		ListDescription:   "List all internet gateways",
+		SearchDescription: "Search internet gateways by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_internet_gateway.id"},
+	},
+	PotentialLinks: []string{"ec2-vpc"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

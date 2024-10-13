@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -129,7 +130,7 @@ func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapterhel
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-link",
-		AdapterMetadata: LinkMetadata(),
+		AdapterMetadata: linkAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinksInput) (*networkmanager.GetLinksOutput, error) {
 			return client.GetLinks(ctx, input)
 		},
@@ -186,23 +187,21 @@ func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapterhel
 	}
 }
 
-func LinkMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-link",
-		DescriptiveName: "Networkmanager Link",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Link",
-			SearchDescription: "Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId",
+var linkAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-link",
+	DescriptiveName: "Networkmanager Link",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Link",
+		SearchDescription: "Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_networkmanager_link.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_networkmanager_link.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link-association", "networkmanager-site", "networkmanager-network-resource-relationship"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link-association", "networkmanager-site", "networkmanager-network-resource-relationship"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

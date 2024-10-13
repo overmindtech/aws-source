@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -45,7 +46,7 @@ func NewVirtualGatewayAdapter(client *directconnect.Client, accountID string, re
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-virtual-gateway",
-		AdapterMetadata: VirtualGatewayMetadata(),
+		AdapterMetadata: virtualGatewayAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualGatewaysInput) (*directconnect.DescribeVirtualGatewaysOutput, error) {
 			return client.DescribeVirtualGateways(ctx, input)
 		},
@@ -61,18 +62,16 @@ func NewVirtualGatewayAdapter(client *directconnect.Client, accountID string, re
 	}
 }
 
-func VirtualGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-virtual-gateway",
-		DescriptiveName: "Direct Connect Virtual Gateway",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a virtual gateway by ID",
-			ListDescription:   "List all virtual gateways",
-			SearchDescription: "Search virtual gateways by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var virtualGatewayAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-virtual-gateway",
+	DescriptiveName: "Direct Connect Virtual Gateway",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a virtual gateway by ID",
+		ListDescription:   "List all virtual gateways",
+		SearchDescription: "Search virtual gateways by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

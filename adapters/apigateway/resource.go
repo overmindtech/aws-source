@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -73,7 +74,7 @@ func NewResourceAdapter(client *apigateway.Client, accountID string, region stri
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: APIGatewayMetadata(),
+		AdapterMetadata: apiGatewayResourceAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *apigateway.Client, scope, query string) (*types.Resource, error) {
 			f := strings.Split(query, "/")
 			if len(f) != 2 {
@@ -115,19 +116,17 @@ func NewResourceAdapter(client *apigateway.Client, accountID string, region stri
 	}
 }
 
-func APIGatewayMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "apigateway-resource",
-		DescriptiveName: "API Gateway",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Resource by rest-api-id/resource-id",
-			SearchDescription: "Search Resources by REST API ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_api_gateway_resource.id"},
-		},
-	}
-}
+var apiGatewayResourceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "apigateway-resource",
+	DescriptiveName: "API Gateway",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Resource by rest-api-id/resource-id",
+		SearchDescription: "Search Resources by REST API ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_resource.id"},
+	},
+})

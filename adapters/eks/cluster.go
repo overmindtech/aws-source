@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -278,7 +279,7 @@ func NewClusterAdapter(client EKSClient, accountID string, region string) *adapt
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: ClusterMetadata(),
+		AdapterMetadata: eksClusterAdapterMetadata,
 		ListInput:       &eks.ListClustersInput{},
 		GetInputMapper: func(scope, query string) *eks.DescribeClusterInput {
 			return &eks.DescribeClusterInput{
@@ -303,24 +304,22 @@ func NewClusterAdapter(client EKSClient, accountID string, region string) *adapt
 	}
 }
 
-func ClusterMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "eks-cluster",
-		DescriptiveName: "EKS Cluster",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a cluster by name",
-			ListDescription:   "List all clusters",
-			SearchDescription: "Search for clusters by ARN",
+var eksClusterAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "eks-cluster",
+	DescriptiveName: "EKS Cluster",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a cluster by name",
+		ListDescription:   "List all clusters",
+		SearchDescription: "Search for clusters by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_eks_cluster.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_eks_cluster.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

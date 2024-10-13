@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -81,7 +82,7 @@ func NewNetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-network-interface-permission",
-		AdapterMetadata: NetworkInterfacePermissionMetadata(),
+		AdapterMetadata: networkInterfacePermissionAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeNetworkInterfacePermissionsInput) (*ec2.DescribeNetworkInterfacePermissionsOutput, error) {
 			return client.DescribeNetworkInterfacePermissions(ctx, input)
 		},
@@ -94,19 +95,17 @@ func NewNetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, 
 	}
 }
 
-func NetworkInterfacePermissionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-network-interface-permission",
-		DescriptiveName: "Network Interface Permission",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a network interface permission by ID",
-			ListDescription:   "List all network interface permissions",
-			SearchDescription: "Search network interface permissions by ARN",
-		},
-		PotentialLinks: []string{"ec2-network-interface"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var networkInterfacePermissionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-network-interface-permission",
+	DescriptiveName: "Network Interface Permission",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a network interface permission by ID",
+		ListDescription:   "List all network interface permissions",
+		SearchDescription: "Search network interface permissions by ARN",
+	},
+	PotentialLinks: []string{"ec2-network-interface"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

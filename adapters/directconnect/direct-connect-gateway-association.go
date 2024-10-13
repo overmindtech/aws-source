@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -95,7 +96,7 @@ func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, acc
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-direct-connect-gateway-association",
-		AdapterMetadata: DirectConnectGatewayAssociationMetadata(),
+		AdapterMetadata: directConnectGatewayAssociationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAssociationsInput) (*directconnect.DescribeDirectConnectGatewayAssociationsOutput, error) {
 			return client.DescribeDirectConnectGatewayAssociations(ctx, input)
 		},
@@ -137,23 +138,21 @@ func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, acc
 	}
 }
 
-func DirectConnectGatewayAssociationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		DescriptiveName: "Direct Connect Gateway Association",
-		Type:            "directconnect-direct-connect-gateway-association",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID",
-			SearchDescription: "Search direct connect gateway associations by direct connect gateway ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_gateway_association.id"},
-		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		PotentialLinks: []string{"directconnect-direct-connect-gateway"},
-	}
-}
+var directConnectGatewayAssociationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	DescriptiveName: "Direct Connect Gateway Association",
+	Type:            "directconnect-direct-connect-gateway-association",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID",
+		SearchDescription: "Search direct connect gateway associations by direct connect gateway ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_gateway_association.id"},
+	},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	PotentialLinks: []string{"directconnect-direct-connect-gateway"},
+})
 
 // parseDirectConnectGatewayAssociationGetInputQuery expects a query:
 //   - in the format of "directConnectGatewayID/virtualGatewayID"

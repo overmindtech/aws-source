@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -66,7 +67,7 @@ func NewKeyPairAdapter(client *ec2.Client, accountID string, region string) *ada
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-key-pair",
-		AdapterMetadata: KeyPairMetadata(),
+		AdapterMetadata: keyPairAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
 			return client.DescribeKeyPairs(ctx, input)
 		},
@@ -76,21 +77,19 @@ func NewKeyPairAdapter(client *ec2.Client, accountID string, region string) *ada
 	}
 }
 
-func KeyPairMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-key-pair",
-		DescriptiveName: "Key Pair",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a key pair by name",
-			ListDescription:   "List all key pairs",
-			SearchDescription: "Search for key pairs by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_key_pair.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var keyPairAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-key-pair",
+	DescriptiveName: "Key Pair",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a key pair by name",
+		ListDescription:   "List all key pairs",
+		SearchDescription: "Search for key pairs by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_key_pair.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

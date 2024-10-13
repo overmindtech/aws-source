@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -42,7 +43,7 @@ func NewKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapterhel
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata: KeyGroupMetadata(),
+		AdapterMetadata: keyGroupAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.KeyGroup, error) {
 			out, err := client.GetKeyGroup(ctx, &cloudfront.GetKeyGroupInput{
 				Id: &query,
@@ -73,21 +74,19 @@ func NewKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapterhel
 	}
 }
 
-func KeyGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-key-group",
-		DescriptiveName: "CloudFront Key Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a CloudFront Key Group by ID",
-			ListDescription:   "List CloudFront Key Groups",
-			SearchDescription: "Search CloudFront Key Groups by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_cloudfront_key_group.id"},
-		},
-	}
-}
+var keyGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-key-group",
+	DescriptiveName: "CloudFront Key Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a CloudFront Key Group by ID",
+		ListDescription:   "List CloudFront Key Groups",
+		SearchDescription: "Search CloudFront Key Groups by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_cloudfront_key_group.id"},
+	},
+})

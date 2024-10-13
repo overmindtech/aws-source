@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -90,7 +91,7 @@ func NewBackupAdapter(client Client, accountID string, region string) *adapterhe
 		Region:          region,
 		GetFunc:         backupGetFunc,
 		ListInput:       &dynamodb.ListBackupsInput{},
-		AdapterMetadata: BackupMetadata(),
+		AdapterMetadata: dynamodbBackupAdapterMetadata,
 		GetInputMapper: func(scope, query string) *dynamodb.DescribeBackupInput {
 			// Get is not supported since you can't search by name
 			return nil
@@ -120,20 +121,18 @@ func NewBackupAdapter(client Client, accountID string, region string) *adapterhe
 	}
 }
 
-func BackupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "dynamodb-backup",
-		DescriptiveName: "DynamoDB Backup",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			List:              true,
-			Search:            true,
-			ListDescription:   "List all DynamoDB backups",
-			SearchDescription: "Search for a DynamoDB backup by table name",
-		},
-		PotentialLinks: []string{"dynamodb-table"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+var dynamodbBackupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "dynamodb-backup",
+	DescriptiveName: "DynamoDB Backup",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		List:              true,
+		Search:            true,
+		ListDescription:   "List all DynamoDB backups",
+		SearchDescription: "Search for a DynamoDB backup by table name",
+	},
+	PotentialLinks: []string{"dynamodb-table"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})
 
 // Another AWS API that doesn't provide a paginator *and* does pagination
 // completely differently from everything else? You don't say.

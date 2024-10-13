@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -85,7 +86,7 @@ func NewSubnetAdapter(client *ec2.Client, accountID string, region string) *adap
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-subnet",
-		AdapterMetadata: SubnetMetadata(),
+		AdapterMetadata: subnetAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
 			return client.DescribeSubnets(ctx, input)
 		},
@@ -98,23 +99,21 @@ func NewSubnetAdapter(client *ec2.Client, accountID string, region string) *adap
 	}
 }
 
-func SubnetMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-subnet",
-		DescriptiveName: "EC2 Subnet",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a subnet by ID",
-			ListDescription:   "List all subnets",
-			SearchDescription: "Search for subnets by ARN",
-		},
-		PotentialLinks: []string{"ec2-vpc"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_route_table_association.subnet_id"},
-			{TerraformQueryMap: "aws_subnet.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var subnetAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-subnet",
+	DescriptiveName: "EC2 Subnet",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a subnet by ID",
+		ListDescription:   "List all subnets",
+		SearchDescription: "Search for subnets by ARN",
+	},
+	PotentialLinks: []string{"ec2-vpc"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_route_table_association.subnet_id"},
+		{TerraformQueryMap: "aws_subnet.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

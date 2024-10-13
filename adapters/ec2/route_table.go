@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -279,7 +280,7 @@ func NewRouteTableAdapter(client *ec2.Client, accountID string, region string) *
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-route-table",
-		AdapterMetadata: RouteTableMetadata(),
+		AdapterMetadata: routeTableAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeRouteTablesInput) (*ec2.DescribeRouteTablesOutput, error) {
 			return client.DescribeRouteTables(ctx, input)
 		},
@@ -292,25 +293,23 @@ func NewRouteTableAdapter(client *ec2.Client, accountID string, region string) *
 	}
 }
 
-func RouteTableMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-route-table",
-		DescriptiveName: "Route Table",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a route table by ID",
-			ListDescription:   "List all route tables",
-			SearchDescription: "Search route tables by ARN",
-		},
-		PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-internet-gateway", "ec2-vpc-endpoint", "ec2-carrier-gateway", "ec2-egress-only-internet-gateway", "ec2-instance", "ec2-local-gateway", "ec2-nat-gateway", "ec2-network-interface", "ec2-transit-gateway", "ec2-vpc-peering-connection"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_route_table.id"},
-			{TerraformQueryMap: "aws_route_table_association.route_table_id"},
-			{TerraformQueryMap: "aws_default_route_table.default_route_table_id"},
-			{TerraformQueryMap: "aws_route.route_table_id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var routeTableAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-route-table",
+	DescriptiveName: "Route Table",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a route table by ID",
+		ListDescription:   "List all route tables",
+		SearchDescription: "Search route tables by ARN",
+	},
+	PotentialLinks: []string{"ec2-vpc", "ec2-subnet", "ec2-internet-gateway", "ec2-vpc-endpoint", "ec2-carrier-gateway", "ec2-egress-only-internet-gateway", "ec2-instance", "ec2-local-gateway", "ec2-nat-gateway", "ec2-network-interface", "ec2-transit-gateway", "ec2-vpc-peering-connection"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_route_table.id"},
+		{TerraformQueryMap: "aws_route_table_association.route_table_id"},
+		{TerraformQueryMap: "aws_default_route_table.default_route_table_id"},
+		{TerraformQueryMap: "aws_route.route_table_id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

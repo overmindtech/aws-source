@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -108,7 +109,7 @@ func NewFileSystemAdapter(client *efs.Client, accountID string, region string) *
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: FileSystemMetadata(),
+		AdapterMetadata: efsFileSystemAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeFileSystemsInput) (*efs.DescribeFileSystemsOutput, error) {
 			return client.DescribeFileSystems(ctx, input)
 		},
@@ -127,19 +128,17 @@ func NewFileSystemAdapter(client *efs.Client, accountID string, region string) *
 	}
 }
 
-func FileSystemMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "efs-file-system",
-		DescriptiveName: "EFS File System",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			List:           true,
-			Search:         true,
-			GetDescription: "Get an file system by ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_efs_file_system.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var efsFileSystemAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "efs-file-system",
+	DescriptiveName: "EFS File System",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		List:           true,
+		Search:         true,
+		GetDescription: "Get an file system by ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_efs_file_system.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

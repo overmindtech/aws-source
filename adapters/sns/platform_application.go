@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -84,7 +85,7 @@ func NewPlatformApplicationAdapter(client platformApplicationClient, accountID s
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &sns.ListPlatformApplicationsInput{},
-		AdapterMetadata: PlatformApplicationMetadata(),
+		AdapterMetadata: platformApplicationAdapterMetadata,
 		GetInputMapper: func(scope, query string) *sns.GetPlatformApplicationAttributesInput {
 			return &sns.GetPlatformApplicationAttributesInput{
 				PlatformApplicationArn: &query,
@@ -106,22 +107,20 @@ func NewPlatformApplicationAdapter(client platformApplicationClient, accountID s
 	}
 }
 
-func PlatformApplicationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sns-platform-application",
-		DescriptiveName: "SNS Platform Application",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an SNS platform application by its ARN",
-			ListDescription:   "List all SNS platform applications",
-			SearchDescription: "Search SNS platform applications by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_sns_platform_application.id"},
-		},
-		PotentialLinks: []string{"sns-endpoint"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var platformApplicationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sns-platform-application",
+	DescriptiveName: "SNS Platform Application",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an SNS platform application by its ARN",
+		ListDescription:   "List all SNS platform applications",
+		SearchDescription: "Search SNS platform applications by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_sns_platform_application.id"},
+	},
+	PotentialLinks: []string{"sns-endpoint"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

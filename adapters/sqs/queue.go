@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -72,7 +73,7 @@ func NewQueueAdapter(client sqsClient, accountID string, region string) *adapter
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &sqs.ListQueuesInput{},
-		AdapterMetadata: QueueMetadata(),
+		AdapterMetadata: sqsQueueAdapterMetadata,
 		GetInputMapper: func(scope, query string) *sqs.GetQueueAttributesInput {
 			return &sqs.GetQueueAttributesInput{
 				QueueUrl: &query,
@@ -96,21 +97,19 @@ func NewQueueAdapter(client sqsClient, accountID string, region string) *adapter
 	}
 }
 
-func QueueMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sqs-queue",
-		DescriptiveName: "SQS Queue",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an SQS queue attributes by its URL",
-			ListDescription:   "List all SQS queue URLs",
-			SearchDescription: "Search SQS queue by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_sqs_queue.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var sqsQueueAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sqs-queue",
+	DescriptiveName: "SQS Queue",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an SQS queue attributes by its URL",
+		ListDescription:   "List all SQS queue URLs",
+		SearchDescription: "Search SQS queue by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_sqs_queue.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

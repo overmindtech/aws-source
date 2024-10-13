@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -123,7 +124,7 @@ func NewLagAdapter(client *directconnect.Client, accountID string, region string
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-lag",
-		AdapterMetadata: LagMetadata(),
+		AdapterMetadata: lagAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeLagsInput) (*directconnect.DescribeLagsOutput, error) {
 			return client.DescribeLags(ctx, input)
 		},
@@ -139,22 +140,20 @@ func NewLagAdapter(client *directconnect.Client, accountID string, region string
 	}
 }
 
-func LagMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-lag",
-		DescriptiveName: "Link Aggregation Group",
-		PotentialLinks:  []string{"directconnect-connection", "directconnect-hosted-connection", "directconnect-location"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Link Aggregation Group by ID",
-			ListDescription:   "List all Link Aggregation Groups",
-			SearchDescription: "Search Link Aggregation Group by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_lag.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var lagAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-lag",
+	DescriptiveName: "Link Aggregation Group",
+	PotentialLinks:  []string{"directconnect-connection", "directconnect-hosted-connection", "directconnect-location"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Link Aggregation Group by ID",
+		ListDescription:   "List all Link Aggregation Groups",
+		SearchDescription: "Search Link Aggregation Group by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_lag.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

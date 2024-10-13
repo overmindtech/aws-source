@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -155,7 +156,7 @@ func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adap
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetConnectionsInput) (*networkmanager.GetConnectionsOutput, error) {
 			return client.GetConnections(ctx, input)
 		},
-		AdapterMetadata: ConnectionMetadata(),
+		AdapterMetadata: networkmanagerConnectionAdapterMetadata,
 		InputMapperGet: func(scope, query string) (*networkmanager.GetConnectionsInput, error) {
 			// We are using a custom id of {globalNetworkId}|{connectionId}
 			sections := strings.Split(query, "|")
@@ -208,23 +209,21 @@ func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adap
 	}
 }
 
-func ConnectionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-connection",
-		DescriptiveName: "Networkmanager Connection",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Connection",
-			SearchDescription: "Search for Networkmanager Connections by GlobalNetworkId",
+var networkmanagerConnectionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-connection",
+	DescriptiveName: "Networkmanager Connection",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Connection",
+		SearchDescription: "Search for Networkmanager Connections by GlobalNetworkId",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_networkmanager_connection.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_networkmanager_connection.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

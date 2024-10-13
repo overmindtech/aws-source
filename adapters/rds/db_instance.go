@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -511,7 +512,7 @@ func NewDBInstanceAdapter(client rdsClient, accountID string, region string) *ad
 		Region:          region,
 		AccountID:       accountID,
 		Client:          client,
-		AdapterMetadata: DBInstanceMetadata(),
+		AdapterMetadata: dbInstanceAdapterMetadata,
 		PaginatorBuilder: func(client rdsClient, params *rds.DescribeDBInstancesInput) adapterhelpers.Paginator[*rds.DescribeDBInstancesOutput, *rds.Options] {
 			return rds.NewDescribeDBInstancesPaginator(client, params)
 		},
@@ -530,23 +531,21 @@ func NewDBInstanceAdapter(client rdsClient, accountID string, region string) *ad
 	}
 }
 
-func DBInstanceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-db-instance",
-		DescriptiveName: "RDS Instance",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an instance by ID",
-			ListDescription:   "List all instances",
-			SearchDescription: "Search for instances by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_db_instance.identifier"},
-			{TerraformQueryMap: "aws_db_instance_role_association.db_instance_identifier"},
-		},
-		PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-security-group", "rds-db-parameter-group", "rds-db-subnet-group", "rds-db-cluster", "kms-key", "logs-log-stream", "iam-role", "kinesis-stream", "backup-recovery-point", "iam-instance-profile", "rds-db-instance-automated-backup", "secretsmanager-secret"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+var dbInstanceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-db-instance",
+	DescriptiveName: "RDS Instance",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an instance by ID",
+		ListDescription:   "List all instances",
+		SearchDescription: "Search for instances by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_db_instance.identifier"},
+		{TerraformQueryMap: "aws_db_instance_role_association.db_instance_identifier"},
+	},
+	PotentialLinks: []string{"dns", "route53-hosted-zone", "ec2-security-group", "rds-db-parameter-group", "rds-db-subnet-group", "rds-db-cluster", "kms-key", "logs-log-stream", "iam-role", "kinesis-stream", "backup-recovery-point", "iam-instance-profile", "rds-db-instance-automated-backup", "secretsmanager-secret"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})

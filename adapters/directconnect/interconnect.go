@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -137,7 +138,7 @@ func NewInterconnectAdapter(client *directconnect.Client, accountID string, regi
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-interconnect",
-		AdapterMetadata: InterconnectMetadata(),
+		AdapterMetadata: interconnectAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeInterconnectsInput) (*directconnect.DescribeInterconnectsOutput, error) {
 			return client.DescribeInterconnects(ctx, input)
 		},
@@ -153,19 +154,17 @@ func NewInterconnectAdapter(client *directconnect.Client, accountID string, regi
 	}
 }
 
-func InterconnectMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-interconnect",
-		DescriptiveName: "Interconnect",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		PotentialLinks:  []string{"directconnect-hosted-connection", "directconnect-lag", "directconnect-loa", "directconnect-location"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a Interconnect by InterconnectId",
-			ListDescription:   "List all Interconnects",
-			SearchDescription: "Search Interconnects by ARN",
-		},
-	}
-}
+var interconnectAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-interconnect",
+	DescriptiveName: "Interconnect",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	PotentialLinks:  []string{"directconnect-hosted-connection", "directconnect-lag", "directconnect-loa", "directconnect-location"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a Interconnect by InterconnectId",
+		ListDescription:   "List all Interconnects",
+		SearchDescription: "Search Interconnects by ARN",
+	},
+})

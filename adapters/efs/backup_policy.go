@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -64,7 +65,7 @@ func NewBackupPolicyAdapter(client *efs.Client, accountID string, region string)
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
-		AdapterMetadata: BackupPolicyMetadata(),
+		AdapterMetadata: backupPolicyAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeBackupPolicyInput) (*efs.DescribeBackupPolicyOutput, error) {
 			return client.DescribeBackupPolicy(ctx, input)
 		},
@@ -77,19 +78,17 @@ func NewBackupPolicyAdapter(client *efs.Client, accountID string, region string)
 	}
 }
 
-func BackupPolicyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "efs-backup-policy",
-		DescriptiveName: "EFS Backup Policy",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get an Backup Policy by file system ID",
-			SearchDescription: "Search for an Backup Policy by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_efs_backup_policy.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
-	}
-}
+var backupPolicyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "efs-backup-policy",
+	DescriptiveName: "EFS Backup Policy",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get an Backup Policy by file system ID",
+		SearchDescription: "Search for an Backup Policy by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_efs_backup_policy.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
+})

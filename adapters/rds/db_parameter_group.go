@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -50,7 +51,7 @@ func NewDBParameterGroupAdapter(client rdsClient, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: DBParameterGroupMetadata(),
+		AdapterMetadata: dbParameterGroupAdapterMetadata,
 		GetFunc: func(ctx context.Context, client rdsClient, scope, query string) (*ParameterGroup, error) {
 			out, err := client.DescribeDBParameterGroups(ctx, &rds.DescribeDBParameterGroupsInput{
 				DBParameterGroupName: &query,
@@ -113,24 +114,22 @@ func NewDBParameterGroupAdapter(client rdsClient, accountID string, region strin
 	}
 }
 
-func DBParameterGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "rds-db-parameter-group",
-		DescriptiveName: "RDS Parameter Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a parameter group by name",
-			ListDescription:   "List all parameter groups",
-			SearchDescription: "Search for a parameter group by ARN",
+var dbParameterGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "rds-db-parameter-group",
+	DescriptiveName: "RDS Parameter Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a parameter group by name",
+		ListDescription:   "List all parameter groups",
+		SearchDescription: "Search for a parameter group by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_db_parameter_group.arn",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-				TerraformQueryMap: "aws_db_parameter_group.arn",
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_DATABASE,
+})

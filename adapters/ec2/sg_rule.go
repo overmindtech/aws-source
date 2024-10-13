@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -104,7 +105,7 @@ func NewSecurityGroupRuleAdapter(client *ec2.Client, accountID string, region st
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-security-group-rule",
-		AdapterMetadata: SecurityGroupRuleMetadata(),
+		AdapterMetadata: securityGroupRuleAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeSecurityGroupRulesInput) (*ec2.DescribeSecurityGroupRulesOutput, error) {
 			return client.DescribeSecurityGroupRules(ctx, input)
 		},
@@ -117,24 +118,22 @@ func NewSecurityGroupRuleAdapter(client *ec2.Client, accountID string, region st
 	}
 }
 
-func SecurityGroupRuleMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-security-group-rule",
-		DescriptiveName: "Security Group Rule",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a security group rule by ID",
-			ListDescription:   "List all security group rules",
-			SearchDescription: "Search security group rules by ARN",
-		},
-		PotentialLinks: []string{"ec2-security-group"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_security_group_rule.security_group_rule_id"},
-			{TerraformQueryMap: "aws_vpc_security_group_ingress_rule.security_group_rule_id"},
-			{TerraformQueryMap: "aws_vpc_security_group_egress_rule.security_group_rule_id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var securityGroupRuleAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-security-group-rule",
+	DescriptiveName: "Security Group Rule",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a security group rule by ID",
+		ListDescription:   "List all security group rules",
+		SearchDescription: "Search security group rules by ARN",
+	},
+	PotentialLinks: []string{"ec2-security-group"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_security_group_rule.security_group_rule_id"},
+		{TerraformQueryMap: "aws_vpc_security_group_ingress_rule.security_group_rule_id"},
+		{TerraformQueryMap: "aws_vpc_security_group_egress_rule.security_group_rule_id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

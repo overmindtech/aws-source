@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -79,7 +80,7 @@ func NewDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID
 		AccountID:       accountID,
 		Region:          region,
 		DisableList:     true,
-		AdapterMetadata: DataProtectionPolicyMetadata(),
+		AdapterMetadata: dataProtectionPolicyAdapterMetadata,
 		GetInputMapper: func(scope, query string) *sns.GetDataProtectionPolicyInput {
 			return &sns.GetDataProtectionPolicyInput{
 				ResourceArn: &query,
@@ -89,20 +90,18 @@ func NewDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID
 	}
 }
 
-func DataProtectionPolicyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "sns-data-protection-policy",
-		DescriptiveName: "SNS Data Protection Policy",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get an SNS data protection policy by associated topic ARN",
-			SearchDescription: "Search SNS data protection policies by its ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_sns_topic_data_protection_policy.arn"},
-		},
-		PotentialLinks: []string{"sns-topic"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var dataProtectionPolicyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "sns-data-protection-policy",
+	DescriptiveName: "SNS Data Protection Policy",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get an SNS data protection policy by associated topic ARN",
+		SearchDescription: "Search SNS data protection policies by its ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_sns_topic_data_protection_policy.arn"},
+	},
+	PotentialLinks: []string{"sns-topic"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

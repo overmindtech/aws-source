@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -89,7 +90,7 @@ func NewCapacityReservationFleetAdapter(client *ec2.Client, accountID string, re
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-capacity-reservation-fleet",
-		AdapterMetadata: CapacityReservationFleetMetadata(),
+		AdapterMetadata: capacityReservationFleetAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeCapacityReservationFleetsInput) (*ec2.DescribeCapacityReservationFleetsOutput, error) {
 			return client.DescribeCapacityReservationFleets(ctx, input)
 		},
@@ -108,19 +109,17 @@ func NewCapacityReservationFleetAdapter(client *ec2.Client, accountID string, re
 	}
 }
 
-func CapacityReservationFleetMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-capacity-reservation-fleet",
-		Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		DescriptiveName: "Capacity Reservation Fleet",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a capacity reservation fleet by ID",
-			ListDescription:   "List capacity reservation fleets",
-			SearchDescription: "Search capacity reservation fleets by ARN",
-		},
-		PotentialLinks: []string{"ec2-capacity-reservation"},
-	}
-}
+var capacityReservationFleetAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-capacity-reservation-fleet",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	DescriptiveName: "Capacity Reservation Fleet",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a capacity reservation fleet by ID",
+		ListDescription:   "List capacity reservation fleets",
+		SearchDescription: "Search capacity reservation fleets by ARN",
+	},
+	PotentialLinks: []string{"ec2-capacity-reservation"},
+})

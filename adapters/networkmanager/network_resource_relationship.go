@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -265,11 +266,11 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 
 func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
-		Client:          client,
-		AccountID:       accountID,
-		Region:          region,
-		ItemType:        "networkmanager-network-resource-relationship",
-		AdapterMetadata: NetworkResourceRelationshipMetadata(),
+		Client:    client,
+		AccountID: accountID,
+		Region:    region,
+		ItemType:  "networkmanager-network-resource-relationship",
+		AdapterMetadata: networkResourceRelationshipAdapterMetadata,
 		OutputMapper:    networkResourceRelationshipOutputMapper,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetNetworkResourceRelationshipsInput) (*networkmanager.GetNetworkResourceRelationshipsOutput, error) {
 			return client.GetNetworkResourceRelationships(ctx, input)
@@ -286,7 +287,7 @@ func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accou
 		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetNetworkResourceRelationshipsInput) adapterhelpers.Paginator[*networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetNetworkResourceRelationshipsPaginator(client, params)
 		},
-		InputMapperSearch: func(ctx context.Context, client *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
+		InputMapperSearch: func(ctx context.Context, clientå *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {
 			// Search by GlobalNetworkId
 			return &networkmanager.GetNetworkResourceRelationshipsInput{
 				GlobalNetworkId: &query,
@@ -295,15 +296,13 @@ func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accou
 	}
 }
 
-func NetworkResourceRelationshipMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-network-resource-relationship",
-		DescriptiveName: "Networkmanager Network Resource Relationships",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Search:            true,
-			SearchDescription: "Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId",
-		},
-		PotentialLinks: []string{"networkmanager-connection", "networkmanager-device", "networkmanager-link", "networkmanager-site", "directconnect-connection", "directconnect-direct-connect-gateway", "directconnect-virtual-interface", "ec2-customer"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var networkResourceRelationshipAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-network-resource-relationship",
+	DescriptiveName: "Networkmanager Network Resource Relationships",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Search:            true,
+		SearchDescription: "Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId",
+	},
+	PotentialLinks: []string{"networkmanager-connection", "networkmanager-device", "networkmanager-link", "networkmanager-site", "directconnect-connection", "directconnect-direct-connect-gateway", "directconnect-virtual-interface", "ec2-customer"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

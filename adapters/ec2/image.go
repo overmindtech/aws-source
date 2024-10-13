@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -77,7 +78,7 @@ func NewImageAdapter(client *ec2.Client, accountID string, region string) *adapt
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-image",
-		AdapterMetadata: ImageMetadata(),
+		AdapterMetadata: imageAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
 			return client.DescribeImages(ctx, input)
 		},
@@ -87,21 +88,19 @@ func NewImageAdapter(client *ec2.Client, accountID string, region string) *adapt
 	}
 }
 
-func ImageMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-image",
-		DescriptiveName: "Amazon Machine Image (AMI)",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an AMI by ID",
-			ListDescription:   "List all AMIs",
-			SearchDescription: "Search AMIs by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_ami.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var imageAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-image",
+	DescriptiveName: "Amazon Machine Image (AMI)",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an AMI by ID",
+		ListDescription:   "List all AMIs",
+		SearchDescription: "Search AMIs by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_ami.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

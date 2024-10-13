@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -164,7 +165,7 @@ func NewVirtualInterfaceAdapter(client *directconnect.Client, accountID string, 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-virtual-interface",
-		AdapterMetadata: VirtualInterfaceMetadata(),
+		AdapterMetadata: virtualInterfaceAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeVirtualInterfacesInput) (*directconnect.DescribeVirtualInterfacesOutput, error) {
 			return client.DescribeVirtualInterfaces(ctx, input)
 		},
@@ -185,24 +186,22 @@ func NewVirtualInterfaceAdapter(client *directconnect.Client, accountID string, 
 	}
 }
 
-func VirtualInterfaceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-virtual-interface",
-		DescriptiveName: "Virtual Interface",
-		PotentialLinks:  []string{"directconnect-connection", "directconnect-direct-connect-gateway", "rdap-ip-network", "directconnect-direct-connect-gateway-attachment", "directconnect-virtual-interface"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a virtual interface by ID",
-			ListDescription:   "List all virtual interfaces",
-			SearchDescription: "Search virtual interfaces by connection ID",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_dx_private_virtual_interface.id"},
-			{TerraformQueryMap: "aws_dx_public_virtual_interface.id"},
-			{TerraformQueryMap: "aws_dx_transit_virtual_interface.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var virtualInterfaceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-virtual-interface",
+	DescriptiveName: "Virtual Interface",
+	PotentialLinks:  []string{"directconnect-connection", "directconnect-direct-connect-gateway", "rdap-ip-network", "directconnect-direct-connect-gateway-attachment", "directconnect-virtual-interface"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a virtual interface by ID",
+		ListDescription:   "List all virtual interfaces",
+		SearchDescription: "Search virtual interfaces by connection ID",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_dx_private_virtual_interface.id"},
+		{TerraformQueryMap: "aws_dx_public_virtual_interface.id"},
+		{TerraformQueryMap: "aws_dx_transit_virtual_interface.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

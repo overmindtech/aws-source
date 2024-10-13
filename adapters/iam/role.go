@@ -12,6 +12,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 	"github.com/sourcegraph/conc/iter"
 )
@@ -308,7 +309,7 @@ func NewRoleAdapter(client *iam.Client, accountID string, region string) *adapte
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:       accountID,
-		AdapterMetadata: RoleMetadata(),
+		AdapterMetadata: roleAdapterMetadata,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
 			return roleGetFunc(ctx, client, scope, query)
 		},
@@ -320,25 +321,23 @@ func NewRoleAdapter(client *iam.Client, accountID string, region string) *adapte
 	}
 }
 
-func RoleMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "iam-role",
-		DescriptiveName: "IAM Role",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an IAM role by name",
-			ListDescription:   "List all IAM roles",
-			SearchDescription: "Search for IAM roles by ARN",
+var roleAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "iam-role",
+	DescriptiveName: "IAM Role",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an IAM role by name",
+		ListDescription:   "List all IAM roles",
+		SearchDescription: "Search for IAM roles by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_iam_role.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_iam_role.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"iam-policy"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"iam-policy"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

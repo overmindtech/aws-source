@@ -37,7 +37,7 @@ type AlwaysGetAdapter[ListInput InputType, ListOutput OutputType, GetInput Input
 	AccountID       string       // The AWS account ID
 	Region          string       // The AWS region this is related to
 	MaxParallel     MaxParallel  // How many Get request to run in parallel for a single List request
-	AdapterMetadata sdp.AdapterMetadata
+	AdapterMetadata *sdp.AdapterMetadata
 
 	// Disables List(), meaning all calls will return empty results. This does
 	// not affect Search()
@@ -140,7 +140,7 @@ func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStru
 }
 
 func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) Metadata() *sdp.AdapterMetadata {
-	return &s.AdapterMetadata
+	return s.AdapterMetadata
 }
 
 // List of scopes that this adapter is capable of find items for. This will be

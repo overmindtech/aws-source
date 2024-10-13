@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -77,7 +78,7 @@ func NewLayerAdapter(client *lambda.Client, accountID string, region string) *ad
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
-		AdapterMetadata: LayerMetadata(),
+		AdapterMetadata: lambdaLayerAdapterMetadata,
 		GetFunc: func(_ context.Context, _ *lambda.Client, _, _ string) (*types.LayersListItem, error) {
 			// Layers can only be listed
 			return nil, errors.New("get is not supported for lambda-layers")
@@ -87,15 +88,13 @@ func NewLayerAdapter(client *lambda.Client, accountID string, region string) *ad
 	}
 }
 
-func LayerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "lambda-layer",
-		DescriptiveName: "Lambda Layer",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			List:            true,
-			ListDescription: "List all lambda layers",
-		},
-		PotentialLinks: []string{"lambda-layer-version"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var lambdaLayerAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "lambda-layer",
+	DescriptiveName: "Lambda Layer",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		List:            true,
+		ListDescription: "List all lambda layers",
+	},
+	PotentialLinks: []string{"lambda-layer-version"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

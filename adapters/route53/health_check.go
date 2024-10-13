@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	cw "github.com/overmindtech/aws-source/adapters/cloudwatch"
 	"github.com/overmindtech/sdp-go"
 )
@@ -150,7 +151,7 @@ func NewHealthCheckAdapter(client *route53.Client, accountID string, region stri
 		GetFunc:         healthCheckGetFunc,
 		ListFunc:        healthCheckListFunc,
 		ItemMapper:      healthCheckItemMapper,
-		AdapterMetadata: HealthCheckMetadata(),
+		AdapterMetadata: healthCheckAdapterMetadata,
 		ListTagsFunc: func(ctx context.Context, hc *HealthCheck, c *route53.Client) (map[string]string, error) {
 			if hc.Id == nil {
 				return nil, nil
@@ -173,22 +174,20 @@ func NewHealthCheckAdapter(client *route53.Client, accountID string, region stri
 	}
 }
 
-func HealthCheckMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "route53-health-check",
-		DescriptiveName: "Route53 Health Check",
-		PotentialLinks:  []string{"cloudwatch-alarm"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get health check by ID",
-			ListDescription:   "List all health checks",
-			SearchDescription: "Search for health checks by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_route53_health_check.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+var healthCheckAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "route53-health-check",
+	DescriptiveName: "Route53 Health Check",
+	PotentialLinks:  []string{"cloudwatch-alarm"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get health check by ID",
+		ListDescription:   "List all health checks",
+		SearchDescription: "Search for health checks by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_route53_health_check.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})

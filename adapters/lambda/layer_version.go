@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -132,7 +133,7 @@ func NewLayerVersionAdapter(client LambdaClient, accountID string, region string
 		GetInputMapper:  layerVersionGetInputMapper,
 		GetFunc:         layerVersionGetFunc,
 		ListInput:       &lambda.ListLayerVersionsInput{},
-		AdapterMetadata: LayerVersionMetadata(),
+		AdapterMetadata: layerVersionAdapterMetadata,
 		ListFuncOutputMapper: func(output *lambda.ListLayerVersionsOutput, input *lambda.ListLayerVersionsInput) ([]*lambda.GetLayerVersionInput, error) {
 			return []*lambda.GetLayerVersionInput{}, nil
 		},
@@ -142,20 +143,18 @@ func NewLayerVersionAdapter(client LambdaClient, accountID string, region string
 	}
 }
 
-func LayerVersionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "lambda-layer-version",
-		DescriptiveName: "Lambda Layer Version",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a layer version by full name ({layerName}:{versionNumber})",
-			SearchDescription: "Search for layer versions by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_lambda_layer_version.arn"},
-		},
-		PotentialLinks: []string{"signer-signing-job", "signer-signing-profile"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var layerVersionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "lambda-layer-version",
+	DescriptiveName: "Lambda Layer Version",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a layer version by full name ({layerName}:{versionNumber})",
+		SearchDescription: "Search for layer versions by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_lambda_layer_version.arn"},
+	},
+	PotentialLinks: []string{"signer-signing-job", "signer-signing-profile"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

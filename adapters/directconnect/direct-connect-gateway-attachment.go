@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -98,7 +99,7 @@ func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, acco
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-direct-connect-gateway-attachment",
-		AdapterMetadata: DirectConnectGatewayAttachmentMetadata(),
+		AdapterMetadata: directConnectGatewayAttachmentAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeDirectConnectGatewayAttachmentsInput) (*directconnect.DescribeDirectConnectGatewayAttachmentsOutput, error) {
 			return client.DescribeDirectConnectGatewayAttachments(ctx, input)
 		},
@@ -130,20 +131,18 @@ func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, acco
 	}
 }
 
-func DirectConnectGatewayAttachmentMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-direct-connect-gateway-attachment",
-		DescriptiveName: "Direct Connect Gateway Attachment",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a direct connect gateway attachment by DirectConnectGatewayId/VirtualInterfaceId",
-			SearchDescription: "Search direct connect gateway attachments for given VirtualInterfaceId",
-		},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		PotentialLinks: []string{"directconnect-direct-connect-gateway", "directconnect-virtual-interface"},
-	}
-}
+var directConnectGatewayAttachmentAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-direct-connect-gateway-attachment",
+	DescriptiveName: "Direct Connect Gateway Attachment",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a direct connect gateway attachment by DirectConnectGatewayId/VirtualInterfaceId",
+		SearchDescription: "Search direct connect gateway attachments for given VirtualInterfaceId",
+	},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	PotentialLinks: []string{"directconnect-direct-connect-gateway", "directconnect-virtual-interface"},
+})
 
 // parseGatewayIDVirtualInterfaceID expects a query in the format of "gatewayID/virtualInterfaceID"
 // First returned item is gatewayID, second is virtualInterfaceID

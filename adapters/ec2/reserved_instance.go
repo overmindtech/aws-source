@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -63,7 +64,7 @@ func NewReservedInstanceAdapter(client *ec2.Client, accountID string, region str
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-reserved-instance",
-		AdapterMetadata: ReservedInstanceMetadata(),
+		AdapterMetadata: reservedInstanceAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeReservedInstancesInput) (*ec2.DescribeReservedInstancesOutput, error) {
 			return client.DescribeReservedInstances(ctx, input)
 		},
@@ -73,18 +74,16 @@ func NewReservedInstanceAdapter(client *ec2.Client, accountID string, region str
 	}
 }
 
-func ReservedInstanceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-reserved-instance",
-		DescriptiveName: "Reserved EC2 Instance",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a reserved EC2 instance by ID",
-			ListDescription:   "List all reserved EC2 instances",
-			SearchDescription: "Search reserved EC2 instances by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var reservedInstanceAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-reserved-instance",
+	DescriptiveName: "Reserved EC2 Instance",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a reserved EC2 instance by ID",
+		ListDescription:   "List all reserved EC2 instances",
+		SearchDescription: "Search reserved EC2 instances by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

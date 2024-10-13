@@ -9,6 +9,7 @@ import (
 	"github.com/micahhausler/aws-iam-policy/policy"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/iam"
 	"github.com/overmindtech/sdp-go"
 )
@@ -228,7 +229,7 @@ func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-vpc-endpoint",
-		AdapterMetadata: VpcEndpointMetadata(),
+		AdapterMetadata: vpcEndpointAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcEndpointsInput) (*ec2.DescribeVpcEndpointsOutput, error) {
 			return client.DescribeVpcEndpoints(ctx, input)
 		},
@@ -241,21 +242,19 @@ func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) 
 	}
 }
 
-func VpcEndpointMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-vpc-endpoint",
-		DescriptiveName: "VPC Endpoint",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a VPC Endpoint by ID",
-			ListDescription:   "List all VPC Endpoints",
-			SearchDescription: "Search VPC Endpoints by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_vpc_endpoint.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var vpcEndpointAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-vpc-endpoint",
+	DescriptiveName: "VPC Endpoint",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a VPC Endpoint by ID",
+		ListDescription:   "List all VPC Endpoints",
+		SearchDescription: "Search VPC Endpoints by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_vpc_endpoint.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

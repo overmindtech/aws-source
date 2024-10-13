@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -228,7 +229,7 @@ func NewClusterAdapter(client ECSClient, accountID string, region string) *adapt
 		AccountID:       accountID,
 		Region:          region,
 		GetFunc:         clusterGetFunc,
-		AdapterMetadata: ClusterMetadata(),
+		AdapterMetadata: ecsClusterAdapterMetadata,
 		GetInputMapper: func(scope, query string) *ecs.DescribeClustersInput {
 			return &ecs.DescribeClustersInput{
 				Clusters: []string{
@@ -267,25 +268,23 @@ func NewClusterAdapter(client ECSClient, accountID string, region string) *adapt
 	}
 }
 
-func ClusterMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ecs-cluster",
-		DescriptiveName: "ECS Cluster",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a cluster by name",
-			ListDescription:   "List all clusters",
-			SearchDescription: "Search for a cluster by ARN",
+var ecsClusterAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ecs-cluster",
+	DescriptiveName: "ECS Cluster",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a cluster by name",
+		ListDescription:   "List all clusters",
+		SearchDescription: "Search for a cluster by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_ecs_cluster.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_ecs_cluster.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-		PotentialLinks: []string{"ecs-container-instance", "ecs-service", "ecs-task", "ecs-capacity-provider"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+	},
+	PotentialLinks: []string{"ecs-container-instance", "ecs-service", "ecs-task", "ecs-capacity-provider"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

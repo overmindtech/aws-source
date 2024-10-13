@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -66,7 +67,7 @@ func NewPlacementGroupAdapter(client *ec2.Client, accountID string, region strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-placement-group",
-		AdapterMetadata: PlacementGroupMetadata(),
+		AdapterMetadata: placementGroupAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribePlacementGroupsInput) (*ec2.DescribePlacementGroupsOutput, error) {
 			return client.DescribePlacementGroups(ctx, input)
 		},
@@ -76,21 +77,19 @@ func NewPlacementGroupAdapter(client *ec2.Client, accountID string, region strin
 	}
 }
 
-func PlacementGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-placement-group",
-		DescriptiveName: "Placement Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a placement group by ID",
-			ListDescription:   "List all placement groups",
-			SearchDescription: "Search for placement groups by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_placement_group.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
-	}
-}
+var placementGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-placement-group",
+	DescriptiveName: "Placement Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a placement group by ID",
+		ListDescription:   "List all placement groups",
+		SearchDescription: "Search for placement groups by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_placement_group.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_COMPUTE_APPLICATION,
+})

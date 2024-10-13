@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -222,7 +223,7 @@ func NewAlarmAdapter(client *cloudwatch.Client, accountID string, region string)
 		Client:          client,
 		Region:          region,
 		AccountID:       accountID,
-		AdapterMetadata: AlarmMetadata(),
+		AdapterMetadata: cloudwatchAlarmAdapterMetadata,
 		PaginatorBuilder: func(client CloudwatchClient, params *cloudwatch.DescribeAlarmsInput) adapterhelpers.Paginator[*cloudwatch.DescribeAlarmsOutput, *cloudwatch.Options] {
 			return cloudwatch.NewDescribeAlarmsPaginator(client, params)
 		},
@@ -268,27 +269,25 @@ func NewAlarmAdapter(client *cloudwatch.Client, accountID string, region string)
 	}
 }
 
-func AlarmMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		DescriptiveName: "CloudWatch Alarm",
-		Type:            "cloudwatch-alarm",
-		PotentialLinks:  []string{"cloudwatch-metric"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an alarm by name",
-			ListDescription:   "List all alarms",
-			SearchDescription: "Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`",
+var cloudwatchAlarmAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	DescriptiveName: "CloudWatch Alarm",
+	Type:            "cloudwatch-alarm",
+	PotentialLinks:  []string{"cloudwatch-metric"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an alarm by name",
+		ListDescription:   "List all alarms",
+		SearchDescription: "Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_cloudwatch_metric_alarm.alarm_name",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_cloudwatch_metric_alarm.alarm_name",
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})
 
 // actionToLink converts an action string to a link to the resource that the
 // action refers to. The actions to execute when this alarm transitions to the

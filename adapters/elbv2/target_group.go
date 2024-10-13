@@ -7,6 +7,7 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -121,7 +122,7 @@ func NewTargetGroupAdapter(client elbClient, accountID string, region string) *a
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elbv2-target-group",
-		AdapterMetadata: TargetGroupMetadata(),
+		AdapterMetadata: targetGroupAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
 			return client.DescribeTargetGroups(ctx, input)
 		},
@@ -164,29 +165,27 @@ func NewTargetGroupAdapter(client elbClient, accountID string, region string) *a
 	}
 }
 
-func TargetGroupMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elbv2-target-group",
-		DescriptiveName: "Target Group",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a target group by name",
-			ListDescription:   "List all target groups",
-			SearchDescription: "Search for target groups by load balancer ARN or target group ARN",
+var targetGroupAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elbv2-target-group",
+	DescriptiveName: "Target Group",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a target group by name",
+		ListDescription:   "List all target groups",
+		SearchDescription: "Search for target groups by load balancer ARN or target group ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_alb_target_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_alb_target_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-			{
-				TerraformQueryMap: "aws_lb_target_group.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
+		{
+			TerraformQueryMap: "aws_lb_target_group.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		PotentialLinks: []string{"ec2-vpc", "elbv2-load-balancer", "elbv2-target-health"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"ec2-vpc", "elbv2-load-balancer", "elbv2-target-health"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

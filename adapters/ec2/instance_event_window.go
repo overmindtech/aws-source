@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -101,7 +102,7 @@ func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-instance-event-window",
-		AdapterMetadata: InstanceEventWindowMetadata(),
+		AdapterMetadata: instanceEventWindowAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeInstanceEventWindowsInput) (*ec2.DescribeInstanceEventWindowsOutput, error) {
 			return client.DescribeInstanceEventWindows(ctx, input)
 		},
@@ -114,19 +115,17 @@ func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region 
 	}
 }
 
-func InstanceEventWindowMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-instance-event-window",
-		DescriptiveName: "EC2 Instance Event Window",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an event window by ID",
-			ListDescription:   "List all event windows",
-			SearchDescription: "Search for event windows by ARN",
-		},
-		PotentialLinks: []string{"ec2-host", "ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var instanceEventWindowAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-instance-event-window",
+	DescriptiveName: "EC2 Instance Event Window",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an event window by ID",
+		ListDescription:   "List all event windows",
+		SearchDescription: "Search for event windows by ARN",
+	},
+	PotentialLinks: []string{"ec2-host", "ec2-instance"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

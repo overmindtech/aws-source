@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -63,7 +64,7 @@ func NewContinuousDeploymentPolicyAdapter(client *cloudfront.Client, accountID s
 		AccountID:              accountID,
 		Region:                 "",   // Cloudfront resources aren't tied to a region
 		SupportGlobalResources: true, // Some policies are global
-		AdapterMetadata:        ContinuousDeploymentPolicyMetadata(),
+		AdapterMetadata:        continuousDeploymentPolicyAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.ContinuousDeploymentPolicy, error) {
 			out, err := client.GetContinuousDeploymentPolicy(ctx, &cloudfront.GetContinuousDeploymentPolicyInput{
 				Id: &query,
@@ -94,19 +95,17 @@ func NewContinuousDeploymentPolicyAdapter(client *cloudfront.Client, accountID s
 	}
 }
 
-func ContinuousDeploymentPolicyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-continuous-deployment-policy",
-		DescriptiveName: "CloudFront Continuous Deployment Policy",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a CloudFront Continuous Deployment Policy by ID",
-			ListDescription:   "List CloudFront Continuous Deployment Policies",
-			SearchDescription: "Search CloudFront Continuous Deployment Policies by ARN",
-		},
-		PotentialLinks: []string{"dns"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-	}
-}
+var continuousDeploymentPolicyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-continuous-deployment-policy",
+	DescriptiveName: "CloudFront Continuous Deployment Policy",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a CloudFront Continuous Deployment Policy by ID",
+		ListDescription:   "List CloudFront Continuous Deployment Policies",
+		SearchDescription: "Search CloudFront Continuous Deployment Policies by ARN",
+	},
+	PotentialLinks: []string{"dns"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+})

@@ -6,6 +6,7 @@ import (
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -279,7 +280,7 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "elbv2-load-balancer",
-		AdapterMetadata: LoadBalancerMetadata(),
+		AdapterMetadata: loadBalancerAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client elbClient, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
 			return client.DescribeLoadBalancers(ctx, input)
 		},
@@ -303,29 +304,27 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 	}
 }
 
-func LoadBalancerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "elbv2-load-balancer",
-		DescriptiveName: "Elastic Load Balancer",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an ELB by name",
-			ListDescription:   "List all ELBs",
-			SearchDescription: "Search for ELBs by ARN",
+var loadBalancerAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "elbv2-load-balancer",
+	DescriptiveName: "Elastic Load Balancer",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an ELB by name",
+		ListDescription:   "List all ELBs",
+		SearchDescription: "Search for ELBs by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_lb.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_lb.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-			{
-				TerraformQueryMap: "aws_lb.id",
-				TerraformMethod:   sdp.QueryMethod_GET,
-			},
+		{
+			TerraformQueryMap: "aws_lb.id",
+			TerraformMethod:   sdp.QueryMethod_GET,
 		},
-		PotentialLinks: []string{"elbv2-target-group", "elbv2-listener", "dns", "route53-hosted-zone", "ec2-vpc", "ec2-subnet", "ec2-address", "ip", "ec2-security-group", "ec2-coip-pool"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	PotentialLinks: []string{"elbv2-target-group", "elbv2-listener", "dns", "route53-hosted-zone", "ec2-vpc", "ec2-subnet", "ec2-address", "ip", "ec2-security-group", "ec2-coip-pool"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -118,7 +119,7 @@ func NewConnectionAdapter(client *directconnect.Client, accountID string, region
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "directconnect-connection",
-		AdapterMetadata: ConnectionMetadata(),
+		AdapterMetadata: directconnectConnectionAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *directconnect.Client, input *directconnect.DescribeConnectionsInput) (*directconnect.DescribeConnectionsOutput, error) {
 			return client.DescribeConnections(ctx, input)
 		},
@@ -134,24 +135,22 @@ func NewConnectionAdapter(client *directconnect.Client, accountID string, region
 	}
 }
 
-func ConnectionMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "directconnect-connection",
-		DescriptiveName: "Connection",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a connection by ID",
-			ListDescription:   "List all connections",
-			SearchDescription: "Search connection by ARN",
+var directconnectConnectionAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "directconnect-connection",
+	DescriptiveName: "Connection",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a connection by ID",
+		ListDescription:   "List all connections",
+		SearchDescription: "Search connection by ARN",
+	},
+	PotentialLinks: []string{"directconnect-lag", "directconnect-location", "directconnect-loa", "directconnect-virtual-interface"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_dx_connection.id",
 		},
-		PotentialLinks: []string{"directconnect-lag", "directconnect-location", "directconnect-loa", "directconnect-virtual-interface"},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_dx_connection.id",
-			},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

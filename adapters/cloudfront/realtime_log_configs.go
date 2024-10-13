@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -87,7 +88,7 @@ func NewRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata: RealtimeLogConfigsMetadata(),
+		AdapterMetadata: realtimeLogConfigsAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.RealtimeLogConfig, error) {
 			out, err := client.GetRealtimeLogConfig(ctx, &cloudfront.GetRealtimeLogConfigInput{
 				Name: &query,
@@ -118,24 +119,22 @@ func NewRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *
 	}
 }
 
-func RealtimeLogConfigsMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-realtime-log-config",
-		DescriptiveName: "CloudFront Realtime Log Config",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get Realtime Log Config by Name",
-			ListDescription:   "List Realtime Log Configs",
-			SearchDescription: "Search Realtime Log Configs by ARN",
+var realtimeLogConfigsAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-realtime-log-config",
+	DescriptiveName: "CloudFront Realtime Log Config",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get Realtime Log Config by Name",
+		ListDescription:   "List Realtime Log Configs",
+		SearchDescription: "Search Realtime Log Configs by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_cloudfront_realtime_log_config.arn",
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_cloudfront_realtime_log_config.arn",
-				TerraformMethod:   sdp.QueryMethod_SEARCH,
-			},
-		},
-	}
-}
+	},
+})

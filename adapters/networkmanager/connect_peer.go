@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -211,7 +212,7 @@ func NewConnectPeerAdapter(client NetworkManagerClient, accountID, region string
 		Region:          region,
 		ItemType:        "networkmanager-connect-peer",
 		ListInput:       &networkmanager.ListConnectPeersInput{},
-		AdapterMetadata: ConnectPeerMetadata(),
+		AdapterMetadata: connectPeerAdapterMetadata,
 		SearchInputMapper: func(scope, query string) (*networkmanager.ListConnectPeersInput, error) {
 			// Search by CoreNetworkId
 			return &networkmanager.ListConnectPeersInput{
@@ -242,18 +243,16 @@ func NewConnectPeerAdapter(client NetworkManagerClient, accountID, region string
 	}
 }
 
-func ConnectPeerMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-connect-peer",
-		DescriptiveName: "Networkmanager Connect Peer",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			GetDescription: "Get a Networkmanager Connect Peer by id",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_connect_peer.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network", "networkmanager-connect-attachment", "ip", "rdap-asn", "ec2-subnet"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var connectPeerAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-connect-peer",
+	DescriptiveName: "Networkmanager Connect Peer",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		GetDescription: "Get a Networkmanager Connect Peer by id",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_connect_peer.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network", "networkmanager-connect-attachment", "ip", "rdap-asn", "ec2-subnet"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

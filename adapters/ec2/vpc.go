@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -65,7 +66,7 @@ func NewVpcAdapter(client *ec2.Client, accountID string, region string) *adapter
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-vpc",
-		AdapterMetadata: VpcMetadata(),
+		AdapterMetadata: vpcAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
 			return client.DescribeVpcs(ctx, input)
 		},
@@ -78,19 +79,17 @@ func NewVpcAdapter(client *ec2.Client, accountID string, region string) *adapter
 	}
 }
 
-func VpcMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		DescriptiveName: "VPC",
-		Type:            "ec2-vpc",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:             true,
-			List:            true,
-			GetDescription:  "Get a VPC by ID",
-			ListDescription: "List all VPCs",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_vpc.id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var vpcAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	DescriptiveName: "VPC",
+	Type:            "ec2-vpc",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:             true,
+		List:            true,
+		GetDescription:  "Get a VPC by ID",
+		ListDescription: "List all VPCs",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_vpc.id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

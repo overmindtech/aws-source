@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -111,7 +112,7 @@ func NewVolumeStatusAdapter(client *ec2.Client, accountID string, region string)
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-volume-status",
-		AdapterMetadata: VolumeStatusMetadata(),
+		AdapterMetadata: volumeStatusAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeVolumeStatusInput) (*ec2.DescribeVolumeStatusOutput, error) {
 			return client.DescribeVolumeStatus(ctx, input)
 		},
@@ -123,19 +124,18 @@ func NewVolumeStatusAdapter(client *ec2.Client, accountID string, region string)
 		OutputMapper: volumeStatusOutputMapper,
 	}
 }
-func VolumeStatusMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-volume-status",
-		DescriptiveName: "EC2 Volume Status",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a volume status by volume ID",
-			ListDescription:   "List all volume statuses",
-			SearchDescription: "Search for volume statuses by ARN",
-		},
-		PotentialLinks: []string{"ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
-	}
-}
+
+var volumeStatusAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-volume-status",
+	DescriptiveName: "EC2 Volume Status",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a volume status by volume ID",
+		ListDescription:   "List all volume statuses",
+		SearchDescription: "Search for volume statuses by ARN",
+	},
+	PotentialLinks: []string{"ec2-instance"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_OBSERVABILITY,
+})

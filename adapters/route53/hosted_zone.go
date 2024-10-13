@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -93,7 +94,7 @@ func NewHostedZoneAdapter(client *route53.Client, accountID string, region strin
 		GetFunc:         hostedZoneGetFunc,
 		ListFunc:        hostedZoneListFunc,
 		ItemMapper:      hostedZoneItemMapper,
-		AdapterMetadata: HostedZoneMetadata(),
+		AdapterMetadata: hostedZoneAdapterMetadata,
 		ListTagsFunc: func(ctx context.Context, hz *types.HostedZone, c *route53.Client) (map[string]string, error) {
 			if hz.Id == nil {
 				return nil, nil
@@ -116,24 +117,22 @@ func NewHostedZoneAdapter(client *route53.Client, accountID string, region strin
 	}
 }
 
-func HostedZoneMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "route53-hosted-zone",
-		DescriptiveName: "Hosted Zone",
-		PotentialLinks:  []string{"route53-resource-record-set"},
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a hosted zone by ID",
-			ListDescription:   "List all hosted zones",
-			SearchDescription: "Search for a hosted zone by ARN",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_route53_hosted_zone_dnssec.id"},
-			{TerraformQueryMap: "aws_route53_zone.zone_id"},
-			{TerraformQueryMap: "aws_route53_zone_association.zone_id"},
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var hostedZoneAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "route53-hosted-zone",
+	DescriptiveName: "Hosted Zone",
+	PotentialLinks:  []string{"route53-resource-record-set"},
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a hosted zone by ID",
+		ListDescription:   "List all hosted zones",
+		SearchDescription: "Search for a hosted zone by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_route53_hosted_zone_dnssec.id"},
+		{TerraformQueryMap: "aws_route53_zone.zone_id"},
+		{TerraformQueryMap: "aws_route53_zone_association.zone_id"},
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

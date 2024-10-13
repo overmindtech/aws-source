@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -138,7 +139,7 @@ func NewKeyAdapter(client kmsClient, accountID, region string) *adapterhelpers.A
 		AccountID:       accountID,
 		Region:          region,
 		ListInput:       &kms.ListKeysInput{},
-		AdapterMetadata: KeyMetadata(),
+		AdapterMetadata: kmsKeyAdapterMetadata,
 		GetInputMapper: func(scope, query string) *kms.DescribeKeyInput {
 			return &kms.DescribeKeyInput{
 				KeyId: &query,
@@ -160,24 +161,22 @@ func NewKeyAdapter(client kmsClient, accountID, region string) *adapterhelpers.A
 	}
 }
 
-func KeyMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "kms-key",
-		DescriptiveName: "KMS Key",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get a KMS Key by its ID",
-			ListDescription:   "List all KMS Keys",
-			SearchDescription: "Search for KMS Keys by ARN",
+var kmsKeyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "kms-key",
+	DescriptiveName: "KMS Key",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get a KMS Key by its ID",
+		ListDescription:   "List all KMS Keys",
+		SearchDescription: "Search for KMS Keys by ARN",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformQueryMap: "aws_kms_key.key_id",
 		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{
-				TerraformQueryMap: "aws_kms_key.key_id",
-			},
-		},
-		PotentialLinks: []string{"kms-custom-key-store", "kms-key-policy", "kms-grant"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+	},
+	PotentialLinks: []string{"kms-custom-key-store", "kms-key-policy", "kms-grant"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})

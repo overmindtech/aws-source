@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -74,7 +75,7 @@ func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region st
 		Region:          region,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-vpc-attachment",
-		AdapterMetadata: VPCAttachmentMetadata(),
+		AdapterMetadata: vpcAttachmentAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.VpcAttachment, error) {
 			return vpcAttachmentGetFunc(ctx, client, scope, query)
 		},
@@ -88,18 +89,16 @@ func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region st
 	}
 }
 
-func VPCAttachmentMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-vpc-attachment",
-		DescriptiveName: "Networkmanager VPC Attachment",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			GetDescription: "Get a Networkmanager VPC Attachment by id",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_vpc_attachment.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var vpcAttachmentAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-vpc-attachment",
+	DescriptiveName: "Networkmanager VPC Attachment",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		GetDescription: "Get a Networkmanager VPC Attachment by id",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_vpc_attachment.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

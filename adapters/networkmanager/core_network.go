@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -129,7 +130,7 @@ func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string
 		GetFunc:         coreNetworkGetFunc,
 		ItemType:        "networkmanager-core-network",
 		ListInput:       &networkmanager.ListCoreNetworksInput{},
-		AdapterMetadata: CoreNetworkMetadata(),
+		AdapterMetadata: coreNetworkAdapterMetadata,
 		GetInputMapper: func(scope, query string) *networkmanager.GetCoreNetworkInput {
 			return &networkmanager.GetCoreNetworkInput{
 				CoreNetworkId: &query,
@@ -152,18 +153,16 @@ func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string
 	}
 }
 
-func CoreNetworkMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-core-network",
-		DescriptiveName: "Networkmanager Core Network",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:            true,
-			GetDescription: "Get a Networkmanager Core Network by id",
-		},
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_networkmanager_core_network.id"},
-		},
-		PotentialLinks: []string{"networkmanager-core-network-policy", "networkmanager-connect-peer"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var coreNetworkAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-core-network",
+	DescriptiveName: "Networkmanager Core Network",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:            true,
+		GetDescription: "Get a Networkmanager Core Network by id",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_networkmanager_core_network.id"},
+	},
+	PotentialLinks: []string{"networkmanager-core-network-policy", "networkmanager-connect-peer"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -156,7 +157,7 @@ func NewAddressAdapter(client *ec2.Client, accountID string, region string) *ada
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-address",
-		AdapterMetadata: AddressMetadata(),
+		AdapterMetadata: addressAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeAddressesInput) (*ec2.DescribeAddressesOutput, error) {
 			return client.DescribeAddresses(ctx, input)
 		},
@@ -166,23 +167,21 @@ func NewAddressAdapter(client *ec2.Client, accountID string, region string) *ada
 	}
 }
 
-func AddressMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-address",
-		DescriptiveName: "EC2 Address",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an EC2 address by Public IP",
-			ListDescription:   "List EC2 addresses",
-			SearchDescription: "Search for EC2 addresses by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_eip.public_ip"},
-			{TerraformQueryMap: "aws_eip_association.public_ip"},
-		},
-		PotentialLinks: []string{"ec2-instance", "ip", "ec2-network-interface"},
-	}
-}
+var addressAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-address",
+	DescriptiveName: "EC2 Address",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an EC2 address by Public IP",
+		ListDescription:   "List EC2 addresses",
+		SearchDescription: "Search for EC2 addresses by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_eip.public_ip"},
+		{TerraformQueryMap: "aws_eip_association.public_ip"},
+	},
+	PotentialLinks: []string{"ec2-instance", "ip", "ec2-network-interface"},
+})

@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -115,7 +116,7 @@ func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) 
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-link-association",
-		AdapterMetadata: LinkAssociationMetadata(),
+		AdapterMetadata: linkAssociationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *networkmanager.Client, input *networkmanager.GetLinkAssociationsInput) (*networkmanager.GetLinkAssociationsOutput, error) {
 			return client.GetLinkAssociations(ctx, input)
 		},
@@ -186,20 +187,17 @@ func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) 
 			}
 		},
 	}
-
 }
 
-func LinkAssociationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "networkmanager-link-association",
-		DescriptiveName: "Networkmanager LinkAssociation",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			Search:            true,
-			GetDescription:    "Get a Networkmanager Link Association",
-			SearchDescription: "Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId",
-		},
-		PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-	}
-}
+var linkAssociationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "networkmanager-link-association",
+	DescriptiveName: "Networkmanager LinkAssociation",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		Search:            true,
+		GetDescription:    "Get a Networkmanager Link Association",
+		SearchDescription: "Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId",
+	},
+	PotentialLinks: []string{"networkmanager-global-network", "networkmanager-link", "networkmanager-device"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+})

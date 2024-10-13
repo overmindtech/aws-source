@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -42,7 +43,7 @@ func NewOriginRequestPolicyAdapter(client *cloudfront.Client, accountID string) 
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
-		AdapterMetadata: OriginRequestPolicySourceMetadata(),
+		AdapterMetadata: originRequestPolicyAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *cloudfront.Client, scope, query string) (*types.OriginRequestPolicy, error) {
 			out, err := client.GetOriginRequestPolicy(ctx, &cloudfront.GetOriginRequestPolicyInput{
 				Id: &query,
@@ -73,21 +74,19 @@ func NewOriginRequestPolicyAdapter(client *cloudfront.Client, accountID string) 
 	}
 }
 
-func OriginRequestPolicySourceMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "cloudfront-origin-request-policy",
-		DescriptiveName: "CloudFront Origin Request Policy",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get Origin Request Policy by ID",
-			ListDescription:   "List Origin Request Policies",
-			SearchDescription: "Origin Request Policy by ARN",
-		},
-		Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
-		TerraformMappings: []*sdp.TerraformMapping{
-			{TerraformQueryMap: "aws_cloudfront_origin_request_policy.id"},
-		},
-	}
-}
+var originRequestPolicyAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "cloudfront-origin-request-policy",
+	DescriptiveName: "CloudFront Origin Request Policy",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get Origin Request Policy by ID",
+		ListDescription:   "List Origin Request Policies",
+		SearchDescription: "Origin Request Policy by ARN",
+	},
+	Category: sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_cloudfront_origin_request_policy.id"},
+	},
+})

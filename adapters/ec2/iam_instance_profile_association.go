@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -85,7 +86,7 @@ func NewIamInstanceProfileAssociationAdapter(client *ec2.Client, accountID strin
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "ec2-iam-instance-profile-association",
-		AdapterMetadata: IamInstanceProfileAssociationMetadata(),
+		AdapterMetadata: iamInstanceProfileAssociationAdapterMetadata,
 		DescribeFunc: func(ctx context.Context, client *ec2.Client, input *ec2.DescribeIamInstanceProfileAssociationsInput) (*ec2.DescribeIamInstanceProfileAssociationsOutput, error) {
 			return client.DescribeIamInstanceProfileAssociations(ctx, input)
 		},
@@ -101,19 +102,17 @@ func NewIamInstanceProfileAssociationAdapter(client *ec2.Client, accountID strin
 	}
 }
 
-func IamInstanceProfileAssociationMetadata() sdp.AdapterMetadata {
-	return sdp.AdapterMetadata{
-		Type:            "ec2-iam-instance-profile-association",
-		DescriptiveName: "IAM Instance Profile Association",
-		SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-			Get:               true,
-			List:              true,
-			Search:            true,
-			GetDescription:    "Get an IAM Instance Profile Association by ID",
-			ListDescription:   "List all IAM Instance Profile Associations",
-			SearchDescription: "Search IAM Instance Profile Associations by ARN",
-		},
-		PotentialLinks: []string{"iam-instance-profile", "ec2-instance"},
-		Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
-	}
-}
+var iamInstanceProfileAssociationAdapterMetadata = adapters.Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ec2-iam-instance-profile-association",
+	DescriptiveName: "IAM Instance Profile Association",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		List:              true,
+		Search:            true,
+		GetDescription:    "Get an IAM Instance Profile Association by ID",
+		ListDescription:   "List all IAM Instance Profile Associations",
+		SearchDescription: "Search IAM Instance Profile Associations by ARN",
+	},
+	PotentialLinks: []string{"iam-instance-profile", "ec2-instance"},
+	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_SECURITY,
+})
