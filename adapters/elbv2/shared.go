@@ -5,7 +5,7 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 type elbClient interface {
@@ -37,7 +37,7 @@ func getTagsMap(ctx context.Context, client elbClient, arns []string) map[string
 			ResourceArns: arns,
 		})
 		if err != nil {
-			tags := adapters.HandleTagsError(ctx, err)
+			tags := adapterhelpers.HandleTagsError(ctx, err)
 
 			// Set these tags for all ARNs
 			for _, arn := range arns {

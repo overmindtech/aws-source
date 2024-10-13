@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,8 +13,8 @@ func TestCoreNetworkPolicyItemMapper(t *testing.T) {
 
 	scope := "123456789012.eu-west-2"
 	item, err := coreNetworkPolicyItemMapper("", scope, &types.CoreNetworkPolicy{
-		CoreNetworkId:   adapters.PtrString("cn-1"),
-		PolicyVersionId: adapters.PtrInt32(1),
+		CoreNetworkId:   adapterhelpers.PtrString("cn-1"),
+		PolicyVersionId: adapterhelpers.PtrInt32(1),
 	})
 	if err != nil {
 		t.Error(err)
@@ -29,7 +30,7 @@ func TestCoreNetworkPolicyItemMapper(t *testing.T) {
 		t.Fatalf("expected cn-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-core-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

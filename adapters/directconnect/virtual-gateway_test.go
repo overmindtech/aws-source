@@ -7,15 +7,15 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestVirtualGatewayOutputMapper(t *testing.T) {
 	output := &directconnect.DescribeVirtualGatewaysOutput{
 		VirtualGateways: []types.VirtualGateway{
 			{
-				VirtualGatewayId:    adapters.PtrString("cf68415c-f4ae-48f2-87a7-3b52cexample"),
-				VirtualGatewayState: adapters.PtrString("available"),
+				VirtualGatewayId:    adapterhelpers.PtrString("cf68415c-f4ae-48f2-87a7-3b52cexample"),
+				VirtualGatewayState: adapterhelpers.PtrString("available"),
 			},
 		},
 	}
@@ -41,7 +41,7 @@ func TestNewVirtualGatewayAdapter(t *testing.T) {
 
 	adapter := NewVirtualGatewayAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 	for _, s := range output.Devices {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(s, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -140,8 +141,8 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 // +overmind:terraform:queryMap aws_networkmanager_device.arn
 // +overmind:terraform:method SEARCH
 
-func NewDeviceAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewDeviceAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-device",
@@ -172,7 +173,7 @@ func NewDeviceAdapter(client *networkmanager.Client, accountID string) *adapters
 				ErrorString: "list not supported for networkmanager-device, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetDevicesInput) adapters.Paginator[*networkmanager.GetDevicesOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetDevicesInput) adapterhelpers.Paginator[*networkmanager.GetDevicesOutput, *networkmanager.Options] {
 			return networkmanager.NewGetDevicesPaginator(client, params)
 		},
 		OutputMapper: deviceOutputMapper,

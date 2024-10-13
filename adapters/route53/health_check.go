@@ -9,7 +9,8 @@ import (
 	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	cw "github.com/overmindtech/aws-source/adapters/cloudwatch"
 	"github.com/overmindtech/sdp-go"
 )
@@ -70,7 +71,7 @@ func healthCheckListFunc(ctx context.Context, client *route53.Client, scope stri
 }
 
 func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -140,8 +141,8 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_route53_health_check.id
 
-func NewHealthCheckAdapter(client *route53.Client, accountID string, region string) *adapters.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
-	return &adapters.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options]{
+func NewHealthCheckAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
+	return &adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options]{
 		ItemType:        "route53-health-check",
 		Client:          client,
 		AccountID:       accountID,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/apigateway"
 	"github.com/overmindtech/aws-source/adapters/integration"
 	"github.com/overmindtech/sdp-go"
@@ -42,7 +42,7 @@ func APIGateway(t *testing.T) {
 		t.Fatalf("failed to validate APIGateway resource adapter: %v", err)
 	}
 
-	scope := adapters.FormatScope(accountID, testAWSConfig.Region)
+	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List restApis
 	restApis, err := restApiSource.List(ctx, scope, true)

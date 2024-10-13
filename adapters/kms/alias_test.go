@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -16,11 +16,11 @@ func TestAliasOutputMapper(t *testing.T) {
 	output := &kms.ListAliasesOutput{
 		Aliases: []types.AliasListEntry{
 			{
-				AliasName:       adapters.PtrString("alias/test-key"),
-				TargetKeyId:     adapters.PtrString("cf68415c-f4ae-48f2-87a7-3b52ce"),
-				AliasArn:        adapters.PtrString("arn:aws:kms:us-west-2:123456789012:alias/test-key"),
-				CreationDate:    adapters.PtrTime(time.Now()),
-				LastUpdatedDate: adapters.PtrTime(time.Now()),
+				AliasName:       adapterhelpers.PtrString("alias/test-key"),
+				TargetKeyId:     adapterhelpers.PtrString("cf68415c-f4ae-48f2-87a7-3b52ce"),
+				AliasArn:        adapterhelpers.PtrString("arn:aws:kms:us-west-2:123456789012:alias/test-key"),
+				CreationDate:    adapterhelpers.PtrTime(time.Now()),
+				LastUpdatedDate: adapterhelpers.PtrTime(time.Now()),
 			},
 		},
 	}
@@ -42,7 +42,7 @@ func TestAliasOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -55,12 +55,12 @@ func TestAliasOutputMapper(t *testing.T) {
 }
 
 func TestNewAliasAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
 	adapter := NewAliasAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

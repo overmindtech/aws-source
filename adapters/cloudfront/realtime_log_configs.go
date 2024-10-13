@@ -5,12 +5,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogConfig) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -26,14 +27,14 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 	for _, endpoint := range awsItem.EndPoints {
 		if endpoint.KinesisStreamConfig != nil {
 			if endpoint.KinesisStreamConfig.RoleARN != nil {
-				if arn, err := adapters.ParseARN(*endpoint.KinesisStreamConfig.RoleARN); err == nil {
+				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.RoleARN); err == nil {
 					// +overmind:link iam-role
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *endpoint.KinesisStreamConfig.RoleARN,
-							Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+							Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// Changes to the role will affect us
@@ -46,14 +47,14 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 			}
 
 			if endpoint.KinesisStreamConfig.StreamARN != nil {
-				if arn, err := adapters.ParseARN(*endpoint.KinesisStreamConfig.StreamARN); err == nil {
+				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.StreamARN); err == nil {
 					// +overmind:link kinesis-stream
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kinesis-stream",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *endpoint.KinesisStreamConfig.StreamARN,
-							Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+							Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// Changes to this will affect the stream
@@ -80,8 +81,8 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 // +overmind:terraform:queryMap aws_cloudfront_realtime_log_config.arn
 // +overmind:terraform:method SEARCH
 
-func NewRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
+func NewRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-realtime-log-config",
 		Client:          client,
 		AccountID:       accountID,

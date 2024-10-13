@@ -8,7 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,27 +17,27 @@ func TestDirectConnectGatewayAssociationProposalOutputMapper(t *testing.T) {
 	output := &directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput{
 		DirectConnectGatewayAssociationProposals: []types.DirectConnectGatewayAssociationProposal{
 			{
-				ProposalId:                       adapters.PtrString("c2ede9b4-bbc6-4d33-923c-bc4feEXAMPLE"),
-				DirectConnectGatewayId:           adapters.PtrString("5f294f92-bafb-4011-916d-9b0bexample"),
-				DirectConnectGatewayOwnerAccount: adapters.PtrString("123456789012"),
+				ProposalId:                       adapterhelpers.PtrString("c2ede9b4-bbc6-4d33-923c-bc4feEXAMPLE"),
+				DirectConnectGatewayId:           adapterhelpers.PtrString("5f294f92-bafb-4011-916d-9b0bexample"),
+				DirectConnectGatewayOwnerAccount: adapterhelpers.PtrString("123456789012"),
 				ProposalState:                    types.DirectConnectGatewayAssociationProposalStateRequested,
 				AssociatedGateway: &types.AssociatedGateway{
-					Id:           adapters.PtrString("tgw-02f776b1a7EXAMPLE"),
+					Id:           adapterhelpers.PtrString("tgw-02f776b1a7EXAMPLE"),
 					Type:         types.GatewayTypeTransitGateway,
-					OwnerAccount: adapters.PtrString("111122223333"),
-					Region:       adapters.PtrString("us-east-1"),
+					OwnerAccount: adapterhelpers.PtrString("111122223333"),
+					Region:       adapterhelpers.PtrString("us-east-1"),
 				},
 				ExistingAllowedPrefixesToDirectConnectGateway: []types.RouteFilterPrefix{
 					{
-						Cidr: adapters.PtrString("192.168.2.0/30"),
+						Cidr: adapterhelpers.PtrString("192.168.2.0/30"),
 					},
 					{
-						Cidr: adapters.PtrString("192.168.1.0/30"),
+						Cidr: adapterhelpers.PtrString("192.168.1.0/30"),
 					},
 				},
 				RequestedAllowedPrefixesToDirectConnectGateway: []types.RouteFilterPrefix{
 					{
-						Cidr: adapters.PtrString("192.168.1.0/30"),
+						Cidr: adapterhelpers.PtrString("192.168.1.0/30"),
 					},
 				},
 			},
@@ -60,7 +61,7 @@ func TestDirectConnectGatewayAssociationProposalOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "directconnect-direct-connect-gateway-association",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -77,7 +78,7 @@ func TestNewDirectConnectGatewayAssociationProposalAdapter(t *testing.T) {
 
 	adapter := NewDirectConnectGatewayAssociationProposalAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

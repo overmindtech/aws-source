@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/sns"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -27,7 +28,7 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(output.Attributes)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +77,8 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_platform_application.id
 
-func NewPlatformApplicationAdapter(client platformApplicationClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
-	return &adapters.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
+func NewPlatformApplicationAdapter(client platformApplicationClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
 		ItemType:        "sns-platform-application",
 		Client:          client,
 		AccountID:       accountID,
@@ -89,7 +90,7 @@ func NewPlatformApplicationAdapter(client platformApplicationClient, accountID s
 				PlatformApplicationArn: &query,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client platformApplicationClient, input *sns.ListPlatformApplicationsInput) adapters.Paginator[*sns.ListPlatformApplicationsOutput, *sns.Options] {
+		ListFuncPaginatorBuilder: func(client platformApplicationClient, input *sns.ListPlatformApplicationsInput) adapterhelpers.Paginator[*sns.ListPlatformApplicationsOutput, *sns.Options] {
 			return sns.NewListPlatformApplicationsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *sns.ListPlatformApplicationsOutput, input *sns.ListPlatformApplicationsInput) ([]*sns.GetPlatformApplicationAttributesInput, error) {

@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -25,7 +26,7 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	cluster := output.Cluster
 
-	attributes, err := adapters.ToAttributesWithExclude(cluster, "clientRequestToken")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(cluster, "clientRequestToken")
 
 	if err != nil {
 		return nil, err
@@ -98,18 +99,18 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		item.Health = sdp.Health_HEALTH_PENDING.Enum()
 	}
 
-	var a *adapters.ARN
+	var a *adapterhelpers.ARN
 
 	if cluster.ConnectorConfig != nil {
 		if cluster.ConnectorConfig.RoleArn != nil {
-			if a, err = adapters.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
+			if a, err = adapterhelpers.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
 				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cluster.ConnectorConfig.RoleArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// The role can affect the cluster
@@ -125,14 +126,14 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	for _, conf := range cluster.EncryptionConfig {
 		if conf.Provider != nil {
 			if conf.Provider.KeyArn != nil {
-				if a, err = adapters.ParseARN(*conf.Provider.KeyArn); err == nil {
+				if a, err = adapterhelpers.ParseARN(*conf.Provider.KeyArn); err == nil {
 					// +overmind:link kms-key
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kms-key",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *conf.Provider.KeyArn,
-							Scope:  adapters.FormatScope(a.AccountID, a.Region),
+							Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// The key can affect the cluster
@@ -238,14 +239,14 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	}
 
 	if cluster.RoleArn != nil {
-		if a, err = adapters.ParseARN(*cluster.RoleArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*cluster.RoleArn); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.RoleArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The role can affect the cluster
@@ -271,8 +272,8 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 // +overmind:terraform:queryMap aws_eks_cluster.arn
 // +overmind:terraform:method SEARCH
 
-func NewClusterAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
+func NewClusterAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-cluster",
 		Client:          client,
 		AccountID:       accountID,
@@ -284,7 +285,7 @@ func NewClusterAdapter(client EKSClient, accountID string, region string) *adapt
 				Name: &query,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListClustersInput) adapters.Paginator[*eks.ListClustersOutput, *eks.Options] {
+		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListClustersInput) adapterhelpers.Paginator[*eks.ListClustersOutput, *eks.Options] {
 			return eks.NewListClustersPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListClustersOutput, _ *eks.ListClustersInput) ([]*eks.DescribeClusterInput, error) {

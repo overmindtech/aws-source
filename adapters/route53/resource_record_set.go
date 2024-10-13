@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -52,7 +53,7 @@ func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 }
 
 func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordSet) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -134,8 +135,8 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 // +overmind:terraform:queryMap aws_route53_record.id
 // +overmind:terraform:method SEARCH
 
-func NewResourceRecordSetAdapter(client *route53.Client, accountID string, region string) *adapters.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
-	return &adapters.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
+func NewResourceRecordSetAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
+	return &adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options]{
 		ItemType:        "route53-resource-record-set",
 		Client:          client,
 		DisableList:     true,

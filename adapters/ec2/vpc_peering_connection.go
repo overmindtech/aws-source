@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -13,7 +14,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 	items := make([]*sdp.Item, 0)
 
 	for _, connection := range output.VpcPeeringConnections {
-		attributes, err := adapters.ToAttributesWithExclude(connection, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(connection, "tags")
 
 		if err != nil {
 			return nil, err
@@ -53,7 +54,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 		if connection.AccepterVpcInfo != nil {
 			if connection.AccepterVpcInfo.Region != nil {
 				if connection.AccepterVpcInfo.VpcId != nil && connection.AccepterVpcInfo.OwnerId != nil {
-					pairedScope := adapters.FormatScope(*connection.AccepterVpcInfo.OwnerId, *connection.AccepterVpcInfo.Region)
+					pairedScope := adapterhelpers.FormatScope(*connection.AccepterVpcInfo.OwnerId, *connection.AccepterVpcInfo.Region)
 
 					// +overmind:link ec2-vpc
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -78,7 +79,7 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 		if connection.RequesterVpcInfo != nil {
 			if connection.RequesterVpcInfo.Region != nil {
 				if connection.RequesterVpcInfo.VpcId != nil && connection.RequesterVpcInfo.OwnerId != nil {
-					pairedScope := adapters.FormatScope(*connection.RequesterVpcInfo.OwnerId, *connection.RequesterVpcInfo.Region)
+					pairedScope := adapterhelpers.FormatScope(*connection.RequesterVpcInfo.OwnerId, *connection.RequesterVpcInfo.Region)
 
 					// +overmind:link ec2-vpc
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -116,8 +117,8 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 // +overmind:terraform:queryMap aws_vpc_peering_connection_accepter.id
 // +overmind:terraform:queryMap aws_vpc_peering_connection_options.vpc_peering_connection_id
 
-func NewVpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options]{
+func NewVpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -134,7 +135,7 @@ func NewVpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region
 		InputMapperList: func(scope string) (*ec2.DescribeVpcPeeringConnectionsInput, error) {
 			return &ec2.DescribeVpcPeeringConnectionsInput{}, nil
 		},
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcPeeringConnectionsInput) adapters.Paginator[*ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcPeeringConnectionsInput) adapterhelpers.Paginator[*ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Options] {
 			return ec2.NewDescribeVpcPeeringConnectionsPaginator(client, params)
 		},
 		OutputMapper: vpcPeeringConnectionOutputMapper,

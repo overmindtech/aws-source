@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,7 +13,7 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 	items := make([]*sdp.Item, 0)
 
 	for _, location := range output.Locations {
-		attributes, err := adapters.ToAttributesWithExclude(location, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(location, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -39,8 +40,8 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_location.location_code
 
-func NewLocationAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
+func NewLocationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

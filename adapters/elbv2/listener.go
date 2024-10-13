@@ -8,7 +8,7 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -37,15 +37,15 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 					sha := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 					if len(sha) > 12 {
-						action.AuthenticateOidcConfig.ClientSecret = adapters.PtrString(fmt.Sprintf("REDACTED (Version: %v)", sha[:11]))
+						action.AuthenticateOidcConfig.ClientSecret = adapterhelpers.PtrString(fmt.Sprintf("REDACTED (Version: %v)", sha[:11]))
 					} else {
-						action.AuthenticateOidcConfig.ClientSecret = adapters.PtrString("[REDACTED]")
+						action.AuthenticateOidcConfig.ClientSecret = adapterhelpers.PtrString("[REDACTED]")
 					}
 				}
 			}
 		}
 
-		attrs, err := adapters.ToAttributesWithExclude(listener)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(listener)
 
 		if err != nil {
 			return nil, err
@@ -66,14 +66,14 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 		}
 
 		if listener.LoadBalancerArn != nil {
-			if a, err := adapters.ParseARN(*listener.LoadBalancerArn); err == nil {
+			if a, err := adapterhelpers.ParseARN(*listener.LoadBalancerArn); err == nil {
 				// +overmind:link elbv2-load-balancer
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *listener.LoadBalancerArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Load balancers and their listeners are tightly coupled
@@ -87,7 +87,7 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 						Type:   "elbv2-rule",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *listener.ListenerArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Tightly coupled
@@ -100,14 +100,14 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 
 		for _, cert := range listener.Certificates {
 			if cert.CertificateArn != nil {
-				if a, err := adapters.ParseARN(*cert.CertificateArn); err == nil {
+				if a, err := adapterhelpers.ParseARN(*cert.CertificateArn); err == nil {
 					// +overmind:link acm-certificate
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "acm-certificate",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *cert.CertificateArn,
-							Scope:  adapters.FormatScope(a.AccountID, a.Region),
+							Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// Changing the cert will affect the LB
@@ -148,8 +148,8 @@ func listenerOutputMapper(ctx context.Context, client elbClient, scope string, _
 // +overmind:terraform:queryMap aws_lb_listener.arn
 // +overmind:terraform:method SEARCH
 
-func NewListenerAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options]{
+func NewListenerAdapter(client elbClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -175,7 +175,7 @@ func NewListenerAdapter(client elbClient, accountID string, region string) *adap
 				LoadBalancerArn: &query,
 			}, nil
 		},
-		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeListenersInput) adapters.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
+		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeListenersInput) adapterhelpers.Paginator[*elbv2.DescribeListenersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeListenersPaginator(client, params)
 		},
 		OutputMapper: listenerOutputMapper,

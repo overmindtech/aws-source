@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -13,7 +14,7 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 	items := make([]*sdp.Item, 0)
 
 	for _, associationProposal := range output.DirectConnectGatewayAssociationProposals {
-		attributes, err := adapters.ToAttributesWithExclude(associationProposal, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(associationProposal, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -59,8 +60,8 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association_proposal.id
 
-func NewDirectConnectGatewayAssociationProposalAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
+func NewDirectConnectGatewayAssociationProposalAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/sns"
-	"github.com/overmindtech/aws-source/adapters"
 
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -31,7 +31,7 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 		"TopicArn": *input.ResourceArn,
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(attr)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(attr)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +72,8 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic_data_protection_policy.arn
 
-func NewDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapters.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
-	return &adapters.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
+func NewDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
 		ItemType:        "sns-data-protection-policy",
 		Client:          client,
 		AccountID:       accountID,

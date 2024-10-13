@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -19,14 +20,14 @@ func TestLayerItemMapper(t *testing.T) {
 			CompatibleRuntimes: []types.Runtime{
 				types.RuntimeJava11,
 			},
-			CreatedDate:     adapters.PtrString("2018-11-27T15:10:45.123+0000"),
-			Description:     adapters.PtrString("description"),
-			LayerVersionArn: adapters.PtrString("arn:aws:service:region:account:type/id"),
-			LicenseInfo:     adapters.PtrString("info"),
+			CreatedDate:     adapterhelpers.PtrString("2018-11-27T15:10:45.123+0000"),
+			Description:     adapterhelpers.PtrString("description"),
+			LayerVersionArn: adapterhelpers.PtrString("arn:aws:service:region:account:type/id"),
+			LicenseInfo:     adapterhelpers.PtrString("info"),
 			Version:         10,
 		},
-		LayerArn:  adapters.PtrString("arn:aws:service:region:account:type/id"),
-		LayerName: adapters.PtrString("name"),
+		LayerArn:  adapterhelpers.PtrString("arn:aws:service:region:account:type/id"),
+		LayerName: adapterhelpers.PtrString("name"),
 	}
 
 	item, err := layerItemMapper("", "foo", &layer)
@@ -39,7 +40,7 @@ func TestLayerItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "lambda-layer-version",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -56,7 +57,7 @@ func TestNewLayerAdapter(t *testing.T) {
 
 	adapter := NewLayerAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 		SkipGet: true,

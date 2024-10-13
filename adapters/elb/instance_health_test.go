@@ -6,7 +6,8 @@ import (
 
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,10 +16,10 @@ func TestInstanceHealthOutputMapper(t *testing.T) {
 	output := elb.DescribeInstanceHealthOutput{
 		InstanceStates: []types.InstanceState{
 			{
-				InstanceId:  adapters.PtrString("i-0337802d908b4a81e"), // link
-				State:       adapters.PtrString("InService"),
-				ReasonCode:  adapters.PtrString("N/A"),
-				Description: adapters.PtrString("N/A"),
+				InstanceId:  adapterhelpers.PtrString("i-0337802d908b4a81e"), // link
+				State:       adapterhelpers.PtrString("InService"),
+				ReasonCode:  adapterhelpers.PtrString("N/A"),
+				Description: adapterhelpers.PtrString("N/A"),
 			},
 		},
 	}
@@ -43,7 +44,7 @@ func TestInstanceHealthOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-instance",
 			ExpectedMethod: sdp.QueryMethod_GET,

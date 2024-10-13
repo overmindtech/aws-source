@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -43,33 +44,33 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 	output := &ec2.DescribeSecurityGroupRulesOutput{
 		SecurityGroupRules: []types.SecurityGroupRule{
 			{
-				SecurityGroupRuleId: adapters.PtrString("sgr-0b0e42d1431e832bd"),
-				GroupId:             adapters.PtrString("sg-0814766e46f201c22"),
-				GroupOwnerId:        adapters.PtrString("052392120703"),
-				IsEgress:            adapters.PtrBool(false),
-				IpProtocol:          adapters.PtrString("tcp"),
-				FromPort:            adapters.PtrInt32(2049),
-				ToPort:              adapters.PtrInt32(2049),
+				SecurityGroupRuleId: adapterhelpers.PtrString("sgr-0b0e42d1431e832bd"),
+				GroupId:             adapterhelpers.PtrString("sg-0814766e46f201c22"),
+				GroupOwnerId:        adapterhelpers.PtrString("052392120703"),
+				IsEgress:            adapterhelpers.PtrBool(false),
+				IpProtocol:          adapterhelpers.PtrString("tcp"),
+				FromPort:            adapterhelpers.PtrInt32(2049),
+				ToPort:              adapterhelpers.PtrInt32(2049),
 				ReferencedGroupInfo: &types.ReferencedSecurityGroup{
-					GroupId: adapters.PtrString("sg-09371b4a54fe7ab38"),
-					UserId:  adapters.PtrString("052392120703"),
+					GroupId: adapterhelpers.PtrString("sg-09371b4a54fe7ab38"),
+					UserId:  adapterhelpers.PtrString("052392120703"),
 				},
-				Description: adapters.PtrString("Created by the LIW for EFS at 2022-12-16T19:14:27.033Z"),
+				Description: adapterhelpers.PtrString("Created by the LIW for EFS at 2022-12-16T19:14:27.033Z"),
 				Tags:        []types.Tag{},
 			},
 			{
-				SecurityGroupRuleId: adapters.PtrString("sgr-04b583a90b4fa4ada"),
-				GroupId:             adapters.PtrString("sg-09371b4a54fe7ab38"),
-				GroupOwnerId:        adapters.PtrString("052392120703"),
-				IsEgress:            adapters.PtrBool(true),
-				IpProtocol:          adapters.PtrString("tcp"),
-				FromPort:            adapters.PtrInt32(2049),
-				ToPort:              adapters.PtrInt32(2049),
+				SecurityGroupRuleId: adapterhelpers.PtrString("sgr-04b583a90b4fa4ada"),
+				GroupId:             adapterhelpers.PtrString("sg-09371b4a54fe7ab38"),
+				GroupOwnerId:        adapterhelpers.PtrString("052392120703"),
+				IsEgress:            adapterhelpers.PtrBool(true),
+				IpProtocol:          adapterhelpers.PtrString("tcp"),
+				FromPort:            adapterhelpers.PtrInt32(2049),
+				ToPort:              adapterhelpers.PtrInt32(2049),
 				ReferencedGroupInfo: &types.ReferencedSecurityGroup{
-					GroupId: adapters.PtrString("sg-0814766e46f201c22"),
-					UserId:  adapters.PtrString("052392120703"),
+					GroupId: adapterhelpers.PtrString("sg-0814766e46f201c22"),
+					UserId:  adapterhelpers.PtrString("052392120703"),
 				},
-				Description: adapters.PtrString("Created by the LIW for EFS at 2022-12-16T19:14:27.349Z"),
+				Description: adapterhelpers.PtrString("Created by the LIW for EFS at 2022-12-16T19:14:27.349Z"),
 				Tags:        []types.Tag{},
 			},
 		},
@@ -89,7 +90,7 @@ func TestSecurityGroupRuleOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-security-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -113,7 +114,7 @@ func TestNewSecurityGroupRuleAdapter(t *testing.T) {
 
 	adapter := NewSecurityGroupRuleAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

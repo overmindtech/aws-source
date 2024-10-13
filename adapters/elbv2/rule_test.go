@@ -9,7 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,11 +18,11 @@ func TestRuleOutputMapper(t *testing.T) {
 	output := elbv2.DescribeRulesOutput{
 		Rules: []types.Rule{
 			{
-				RuleArn:  adapters.PtrString("arn:aws:elasticloadbalancing:eu-west-2:944651592624:listener-rule/app/ingress/1bf10920c5bd199d/9d28f512be129134/0f73a74d21b008f7"),
-				Priority: adapters.PtrString("1"),
+				RuleArn:  adapterhelpers.PtrString("arn:aws:elasticloadbalancing:eu-west-2:944651592624:listener-rule/app/ingress/1bf10920c5bd199d/9d28f512be129134/0f73a74d21b008f7"),
+				Priority: adapterhelpers.PtrString("1"),
 				Conditions: []types.RuleCondition{
 					{
-						Field: adapters.PtrString("path-pattern"),
+						Field: adapterhelpers.PtrString("path-pattern"),
 						Values: []string{
 							"/api/gateway",
 						},
@@ -36,7 +37,7 @@ func TestRuleOutputMapper(t *testing.T) {
 							},
 						},
 						HttpHeaderConfig: &types.HttpHeaderConditionConfig{
-							HttpHeaderName: adapters.PtrString("SOMETHING"),
+							HttpHeaderName: adapterhelpers.PtrString("SOMETHING"),
 							Values: []string{
 								"foo",
 							},
@@ -49,8 +50,8 @@ func TestRuleOutputMapper(t *testing.T) {
 						QueryStringConfig: &types.QueryStringConditionConfig{
 							Values: []types.QueryStringKeyValuePair{
 								{
-									Key:   adapters.PtrString("foo"),
-									Value: adapters.PtrString("bar"),
+									Key:   adapterhelpers.PtrString("foo"),
+									Value: adapterhelpers.PtrString("bar"),
 								},
 							},
 						},
@@ -64,7 +65,7 @@ func TestRuleOutputMapper(t *testing.T) {
 				Actions: []types.Action{
 					// Tested in actions.go
 				},
-				IsDefault: adapters.PtrBool(false),
+				IsDefault: adapterhelpers.PtrBool(false),
 			},
 		},
 	}
@@ -81,7 +82,7 @@ func TestRuleOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -94,7 +95,7 @@ func TestRuleOutputMapper(t *testing.T) {
 }
 
 func TestNewRuleAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := elasticloadbalancingv2.NewFromConfig(config)
 
 	lbSource := NewLoadBalancerAdapter(client, account, region)
@@ -131,7 +132,7 @@ func TestNewRuleAdapter(t *testing.T) {
 
 	goodSearch := fmt.Sprint(listenerARN)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:         ruleSource,
 		Timeout:         10 * time.Second,
 		GoodSearchQuery: &goodSearch,

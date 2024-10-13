@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,7 +13,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 	items := make([]*sdp.Item, 0)
 
 	for _, cr := range output.CapacityReservations {
-		attributes, err := adapters.ToAttributesWithExclude(cr, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(cr, "tags")
 
 		if err != nil {
 			return nil, err
@@ -45,14 +46,14 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 		}
 
 		if cr.OutpostArn != nil {
-			if arn, err := adapters.ParseARN(*cr.OutpostArn); err == nil {
+			if arn, err := adapterhelpers.ParseARN(*cr.OutpostArn); err == nil {
 				// +overmind:link outposts-outpost
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "outposts-outpost",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cr.OutpostArn,
-						Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+						Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to the outpost will affect this
@@ -65,14 +66,14 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 		}
 
 		if cr.PlacementGroupArn != nil {
-			if arn, err := adapters.ParseARN(*cr.PlacementGroupArn); err == nil {
+			if arn, err := adapterhelpers.ParseARN(*cr.PlacementGroupArn); err == nil {
 				// +overmind:link ec2-placement-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-placement-group",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *cr.PlacementGroupArn,
-						Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+						Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to the placement group will affect this
@@ -99,8 +100,8 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ec2_capacity_reservation.id
 
-func NewCapacityReservationAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
+func NewCapacityReservationAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -117,7 +118,7 @@ func NewCapacityReservationAdapter(client *ec2.Client, accountID string, region 
 		InputMapperList: func(scope string) (*ec2.DescribeCapacityReservationsInput, error) {
 			return &ec2.DescribeCapacityReservationsInput{}, nil
 		},
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeCapacityReservationsInput) adapters.Paginator[*ec2.DescribeCapacityReservationsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeCapacityReservationsInput) adapterhelpers.Paginator[*ec2.DescribeCapacityReservationsOutput, *ec2.Options] {
 			return ec2.NewDescribeCapacityReservationsPaginator(client, params)
 		},
 		OutputMapper: capacityReservationOutputMapper,

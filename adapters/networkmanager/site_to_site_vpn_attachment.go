@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -21,7 +22,7 @@ func getSiteToSiteVpnAttachmentGetFunc(ctx context.Context, client *networkmanag
 }
 
 func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSiteVpnAttachment) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -96,8 +97,8 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_site_to_site_vpn_attachment.id
 
-func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,

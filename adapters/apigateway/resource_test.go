@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 /*
@@ -83,25 +83,25 @@ import (
 
 func TestResourceOutputMapper(t *testing.T) {
 	resource := &types.Resource{
-		Id:       adapters.PtrString("test-id"),
-		ParentId: adapters.PtrString("parent-id"),
-		Path:     adapters.PtrString("/test-path"),
-		PathPart: adapters.PtrString("test-path-part"),
+		Id:       adapterhelpers.PtrString("test-id"),
+		ParentId: adapterhelpers.PtrString("parent-id"),
+		Path:     adapterhelpers.PtrString("/test-path"),
+		PathPart: adapterhelpers.PtrString("test-path-part"),
 		ResourceMethods: map[string]types.Method{
 			"GET": {
-				ApiKeyRequired:      adapters.PtrBool(true),
+				ApiKeyRequired:      adapterhelpers.PtrBool(true),
 				AuthorizationScopes: []string{"scope1", "scope2"},
-				AuthorizationType:   adapters.PtrString("NONE"),
-				AuthorizerId:        adapters.PtrString("authorizer-id"),
-				HttpMethod:          adapters.PtrString("GET"),
+				AuthorizationType:   adapterhelpers.PtrString("NONE"),
+				AuthorizerId:        adapterhelpers.PtrString("authorizer-id"),
+				HttpMethod:          adapterhelpers.PtrString("GET"),
 				MethodIntegration: &types.Integration{
 					CacheKeyParameters: []string{"param1", "param2"},
-					CacheNamespace:     adapters.PtrString("namespace"),
-					ConnectionId:       adapters.PtrString("connection-id"),
+					CacheNamespace:     adapterhelpers.PtrString("namespace"),
+					ConnectionId:       adapterhelpers.PtrString("connection-id"),
 					ConnectionType:     types.ConnectionTypeInternet,
 					ContentHandling:    types.ContentHandlingStrategyConvertToBinary,
-					Credentials:        adapters.PtrString("credentials"),
-					HttpMethod:         adapters.PtrString("POST"),
+					Credentials:        adapterhelpers.PtrString("credentials"),
+					HttpMethod:         adapterhelpers.PtrString("POST"),
 					IntegrationResponses: map[string]types.IntegrationResponse{
 						"200": {
 							ContentHandling: types.ContentHandlingStrategyConvertToText,
@@ -111,11 +111,11 @@ func TestResourceOutputMapper(t *testing.T) {
 							ResponseTemplates: map[string]string{
 								"template1": "value1",
 							},
-							SelectionPattern: adapters.PtrString("pattern"),
-							StatusCode:       adapters.PtrString("200"),
+							SelectionPattern: adapterhelpers.PtrString("pattern"),
+							StatusCode:       adapterhelpers.PtrString("200"),
 						},
 					},
-					PassthroughBehavior: adapters.PtrString("WHEN_NO_MATCH"),
+					PassthroughBehavior: adapterhelpers.PtrString("WHEN_NO_MATCH"),
 					RequestParameters: map[string]string{
 						"param1": "value1",
 					},
@@ -127,7 +127,7 @@ func TestResourceOutputMapper(t *testing.T) {
 						InsecureSkipVerification: false,
 					},
 					Type: types.IntegrationTypeAwsProxy,
-					Uri:  adapters.PtrString("uri"),
+					Uri:  adapterhelpers.PtrString("uri"),
 				},
 				MethodResponses: map[string]types.MethodResponse{
 					"200": {
@@ -137,17 +137,17 @@ func TestResourceOutputMapper(t *testing.T) {
 						ResponseParameters: map[string]bool{
 							"param1": true,
 						},
-						StatusCode: adapters.PtrString("200"),
+						StatusCode: adapterhelpers.PtrString("200"),
 					},
 				},
-				OperationName: adapters.PtrString("operation"),
+				OperationName: adapterhelpers.PtrString("operation"),
 				RequestModels: map[string]string{
 					"model1": "value1",
 				},
 				RequestParameters: map[string]bool{
 					"param1": true,
 				},
-				RequestValidatorId: adapters.PtrString("validator-id"),
+				RequestValidatorId: adapterhelpers.PtrString("validator-id"),
 			},
 		},
 	}
@@ -163,13 +163,13 @@ func TestResourceOutputMapper(t *testing.T) {
 }
 
 func TestNewResourceAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 
 	client := apigateway.NewFromConfig(config)
 
 	adapter := NewResourceAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,

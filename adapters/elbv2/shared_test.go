@@ -5,7 +5,7 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 type mockElbClient struct{}
@@ -18,8 +18,8 @@ func (m mockElbClient) DescribeTags(ctx context.Context, params *elbv2.DescribeT
 			ResourceArn: &arn,
 			Tags: []types.Tag{
 				{
-					Key:   adapters.PtrString("foo"),
-					Value: adapters.PtrString("bar"),
+					Key:   adapterhelpers.PtrString("foo"),
+					Value: adapterhelpers.PtrString("bar"),
 				},
 			},
 		})

@@ -5,12 +5,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.ContinuousDeploymentPolicy) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -55,8 +56,8 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 // Terraform is not yet supported for this: https://github.com/hashicorp/terraform-provider-aws/issues/28920
 
-func NewContinuousDeploymentPolicyAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options]{
+func NewContinuousDeploymentPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:               "cloudfront-continuous-deployment-policy",
 		Client:                 client,
 		AccountID:              accountID,

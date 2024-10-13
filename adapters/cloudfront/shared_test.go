@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func (c TestCloudFrontClient) ListTagsForResource(ctx context.Context, params *cloudfront.ListTagsForResourceInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListTagsForResourceOutput, error) {
@@ -14,8 +14,8 @@ func (c TestCloudFrontClient) ListTagsForResource(ctx context.Context, params *c
 		Tags: &types.Tags{
 			Items: []types.Tag{
 				{
-					Key:   adapters.PtrString("foo"),
-					Value: adapters.PtrString("bar"),
+					Key:   adapterhelpers.PtrString("foo"),
+					Value: adapterhelpers.PtrString("bar"),
 				},
 			},
 		},
@@ -25,7 +25,7 @@ func (c TestCloudFrontClient) ListTagsForResource(ctx context.Context, params *c
 type TestCloudFrontClient struct{}
 
 func GetAutoConfig(t *testing.T) (*cloudfront.Client, string, string) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
 	return client, account, region

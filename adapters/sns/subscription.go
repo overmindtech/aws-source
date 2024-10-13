@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/sns"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,7 +29,7 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(output.Attributes)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
@@ -63,14 +64,14 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 	}
 
 	if subsRoleArn, err := attributes.Get("subscriptionRoleArn"); err == nil {
-		if arn, err := adapters.ParseARN(fmt.Sprint(subsRoleArn)); err == nil {
+		if arn, err := adapterhelpers.ParseARN(fmt.Sprint(subsRoleArn)); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_GET,
 					Query:  arn.ResourceID(),
-					Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+					Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// If role is not healthy, subscription will not work
@@ -94,8 +95,8 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic_subscription.id
 
-func NewSubscriptionAdapter(client subsCli, accountID string, region string) *adapters.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
-	return &adapters.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{
+func NewSubscriptionAdapter(client subsCli, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{
 		ItemType:        "sns-subscription",
 		Client:          client,
 		AccountID:       accountID,
@@ -107,7 +108,7 @@ func NewSubscriptionAdapter(client subsCli, accountID string, region string) *ad
 				SubscriptionArn: &query,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client subsCli, input *sns.ListSubscriptionsInput) adapters.Paginator[*sns.ListSubscriptionsOutput, *sns.Options] {
+		ListFuncPaginatorBuilder: func(client subsCli, input *sns.ListSubscriptionsInput) adapterhelpers.Paginator[*sns.ListSubscriptionsOutput, *sns.Options] {
 			return sns.NewListSubscriptionsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *sns.ListSubscriptionsOutput, _ *sns.ListSubscriptionsInput) ([]*sns.GetSubscriptionAttributesInput, error) {

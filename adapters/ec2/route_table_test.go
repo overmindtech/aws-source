@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -45,11 +46,11 @@ func TestRouteTableOutputMapper(t *testing.T) {
 			{
 				Associations: []types.RouteTableAssociation{
 					{
-						Main:                    adapters.PtrBool(false),
-						RouteTableAssociationId: adapters.PtrString("rtbassoc-0aa1442039abff3db"),
-						RouteTableId:            adapters.PtrString("rtb-00b1197fa95a6b35f"),
-						SubnetId:                adapters.PtrString("subnet-06c0dea0437180c61"),
-						GatewayId:               adapters.PtrString("ID"),
+						Main:                    adapterhelpers.PtrBool(false),
+						RouteTableAssociationId: adapterhelpers.PtrString("rtbassoc-0aa1442039abff3db"),
+						RouteTableId:            adapterhelpers.PtrString("rtb-00b1197fa95a6b35f"),
+						SubnetId:                adapterhelpers.PtrString("subnet-06c0dea0437180c61"),
+						GatewayId:               adapterhelpers.PtrString("ID"),
 						AssociationState: &types.RouteTableAssociationState{
 							State: types.RouteTableAssociationStateCodeAssociated,
 						},
@@ -57,35 +58,35 @@ func TestRouteTableOutputMapper(t *testing.T) {
 				},
 				PropagatingVgws: []types.PropagatingVgw{
 					{
-						GatewayId: adapters.PtrString("goo"),
+						GatewayId: adapterhelpers.PtrString("goo"),
 					},
 				},
-				RouteTableId: adapters.PtrString("rtb-00b1197fa95a6b35f"),
+				RouteTableId: adapterhelpers.PtrString("rtb-00b1197fa95a6b35f"),
 				Routes: []types.Route{
 					{
-						DestinationCidrBlock: adapters.PtrString("172.31.0.0/16"),
-						GatewayId:            adapters.PtrString("igw-12345"),
+						DestinationCidrBlock: adapterhelpers.PtrString("172.31.0.0/16"),
+						GatewayId:            adapterhelpers.PtrString("igw-12345"),
 						Origin:               types.RouteOriginCreateRouteTable,
 						State:                types.RouteStateActive,
 					},
 					{
-						DestinationPrefixListId:     adapters.PtrString("pl-7ca54015"),
-						GatewayId:                   adapters.PtrString("vpce-09fcbac4dcf142db3"),
+						DestinationPrefixListId:     adapterhelpers.PtrString("pl-7ca54015"),
+						GatewayId:                   adapterhelpers.PtrString("vpce-09fcbac4dcf142db3"),
 						Origin:                      types.RouteOriginCreateRoute,
 						State:                       types.RouteStateActive,
-						CarrierGatewayId:            adapters.PtrString("id"),
-						EgressOnlyInternetGatewayId: adapters.PtrString("id"),
-						InstanceId:                  adapters.PtrString("id"),
-						InstanceOwnerId:             adapters.PtrString("id"),
-						LocalGatewayId:              adapters.PtrString("id"),
-						NatGatewayId:                adapters.PtrString("id"),
-						NetworkInterfaceId:          adapters.PtrString("id"),
-						TransitGatewayId:            adapters.PtrString("id"),
-						VpcPeeringConnectionId:      adapters.PtrString("id"),
+						CarrierGatewayId:            adapterhelpers.PtrString("id"),
+						EgressOnlyInternetGatewayId: adapterhelpers.PtrString("id"),
+						InstanceId:                  adapterhelpers.PtrString("id"),
+						InstanceOwnerId:             adapterhelpers.PtrString("id"),
+						LocalGatewayId:              adapterhelpers.PtrString("id"),
+						NatGatewayId:                adapterhelpers.PtrString("id"),
+						NetworkInterfaceId:          adapterhelpers.PtrString("id"),
+						TransitGatewayId:            adapterhelpers.PtrString("id"),
+						VpcPeeringConnectionId:      adapterhelpers.PtrString("id"),
 					},
 				},
-				VpcId:   adapters.PtrString("vpc-0d7892e00e573e701"),
-				OwnerId: adapters.PtrString("052392120703"),
+				VpcId:   adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
+				OwnerId: adapterhelpers.PtrString("052392120703"),
 			},
 		},
 	}
@@ -110,7 +111,7 @@ func TestRouteTableOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -200,7 +201,7 @@ func TestNewRouteTableAdapter(t *testing.T) {
 
 	adapter := NewRouteTableAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, ng := range output.NatGateways {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(ng, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(ng, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -150,8 +151,8 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_nat_gateway.id
 
-func NewNatGatewayAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{
+func NewNatGatewayAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -162,7 +163,7 @@ func NewNatGatewayAdapter(client *ec2.Client, accountID string, region string) *
 		},
 		InputMapperGet:  natGatewayInputMapperGet,
 		InputMapperList: natGatewayInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNatGatewaysInput) adapters.Paginator[*ec2.DescribeNatGatewaysOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNatGatewaysInput) adapterhelpers.Paginator[*ec2.DescribeNatGatewaysOutput, *ec2.Options] {
 			return ec2.NewDescribeNatGatewaysPaginator(client, params)
 		},
 		OutputMapper: natGatewayOutputMapper,

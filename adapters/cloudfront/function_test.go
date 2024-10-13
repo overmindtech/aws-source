@@ -5,23 +5,23 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestFunctionItemMapper(t *testing.T) {
 	summary := types.FunctionSummary{
 		FunctionConfig: &types.FunctionConfig{
-			Comment: adapters.PtrString("test-comment"),
+			Comment: adapterhelpers.PtrString("test-comment"),
 			Runtime: types.FunctionRuntimeCloudfrontJs20,
 		},
 		FunctionMetadata: &types.FunctionMetadata{
-			FunctionARN:      adapters.PtrString("arn:aws:cloudfront::123456789012:function/test-function"),
-			LastModifiedTime: adapters.PtrTime(time.Now()),
-			CreatedTime:      adapters.PtrTime(time.Now()),
+			FunctionARN:      adapterhelpers.PtrString("arn:aws:cloudfront::123456789012:function/test-function"),
+			LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
+			CreatedTime:      adapterhelpers.PtrTime(time.Now()),
 			Stage:            types.FunctionStageLive,
 		},
-		Name:   adapters.PtrString("test-function"),
-		Status: adapters.PtrString("test-status"),
+		Name:   adapterhelpers.PtrString("test-function"),
+		Status: adapterhelpers.PtrString("test-status"),
 	}
 
 	item, err := functionItemMapper("", "test", &summary)
@@ -40,7 +40,7 @@ func TestNewFunctionAdapter(t *testing.T) {
 
 	adapter := NewFunctionAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

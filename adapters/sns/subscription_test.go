@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/aws/aws-sdk-go-v2/service/sns/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 type testClient struct{}
@@ -29,11 +29,11 @@ func (t testClient) ListSubscriptions(context.Context, *sns.ListSubscriptionsInp
 	return &sns.ListSubscriptionsOutput{
 		Subscriptions: []types.Subscription{
 			{
-				Owner:           adapters.PtrString("123456789012"),
-				Endpoint:        adapters.PtrString("my-email@example.com"),
-				Protocol:        adapters.PtrString("email"),
-				TopicArn:        adapters.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic"),
-				SubscriptionArn: adapters.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic:8a21d249-4329-4871-acc6-7be709c6ea7f"),
+				Owner:           adapterhelpers.PtrString("123456789012"),
+				Endpoint:        adapterhelpers.PtrString("my-email@example.com"),
+				Protocol:        adapterhelpers.PtrString("email"),
+				TopicArn:        adapterhelpers.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic"),
+				SubscriptionArn: adapterhelpers.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic:8a21d249-4329-4871-acc6-7be709c6ea7f"),
 			},
 		},
 	}, nil
@@ -42,8 +42,8 @@ func (t testClient) ListSubscriptions(context.Context, *sns.ListSubscriptionsInp
 func (t testClient) ListTagsForResource(context.Context, *sns.ListTagsForResourceInput, ...func(*sns.Options)) (*sns.ListTagsForResourceOutput, error) {
 	return &sns.ListTagsForResourceOutput{
 		Tags: []types.Tag{
-			{Key: adapters.PtrString("tag1"), Value: adapters.PtrString("value1")},
-			{Key: adapters.PtrString("tag2"), Value: adapters.PtrString("value2")},
+			{Key: adapterhelpers.PtrString("tag1"), Value: adapterhelpers.PtrString("value1")},
+			{Key: adapterhelpers.PtrString("tag2"), Value: adapterhelpers.PtrString("value2")},
 		},
 	}, nil
 }
@@ -53,7 +53,7 @@ func TestGetFunc(t *testing.T) {
 	cli := testClient{}
 
 	item, err := getSubsFunc(ctx, cli, "scope", &sns.GetSubscriptionAttributesInput{
-		SubscriptionArn: adapters.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic:8a21d249-4329-4871-acc6-7be709c6ea7f"),
+		SubscriptionArn: adapterhelpers.PtrString("arn:aws:sns:us-west-2:123456789012:my-topic:8a21d249-4329-4871-acc6-7be709c6ea7f"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -69,7 +69,7 @@ func TestNewSubscriptionAdapter(t *testing.T) {
 
 	adapter := NewSubscriptionAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

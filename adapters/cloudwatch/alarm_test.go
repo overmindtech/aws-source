@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,8 +18,8 @@ func (c testCloudwatchClient) ListTagsForResource(ctx context.Context, params *c
 	return &cloudwatch.ListTagsForResourceOutput{
 		Tags: []types.Tag{
 			{
-				Key:   adapters.PtrString("Name"),
-				Value: adapters.PtrString("example"),
+				Key:   adapterhelpers.PtrString("Name"),
+				Value: adapterhelpers.PtrString("example"),
 			},
 		},
 	}, nil
@@ -36,11 +37,11 @@ func TestAlarmOutputMapper(t *testing.T) {
 	output := &cloudwatch.DescribeAlarmsOutput{
 		MetricAlarms: []types.MetricAlarm{
 			{
-				AlarmName:                          adapters.PtrString("TargetTracking-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
-				AlarmArn:                           adapters.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
-				AlarmDescription:                   adapters.PtrString("DO NOT EDIT OR DELETE. For TargetTrackingScaling policy arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b."),
-				AlarmConfigurationUpdatedTimestamp: adapters.PtrTime(time.Now()),
-				ActionsEnabled:                     adapters.PtrBool(true),
+				AlarmName:                          adapterhelpers.PtrString("TargetTracking-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				AlarmArn:                           adapterhelpers.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				AlarmDescription:                   adapterhelpers.PtrString("DO NOT EDIT OR DELETE. For TargetTrackingScaling policy arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b."),
+				AlarmConfigurationUpdatedTimestamp: adapterhelpers.PtrTime(time.Now()),
+				ActionsEnabled:                     adapterhelpers.PtrBool(true),
 				OKActions: []string{
 					"arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b",
 				},
@@ -51,32 +52,32 @@ func TestAlarmOutputMapper(t *testing.T) {
 					"arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b",
 				},
 				StateValue:            types.StateValueOk,
-				StateReason:           adapters.PtrString("Threshold Crossed: 2 datapoints [0.0 (09/01/23 14:02:00), 1.0 (09/01/23 14:01:00)] were not greater than the threshold (42.0)."),
-				StateReasonData:       adapters.PtrString("{\"version\":\"1.0\",\"queryDate\":\"2023-01-09T14:07:25.504+0000\",\"startDate\":\"2023-01-09T14:01:00.000+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[1.0,0.0],\"threshold\":42.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2023-01-09T14:02:00.000+0000\",\"sampleCount\":1.0,\"value\":0.0}]}"),
-				StateUpdatedTimestamp: adapters.PtrTime(time.Now()),
-				MetricName:            adapters.PtrString("ConsumedWriteCapacityUnits"),
-				Namespace:             adapters.PtrString("AWS/DynamoDB"),
+				StateReason:           adapterhelpers.PtrString("Threshold Crossed: 2 datapoints [0.0 (09/01/23 14:02:00), 1.0 (09/01/23 14:01:00)] were not greater than the threshold (42.0)."),
+				StateReasonData:       adapterhelpers.PtrString("{\"version\":\"1.0\",\"queryDate\":\"2023-01-09T14:07:25.504+0000\",\"startDate\":\"2023-01-09T14:01:00.000+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[1.0,0.0],\"threshold\":42.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2023-01-09T14:02:00.000+0000\",\"sampleCount\":1.0,\"value\":0.0}]}"),
+				StateUpdatedTimestamp: adapterhelpers.PtrTime(time.Now()),
+				MetricName:            adapterhelpers.PtrString("ConsumedWriteCapacityUnits"),
+				Namespace:             adapterhelpers.PtrString("AWS/DynamoDB"),
 				Statistic:             types.StatisticSum,
 				Dimensions: []types.Dimension{
 					{
-						Name:  adapters.PtrString("TableName"),
-						Value: adapters.PtrString("dylan-tfstate"),
+						Name:  adapterhelpers.PtrString("TableName"),
+						Value: adapterhelpers.PtrString("dylan-tfstate"),
 					},
 				},
-				Period:                     adapters.PtrInt32(60),
-				EvaluationPeriods:          adapters.PtrInt32(2),
-				Threshold:                  adapters.PtrFloat64(42.0),
+				Period:                     adapterhelpers.PtrInt32(60),
+				EvaluationPeriods:          adapterhelpers.PtrInt32(2),
+				Threshold:                  adapterhelpers.PtrFloat64(42.0),
 				ComparisonOperator:         types.ComparisonOperatorGreaterThanThreshold,
-				StateTransitionedTimestamp: adapters.PtrTime(time.Now()),
+				StateTransitionedTimestamp: adapterhelpers.PtrTime(time.Now()),
 			},
 		},
 		CompositeAlarms: []types.CompositeAlarm{
 			{
-				AlarmName:                          adapters.PtrString("TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
-				AlarmArn:                           adapters.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
-				AlarmDescription:                   adapters.PtrString("DO NOT EDIT OR DELETE. For TargetTrackingScaling policy arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b."),
-				AlarmConfigurationUpdatedTimestamp: adapters.PtrTime(time.Now()),
-				ActionsEnabled:                     adapters.PtrBool(true),
+				AlarmName:                          adapterhelpers.PtrString("TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				AlarmArn:                           adapterhelpers.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				AlarmDescription:                   adapterhelpers.PtrString("DO NOT EDIT OR DELETE. For TargetTrackingScaling policy arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b."),
+				AlarmConfigurationUpdatedTimestamp: adapterhelpers.PtrTime(time.Now()),
+				ActionsEnabled:                     adapterhelpers.PtrBool(true),
 				OKActions: []string{
 					"arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b",
 				},
@@ -87,17 +88,17 @@ func TestAlarmOutputMapper(t *testing.T) {
 					"arn:aws:autoscaling:eu-west-2:052392120703:scalingPolicy:32f3f053-dc75-46fa-9cd4-8e8c34c47b37:resource/dynamodb/table/dylan-tfstate:policyName/$dylan-tfstate-scaling-policy:createdBy/e5bd51d8-94a8-461e-a989-08f4d10b326b",
 				},
 				StateValue:                 types.StateValueOk,
-				StateReason:                adapters.PtrString("Threshold Crossed: 2 datapoints [0.0 (09/01/23 14:02:00), 1.0 (09/01/23 14:01:00)] were not greater than the threshold (42.0)."),
-				StateReasonData:            adapters.PtrString("{\"version\":\"1.0\",\"queryDate\":\"2023-01-09T14:07:25.504+0000\",\"startDate\":\"2023-01-09T14:01:00.000+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[1.0,0.0],\"threshold\":42.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2023-01-09T14:02:00.000+0000\",\"sampleCount\":1.0,\"value\":0.0}]}"),
-				StateUpdatedTimestamp:      adapters.PtrTime(time.Now()),
-				StateTransitionedTimestamp: adapters.PtrTime(time.Now()),
+				StateReason:                adapterhelpers.PtrString("Threshold Crossed: 2 datapoints [0.0 (09/01/23 14:02:00), 1.0 (09/01/23 14:01:00)] were not greater than the threshold (42.0)."),
+				StateReasonData:            adapterhelpers.PtrString("{\"version\":\"1.0\",\"queryDate\":\"2023-01-09T14:07:25.504+0000\",\"startDate\":\"2023-01-09T14:01:00.000+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[1.0,0.0],\"threshold\":42.0,\"evaluatedDatapoints\":[{\"timestamp\":\"2023-01-09T14:02:00.000+0000\",\"sampleCount\":1.0,\"value\":0.0}]}"),
+				StateUpdatedTimestamp:      adapterhelpers.PtrTime(time.Now()),
+				StateTransitionedTimestamp: adapterhelpers.PtrTime(time.Now()),
 				ActionsSuppressedBy:        types.ActionsSuppressedByAlarm,
-				ActionsSuppressedReason:    adapters.PtrString("Alarm is in INSUFFICIENT_DATA state"),
+				ActionsSuppressedReason:    adapterhelpers.PtrString("Alarm is in INSUFFICIENT_DATA state"),
 				// link
-				ActionsSuppressor:                adapters.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
-				ActionsSuppressorExtensionPeriod: adapters.PtrInt32(0),
-				ActionsSuppressorWaitPeriod:      adapters.PtrInt32(0),
-				AlarmRule:                        adapters.PtrString("ALARM TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				ActionsSuppressor:                adapterhelpers.PtrString("arn:aws:cloudwatch:eu-west-2:052392120703:alarm:TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
+				ActionsSuppressorExtensionPeriod: adapterhelpers.PtrInt32(0),
+				ActionsSuppressorWaitPeriod:      adapterhelpers.PtrInt32(0),
+				AlarmRule:                        adapterhelpers.PtrString("ALARM TargetTracking2-table/dylan-tfstate-AlarmHigh-14069c4a-6dcc-48a2-bfe6-b5547c90c43d"),
 			},
 		},
 	}
@@ -123,7 +124,7 @@ func TestAlarmOutputMapper(t *testing.T) {
 		t.Errorf("Expected tag Name to be example, got %s", item.GetTags()["Name"])
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "cloudwatch-alarm",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -140,7 +141,7 @@ func TestAlarmOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests = adapters.QueryTests{
+	tests = adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dynamodb-table",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -153,12 +154,12 @@ func TestAlarmOutputMapper(t *testing.T) {
 }
 
 func TestNewAlarmAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := cloudwatch.NewFromConfig(config)
 
 	adapter := NewAlarmAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

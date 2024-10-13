@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,10 +15,10 @@ func TestDeviceOutputMapper(t *testing.T) {
 	output := networkmanager.GetDevicesOutput{
 		Devices: []types.Device{
 			{
-				DeviceId:        adapters.PtrString("dvc-1"),
-				GlobalNetworkId: adapters.PtrString("default"),
-				SiteId:          adapters.PtrString("site-1"),
-				DeviceArn:       adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/dvc-1"),
+				DeviceId:        adapterhelpers.PtrString("dvc-1"),
+				GlobalNetworkId: adapterhelpers.PtrString("default"),
+				SiteId:          adapterhelpers.PtrString("site-1"),
+				DeviceArn:       adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/dvc-1"),
 			},
 		},
 	}
@@ -51,7 +52,7 @@ func TestDeviceOutputMapper(t *testing.T) {
 		t.Fatalf("expected default|dvc-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

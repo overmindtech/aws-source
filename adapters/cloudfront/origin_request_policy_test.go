@@ -5,34 +5,34 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestOriginRequestPolicyItemMapper(t *testing.T) {
 	x := types.OriginRequestPolicy{
-		Id:               adapters.PtrString("test"),
-		LastModifiedTime: adapters.PtrTime(time.Now()),
+		Id:               adapterhelpers.PtrString("test"),
+		LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
 		OriginRequestPolicyConfig: &types.OriginRequestPolicyConfig{
-			Name:    adapters.PtrString("example-policy"),
-			Comment: adapters.PtrString("example comment"),
+			Name:    adapterhelpers.PtrString("example-policy"),
+			Comment: adapterhelpers.PtrString("example comment"),
 			QueryStringsConfig: &types.OriginRequestPolicyQueryStringsConfig{
 				QueryStringBehavior: types.OriginRequestPolicyQueryStringBehaviorAllExcept,
 				QueryStrings: &types.QueryStringNames{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items:    []string{"test"},
 				},
 			},
 			CookiesConfig: &types.OriginRequestPolicyCookiesConfig{
 				CookieBehavior: types.OriginRequestPolicyCookieBehaviorAll,
 				Cookies: &types.CookieNames{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items:    []string{"test"},
 				},
 			},
 			HeadersConfig: &types.OriginRequestPolicyHeadersConfig{
 				HeaderBehavior: types.OriginRequestPolicyHeaderBehaviorAllViewer,
 				Headers: &types.Headers{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items:    []string{"test"},
 				},
 			},
@@ -55,7 +55,7 @@ func TestNewOriginRequestPolicyAdapter(t *testing.T) {
 
 	adapter := NewOriginRequestPolicyAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

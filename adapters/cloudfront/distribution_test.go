@@ -7,27 +7,28 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloudfront.GetDistributionInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetDistributionOutput, error) {
 	return &cloudfront.GetDistributionOutput{
 		Distribution: &types.Distribution{
-			ARN:                           adapters.PtrString("arn:aws:cloudfront::123456789012:distribution/test-id"),
-			DomainName:                    adapters.PtrString("d111111abcdef8.cloudfront.net"), // link
-			Id:                            adapters.PtrString("test-id"),
-			InProgressInvalidationBatches: adapters.PtrInt32(1),
-			LastModifiedTime:              adapters.PtrTime(time.Now()),
-			Status:                        adapters.PtrString("Deployed"), // health: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-returned.html
+			ARN:                           adapterhelpers.PtrString("arn:aws:cloudfront::123456789012:distribution/test-id"),
+			DomainName:                    adapterhelpers.PtrString("d111111abcdef8.cloudfront.net"), // link
+			Id:                            adapterhelpers.PtrString("test-id"),
+			InProgressInvalidationBatches: adapterhelpers.PtrInt32(1),
+			LastModifiedTime:              adapterhelpers.PtrTime(time.Now()),
+			Status:                        adapterhelpers.PtrString("Deployed"), // health: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-returned.html
 			ActiveTrustedKeyGroups: &types.ActiveTrustedKeyGroups{
-				Enabled:  adapters.PtrBool(true),
-				Quantity: adapters.PtrInt32(1),
+				Enabled:  adapterhelpers.PtrBool(true),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []types.KGKeyPairIds{
 					{
-						KeyGroupId: adapters.PtrString("key-group-1"), // link
+						KeyGroupId: adapterhelpers.PtrString("key-group-1"), // link
 						KeyPairIds: &types.KeyPairIds{
-							Quantity: adapters.PtrInt32(1),
+							Quantity: adapterhelpers.PtrInt32(1),
 							Items: []string{
 								"123456789",
 							},
@@ -36,13 +37,13 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 				},
 			},
 			ActiveTrustedSigners: &types.ActiveTrustedSigners{
-				Enabled:  adapters.PtrBool(true),
-				Quantity: adapters.PtrInt32(1),
+				Enabled:  adapterhelpers.PtrBool(true),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []types.Signer{
 					{
-						AwsAccountNumber: adapters.PtrString("123456789"),
+						AwsAccountNumber: adapterhelpers.PtrString("123456789"),
 						KeyPairIds: &types.KeyPairIds{
-							Quantity: adapters.PtrInt32(1),
+							Quantity: adapterhelpers.PtrInt32(1),
 							Items: []string{
 								"123456789",
 							},
@@ -52,54 +53,54 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 			},
 			AliasICPRecordals: []types.AliasICPRecordal{
 				{
-					CNAME:             adapters.PtrString("something.foo.bar.com"), // link
+					CNAME:             adapterhelpers.PtrString("something.foo.bar.com"), // link
 					ICPRecordalStatus: types.ICPRecordalStatusApproved,
 				},
 			},
 			DistributionConfig: &types.DistributionConfig{
-				CallerReference: adapters.PtrString("test-caller-reference"),
-				Comment:         adapters.PtrString("test-comment"),
-				Enabled:         adapters.PtrBool(true),
+				CallerReference: adapterhelpers.PtrString("test-caller-reference"),
+				Comment:         adapterhelpers.PtrString("test-comment"),
+				Enabled:         adapterhelpers.PtrBool(true),
 				Aliases: &types.Aliases{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"www.example.com", // link
 					},
 				},
-				Staging:                      adapters.PtrBool(true),
-				ContinuousDeploymentPolicyId: adapters.PtrString("test-continuous-deployment-policy-id"), // link
+				Staging:                      adapterhelpers.PtrBool(true),
+				ContinuousDeploymentPolicyId: adapterhelpers.PtrString("test-continuous-deployment-policy-id"), // link
 				CacheBehaviors: &types.CacheBehaviors{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []types.CacheBehavior{
 						{
-							PathPattern:          adapters.PtrString("/foo"),
-							TargetOriginId:       adapters.PtrString("CustomOriginConfig"),
+							PathPattern:          adapterhelpers.PtrString("/foo"),
+							TargetOriginId:       adapterhelpers.PtrString("CustomOriginConfig"),
 							ViewerProtocolPolicy: types.ViewerProtocolPolicyHttpsOnly,
 							AllowedMethods: &types.AllowedMethods{
 								Items: []types.Method{
 									types.MethodGet,
 								},
 							},
-							CachePolicyId:           adapters.PtrString("test-cache-policy-id"), // link
-							Compress:                adapters.PtrBool(true),
-							DefaultTTL:              adapters.PtrInt64(1),
-							FieldLevelEncryptionId:  adapters.PtrString("test-field-level-encryption-id"), // link
-							MaxTTL:                  adapters.PtrInt64(1),
-							MinTTL:                  adapters.PtrInt64(1),
-							OriginRequestPolicyId:   adapters.PtrString("test-origin-request-policy-id"),                                   // link
-							RealtimeLogConfigArn:    adapters.PtrString("arn:aws:logs:us-east-1:123456789012:realtime-log-config/test-id"), // link
-							ResponseHeadersPolicyId: adapters.PtrString("test-response-headers-policy-id"),                                 // link
-							SmoothStreaming:         adapters.PtrBool(true),
+							CachePolicyId:           adapterhelpers.PtrString("test-cache-policy-id"), // link
+							Compress:                adapterhelpers.PtrBool(true),
+							DefaultTTL:              adapterhelpers.PtrInt64(1),
+							FieldLevelEncryptionId:  adapterhelpers.PtrString("test-field-level-encryption-id"), // link
+							MaxTTL:                  adapterhelpers.PtrInt64(1),
+							MinTTL:                  adapterhelpers.PtrInt64(1),
+							OriginRequestPolicyId:   adapterhelpers.PtrString("test-origin-request-policy-id"),                                   // link
+							RealtimeLogConfigArn:    adapterhelpers.PtrString("arn:aws:logs:us-east-1:123456789012:realtime-log-config/test-id"), // link
+							ResponseHeadersPolicyId: adapterhelpers.PtrString("test-response-headers-policy-id"),                                 // link
+							SmoothStreaming:         adapterhelpers.PtrBool(true),
 							TrustedKeyGroups: &types.TrustedKeyGroups{
-								Enabled:  adapters.PtrBool(true),
-								Quantity: adapters.PtrInt32(1),
+								Enabled:  adapterhelpers.PtrBool(true),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []string{
 									"key-group-1", // link
 								},
 							},
 							TrustedSigners: &types.TrustedSigners{
-								Enabled:  adapters.PtrBool(true),
-								Quantity: adapters.PtrInt32(1),
+								Enabled:  adapterhelpers.PtrBool(true),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []string{
 									"123456789",
 								},
@@ -108,42 +109,42 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 								Cookies: &types.CookiePreference{
 									Forward: types.ItemSelectionWhitelist,
 									WhitelistedNames: &types.CookieNames{
-										Quantity: adapters.PtrInt32(1),
+										Quantity: adapterhelpers.PtrInt32(1),
 										Items: []string{
 											"cookie_123",
 										},
 									},
 								},
-								QueryString: adapters.PtrBool(true),
+								QueryString: adapterhelpers.PtrBool(true),
 								Headers: &types.Headers{
-									Quantity: adapters.PtrInt32(1),
+									Quantity: adapterhelpers.PtrInt32(1),
 									Items: []string{
 										"X-Customer-Header",
 									},
 								},
 								QueryStringCacheKeys: &types.QueryStringCacheKeys{
-									Quantity: adapters.PtrInt32(1),
+									Quantity: adapterhelpers.PtrInt32(1),
 									Items: []string{
 										"test-query-string-cache-key",
 									},
 								},
 							},
 							FunctionAssociations: &types.FunctionAssociations{
-								Quantity: adapters.PtrInt32(1),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []types.FunctionAssociation{
 									{
 										EventType:   types.EventTypeOriginRequest,
-										FunctionARN: adapters.PtrString("arn:aws:cloudfront::123412341234:function/1234"), // link
+										FunctionARN: adapterhelpers.PtrString("arn:aws:cloudfront::123412341234:function/1234"), // link
 									},
 								},
 							},
 							LambdaFunctionAssociations: &types.LambdaFunctionAssociations{
-								Quantity: adapters.PtrInt32(1),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []types.LambdaFunctionAssociation{
 									{
 										EventType:         types.EventTypeOriginResponse,
-										LambdaFunctionARN: adapters.PtrString("arn:aws:lambda:us-east-1:123456789012:function:test-function"), // link
-										IncludeBody:       adapters.PtrBool(true),
+										LambdaFunctionARN: adapterhelpers.PtrString("arn:aws:lambda:us-east-1:123456789012:function:test-function"), // link
+										IncludeBody:       adapterhelpers.PtrBool(true),
 									},
 								},
 							},
@@ -153,107 +154,107 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 				Origins: &types.Origins{
 					Items: []types.Origin{
 						{
-							DomainName:         adapters.PtrString("DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com"), // link
-							Id:                 adapters.PtrString("CustomOriginConfig"),
-							ConnectionAttempts: adapters.PtrInt32(3),
-							ConnectionTimeout:  adapters.PtrInt32(10),
+							DomainName:         adapterhelpers.PtrString("DOC-EXAMPLE-BUCKET.s3.us-west-2.amazonaws.com"), // link
+							Id:                 adapterhelpers.PtrString("CustomOriginConfig"),
+							ConnectionAttempts: adapterhelpers.PtrInt32(3),
+							ConnectionTimeout:  adapterhelpers.PtrInt32(10),
 							CustomHeaders: &types.CustomHeaders{
-								Quantity: adapters.PtrInt32(1),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []types.OriginCustomHeader{
 									{
-										HeaderName:  adapters.PtrString("test-header-name"),
-										HeaderValue: adapters.PtrString("test-header-value"),
+										HeaderName:  adapterhelpers.PtrString("test-header-name"),
+										HeaderValue: adapterhelpers.PtrString("test-header-value"),
 									},
 								},
 							},
 							CustomOriginConfig: &types.CustomOriginConfig{
-								HTTPPort:               adapters.PtrInt32(80),
-								HTTPSPort:              adapters.PtrInt32(443),
+								HTTPPort:               adapterhelpers.PtrInt32(80),
+								HTTPSPort:              adapterhelpers.PtrInt32(443),
 								OriginProtocolPolicy:   types.OriginProtocolPolicyMatchViewer,
-								OriginKeepaliveTimeout: adapters.PtrInt32(5),
-								OriginReadTimeout:      adapters.PtrInt32(30),
+								OriginKeepaliveTimeout: adapterhelpers.PtrInt32(5),
+								OriginReadTimeout:      adapterhelpers.PtrInt32(30),
 								OriginSslProtocols: &types.OriginSslProtocols{
 									Items: types.SslProtocolSSLv3.Values(),
 								},
 							},
-							OriginAccessControlId: adapters.PtrString("test-origin-access-control-id"), // link
-							OriginPath:            adapters.PtrString("/foo"),
+							OriginAccessControlId: adapterhelpers.PtrString("test-origin-access-control-id"), // link
+							OriginPath:            adapterhelpers.PtrString("/foo"),
 							OriginShield: &types.OriginShield{
-								Enabled:            adapters.PtrBool(true),
-								OriginShieldRegion: adapters.PtrString("eu-west-1"),
+								Enabled:            adapterhelpers.PtrBool(true),
+								OriginShieldRegion: adapterhelpers.PtrString("eu-west-1"),
 							},
 							S3OriginConfig: &types.S3OriginConfig{
-								OriginAccessIdentity: adapters.PtrString("test-origin-access-identity"), // link
+								OriginAccessIdentity: adapterhelpers.PtrString("test-origin-access-identity"), // link
 							},
 						},
 					},
 				},
 				DefaultCacheBehavior: &types.DefaultCacheBehavior{
-					TargetOriginId:          adapters.PtrString("CustomOriginConfig"),
+					TargetOriginId:          adapterhelpers.PtrString("CustomOriginConfig"),
 					ViewerProtocolPolicy:    types.ViewerProtocolPolicyHttpsOnly,
-					CachePolicyId:           adapters.PtrString("test-cache-policy-id"), // link
-					Compress:                adapters.PtrBool(true),
-					DefaultTTL:              adapters.PtrInt64(1),
-					FieldLevelEncryptionId:  adapters.PtrString("test-field-level-encryption-id"), // link
-					MaxTTL:                  adapters.PtrInt64(1),
-					MinTTL:                  adapters.PtrInt64(1),
-					OriginRequestPolicyId:   adapters.PtrString("test-origin-request-policy-id"),                                   // link
-					RealtimeLogConfigArn:    adapters.PtrString("arn:aws:logs:us-east-1:123456789012:realtime-log-config/test-id"), // link
-					ResponseHeadersPolicyId: adapters.PtrString("test-response-headers-policy-id"),                                 // link
-					SmoothStreaming:         adapters.PtrBool(true),
+					CachePolicyId:           adapterhelpers.PtrString("test-cache-policy-id"), // link
+					Compress:                adapterhelpers.PtrBool(true),
+					DefaultTTL:              adapterhelpers.PtrInt64(1),
+					FieldLevelEncryptionId:  adapterhelpers.PtrString("test-field-level-encryption-id"), // link
+					MaxTTL:                  adapterhelpers.PtrInt64(1),
+					MinTTL:                  adapterhelpers.PtrInt64(1),
+					OriginRequestPolicyId:   adapterhelpers.PtrString("test-origin-request-policy-id"),                                   // link
+					RealtimeLogConfigArn:    adapterhelpers.PtrString("arn:aws:logs:us-east-1:123456789012:realtime-log-config/test-id"), // link
+					ResponseHeadersPolicyId: adapterhelpers.PtrString("test-response-headers-policy-id"),                                 // link
+					SmoothStreaming:         adapterhelpers.PtrBool(true),
 					ForwardedValues: &types.ForwardedValues{
 						Cookies: &types.CookiePreference{
 							Forward: types.ItemSelectionWhitelist,
 							WhitelistedNames: &types.CookieNames{
-								Quantity: adapters.PtrInt32(1),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []string{
 									"cooke_123",
 								},
 							},
 						},
-						QueryString: adapters.PtrBool(true),
+						QueryString: adapterhelpers.PtrBool(true),
 						Headers: &types.Headers{
-							Quantity: adapters.PtrInt32(1),
+							Quantity: adapterhelpers.PtrInt32(1),
 							Items: []string{
 								"X-Customer-Header",
 							},
 						},
 						QueryStringCacheKeys: &types.QueryStringCacheKeys{
-							Quantity: adapters.PtrInt32(1),
+							Quantity: adapterhelpers.PtrInt32(1),
 							Items: []string{
 								"test-query-string-cache-key",
 							},
 						},
 					},
 					FunctionAssociations: &types.FunctionAssociations{
-						Quantity: adapters.PtrInt32(1),
+						Quantity: adapterhelpers.PtrInt32(1),
 						Items: []types.FunctionAssociation{
 							{
 								EventType:   types.EventTypeViewerRequest,
-								FunctionARN: adapters.PtrString("arn:aws:cloudfront::123412341234:function/1234"), // link
+								FunctionARN: adapterhelpers.PtrString("arn:aws:cloudfront::123412341234:function/1234"), // link
 							},
 						},
 					},
 					LambdaFunctionAssociations: &types.LambdaFunctionAssociations{
-						Quantity: adapters.PtrInt32(1),
+						Quantity: adapterhelpers.PtrInt32(1),
 						Items: []types.LambdaFunctionAssociation{
 							{
 								EventType:         types.EventTypeOriginRequest,
-								LambdaFunctionARN: adapters.PtrString("arn:aws:lambda:us-east-1:123456789012:function:test-function"), // link
-								IncludeBody:       adapters.PtrBool(true),
+								LambdaFunctionARN: adapterhelpers.PtrString("arn:aws:lambda:us-east-1:123456789012:function:test-function"), // link
+								IncludeBody:       adapterhelpers.PtrBool(true),
 							},
 						},
 					},
 					TrustedKeyGroups: &types.TrustedKeyGroups{
-						Enabled:  adapters.PtrBool(true),
-						Quantity: adapters.PtrInt32(1),
+						Enabled:  adapterhelpers.PtrBool(true),
+						Quantity: adapterhelpers.PtrInt32(1),
 						Items: []string{
 							"key-group-1", // link
 						},
 					},
 					TrustedSigners: &types.TrustedSigners{
-						Enabled:  adapters.PtrBool(true),
-						Quantity: adapters.PtrInt32(1),
+						Enabled:  adapterhelpers.PtrBool(true),
+						Quantity: adapterhelpers.PtrInt32(1),
 						Items: []string{
 							"123456789",
 						},
@@ -262,7 +263,7 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 						Items: []types.Method{
 							types.MethodGet,
 						},
-						Quantity: adapters.PtrInt32(1),
+						Quantity: adapterhelpers.PtrInt32(1),
 						CachedMethods: &types.CachedMethods{
 							Items: []types.Method{
 								types.MethodGet,
@@ -271,27 +272,27 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 					},
 				},
 				CustomErrorResponses: &types.CustomErrorResponses{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []types.CustomErrorResponse{
 						{
-							ErrorCode:          adapters.PtrInt32(404),
-							ErrorCachingMinTTL: adapters.PtrInt64(1),
-							ResponseCode:       adapters.PtrString("200"),
-							ResponsePagePath:   adapters.PtrString("/foo"),
+							ErrorCode:          adapterhelpers.PtrInt32(404),
+							ErrorCachingMinTTL: adapterhelpers.PtrInt64(1),
+							ResponseCode:       adapterhelpers.PtrString("200"),
+							ResponsePagePath:   adapterhelpers.PtrString("/foo"),
 						},
 					},
 				},
-				DefaultRootObject: adapters.PtrString("index.html"),
+				DefaultRootObject: adapterhelpers.PtrString("index.html"),
 				HttpVersion:       types.HttpVersionHttp11,
-				IsIPV6Enabled:     adapters.PtrBool(true),
+				IsIPV6Enabled:     adapterhelpers.PtrBool(true),
 				Logging: &types.LoggingConfig{
-					Bucket:         adapters.PtrString("aws-cf-access-logs.s3.amazonaws.com"), // link
-					Enabled:        adapters.PtrBool(true),
-					IncludeCookies: adapters.PtrBool(true),
-					Prefix:         adapters.PtrString("test-prefix"),
+					Bucket:         adapterhelpers.PtrString("aws-cf-access-logs.s3.amazonaws.com"), // link
+					Enabled:        adapterhelpers.PtrBool(true),
+					IncludeCookies: adapterhelpers.PtrBool(true),
+					Prefix:         adapterhelpers.PtrString("test-prefix"),
 				},
 				OriginGroups: &types.OriginGroups{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []types.OriginGroup{
 						{
 							FailoverCriteria: &types.OriginGroupFailoverCriteria{
@@ -299,15 +300,15 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 									Items: []int32{
 										404,
 									},
-									Quantity: adapters.PtrInt32(1),
+									Quantity: adapterhelpers.PtrInt32(1),
 								},
 							},
-							Id: adapters.PtrString("test-id"),
+							Id: adapterhelpers.PtrString("test-id"),
 							Members: &types.OriginGroupMembers{
-								Quantity: adapters.PtrInt32(1),
+								Quantity: adapterhelpers.PtrInt32(1),
 								Items: []types.OriginGroupMember{
 									{
-										OriginId: adapters.PtrString("CustomOriginConfig"),
+										OriginId: adapterhelpers.PtrString("CustomOriginConfig"),
 									},
 								},
 							},
@@ -317,7 +318,7 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 				PriceClass: types.PriceClassPriceClass200,
 				Restrictions: &types.Restrictions{
 					GeoRestriction: &types.GeoRestriction{
-						Quantity:        adapters.PtrInt32(1),
+						Quantity:        adapterhelpers.PtrInt32(1),
 						RestrictionType: types.GeoRestrictionTypeWhitelist,
 						Items: []string{
 							"US",
@@ -325,16 +326,16 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 					},
 				},
 				ViewerCertificate: &types.ViewerCertificate{
-					ACMCertificateArn:            adapters.PtrString("arn:aws:acm:us-east-1:123456789012:certificate/test-id"), // link
-					Certificate:                  adapters.PtrString("test-certificate"),
+					ACMCertificateArn:            adapterhelpers.PtrString("arn:aws:acm:us-east-1:123456789012:certificate/test-id"), // link
+					Certificate:                  adapterhelpers.PtrString("test-certificate"),
 					CertificateSource:            types.CertificateSourceAcm,
-					CloudFrontDefaultCertificate: adapters.PtrBool(true),
-					IAMCertificateId:             adapters.PtrString("test-iam-certificate-id"), // link
+					CloudFrontDefaultCertificate: adapterhelpers.PtrBool(true),
+					IAMCertificateId:             adapterhelpers.PtrString("test-iam-certificate-id"), // link
 					MinimumProtocolVersion:       types.MinimumProtocolVersion(types.SslProtocolSSLv3),
 					SSLSupportMethod:             types.SSLSupportMethodSniOnly,
 				},
 				// Note this can also be in the format: 473e64fd-f30b-4765-81a0-62ad96dd167a for WAF Classic
-				WebACLId: adapters.PtrString("arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a"), // link
+				WebACLId: adapterhelpers.PtrString("arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a"), // link
 			},
 		},
 	}, nil
@@ -343,10 +344,10 @@ func (t TestCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 func (t TestCloudFrontClient) ListDistributions(ctx context.Context, params *cloudfront.ListDistributionsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListDistributionsOutput, error) {
 	return &cloudfront.ListDistributionsOutput{
 		DistributionList: &types.DistributionList{
-			IsTruncated: adapters.PtrBool(false),
+			IsTruncated: adapterhelpers.PtrBool(false),
 			Items: []types.DistributionSummary{
 				{
-					Id: adapters.PtrString("test-id"),
+					Id: adapterhelpers.PtrString("test-id"),
 				},
 			},
 		},
@@ -369,7 +370,7 @@ func TestDistributionGetFunc(t *testing.T) {
 		t.Errorf("expected health to be HEALTH_OK, got %s", item.GetHealth())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -496,12 +497,12 @@ func TestDistributionGetFunc(t *testing.T) {
 }
 
 func TestNewDistributionAdapter(t *testing.T) {
-	config, account, _ := adapters.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
 	adapter := NewDistributionAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

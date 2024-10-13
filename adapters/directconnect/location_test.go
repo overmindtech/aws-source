@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestLocationOutputMapper(t *testing.T) {
@@ -17,9 +17,9 @@ func TestLocationOutputMapper(t *testing.T) {
 				AvailableMacSecPortSpeeds: []string{"1 Gbps", "10 Gbps"},
 				AvailablePortSpeeds:       []string{"50 Mbps", "100 Mbps", "1 Gbps", "10 Gbps"},
 				AvailableProviders:        []string{"ProviderA", "ProviderB", "ProviderC"},
-				LocationName:              adapters.PtrString("NAP do Brasil, Barueri, Sao Paulo"),
-				LocationCode:              adapters.PtrString("TNDB"),
-				Region:                    adapters.PtrString("us-east-1"),
+				LocationName:              adapterhelpers.PtrString("NAP do Brasil, Barueri, Sao Paulo"),
+				LocationCode:              adapterhelpers.PtrString("TNDB"),
+				Region:                    adapterhelpers.PtrString("us-east-1"),
 			},
 		},
 	}
@@ -45,7 +45,7 @@ func TestNewLocationAdapter(t *testing.T) {
 
 	adapter := NewLocationAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

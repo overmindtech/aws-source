@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/eks"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -23,7 +24,7 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(out.FargateProfile)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(out.FargateProfile)
 
 	if err != nil {
 		return nil, err
@@ -42,14 +43,14 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	}
 
 	if out.FargateProfile.PodExecutionRoleArn != nil {
-		if a, err := adapters.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *out.FargateProfile.PodExecutionRoleArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The execution role will affect the fargate profile
@@ -92,8 +93,8 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 // +overmind:terraform:queryMap aws_eks_fargate_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewFargateProfileAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
+func NewFargateProfileAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-fargate-profile",
 		Client:           client,
 		AccountID:        accountID,
@@ -124,7 +125,7 @@ func NewFargateProfileAdapter(client EKSClient, accountID string, region string)
 				ClusterName:        &clusterName,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListFargateProfilesInput) adapters.Paginator[*eks.ListFargateProfilesOutput, *eks.Options] {
+		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListFargateProfilesInput) adapterhelpers.Paginator[*eks.ListFargateProfilesOutput, *eks.Options] {
 			return eks.NewListFargateProfilesPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListFargateProfilesOutput, input *eks.ListFargateProfilesInput) ([]*eks.DescribeFargateProfileInput, error) {

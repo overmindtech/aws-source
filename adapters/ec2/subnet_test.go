@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -43,36 +44,36 @@ func TestSubnetOutputMapper(t *testing.T) {
 	output := &ec2.DescribeSubnetsOutput{
 		Subnets: []types.Subnet{
 			{
-				AvailabilityZone:            adapters.PtrString("eu-west-2c"),
-				AvailabilityZoneId:          adapters.PtrString("euw2-az1"),
-				AvailableIpAddressCount:     adapters.PtrInt32(4091),
-				CidrBlock:                   adapters.PtrString("172.31.80.0/20"),
-				DefaultForAz:                adapters.PtrBool(false),
-				MapPublicIpOnLaunch:         adapters.PtrBool(false),
-				MapCustomerOwnedIpOnLaunch:  adapters.PtrBool(false),
+				AvailabilityZone:            adapterhelpers.PtrString("eu-west-2c"),
+				AvailabilityZoneId:          adapterhelpers.PtrString("euw2-az1"),
+				AvailableIpAddressCount:     adapterhelpers.PtrInt32(4091),
+				CidrBlock:                   adapterhelpers.PtrString("172.31.80.0/20"),
+				DefaultForAz:                adapterhelpers.PtrBool(false),
+				MapPublicIpOnLaunch:         adapterhelpers.PtrBool(false),
+				MapCustomerOwnedIpOnLaunch:  adapterhelpers.PtrBool(false),
 				State:                       types.SubnetStateAvailable,
-				SubnetId:                    adapters.PtrString("subnet-0450a637af9984235"),
-				VpcId:                       adapters.PtrString("vpc-0d7892e00e573e701"),
-				OwnerId:                     adapters.PtrString("052392120703"),
-				AssignIpv6AddressOnCreation: adapters.PtrBool(false),
+				SubnetId:                    adapterhelpers.PtrString("subnet-0450a637af9984235"),
+				VpcId:                       adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
+				OwnerId:                     adapterhelpers.PtrString("052392120703"),
+				AssignIpv6AddressOnCreation: adapterhelpers.PtrBool(false),
 				Ipv6CidrBlockAssociationSet: []types.SubnetIpv6CidrBlockAssociation{
 					{
-						AssociationId: adapters.PtrString("id-1234"),
-						Ipv6CidrBlock: adapters.PtrString("something"),
+						AssociationId: adapterhelpers.PtrString("id-1234"),
+						Ipv6CidrBlock: adapterhelpers.PtrString("something"),
 						Ipv6CidrBlockState: &types.SubnetCidrBlockState{
 							State:         types.SubnetCidrBlockStateCodeAssociated,
-							StatusMessage: adapters.PtrString("something here"),
+							StatusMessage: adapterhelpers.PtrString("something here"),
 						},
 					},
 				},
 				Tags:        []types.Tag{},
-				SubnetArn:   adapters.PtrString("arn:aws:ec2:eu-west-2:052392120703:subnet/subnet-0450a637af9984235"),
-				EnableDns64: adapters.PtrBool(false),
-				Ipv6Native:  adapters.PtrBool(false),
+				SubnetArn:   adapterhelpers.PtrString("arn:aws:ec2:eu-west-2:052392120703:subnet/subnet-0450a637af9984235"),
+				EnableDns64: adapterhelpers.PtrBool(false),
+				Ipv6Native:  adapterhelpers.PtrBool(false),
 				PrivateDnsNameOptionsOnLaunch: &types.PrivateDnsNameOptionsOnLaunch{
 					HostnameType:                    types.HostnameTypeIpName,
-					EnableResourceNameDnsARecord:    adapters.PtrBool(false),
-					EnableResourceNameDnsAAAARecord: adapters.PtrBool(false),
+					EnableResourceNameDnsARecord:    adapterhelpers.PtrBool(false),
+					EnableResourceNameDnsAAAARecord: adapterhelpers.PtrBool(false),
 				},
 			},
 		},
@@ -98,7 +99,7 @@ func TestSubnetOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -116,7 +117,7 @@ func TestNewSubnetAdapter(t *testing.T) {
 
 	adapter := NewSubnetAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

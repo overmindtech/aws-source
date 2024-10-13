@@ -5,57 +5,57 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestDBParameterGroupOutputMapper(t *testing.T) {
 	group := ParameterGroup{
 		DBParameterGroup: types.DBParameterGroup{
-			DBParameterGroupName:   adapters.PtrString("default.aurora-mysql5.7"),
-			DBParameterGroupFamily: adapters.PtrString("aurora-mysql5.7"),
-			Description:            adapters.PtrString("Default parameter group for aurora-mysql5.7"),
-			DBParameterGroupArn:    adapters.PtrString("arn:aws:rds:eu-west-1:052392120703:pg:default.aurora-mysql5.7"),
+			DBParameterGroupName:   adapterhelpers.PtrString("default.aurora-mysql5.7"),
+			DBParameterGroupFamily: adapterhelpers.PtrString("aurora-mysql5.7"),
+			Description:            adapterhelpers.PtrString("Default parameter group for aurora-mysql5.7"),
+			DBParameterGroupArn:    adapterhelpers.PtrString("arn:aws:rds:eu-west-1:052392120703:pg:default.aurora-mysql5.7"),
 		},
 		Parameters: []types.Parameter{
 			{
-				ParameterName:  adapters.PtrString("activate_all_roles_on_login"),
-				ParameterValue: adapters.PtrString("0"),
-				Description:    adapters.PtrString("Automatically set all granted roles as active after the user has authenticated successfully."),
-				Source:         adapters.PtrString("engine-default"),
-				ApplyType:      adapters.PtrString("dynamic"),
-				DataType:       adapters.PtrString("boolean"),
-				AllowedValues:  adapters.PtrString("0,1"),
-				IsModifiable:   adapters.PtrBool(true),
+				ParameterName:  adapterhelpers.PtrString("activate_all_roles_on_login"),
+				ParameterValue: adapterhelpers.PtrString("0"),
+				Description:    adapterhelpers.PtrString("Automatically set all granted roles as active after the user has authenticated successfully."),
+				Source:         adapterhelpers.PtrString("engine-default"),
+				ApplyType:      adapterhelpers.PtrString("dynamic"),
+				DataType:       adapterhelpers.PtrString("boolean"),
+				AllowedValues:  adapterhelpers.PtrString("0,1"),
+				IsModifiable:   adapterhelpers.PtrBool(true),
 				ApplyMethod:    types.ApplyMethodPendingReboot,
 			},
 			{
-				ParameterName: adapters.PtrString("allow-suspicious-udfs"),
-				Description:   adapters.PtrString("Controls whether user-defined functions that have only an xxx symbol for the main function can be loaded"),
-				Source:        adapters.PtrString("engine-default"),
-				ApplyType:     adapters.PtrString("static"),
-				DataType:      adapters.PtrString("boolean"),
-				AllowedValues: adapters.PtrString("0,1"),
-				IsModifiable:  adapters.PtrBool(false),
+				ParameterName: adapterhelpers.PtrString("allow-suspicious-udfs"),
+				Description:   adapterhelpers.PtrString("Controls whether user-defined functions that have only an xxx symbol for the main function can be loaded"),
+				Source:        adapterhelpers.PtrString("engine-default"),
+				ApplyType:     adapterhelpers.PtrString("static"),
+				DataType:      adapterhelpers.PtrString("boolean"),
+				AllowedValues: adapterhelpers.PtrString("0,1"),
+				IsModifiable:  adapterhelpers.PtrBool(false),
 				ApplyMethod:   types.ApplyMethodPendingReboot,
 			},
 			{
-				ParameterName: adapters.PtrString("aurora_parallel_query"),
-				Description:   adapters.PtrString("This parameter can be used to enable and disable Aurora Parallel Query."),
-				Source:        adapters.PtrString("engine-default"),
-				ApplyType:     adapters.PtrString("dynamic"),
-				DataType:      adapters.PtrString("boolean"),
-				AllowedValues: adapters.PtrString("0,1"),
-				IsModifiable:  adapters.PtrBool(true),
+				ParameterName: adapterhelpers.PtrString("aurora_parallel_query"),
+				Description:   adapterhelpers.PtrString("This parameter can be used to enable and disable Aurora Parallel Query."),
+				Source:        adapterhelpers.PtrString("engine-default"),
+				ApplyType:     adapterhelpers.PtrString("dynamic"),
+				DataType:      adapterhelpers.PtrString("boolean"),
+				AllowedValues: adapterhelpers.PtrString("0,1"),
+				IsModifiable:  adapterhelpers.PtrBool(true),
 				ApplyMethod:   types.ApplyMethodPendingReboot,
 			},
 			{
-				ParameterName: adapters.PtrString("autocommit"),
-				Description:   adapters.PtrString("Sets the autocommit mode"),
-				Source:        adapters.PtrString("engine-default"),
-				ApplyType:     adapters.PtrString("dynamic"),
-				DataType:      adapters.PtrString("boolean"),
-				AllowedValues: adapters.PtrString("0,1"),
-				IsModifiable:  adapters.PtrBool(true),
+				ParameterName: adapterhelpers.PtrString("autocommit"),
+				Description:   adapterhelpers.PtrString("Sets the autocommit mode"),
+				Source:        adapterhelpers.PtrString("engine-default"),
+				ApplyType:     adapterhelpers.PtrString("dynamic"),
+				DataType:      adapterhelpers.PtrString("boolean"),
+				AllowedValues: adapterhelpers.PtrString("0,1"),
+				IsModifiable:  adapterhelpers.PtrBool(true),
 				ApplyMethod:   types.ApplyMethodPendingReboot,
 			},
 		},
@@ -77,7 +77,7 @@ func TestNewDBParameterGroupAdapter(t *testing.T) {
 
 	adapter := NewDBParameterGroupAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

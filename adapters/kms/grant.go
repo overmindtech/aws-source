@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 
 	log "github.com/sirupsen/logrus"
@@ -16,7 +17,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 	items := make([]*sdp.Item, 0)
 
 	for _, grant := range output.Grants {
-		attributes, err := adapters.ToAttributesWithExclude(grant, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(grant, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +30,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 			}
 		}
 
-		arn, errA := adapters.ParseARN(*grant.KeyId)
+		arn, errA := adapterhelpers.ParseARN(*grant.KeyId)
 		if errA != nil {
 			return nil, &sdp.QueryError{
 				ErrorType:   sdp.QueryError_OTHER,
@@ -53,7 +54,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 			Scope:           scope,
 		}
 
-		scope = adapters.FormatScope(arn.AccountID, arn.Region)
+		scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
 
 		// +overmind:link kms-key
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
@@ -120,7 +121,7 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 				},
 			}
 
-			arn, errA := adapters.ParseARN(principal)
+			arn, errA := adapterhelpers.ParseARN(principal)
 			if errA != nil {
 				log.WithFields(log.Fields{
 					"error": errA,
@@ -177,8 +178,8 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_grant.grant_id
 
-func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
-	return &adapters.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
+func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
 		ItemType:        "kms-grant",
 		Client:          client,
 		AccountID:       accountID,
@@ -199,8 +200,8 @@ func NewGrantAdapter(client *kms.Client, accountID string, region string) *adapt
 			}
 
 			return &kms.ListGrantsInput{
-				KeyId:   &tmp[0],                                        // keyID
-				GrantId: adapters.PtrString(strings.Join(tmp[1:], "/")), // grantId
+				KeyId:   &tmp[0],                                              // keyID
+				GrantId: adapterhelpers.PtrString(strings.Join(tmp[1:], "/")), // grantId
 			}, nil
 		},
 		UseListForGet: true,

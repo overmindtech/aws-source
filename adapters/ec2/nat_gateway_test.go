@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -43,47 +44,47 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 	output := &ec2.DescribeNatGatewaysOutput{
 		NatGateways: []types.NatGateway{
 			{
-				CreateTime:     adapters.PtrTime(time.Now()),
-				DeleteTime:     adapters.PtrTime(time.Now()),
-				FailureCode:    adapters.PtrString("Gateway.NotAttached"),
-				FailureMessage: adapters.PtrString("Network vpc-0d7892e00e573e701 has no Internet gateway attached"),
+				CreateTime:     adapterhelpers.PtrTime(time.Now()),
+				DeleteTime:     adapterhelpers.PtrTime(time.Now()),
+				FailureCode:    adapterhelpers.PtrString("Gateway.NotAttached"),
+				FailureMessage: adapterhelpers.PtrString("Network vpc-0d7892e00e573e701 has no Internet gateway attached"),
 				NatGatewayAddresses: []types.NatGatewayAddress{
 					{
-						AllocationId:       adapters.PtrString("eipalloc-000a9739291350592"),
-						NetworkInterfaceId: adapters.PtrString("eni-0c59532b8e10343ae"),
-						PrivateIp:          adapters.PtrString("172.31.89.23"),
+						AllocationId:       adapterhelpers.PtrString("eipalloc-000a9739291350592"),
+						NetworkInterfaceId: adapterhelpers.PtrString("eni-0c59532b8e10343ae"),
+						PrivateIp:          adapterhelpers.PtrString("172.31.89.23"),
 					},
 				},
-				NatGatewayId: adapters.PtrString("nat-0e4e73d7ac46af25e"),
+				NatGatewayId: adapterhelpers.PtrString("nat-0e4e73d7ac46af25e"),
 				State:        types.NatGatewayStateFailed,
-				SubnetId:     adapters.PtrString("subnet-0450a637af9984235"),
-				VpcId:        adapters.PtrString("vpc-0d7892e00e573e701"),
+				SubnetId:     adapterhelpers.PtrString("subnet-0450a637af9984235"),
+				VpcId:        adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("Name"),
-						Value: adapters.PtrString("test"),
+						Key:   adapterhelpers.PtrString("Name"),
+						Value: adapterhelpers.PtrString("test"),
 					},
 				},
 				ConnectivityType: types.ConnectivityTypePublic,
 			},
 			{
-				CreateTime: adapters.PtrTime(time.Now()),
+				CreateTime: adapterhelpers.PtrTime(time.Now()),
 				NatGatewayAddresses: []types.NatGatewayAddress{
 					{
-						AllocationId:       adapters.PtrString("eipalloc-000a9739291350592"),
-						NetworkInterfaceId: adapters.PtrString("eni-0b4652e6f2aa36d78"),
-						PrivateIp:          adapters.PtrString("172.31.35.98"),
-						PublicIp:           adapters.PtrString("18.170.133.9"),
+						AllocationId:       adapterhelpers.PtrString("eipalloc-000a9739291350592"),
+						NetworkInterfaceId: adapterhelpers.PtrString("eni-0b4652e6f2aa36d78"),
+						PrivateIp:          adapterhelpers.PtrString("172.31.35.98"),
+						PublicIp:           adapterhelpers.PtrString("18.170.133.9"),
 					},
 				},
-				NatGatewayId: adapters.PtrString("nat-0e07f7530ef076766"),
+				NatGatewayId: adapterhelpers.PtrString("nat-0e07f7530ef076766"),
 				State:        types.NatGatewayStateAvailable,
-				SubnetId:     adapters.PtrString("subnet-0d8ae4b4e07647efa"),
-				VpcId:        adapters.PtrString("vpc-0d7892e00e573e701"),
+				SubnetId:     adapterhelpers.PtrString("subnet-0d8ae4b4e07647efa"),
+				VpcId:        adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("Name"),
-						Value: adapters.PtrString("test"),
+						Key:   adapterhelpers.PtrString("Name"),
+						Value: adapterhelpers.PtrString("test"),
 					},
 				},
 				ConnectivityType: types.ConnectivityTypePublic,
@@ -111,7 +112,7 @@ func TestNatGatewayOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-network-interface",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -153,7 +154,7 @@ func TestNewNatGatewayAdapter(t *testing.T) {
 
 	adapter := NewNatGatewayAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

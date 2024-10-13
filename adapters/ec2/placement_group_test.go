@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestPlacementGroupInputMapperGet(t *testing.T) {
@@ -42,13 +42,13 @@ func TestPlacementGroupOutputMapper(t *testing.T) {
 	output := &ec2.DescribePlacementGroupsOutput{
 		PlacementGroups: []types.PlacementGroup{
 			{
-				GroupArn:       adapters.PtrString("arn"),
-				GroupId:        adapters.PtrString("id"),
-				GroupName:      adapters.PtrString("name"),
+				GroupArn:       adapterhelpers.PtrString("arn"),
+				GroupId:        adapterhelpers.PtrString("id"),
+				GroupName:      adapterhelpers.PtrString("name"),
 				SpreadLevel:    types.SpreadLevelHost,
 				State:          types.PlacementGroupStateAvailable,
 				Strategy:       types.PlacementStrategyCluster,
-				PartitionCount: adapters.PtrInt32(1),
+				PartitionCount: adapterhelpers.PtrInt32(1),
 				Tags:           []types.Tag{},
 			},
 		},
@@ -77,7 +77,7 @@ func TestNewPlacementGroupAdapter(t *testing.T) {
 
 	adapter := NewPlacementGroupAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

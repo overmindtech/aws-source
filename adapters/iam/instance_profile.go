@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -40,7 +40,7 @@ func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) 
 }
 
 func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -54,14 +54,14 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 	}
 
 	for _, role := range awsItem.Roles {
-		if arn, err := adapters.ParseARN(*role.Arn); err == nil {
+		if arn, err := adapterhelpers.ParseARN(*role.Arn); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *role.Arn,
-					Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+					Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// Changes to the role will affect this
@@ -73,14 +73,14 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 		}
 
 		if role.PermissionsBoundary != nil {
-			if arn, err := adapters.ParseARN(*role.PermissionsBoundary.PermissionsBoundaryArn); err == nil {
+			if arn, err := adapterhelpers.ParseARN(*role.PermissionsBoundary.PermissionsBoundaryArn); err == nil {
 				// +overmind:link iam-policy
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *role.PermissionsBoundary.PermissionsBoundaryArn,
-						Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+						Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to the policy will affect this
@@ -107,7 +107,7 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return adapters.HandleTagsError(ctx, err)
+			return adapterhelpers.HandleTagsError(ctx, err)
 		}
 
 		for _, tag := range out.Tags {
@@ -130,8 +130,8 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 // +overmind:terraform:queryMap aws_iam_instance_profile.arn
 // +overmind:terraform:method SEARCH
 
-func NewInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
-	return &adapters.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
+func NewInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
+	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:        "iam-instance-profile",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

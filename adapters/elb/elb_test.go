@@ -7,7 +7,8 @@ import (
 
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,11 +18,11 @@ func (m mockElbClient) DescribeTags(ctx context.Context, params *elb.DescribeTag
 	return &elb.DescribeTagsOutput{
 		TagDescriptions: []types.TagDescription{
 			{
-				LoadBalancerName: adapters.PtrString("a8c3c8851f0df43fda89797c8e941a91"),
+				LoadBalancerName: adapterhelpers.PtrString("a8c3c8851f0df43fda89797c8e941a91"),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("foo"),
-						Value: adapters.PtrString("bar"),
+						Key:   adapterhelpers.PtrString("foo"),
+						Value: adapterhelpers.PtrString("bar"),
 					},
 				},
 			},
@@ -37,35 +38,35 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 	output := &elb.DescribeLoadBalancersOutput{
 		LoadBalancerDescriptions: []types.LoadBalancerDescription{
 			{
-				LoadBalancerName:          adapters.PtrString("a8c3c8851f0df43fda89797c8e941a91"),
-				DNSName:                   adapters.PtrString("a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com"), // link
-				CanonicalHostedZoneName:   adapters.PtrString("a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com"), // link
-				CanonicalHostedZoneNameID: adapters.PtrString("ZHURV8PSTC4K8"),                                                          // link
+				LoadBalancerName:          adapterhelpers.PtrString("a8c3c8851f0df43fda89797c8e941a91"),
+				DNSName:                   adapterhelpers.PtrString("a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com"), // link
+				CanonicalHostedZoneName:   adapterhelpers.PtrString("a8c3c8851f0df43fda89797c8e941a91-182843316.eu-west-2.elb.amazonaws.com"), // link
+				CanonicalHostedZoneNameID: adapterhelpers.PtrString("ZHURV8PSTC4K8"),                                                          // link
 				ListenerDescriptions: []types.ListenerDescription{
 					{
 						Listener: &types.Listener{
-							Protocol:         adapters.PtrString("TCP"),
+							Protocol:         adapterhelpers.PtrString("TCP"),
 							LoadBalancerPort: 7687,
-							InstanceProtocol: adapters.PtrString("TCP"),
-							InstancePort:     adapters.PtrInt32(30133),
+							InstanceProtocol: adapterhelpers.PtrString("TCP"),
+							InstancePort:     adapterhelpers.PtrInt32(30133),
 						},
 						PolicyNames: []string{},
 					},
 					{
 						Listener: &types.Listener{
-							Protocol:         adapters.PtrString("TCP"),
+							Protocol:         adapterhelpers.PtrString("TCP"),
 							LoadBalancerPort: 7473,
-							InstanceProtocol: adapters.PtrString("TCP"),
-							InstancePort:     adapters.PtrInt32(31459),
+							InstanceProtocol: adapterhelpers.PtrString("TCP"),
+							InstancePort:     adapterhelpers.PtrInt32(31459),
 						},
 						PolicyNames: []string{},
 					},
 					{
 						Listener: &types.Listener{
-							Protocol:         adapters.PtrString("TCP"),
+							Protocol:         adapterhelpers.PtrString("TCP"),
 							LoadBalancerPort: 7474,
-							InstanceProtocol: adapters.PtrString("TCP"),
-							InstancePort:     adapters.PtrInt32(30761),
+							InstanceProtocol: adapterhelpers.PtrString("TCP"),
+							InstancePort:     adapterhelpers.PtrInt32(30761),
 						},
 						PolicyNames: []string{},
 					},
@@ -73,21 +74,21 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 				Policies: &types.Policies{
 					AppCookieStickinessPolicies: []types.AppCookieStickinessPolicy{
 						{
-							CookieName: adapters.PtrString("foo"),
-							PolicyName: adapters.PtrString("policy"),
+							CookieName: adapterhelpers.PtrString("foo"),
+							PolicyName: adapterhelpers.PtrString("policy"),
 						},
 					},
 					LBCookieStickinessPolicies: []types.LBCookieStickinessPolicy{
 						{
-							CookieExpirationPeriod: adapters.PtrInt64(10),
-							PolicyName:             adapters.PtrString("name"),
+							CookieExpirationPeriod: adapterhelpers.PtrInt64(10),
+							PolicyName:             adapterhelpers.PtrString("name"),
 						},
 					},
 					OtherPolicies: []string{},
 				},
 				BackendServerDescriptions: []types.BackendServerDescription{
 					{
-						InstancePort: adapters.PtrInt32(443),
+						InstancePort: adapterhelpers.PtrInt32(443),
 						PolicyNames:  []string{},
 					},
 				},
@@ -101,28 +102,28 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 					"subnet09d5f6fa75b0b4569",
 					"subnet0e234bef35fc4a9e1",
 				},
-				VPCId: adapters.PtrString("vpc-0c72199250cd479ea"), // link
+				VPCId: adapterhelpers.PtrString("vpc-0c72199250cd479ea"), // link
 				Instances: []types.Instance{
 					{
-						InstanceId: adapters.PtrString("i-0337802d908b4a81e"), // link *2 to ec2-instance and health
+						InstanceId: adapterhelpers.PtrString("i-0337802d908b4a81e"), // link *2 to ec2-instance and health
 					},
 				},
 				HealthCheck: &types.HealthCheck{
-					Target:             adapters.PtrString("HTTP:31151/healthz"),
-					Interval:           adapters.PtrInt32(10),
-					Timeout:            adapters.PtrInt32(5),
-					UnhealthyThreshold: adapters.PtrInt32(6),
-					HealthyThreshold:   adapters.PtrInt32(2),
+					Target:             adapterhelpers.PtrString("HTTP:31151/healthz"),
+					Interval:           adapterhelpers.PtrInt32(10),
+					Timeout:            adapterhelpers.PtrInt32(5),
+					UnhealthyThreshold: adapterhelpers.PtrInt32(6),
+					HealthyThreshold:   adapterhelpers.PtrInt32(2),
 				},
 				SourceSecurityGroup: &types.SourceSecurityGroup{
-					OwnerAlias: adapters.PtrString("944651592624"),
-					GroupName:  adapters.PtrString("k8s-elb-a8c3c8851f0df43fda89797c8e941a91"), // link
+					OwnerAlias: adapterhelpers.PtrString("944651592624"),
+					GroupName:  adapterhelpers.PtrString("k8s-elb-a8c3c8851f0df43fda89797c8e941a91"), // link
 				},
 				SecurityGroups: []string{
 					"sg097e3cfdfc6d53b77", // link
 				},
-				CreatedTime: adapters.PtrTime(time.Now()),
-				Scheme:      adapters.PtrString("internet-facing"),
+				CreatedTime: adapterhelpers.PtrTime(time.Now()),
+				Scheme:      adapterhelpers.PtrString("internet-facing"),
 			},
 		},
 	}
@@ -151,7 +152,7 @@ func TestLoadBalancerOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

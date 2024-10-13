@@ -8,7 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -30,7 +31,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 
 	task := out.Tasks[0]
 
-	attributes, err := adapters.ToAttributesWithExclude(task, "tags")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(task, "tags")
 
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 		return nil, errors.New("task has nil ARN")
 	}
 
-	a, err := adapters.ParseARN(*task.TaskArn)
+	a, err := adapterhelpers.ParseARN(*task.TaskArn)
 
 	if err != nil {
 		return nil, err
@@ -91,14 +92,14 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	}
 
 	if task.ClusterArn != nil {
-		if a, err = adapters.ParseARN(*task.ClusterArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*task.ClusterArn); err == nil {
 			// +overmind:link ecs-cluster
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ecs-cluster",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *task.ClusterArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The cluster can affect the task
@@ -111,7 +112,7 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	}
 
 	if task.ContainerInstanceArn != nil {
-		if a, err = adapters.ParseARN(*task.ContainerInstanceArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*task.ContainerInstanceArn); err == nil {
 			// +overmind:link ecs-container-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
@@ -169,14 +170,14 @@ func taskGetFunc(ctx context.Context, client ECSClient, scope string, input *ecs
 	}
 
 	if task.TaskDefinitionArn != nil {
-		if a, err = adapters.ParseARN(*task.TaskDefinitionArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*task.TaskDefinitionArn); err == nil {
 			// +overmind:link ecs-task-definition
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ecs-task-definition",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *task.TaskDefinitionArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The task definition can affect the task
@@ -203,7 +204,7 @@ func taskGetInputMapper(scope, query string) *ecs.DescribeTasksInput {
 		Tasks: []string{
 			sections[1],
 		},
-		Cluster: adapters.PtrString(sections[0]),
+		Cluster: adapterhelpers.PtrString(sections[0]),
 		Include: TaskIncludeFields,
 	}
 }
@@ -212,7 +213,7 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 	inputs := make([]*ecs.DescribeTasksInput, 0)
 
 	for _, taskArn := range output.TaskArns {
-		if a, err := adapters.ParseARN(taskArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(taskArn); err == nil {
 			// split the cluster name out
 			sections := strings.Split(a.ResourceID(), "/")
 
@@ -241,8 +242,8 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 // +overmind:search Search for ECS tasks by cluster
 // +overmind:group AWS
 
-func NewTaskAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
+func NewTaskAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-task",
 		Client:          client,
 		AccountID:       accountID,
@@ -255,10 +256,10 @@ func NewTaskAdapter(client ECSClient, accountID string, region string) *adapters
 		SearchInputMapper: func(scope, query string) (*ecs.ListTasksInput, error) {
 			// Search by cluster
 			return &ecs.ListTasksInput{
-				Cluster: adapters.PtrString(query),
+				Cluster: adapterhelpers.PtrString(query),
 			}, nil
 		},
-		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListTasksInput) adapters.Paginator[*ecs.ListTasksOutput, *ecs.Options] {
+		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListTasksInput) adapterhelpers.Paginator[*ecs.ListTasksOutput, *ecs.Options] {
 			return ecs.NewListTasksPaginator(client, input)
 		},
 		ListFuncOutputMapper: tasksListFuncOutputMapper,

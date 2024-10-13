@@ -6,7 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,7 +15,7 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 	items := make([]*sdp.Item, 0)
 
 	for _, lag := range output.Lags {
-		attributes, err := adapters.ToAttributesWithExclude(lag, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(lag, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -116,8 +117,8 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_lag.id
 
-func NewLagAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
+func NewLagAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,7 +15,7 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 	items := make([]*sdp.Item, 0)
 
 	for _, attachment := range output.DirectConnectGatewayAttachments {
-		attributes, err := adapters.ToAttributesWithExclude(attachment, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(attachment, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -91,8 +92,8 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 // +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
 // +overmind:group AWS
 
-func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
+func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

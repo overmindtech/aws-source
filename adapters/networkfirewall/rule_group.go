@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -33,7 +34,7 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 		RuleGroup:  resp.RuleGroup,
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(urg)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(urg)
 
 	if err != nil {
 		return nil, err
@@ -69,14 +70,14 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 	item.LinkedItemQueries = append(item.LinkedItemQueries, encryptionConfigurationLink(resp.RuleGroupResponse.EncryptionConfiguration, scope))
 
 	if resp.RuleGroupResponse.SnsTopic != nil {
-		if a, err := adapters.ParseARN(*resp.RuleGroupResponse.SnsTopic); err == nil {
+		if a, err := adapterhelpers.ParseARN(*resp.RuleGroupResponse.SnsTopic); err == nil {
 			//+overmind:link sns-topic
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "sns-topic",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *resp.RuleGroupResponse.SnsTopic,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					In:  false,
@@ -87,14 +88,14 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 	}
 
 	if resp.RuleGroupResponse.SourceMetadata != nil && resp.RuleGroupResponse.SourceMetadata.SourceArn != nil {
-		if a, err := adapters.ParseARN(*resp.RuleGroupResponse.SourceMetadata.SourceArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(*resp.RuleGroupResponse.SourceMetadata.SourceArn); err == nil {
 			//+overmind:link network-firewall-rule-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "network-firewall-rule-group",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *resp.RuleGroupResponse.SourceMetadata.SourceArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					In:  false,
@@ -116,8 +117,8 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_rule_group.name
 
-func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-rule-group",
 		Client:          client,
 		AccountID:       accountID,
@@ -134,7 +135,7 @@ func NewRuleGroupAdapter(client networkFirewallClient, accountID string, region 
 				RuleGroupArn: &query,
 			}, nil
 		},
-		ListFuncPaginatorBuilder: func(client networkFirewallClient, input *networkfirewall.ListRuleGroupsInput) adapters.Paginator[*networkfirewall.ListRuleGroupsOutput, *networkfirewall.Options] {
+		ListFuncPaginatorBuilder: func(client networkFirewallClient, input *networkfirewall.ListRuleGroupsInput) adapterhelpers.Paginator[*networkfirewall.ListRuleGroupsOutput, *networkfirewall.Options] {
 			return networkfirewall.NewListRuleGroupsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *networkfirewall.ListRuleGroupsOutput, input *networkfirewall.ListRuleGroupsInput) ([]*networkfirewall.DescribeRuleGroupInput, error) {

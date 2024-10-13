@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
@@ -44,7 +44,7 @@ type mockKeyPolicyClient struct{}
 
 func (m *mockKeyPolicyClient) GetKeyPolicy(ctx context.Context, params *kms.GetKeyPolicyInput, optFns ...func(*kms.Options)) (*kms.GetKeyPolicyOutput, error) {
 	return &kms.GetKeyPolicyOutput{
-		Policy: adapters.PtrString(`{
+		Policy: adapterhelpers.PtrString(`{
 			"Version" : "2012-10-17",
 			"Id" : "key-default-1",
 			"Statement" : [
@@ -68,7 +68,7 @@ func (m *mockKeyPolicyClient) GetKeyPolicy(ctx context.Context, params *kms.GetK
 				}
 			]
 		}`),
-		PolicyName: adapters.PtrString("default"),
+		PolicyName: adapterhelpers.PtrString("default"),
 	}, nil
 }
 
@@ -83,7 +83,7 @@ func TestGetKeyPolicyFunc(t *testing.T) {
 	cli := &mockKeyPolicyClient{}
 
 	item, err := getKeyPolicyFunc(ctx, cli, "scope", &kms.GetKeyPolicyInput{
-		KeyId: adapters.PtrString("1234abcd-12ab-34cd-56ef-1234567890ab"),
+		KeyId: adapterhelpers.PtrString("1234abcd-12ab-34cd-56ef-1234567890ab"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +93,7 @@ func TestGetKeyPolicyFunc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -106,13 +106,13 @@ func TestGetKeyPolicyFunc(t *testing.T) {
 }
 
 func TestNewKeyPolicyAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 
 	client := kms.NewFromConfig(config)
 
 	adapter := NewKeyPolicyAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,

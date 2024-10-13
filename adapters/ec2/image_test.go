@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestImageInputMapperGet(t *testing.T) {
@@ -44,38 +44,38 @@ func TestImageOutputMapper(t *testing.T) {
 		Images: []types.Image{
 			{
 				Architecture:    "x86_64",
-				CreationDate:    adapters.PtrString("2022-12-16T19:37:36.000Z"),
-				ImageId:         adapters.PtrString("ami-0ed3646be6ecd97c5"),
-				ImageLocation:   adapters.PtrString("052392120703/test"),
+				CreationDate:    adapterhelpers.PtrString("2022-12-16T19:37:36.000Z"),
+				ImageId:         adapterhelpers.PtrString("ami-0ed3646be6ecd97c5"),
+				ImageLocation:   adapterhelpers.PtrString("052392120703/test"),
 				ImageType:       types.ImageTypeValuesMachine,
-				Public:          adapters.PtrBool(false),
-				OwnerId:         adapters.PtrString("052392120703"),
-				PlatformDetails: adapters.PtrString("Linux/UNIX"),
-				UsageOperation:  adapters.PtrString("RunInstances"),
+				Public:          adapterhelpers.PtrBool(false),
+				OwnerId:         adapterhelpers.PtrString("052392120703"),
+				PlatformDetails: adapterhelpers.PtrString("Linux/UNIX"),
+				UsageOperation:  adapterhelpers.PtrString("RunInstances"),
 				State:           types.ImageStateAvailable,
 				BlockDeviceMappings: []types.BlockDeviceMapping{
 					{
-						DeviceName: adapters.PtrString("/dev/xvda"),
+						DeviceName: adapterhelpers.PtrString("/dev/xvda"),
 						Ebs: &types.EbsBlockDevice{
-							DeleteOnTermination: adapters.PtrBool(true),
-							SnapshotId:          adapters.PtrString("snap-0efd796ecbd599f8d"),
-							VolumeSize:          adapters.PtrInt32(8),
+							DeleteOnTermination: adapterhelpers.PtrBool(true),
+							SnapshotId:          adapterhelpers.PtrString("snap-0efd796ecbd599f8d"),
+							VolumeSize:          adapterhelpers.PtrInt32(8),
 							VolumeType:          types.VolumeTypeGp2,
-							Encrypted:           adapters.PtrBool(false),
+							Encrypted:           adapterhelpers.PtrBool(false),
 						},
 					},
 				},
-				EnaSupport:         adapters.PtrBool(true),
+				EnaSupport:         adapterhelpers.PtrBool(true),
 				Hypervisor:         types.HypervisorTypeXen,
-				Name:               adapters.PtrString("test"),
-				RootDeviceName:     adapters.PtrString("/dev/xvda"),
+				Name:               adapterhelpers.PtrString("test"),
+				RootDeviceName:     adapterhelpers.PtrString("/dev/xvda"),
 				RootDeviceType:     types.DeviceTypeEbs,
-				SriovNetSupport:    adapters.PtrString("simple"),
+				SriovNetSupport:    adapterhelpers.PtrString("simple"),
 				VirtualizationType: types.VirtualizationTypeHvm,
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("Name"),
-						Value: adapters.PtrString("test"),
+						Key:   adapterhelpers.PtrString("Name"),
+						Value: adapterhelpers.PtrString("test"),
 					},
 				},
 			},
@@ -110,7 +110,7 @@ func TestNewImageAdapter(t *testing.T) {
 
 	adapter := NewImageAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

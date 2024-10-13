@@ -7,30 +7,30 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/eks/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 var AddonTestClient = TestClient{
 	DescribeAddonOutput: &eks.DescribeAddonOutput{
 		Addon: &types.Addon{
-			AddonName:           adapters.PtrString("aws-ebs-csi-driver"),
-			ClusterName:         adapters.PtrString("dylan"),
+			AddonName:           adapterhelpers.PtrString("aws-ebs-csi-driver"),
+			ClusterName:         adapterhelpers.PtrString("dylan"),
 			Status:              types.AddonStatusActive,
-			AddonVersion:        adapters.PtrString("v1.13.0-eksbuild.3"),
-			ConfigurationValues: adapters.PtrString("values"),
+			AddonVersion:        adapterhelpers.PtrString("v1.13.0-eksbuild.3"),
+			ConfigurationValues: adapterhelpers.PtrString("values"),
 			MarketplaceInformation: &types.MarketplaceInformation{
-				ProductId:  adapters.PtrString("id"),
-				ProductUrl: adapters.PtrString("url"),
+				ProductId:  adapterhelpers.PtrString("id"),
+				ProductUrl: adapterhelpers.PtrString("url"),
 			},
-			Publisher: adapters.PtrString("publisher"),
-			Owner:     adapters.PtrString("owner"),
+			Publisher: adapterhelpers.PtrString("publisher"),
+			Owner:     adapterhelpers.PtrString("owner"),
 			Health: &types.AddonHealth{
 				Issues: []types.AddonIssue{},
 			},
-			AddonArn:              adapters.PtrString("arn:aws:eks:eu-west-2:801795385023:addon/dylan/aws-ebs-csi-driver/a2c29d0e-72c4-a702-7887-2f739f4fc189"),
-			CreatedAt:             adapters.PtrTime(time.Now()),
-			ModifiedAt:            adapters.PtrTime(time.Now()),
-			ServiceAccountRoleArn: adapters.PtrString("arn:aws:iam::801795385023:role/eks-csi-dylan"),
+			AddonArn:              adapterhelpers.PtrString("arn:aws:eks:eu-west-2:801795385023:addon/dylan/aws-ebs-csi-driver/a2c29d0e-72c4-a702-7887-2f739f4fc189"),
+			CreatedAt:             adapterhelpers.PtrTime(time.Now()),
+			ModifiedAt:            adapterhelpers.PtrTime(time.Now()),
+			ServiceAccountRoleArn: adapterhelpers.PtrString("arn:aws:iam::801795385023:role/eks-csi-dylan"),
 		},
 	},
 }
@@ -52,7 +52,7 @@ func TestNewAddonAdapter(t *testing.T) {
 
 	adapter := NewAddonAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,

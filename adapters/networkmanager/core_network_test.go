@@ -6,28 +6,29 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func (n NetworkManagerTestClient) GetCoreNetwork(ctx context.Context, params *networkmanager.GetCoreNetworkInput, optFns ...func(*networkmanager.Options)) (*networkmanager.GetCoreNetworkOutput, error) {
 	return &networkmanager.GetCoreNetworkOutput{
 		CoreNetwork: &types.CoreNetwork{
-			CoreNetworkArn:  adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:core-network/cn-1"),
-			CoreNetworkId:   adapters.PtrString("cn-1"),
-			GlobalNetworkId: adapters.PtrString("default"),
-			Description:     adapters.PtrString("core network description"),
+			CoreNetworkArn:  adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:core-network/cn-1"),
+			CoreNetworkId:   adapterhelpers.PtrString("cn-1"),
+			GlobalNetworkId: adapterhelpers.PtrString("default"),
+			Description:     adapterhelpers.PtrString("core network description"),
 			State:           types.CoreNetworkStateAvailable,
 			Edges: []types.CoreNetworkEdge{
 				{
-					Asn:          adapters.PtrInt64(64512), // link
-					EdgeLocation: adapters.PtrString("us-west-2"),
+					Asn:          adapterhelpers.PtrInt64(64512), // link
+					EdgeLocation: adapterhelpers.PtrString("us-west-2"),
 				},
 			},
 			Segments: []types.CoreNetworkSegment{
 				{
 					EdgeLocations: []string{"us-west-2"},
-					Name:          adapters.PtrString("segment-1"),
+					Name:          adapterhelpers.PtrString("segment-1"),
 				},
 			},
 		},
@@ -58,7 +59,7 @@ func TestCoreNetworkItemMapper(t *testing.T) {
 		t.Fatalf("expected cn-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

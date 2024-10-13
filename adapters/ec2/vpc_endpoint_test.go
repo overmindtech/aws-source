@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -31,13 +32,13 @@ func TestVpcEndpointOutputMapper(t *testing.T) {
 	output := &ec2.DescribeVpcEndpointsOutput{
 		VpcEndpoints: []types.VpcEndpoint{
 			{
-				VpcEndpointId:     adapters.PtrString("vpce-0d7892e00e573e701"),
+				VpcEndpointId:     adapterhelpers.PtrString("vpce-0d7892e00e573e701"),
 				VpcEndpointType:   types.VpcEndpointTypeInterface,
-				CreationTimestamp: adapters.PtrTime(time.Now()),
-				VpcId:             adapters.PtrString("vpc-0d7892e00e573e701"), // link
-				ServiceName:       adapters.PtrString("com.amazonaws.us-east-1.s3"),
+				CreationTimestamp: adapterhelpers.PtrTime(time.Now()),
+				VpcId:             adapterhelpers.PtrString("vpc-0d7892e00e573e701"), // link
+				ServiceName:       adapterhelpers.PtrString("com.amazonaws.us-east-1.s3"),
 				State:             types.StateAvailable,
-				PolicyDocument:    adapters.PtrString("{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"*\",\"Resource\":\"*\",\"Effect\":\"Allow\",\"Principal\":\"*\"},{\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"944651592624\"}},\"Action\":\"*\",\"Resource\":\"*\",\"Effect\":\"Deny\",\"Principal\":\"*\"}]}"), // parse this
+				PolicyDocument:    adapterhelpers.PtrString("{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"*\",\"Resource\":\"*\",\"Effect\":\"Allow\",\"Principal\":\"*\"},{\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"944651592624\"}},\"Action\":\"*\",\"Resource\":\"*\",\"Effect\":\"Deny\",\"Principal\":\"*\"}]}"), // parse this
 				RouteTableIds: []string{
 					"rtb-0d7892e00e573e701", // link
 				},
@@ -46,35 +47,35 @@ func TestVpcEndpointOutputMapper(t *testing.T) {
 				},
 				Groups: []types.SecurityGroupIdentifier{
 					{
-						GroupId:   adapters.PtrString("sg-0d7892e00e573e701"), // link
-						GroupName: adapters.PtrString("default"),
+						GroupId:   adapterhelpers.PtrString("sg-0d7892e00e573e701"), // link
+						GroupName: adapterhelpers.PtrString("default"),
 					},
 				},
 				IpAddressType:     types.IpAddressTypeIpv4,
-				PrivateDnsEnabled: adapters.PtrBool(true),
-				RequesterManaged:  adapters.PtrBool(false),
+				PrivateDnsEnabled: adapterhelpers.PtrBool(true),
+				RequesterManaged:  adapterhelpers.PtrBool(false),
 				DnsEntries: []types.DnsEntry{
 					{
-						DnsName:      adapters.PtrString("vpce-0d7892e00e573e701-123456789012.us-east-1.vpce.amazonaws.com"), // link
-						HostedZoneId: adapters.PtrString("Z2F56UZL2M1ACD"),                                                   // link
+						DnsName:      adapterhelpers.PtrString("vpce-0d7892e00e573e701-123456789012.us-east-1.vpce.amazonaws.com"), // link
+						HostedZoneId: adapterhelpers.PtrString("Z2F56UZL2M1ACD"),                                                   // link
 					},
 				},
 				DnsOptions: &types.DnsOptions{
 					DnsRecordIpType:                          types.DnsRecordIpTypeDualstack,
-					PrivateDnsOnlyForInboundResolverEndpoint: adapters.PtrBool(false),
+					PrivateDnsOnlyForInboundResolverEndpoint: adapterhelpers.PtrBool(false),
 				},
 				LastError: &types.LastError{
-					Code:    adapters.PtrString("Client::ValidationException"),
-					Message: adapters.PtrString("The security group 'sg-0d7892e00e573e701' does not exist"),
+					Code:    adapterhelpers.PtrString("Client::ValidationException"),
+					Message: adapterhelpers.PtrString("The security group 'sg-0d7892e00e573e701' does not exist"),
 				},
 				NetworkInterfaceIds: []string{
 					"eni-0d7892e00e573e701", // link
 				},
-				OwnerId: adapters.PtrString("052392120703"),
+				OwnerId: adapterhelpers.PtrString("052392120703"),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("Name"),
-						Value: adapters.PtrString("my-vpce"),
+						Key:   adapterhelpers.PtrString("Name"),
+						Value: adapterhelpers.PtrString("my-vpce"),
 					},
 				},
 			},
@@ -97,7 +98,7 @@ func TestVpcEndpointOutputMapper(t *testing.T) {
 		t.Fatalf("expected 1 item, got %v", len(items))
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -150,7 +151,7 @@ func TestNewVpcEndpointAdapter(t *testing.T) {
 
 	adapter := NewVpcEndpointAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

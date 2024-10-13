@@ -7,7 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,7 +16,7 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, customKeyStore := range output.CustomKeyStores {
-		attributes, err := adapters.ToAttributesWithExclude(customKeyStore, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(customKeyStore, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -97,8 +98,8 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_kms_custom_key_store.id
 
-func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
-	return &adapters.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
+func NewCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,24 +16,24 @@ func (t *TestClient) DescribeClusters(ctx context.Context, params *ecs.DescribeC
 	return &ecs.DescribeClustersOutput{
 		Clusters: []types.Cluster{
 			{
-				ClusterArn:                        adapters.PtrString("arn:aws:ecs:eu-west-2:052392120703:cluster/default"),
-				ClusterName:                       adapters.PtrString("default"),
-				Status:                            adapters.PtrString("ACTIVE"),
+				ClusterArn:                        adapterhelpers.PtrString("arn:aws:ecs:eu-west-2:052392120703:cluster/default"),
+				ClusterName:                       adapterhelpers.PtrString("default"),
+				Status:                            adapterhelpers.PtrString("ACTIVE"),
 				RegisteredContainerInstancesCount: 0,
 				RunningTasksCount:                 1,
 				PendingTasksCount:                 0,
 				ActiveServicesCount:               1,
 				Statistics: []types.KeyValuePair{
 					{
-						Name:  adapters.PtrString("key"),
-						Value: adapters.PtrString("value"),
+						Name:  adapterhelpers.PtrString("key"),
+						Value: adapterhelpers.PtrString("value"),
 					},
 				},
 				Tags: []types.Tag{},
 				Settings: []types.ClusterSetting{
 					{
 						Name:  types.ClusterSettingNameContainerInsights,
-						Value: adapters.PtrString("ENABLED"),
+						Value: adapterhelpers.PtrString("ENABLED"),
 					},
 				},
 				CapacityProviders: []string{
@@ -40,43 +41,43 @@ func (t *TestClient) DescribeClusters(ctx context.Context, params *ecs.DescribeC
 				},
 				DefaultCapacityProviderStrategy: []types.CapacityProviderStrategyItem{
 					{
-						CapacityProvider: adapters.PtrString("provider"),
+						CapacityProvider: adapterhelpers.PtrString("provider"),
 						Base:             10,
 						Weight:           100,
 					},
 				},
 				Attachments: []types.Attachment{
 					{
-						Id:     adapters.PtrString("1c1f9cf4-461c-4072-aab2-e2dd346c53e1"),
-						Type:   adapters.PtrString("as_policy"),
-						Status: adapters.PtrString("CREATED"),
+						Id:     adapterhelpers.PtrString("1c1f9cf4-461c-4072-aab2-e2dd346c53e1"),
+						Type:   adapterhelpers.PtrString("as_policy"),
+						Status: adapterhelpers.PtrString("CREATED"),
 						Details: []types.KeyValuePair{
 							{
-								Name:  adapters.PtrString("capacityProviderName"),
-								Value: adapters.PtrString("test"),
+								Name:  adapterhelpers.PtrString("capacityProviderName"),
+								Value: adapterhelpers.PtrString("test"),
 							},
 							{
-								Name:  adapters.PtrString("scalingPolicyName"),
-								Value: adapters.PtrString("ECSManagedAutoScalingPolicy-d2f110eb-20a6-4278-9c1c-47d98e21b1ed"),
+								Name:  adapterhelpers.PtrString("scalingPolicyName"),
+								Value: adapterhelpers.PtrString("ECSManagedAutoScalingPolicy-d2f110eb-20a6-4278-9c1c-47d98e21b1ed"),
 							},
 						},
 					},
 				},
-				AttachmentsStatus: adapters.PtrString("UPDATE_COMPLETE"),
+				AttachmentsStatus: adapterhelpers.PtrString("UPDATE_COMPLETE"),
 				Configuration: &types.ClusterConfiguration{
 					ExecuteCommandConfiguration: &types.ExecuteCommandConfiguration{
-						KmsKeyId: adapters.PtrString("id"),
+						KmsKeyId: adapterhelpers.PtrString("id"),
 						LogConfiguration: &types.ExecuteCommandLogConfiguration{
 							CloudWatchEncryptionEnabled: true,
-							CloudWatchLogGroupName:      adapters.PtrString("cloud-watch-name"),
-							S3BucketName:                adapters.PtrString("s3-name"),
+							CloudWatchLogGroupName:      adapterhelpers.PtrString("cloud-watch-name"),
+							S3BucketName:                adapterhelpers.PtrString("s3-name"),
 							S3EncryptionEnabled:         true,
-							S3KeyPrefix:                 adapters.PtrString("prod"),
+							S3KeyPrefix:                 adapterhelpers.PtrString("prod"),
 						},
 					},
 				},
 				ServiceConnectDefaults: &types.ClusterServiceConnectDefaults{
-					Namespace: adapters.PtrString("prod"),
+					Namespace: adapterhelpers.PtrString("prod"),
 				},
 			},
 		},
@@ -103,7 +104,7 @@ func TestClusterGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -150,7 +151,7 @@ func TestNewClusterAdapter(t *testing.T) {
 
 	adapter := NewClusterAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

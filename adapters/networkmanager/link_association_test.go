@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,9 +15,9 @@ func TestLinkAssociationOutputMapper(t *testing.T) {
 	output := networkmanager.GetLinkAssociationsOutput{
 		LinkAssociations: []types.LinkAssociation{
 			{
-				LinkId:          adapters.PtrString("link-1"),
-				GlobalNetworkId: adapters.PtrString("default"),
-				DeviceId:        adapters.PtrString("dvc-1"),
+				LinkId:          adapterhelpers.PtrString("link-1"),
+				GlobalNetworkId: adapterhelpers.PtrString("default"),
+				DeviceId:        adapterhelpers.PtrString("dvc-1"),
 			},
 		},
 	}
@@ -50,7 +51,7 @@ func TestLinkAssociationOutputMapper(t *testing.T) {
 		t.Fatalf("expected default|link-1|dvc-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

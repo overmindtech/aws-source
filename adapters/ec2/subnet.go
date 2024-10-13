@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 	for _, subnet := range output.Subnets {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(subnet, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(subnet, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -78,8 +79,8 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 // +overmind:terraform:queryMap aws_route_table_association.subnet_id
 // +overmind:terraform:queryMap aws_subnet.id
 
-func NewSubnetAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
+func NewSubnetAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -90,7 +91,7 @@ func NewSubnetAdapter(client *ec2.Client, accountID string, region string) *adap
 		},
 		InputMapperGet:  subnetInputMapperGet,
 		InputMapperList: subnetInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSubnetsInput) adapters.Paginator[*ec2.DescribeSubnetsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSubnetsInput) adapterhelpers.Paginator[*ec2.DescribeSubnetsOutput, *ec2.Options] {
 			return ec2.NewDescribeSubnetsPaginator(client, params)
 		},
 		OutputMapper: subnetOutputMapper,

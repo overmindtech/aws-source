@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/ec2"
 	"github.com/overmindtech/aws-source/adapters/integration"
 	"github.com/overmindtech/sdp-go"
@@ -36,7 +36,7 @@ func EC2(t *testing.T) {
 		t.Fatalf("failed to validate EC2 instance adapter: %v", err)
 	}
 
-	scope := adapters.FormatScope(accountID, testAWSConfig.Region)
+	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List instances
 	sdpListInstances, err := instanceAdapter.List(context.Background(), scope, true)

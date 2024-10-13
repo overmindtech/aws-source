@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,42 +17,42 @@ func (t *TestClient) DescribeCapacityProviders(ctx context.Context, params *ecs.
 		"": {
 			CapacityProviders: []types.CapacityProvider{
 				{
-					CapacityProviderArn: adapters.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/FARGATE"),
-					Name:                adapters.PtrString("FARGATE"),
+					CapacityProviderArn: adapterhelpers.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/FARGATE"),
+					Name:                adapterhelpers.PtrString("FARGATE"),
 					Status:              types.CapacityProviderStatusActive,
 				},
 			},
-			NextToken: adapters.PtrString("one"),
+			NextToken: adapterhelpers.PtrString("one"),
 		},
 		"one": {
 			CapacityProviders: []types.CapacityProvider{
 				{
-					CapacityProviderArn: adapters.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/FARGATE_SPOT"),
-					Name:                adapters.PtrString("FARGATE_SPOT"),
+					CapacityProviderArn: adapterhelpers.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/FARGATE_SPOT"),
+					Name:                adapterhelpers.PtrString("FARGATE_SPOT"),
 					Status:              types.CapacityProviderStatusActive,
 				},
 			},
-			NextToken: adapters.PtrString("two"),
+			NextToken: adapterhelpers.PtrString("two"),
 		},
 		"two": {
 			CapacityProviders: []types.CapacityProvider{
 				{
-					CapacityProviderArn: adapters.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/test"),
-					Name:                adapters.PtrString("test"),
+					CapacityProviderArn: adapterhelpers.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/test"),
+					Name:                adapterhelpers.PtrString("test"),
 					Status:              types.CapacityProviderStatusActive,
 					AutoScalingGroupProvider: &types.AutoScalingGroupProvider{
-						AutoScalingGroupArn: adapters.PtrString("arn:aws:autoscaling:eu-west-2:052392120703:autoScalingGroup:9df90815-98c1-4136-a12a-90abef1c4e4e:autoScalingGroupName/ecs-test"),
+						AutoScalingGroupArn: adapterhelpers.PtrString("arn:aws:autoscaling:eu-west-2:052392120703:autoScalingGroup:9df90815-98c1-4136-a12a-90abef1c4e4e:autoScalingGroupName/ecs-test"),
 						ManagedScaling: &types.ManagedScaling{
 							Status:                 types.ManagedScalingStatusEnabled,
-							TargetCapacity:         adapters.PtrInt32(80),
-							MinimumScalingStepSize: adapters.PtrInt32(1),
-							MaximumScalingStepSize: adapters.PtrInt32(10000),
-							InstanceWarmupPeriod:   adapters.PtrInt32(300),
+							TargetCapacity:         adapterhelpers.PtrInt32(80),
+							MinimumScalingStepSize: adapterhelpers.PtrInt32(1),
+							MaximumScalingStepSize: adapterhelpers.PtrInt32(10000),
+							InstanceWarmupPeriod:   adapterhelpers.PtrInt32(300),
 						},
 						ManagedTerminationProtection: types.ManagedTerminationProtectionDisabled,
 					},
 					UpdateStatus:       types.CapacityProviderUpdateStatusDeleteComplete,
-					UpdateStatusReason: adapters.PtrString("reason"),
+					UpdateStatusReason: adapterhelpers.PtrString("reason"),
 				},
 			},
 		},
@@ -75,22 +76,22 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 		&ecs.DescribeCapacityProvidersOutput{
 			CapacityProviders: []types.CapacityProvider{
 				{
-					CapacityProviderArn: adapters.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/test"),
-					Name:                adapters.PtrString("test"),
+					CapacityProviderArn: adapterhelpers.PtrString("arn:aws:ecs:eu-west-2:052392120703:capacity-provider/test"),
+					Name:                adapterhelpers.PtrString("test"),
 					Status:              types.CapacityProviderStatusActive,
 					AutoScalingGroupProvider: &types.AutoScalingGroupProvider{
-						AutoScalingGroupArn: adapters.PtrString("arn:aws:autoscaling:eu-west-2:052392120703:autoScalingGroup:9df90815-98c1-4136-a12a-90abef1c4e4e:autoScalingGroupName/ecs-test"),
+						AutoScalingGroupArn: adapterhelpers.PtrString("arn:aws:autoscaling:eu-west-2:052392120703:autoScalingGroup:9df90815-98c1-4136-a12a-90abef1c4e4e:autoScalingGroupName/ecs-test"),
 						ManagedScaling: &types.ManagedScaling{
 							Status:                 types.ManagedScalingStatusEnabled,
-							TargetCapacity:         adapters.PtrInt32(80),
-							MinimumScalingStepSize: adapters.PtrInt32(1),
-							MaximumScalingStepSize: adapters.PtrInt32(10000),
-							InstanceWarmupPeriod:   adapters.PtrInt32(300),
+							TargetCapacity:         adapterhelpers.PtrInt32(80),
+							MinimumScalingStepSize: adapterhelpers.PtrInt32(1),
+							MaximumScalingStepSize: adapterhelpers.PtrInt32(10000),
+							InstanceWarmupPeriod:   adapterhelpers.PtrInt32(300),
 						},
 						ManagedTerminationProtection: types.ManagedTerminationProtectionDisabled,
 					},
 					UpdateStatus:       types.CapacityProviderUpdateStatusDeleteComplete,
-					UpdateStatusReason: adapters.PtrString("reason"),
+					UpdateStatusReason: adapterhelpers.PtrString("reason"),
 				},
 			},
 		},
@@ -110,7 +111,7 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "autoscaling-auto-scaling-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -137,12 +138,12 @@ func TestCapacityProviderAdapter(t *testing.T) {
 }
 
 func TestNewCapacityProviderAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := ecs.NewFromConfig(config)
 
 	adapter := NewCapacityProviderAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

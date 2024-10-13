@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -30,7 +31,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 
 	containerInstance := out.ContainerInstances[0]
 
-	attributes, err := adapters.ToAttributesWithExclude(containerInstance, "tags")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(containerInstance, "tags")
 
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	// Create an ID param since they don't have anything that uniquely
 	// identifies them. This is {clusterName}/{id}
 	// ecs-template-ECSCluster-8nS0WOLbs3nZ/50e9bf71ed57450ca56293cc5a042886
-	if a, err := adapters.ParseARN(*containerInstance.ContainerInstanceArn); err == nil {
+	if a, err := adapterhelpers.ParseARN(*containerInstance.ContainerInstanceArn); err == nil {
 		attributes.Set("Id", a.Resource)
 	}
 
@@ -87,11 +88,11 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOutput, input *ecs.ListContainerInstancesInput) ([]*ecs.DescribeContainerInstancesInput, error) {
 	inputs := make([]*ecs.DescribeContainerInstancesInput, 0)
 
-	var a *adapters.ARN
+	var a *adapterhelpers.ARN
 	var err error
 
 	for _, arn := range output.ContainerInstanceArns {
-		a, err = adapters.ParseARN(arn)
+		a, err = adapterhelpers.ParseARN(arn)
 
 		if err != nil {
 			continue
@@ -123,8 +124,8 @@ func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOut
 // +overmind:search Search for container instances by cluster
 // +overmind:group AWS
 
-func NewContainerInstanceAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{
+func NewContainerInstanceAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-container-instance",
 		Client:          client,
 		AccountID:       accountID,
@@ -150,13 +151,13 @@ func NewContainerInstanceAdapter(client ECSClient, accountID string, region stri
 		},
 		ListInput:   &ecs.ListContainerInstancesInput{},
 		DisableList: true, // Tou can't list without a cluster
-		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListContainerInstancesInput) adapters.Paginator[*ecs.ListContainerInstancesOutput, *ecs.Options] {
+		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListContainerInstancesInput) adapterhelpers.Paginator[*ecs.ListContainerInstancesOutput, *ecs.Options] {
 			return ecs.NewListContainerInstancesPaginator(client, input)
 		},
 		SearchInputMapper: func(scope, query string) (*ecs.ListContainerInstancesInput, error) {
 			// Custom search by cluster
 			return &ecs.ListContainerInstancesInput{
-				Cluster: adapters.PtrString(query),
+				Cluster: adapterhelpers.PtrString(query),
 			}, nil
 		},
 		ListFuncOutputMapper: containerInstanceListFuncOutputMapper,

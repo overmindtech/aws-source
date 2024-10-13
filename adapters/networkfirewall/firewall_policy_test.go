@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,23 +16,23 @@ func (c testNetworkFirewallClient) DescribeFirewallPolicy(ctx context.Context, p
 	now := time.Now()
 	return &networkfirewall.DescribeFirewallPolicyOutput{
 		FirewallPolicyResponse: &types.FirewallPolicyResponse{
-			FirewallPolicyArn:             adapters.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"),
-			FirewallPolicyId:              adapters.PtrString("test"),
-			FirewallPolicyName:            adapters.PtrString("test"),
-			ConsumedStatefulRuleCapacity:  adapters.PtrInt32(1),
-			ConsumedStatelessRuleCapacity: adapters.PtrInt32(1),
-			Description:                   adapters.PtrString("test"),
+			FirewallPolicyArn:             adapterhelpers.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"),
+			FirewallPolicyId:              adapterhelpers.PtrString("test"),
+			FirewallPolicyName:            adapterhelpers.PtrString("test"),
+			ConsumedStatefulRuleCapacity:  adapterhelpers.PtrInt32(1),
+			ConsumedStatelessRuleCapacity: adapterhelpers.PtrInt32(1),
+			Description:                   adapterhelpers.PtrString("test"),
 			EncryptionConfiguration: &types.EncryptionConfiguration{
 				Type:  types.EncryptionTypeAwsOwnedKmsKey,
-				KeyId: adapters.PtrString("arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"), // link (this can be an ARN or ID)
+				KeyId: adapterhelpers.PtrString("arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"), // link (this can be an ARN or ID)
 			},
 			FirewallPolicyStatus: types.ResourceStatusActive, // health
 			LastModifiedTime:     &now,
-			NumberOfAssociations: adapters.PtrInt32(1),
+			NumberOfAssociations: adapterhelpers.PtrInt32(1),
 			Tags: []types.Tag{
 				{
-					Key:   adapters.PtrString("test"),
-					Value: adapters.PtrString("test"),
+					Key:   adapterhelpers.PtrString("test"),
+					Value: adapterhelpers.PtrString("test"),
 				},
 			},
 		},
@@ -52,11 +53,11 @@ func (c testNetworkFirewallClient) DescribeFirewallPolicy(ctx context.Context, p
 			},
 			StatefulRuleGroupReferences: []types.StatefulRuleGroupReference{
 				{
-					ResourceArn: adapters.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateful-rulegroup/aws-network-firewall-DefaultStatefulRuleGroup-1J3Z3W2ZQXV3"), // link
+					ResourceArn: adapterhelpers.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateful-rulegroup/aws-network-firewall-DefaultStatefulRuleGroup-1J3Z3W2ZQXV3"), // link
 					Override: &types.StatefulRuleGroupOverride{
 						Action: types.OverrideActionDropToAlert,
 					},
-					Priority: adapters.PtrInt32(1),
+					Priority: adapterhelpers.PtrInt32(1),
 				},
 			},
 			StatelessCustomActions: []types.CustomAction{
@@ -66,16 +67,16 @@ func (c testNetworkFirewallClient) DescribeFirewallPolicy(ctx context.Context, p
 							Dimensions: []types.Dimension{},
 						},
 					},
-					ActionName: adapters.PtrString("test"),
+					ActionName: adapterhelpers.PtrString("test"),
 				},
 			},
 			StatelessRuleGroupReferences: []types.StatelessRuleGroupReference{
 				{
-					Priority:    adapters.PtrInt32(1),
-					ResourceArn: adapters.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"), // link
+					Priority:    adapterhelpers.PtrInt32(1),
+					ResourceArn: adapterhelpers.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"), // link
 				},
 			},
-			TLSInspectionConfigurationArn: adapters.PtrString("arn:aws:network-firewall:us-east-1:123456789012:tls-inspection-configuration/aws-network-firewall-DefaultTlsInspectionConfiguration-1J3Z3W2ZQXV3"), // link
+			TLSInspectionConfigurationArn: adapterhelpers.PtrString("arn:aws:network-firewall:us-east-1:123456789012:tls-inspection-configuration/aws-network-firewall-DefaultTlsInspectionConfiguration-1J3Z3W2ZQXV3"), // link
 		},
 	}, nil
 }
@@ -84,7 +85,7 @@ func (c testNetworkFirewallClient) ListFirewallPolicies(context.Context, *networ
 	return &networkfirewall.ListFirewallPoliciesOutput{
 		FirewallPolicies: []types.FirewallPolicyMetadata{
 			{
-				Arn: adapters.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"),
+				Arn: adapterhelpers.PtrString("arn:aws:network-firewall:us-east-1:123456789012:stateless-rulegroup/aws-network-firewall-DefaultStatelessRuleGroup-1J3Z3W2ZQXV3"),
 			},
 		},
 	}, nil
@@ -101,7 +102,7 @@ func TestFirewallPolicyGetFunc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

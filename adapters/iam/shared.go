@@ -9,7 +9,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/micahhausler/aws-iam-policy/policy"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -39,7 +40,7 @@ type IAMClient interface {
 func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 	// We want to link all of the resources in the policy document, as long
 	// as they have a valid ARN
-	var arn *adapters.ARN
+	var arn *adapterhelpers.ARN
 	var err error
 	queries := make([]*sdp.LinkedItemQuery, 0)
 
@@ -54,7 +55,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 			if awsPrincipal := statement.Principal.AWS(); awsPrincipal != nil {
 				for _, value := range awsPrincipal.Values() {
 					// These are in the format of ARN so we'll parse them
-					if arn, err := adapters.ParseARN(value); err == nil {
+					if arn, err := adapterhelpers.ParseARN(value); err == nil {
 						var typ string
 						switch arn.Type() {
 						case "role":
@@ -69,7 +70,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 									Type:   "iam-role",
 									Method: sdp.QueryMethod_SEARCH,
 									Query:  arn.String(),
-									Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+									Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 								},
 								BlastPropagation: &sdp.BlastPropagation{
 									// If a user or role iex explicitly
@@ -87,7 +88,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 
 		if statement.Resource != nil {
 			for _, resource := range statement.Resource.Values() {
-				arn, err = adapters.ParseARN(resource)
+				arn, err = adapterhelpers.ParseARN(resource)
 				if err != nil {
 					continue
 				}
@@ -104,7 +105,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 				scope := sdp.WILDCARD
 				if arn.AccountID != "aws" {
 					// If we have an account and region, then use those
-					scope = adapters.FormatScope(arn.AccountID, arn.Region)
+					scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
 				}
 
 				// It would be good here if we had a way to definitely know what

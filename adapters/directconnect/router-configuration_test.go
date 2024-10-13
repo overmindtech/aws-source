@@ -7,23 +7,24 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestRouterConfigurationOutputMapper(t *testing.T) {
 	output := &directconnect.DescribeRouterConfigurationOutput{
-		CustomerRouterConfig: adapters.PtrString("some config"),
+		CustomerRouterConfig: adapterhelpers.PtrString("some config"),
 		Router: &types.RouterType{
-			Platform:                  adapters.PtrString("2900 Series Routers"),
-			RouterTypeIdentifier:      adapters.PtrString("CiscoSystemsInc-2900SeriesRouters-IOS124"),
-			Software:                  adapters.PtrString("IOS 12.4+"),
-			Vendor:                    adapters.PtrString("Cisco Systems, Inc."),
-			XsltTemplateName:          adapters.PtrString("customer-router-cisco-generic.xslt"),
-			XsltTemplateNameForMacSec: adapters.PtrString(""),
+			Platform:                  adapterhelpers.PtrString("2900 Series Routers"),
+			RouterTypeIdentifier:      adapterhelpers.PtrString("CiscoSystemsInc-2900SeriesRouters-IOS124"),
+			Software:                  adapterhelpers.PtrString("IOS 12.4+"),
+			Vendor:                    adapterhelpers.PtrString("Cisco Systems, Inc."),
+			XsltTemplateName:          adapterhelpers.PtrString("customer-router-cisco-generic.xslt"),
+			XsltTemplateNameForMacSec: adapterhelpers.PtrString(""),
 		},
-		VirtualInterfaceId:   adapters.PtrString("dxvif-ffhhk74f"),
-		VirtualInterfaceName: adapters.PtrString("PrivateVirtualInterface"),
+		VirtualInterfaceId:   adapterhelpers.PtrString("dxvif-ffhhk74f"),
+		VirtualInterfaceName: adapterhelpers.PtrString("PrivateVirtualInterface"),
 	}
 
 	items, err := routerConfigurationOutputMapper(context.Background(), nil, "foo", nil, output)
@@ -43,7 +44,7 @@ func TestRouterConfigurationOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "directconnect-virtual-interface",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -60,7 +61,7 @@ func TestNewRouterConfigurationAdapter(t *testing.T) {
 
 	adapter := NewRouterConfigurationAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,

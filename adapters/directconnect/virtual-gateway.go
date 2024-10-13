@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,7 +13,7 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 	items := make([]*sdp.Item, 0)
 
 	for _, virtualGateway := range output.VirtualGateways {
-		attributes, err := adapters.ToAttributesWithExclude(virtualGateway, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(virtualGateway, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -38,8 +39,8 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 // +overmind:search Search virtual gateways by ARN
 // +overmind:group AWS
 
-func NewVirtualGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
+func NewVirtualGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

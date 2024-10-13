@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
@@ -52,7 +52,7 @@ func TestLagHealth(t *testing.T) {
 			Lags: []types.Lag{
 				{
 					LagState: c.state,
-					LagId:    adapters.PtrString("dxlag-fgsu9erb"),
+					LagId:    adapterhelpers.PtrString("dxlag-fgsu9erb"),
 				},
 			},
 		}
@@ -78,38 +78,38 @@ func TestLagOutputMapper(t *testing.T) {
 	output := &directconnect.DescribeLagsOutput{
 		Lags: []types.Lag{
 			{
-				AwsDeviceV2:         adapters.PtrString("EqDC2-19y7z3m17xpuz"),
+				AwsDeviceV2:         adapterhelpers.PtrString("EqDC2-19y7z3m17xpuz"),
 				NumberOfConnections: int32(2),
 				LagState:            types.LagStateAvailable,
-				OwnerAccount:        adapters.PtrString("123456789012"),
-				LagName:             adapters.PtrString("DA-LAG"),
+				OwnerAccount:        adapterhelpers.PtrString("123456789012"),
+				LagName:             adapterhelpers.PtrString("DA-LAG"),
 				Connections: []types.Connection{
 					{
-						OwnerAccount:    adapters.PtrString("123456789012"),
-						ConnectionId:    adapters.PtrString("dxcon-ffnikghc"),
-						LagId:           adapters.PtrString("dxlag-fgsu9erb"),
+						OwnerAccount:    adapterhelpers.PtrString("123456789012"),
+						ConnectionId:    adapterhelpers.PtrString("dxcon-ffnikghc"),
+						LagId:           adapterhelpers.PtrString("dxlag-fgsu9erb"),
 						ConnectionState: "requested",
-						Bandwidth:       adapters.PtrString("10Gbps"),
-						Location:        adapters.PtrString("EqDC2"),
-						ConnectionName:  adapters.PtrString("Requested Connection 1 for Lag dxlag-fgsu9erb"),
-						Region:          adapters.PtrString("us-east-1"),
+						Bandwidth:       adapterhelpers.PtrString("10Gbps"),
+						Location:        adapterhelpers.PtrString("EqDC2"),
+						ConnectionName:  adapterhelpers.PtrString("Requested Connection 1 for Lag dxlag-fgsu9erb"),
+						Region:          adapterhelpers.PtrString("us-east-1"),
 					},
 					{
-						OwnerAccount:    adapters.PtrString("123456789012"),
-						ConnectionId:    adapters.PtrString("dxcon-fglgbdea"),
-						LagId:           adapters.PtrString("dxlag-fgsu9erb"),
+						OwnerAccount:    adapterhelpers.PtrString("123456789012"),
+						ConnectionId:    adapterhelpers.PtrString("dxcon-fglgbdea"),
+						LagId:           adapterhelpers.PtrString("dxlag-fgsu9erb"),
 						ConnectionState: "requested",
-						Bandwidth:       adapters.PtrString("10Gbps"),
-						Location:        adapters.PtrString("EqDC2"),
-						ConnectionName:  adapters.PtrString("Requested Connection 2 for Lag dxlag-fgsu9erb"),
-						Region:          adapters.PtrString("us-east-1"),
+						Bandwidth:       adapterhelpers.PtrString("10Gbps"),
+						Location:        adapterhelpers.PtrString("EqDC2"),
+						ConnectionName:  adapterhelpers.PtrString("Requested Connection 2 for Lag dxlag-fgsu9erb"),
+						Region:          adapterhelpers.PtrString("us-east-1"),
 					},
 				},
-				LagId:                adapters.PtrString("dxlag-fgsu9erb"),
+				LagId:                adapterhelpers.PtrString("dxlag-fgsu9erb"),
 				MinimumLinks:         int32(0),
-				ConnectionsBandwidth: adapters.PtrString("10Gbps"),
-				Region:               adapters.PtrString("us-east-1"),
-				Location:             adapters.PtrString("EqDC2"),
+				ConnectionsBandwidth: adapterhelpers.PtrString("10Gbps"),
+				Region:               adapterhelpers.PtrString("us-east-1"),
+				Location:             adapterhelpers.PtrString("EqDC2"),
 			},
 		},
 	}
@@ -135,7 +135,7 @@ func TestLagOutputMapper(t *testing.T) {
 		t.Fatalf("expected health to be OK, got: %v", item.GetHealth())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "directconnect-connection",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -170,7 +170,7 @@ func TestNewLagAdapter(t *testing.T) {
 
 	adapter := NewLagAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

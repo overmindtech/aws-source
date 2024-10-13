@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -24,7 +25,7 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 	items := make([]*sdp.Item, 0)
 
 	for _, ew := range output.InstanceEventWindows {
-		attrs, err := adapters.ToAttributesWithExclude(ew, "tags")
+		attrs, err := adapterhelpers.ToAttributesWithExclude(ew, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -94,8 +95,8 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 // +overmind:search Search for event windows by ARN
 // +overmind:group AWS
 
-func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
+func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -106,7 +107,7 @@ func NewInstanceEventWindowAdapter(client *ec2.Client, accountID string, region 
 		},
 		InputMapperGet:  instanceEventWindowInputMapperGet,
 		InputMapperList: instanceEventWindowInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceEventWindowsInput) adapters.Paginator[*ec2.DescribeInstanceEventWindowsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeInstanceEventWindowsInput) adapterhelpers.Paginator[*ec2.DescribeInstanceEventWindowsOutput, *ec2.Options] {
 			return ec2.NewDescribeInstanceEventWindowsPaginator(client, params)
 		},
 		OutputMapper: instanceEventWindowOutputMapper,

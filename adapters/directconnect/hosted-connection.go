@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,7 +13,7 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	items := make([]*sdp.Item, 0)
 
 	for _, connection := range output.Connections {
-		attributes, err := adapters.ToAttributesWithExclude(connection, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(connection, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -109,8 +110,8 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_hosted_connection.id
 
-func NewHostedConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
+func NewHostedConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

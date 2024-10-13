@@ -10,7 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -19,7 +20,7 @@ func (t *TestIAMClient) ListGroupsForUser(ctx context.Context, params *iam.ListG
 	marker := params.Marker
 
 	if marker == nil {
-		marker = adapters.PtrString("0")
+		marker = adapterhelpers.PtrString("0")
 	}
 
 	// Get the current page
@@ -32,17 +33,17 @@ func (t *TestIAMClient) ListGroupsForUser(ctx context.Context, params *iam.ListG
 		isTruncated = false
 		marker = nil
 	} else {
-		marker = adapters.PtrString(fmt.Sprint(markerInt))
+		marker = adapterhelpers.PtrString(fmt.Sprint(markerInt))
 	}
 
 	return &iam.ListGroupsForUserOutput{
 		Groups: []types.Group{
 			{
-				Arn:        adapters.PtrString("arn:aws:iam::801795385023:Group/something"),
-				CreateDate: adapters.PtrTime(time.Now()),
-				GroupId:    adapters.PtrString("id"),
-				GroupName:  adapters.PtrString(fmt.Sprintf("group-%v", marker)),
-				Path:       adapters.PtrString("/"),
+				Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:Group/something"),
+				CreateDate: adapterhelpers.PtrTime(time.Now()),
+				GroupId:    adapterhelpers.PtrString("id"),
+				GroupName:  adapterhelpers.PtrString(fmt.Sprintf("group-%v", marker)),
+				Path:       adapterhelpers.PtrString("/"),
 			},
 		},
 		IsTruncated: isTruncated,
@@ -53,11 +54,11 @@ func (t *TestIAMClient) ListGroupsForUser(ctx context.Context, params *iam.ListG
 func (t *TestIAMClient) GetUser(ctx context.Context, params *iam.GetUserInput, optFns ...func(*iam.Options)) (*iam.GetUserOutput, error) {
 	return &iam.GetUserOutput{
 		User: &types.User{
-			Path:       adapters.PtrString("/"),
-			UserName:   adapters.PtrString("power-users"),
-			UserId:     adapters.PtrString("AGPA3VLV2U27T6SSLJMDS"),
-			Arn:        adapters.PtrString("arn:aws:iam::801795385023:User/power-users"),
-			CreateDate: adapters.PtrTime(time.Now()),
+			Path:       adapterhelpers.PtrString("/"),
+			UserName:   adapterhelpers.PtrString("power-users"),
+			UserId:     adapterhelpers.PtrString("AGPA3VLV2U27T6SSLJMDS"),
+			Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:User/power-users"),
+			CreateDate: adapterhelpers.PtrTime(time.Now()),
 		},
 	}, nil
 }
@@ -67,7 +68,7 @@ func (t *TestIAMClient) ListUsers(ctx context.Context, params *iam.ListUsersInpu
 	marker := params.Marker
 
 	if marker == nil {
-		marker = adapters.PtrString("0")
+		marker = adapterhelpers.PtrString("0")
 	}
 
 	// Get the current page
@@ -80,17 +81,17 @@ func (t *TestIAMClient) ListUsers(ctx context.Context, params *iam.ListUsersInpu
 		isTruncated = false
 		marker = nil
 	} else {
-		marker = adapters.PtrString(fmt.Sprint(markerInt))
+		marker = adapterhelpers.PtrString(fmt.Sprint(markerInt))
 	}
 
 	return &iam.ListUsersOutput{
 		Users: []types.User{
 			{
-				Path:       adapters.PtrString("/"),
-				UserName:   adapters.PtrString(fmt.Sprintf("user-%v", marker)),
-				UserId:     adapters.PtrString("AGPA3VLV2U27T6SSLJMDS"),
-				Arn:        adapters.PtrString("arn:aws:iam::801795385023:User/power-users"),
-				CreateDate: adapters.PtrTime(time.Now()),
+				Path:       adapterhelpers.PtrString("/"),
+				UserName:   adapterhelpers.PtrString(fmt.Sprintf("user-%v", marker)),
+				UserId:     adapterhelpers.PtrString("AGPA3VLV2U27T6SSLJMDS"),
+				Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:User/power-users"),
+				CreateDate: adapterhelpers.PtrTime(time.Now()),
 			},
 		},
 		IsTruncated: isTruncated,
@@ -102,8 +103,8 @@ func (t *TestIAMClient) ListUserTags(context.Context, *iam.ListUserTagsInput, ..
 	return &iam.ListUserTagsOutput{
 		Tags: []types.Tag{
 			{
-				Key:   adapters.PtrString("foo"),
-				Value: adapters.PtrString("bar"),
+				Key:   adapterhelpers.PtrString("foo"),
+				Value: adapterhelpers.PtrString("bar"),
 			},
 		},
 		IsTruncated: false,
@@ -112,7 +113,7 @@ func (t *TestIAMClient) ListUserTags(context.Context, *iam.ListUserTagsInput, ..
 }
 
 func TestGetUserGroups(t *testing.T) {
-	groups, err := getUserGroups(context.Background(), &TestIAMClient{}, adapters.PtrString("foo"))
+	groups, err := getUserGroups(context.Background(), &TestIAMClient{}, adapterhelpers.PtrString("foo"))
 
 	if err != nil {
 		t.Error(err)
@@ -161,7 +162,7 @@ func TestUserListFunc(t *testing.T) {
 func TestUserListTagsFunc(t *testing.T) {
 	tags, err := userListTagsFunc(context.Background(), &UserDetails{
 		User: &types.User{
-			UserName: adapters.PtrString("foo"),
+			UserName: adapterhelpers.PtrString("foo"),
 		},
 	}, &TestIAMClient{})
 
@@ -177,19 +178,19 @@ func TestUserListTagsFunc(t *testing.T) {
 func TestUserItemMapper(t *testing.T) {
 	details := UserDetails{
 		User: &types.User{
-			Path:       adapters.PtrString("/"),
-			UserName:   adapters.PtrString("power-users"),
-			UserId:     adapters.PtrString("AGPA3VLV2U27T6SSLJMDS"),
-			Arn:        adapters.PtrString("arn:aws:iam::801795385023:User/power-users"),
-			CreateDate: adapters.PtrTime(time.Now()),
+			Path:       adapterhelpers.PtrString("/"),
+			UserName:   adapterhelpers.PtrString("power-users"),
+			UserId:     adapterhelpers.PtrString("AGPA3VLV2U27T6SSLJMDS"),
+			Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:User/power-users"),
+			CreateDate: adapterhelpers.PtrTime(time.Now()),
 		},
 		UserGroups: []types.Group{
 			{
-				Arn:        adapters.PtrString("arn:aws:iam::801795385023:Group/something"),
-				CreateDate: adapters.PtrTime(time.Now()),
-				GroupId:    adapters.PtrString("id"),
-				GroupName:  adapters.PtrString("name"),
-				Path:       adapters.PtrString("/"),
+				Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:Group/something"),
+				CreateDate: adapterhelpers.PtrTime(time.Now()),
+				GroupId:    adapterhelpers.PtrString("id"),
+				GroupName:  adapterhelpers.PtrString("name"),
+				Path:       adapterhelpers.PtrString("/"),
 			},
 		},
 	}
@@ -204,7 +205,7 @@ func TestUserItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "iam-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -217,7 +218,7 @@ func TestUserItemMapper(t *testing.T) {
 }
 
 func TestNewUserAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
@@ -225,7 +226,7 @@ func TestNewUserAdapter(t *testing.T) {
 
 	adapter := NewUserAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}

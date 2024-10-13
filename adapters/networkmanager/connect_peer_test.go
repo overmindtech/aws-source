@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,21 +17,21 @@ func (n NetworkManagerTestClient) GetConnectPeer(ctx context.Context, params *ne
 			Configuration: &types.ConnectPeerConfiguration{
 				BgpConfigurations: []types.ConnectPeerBgpConfiguration{
 					{
-						CoreNetworkAddress: adapters.PtrString("1.4.2.4"),         // link
-						CoreNetworkAsn:     adapters.PtrInt64(64512),              // link
-						PeerAddress:        adapters.PtrString("123.123.123.123"), // link
-						PeerAsn:            adapters.PtrInt64(64513),              // link
+						CoreNetworkAddress: adapterhelpers.PtrString("1.4.2.4"),         // link
+						CoreNetworkAsn:     adapterhelpers.PtrInt64(64512),              // link
+						PeerAddress:        adapterhelpers.PtrString("123.123.123.123"), // link
+						PeerAsn:            adapterhelpers.PtrInt64(64513),              // link
 					},
 				},
-				CoreNetworkAddress: adapters.PtrString("1.1.1.3"),  // link
-				PeerAddress:        adapters.PtrString("1.1.1.45"), // link
+				CoreNetworkAddress: adapterhelpers.PtrString("1.1.1.3"),  // link
+				PeerAddress:        adapterhelpers.PtrString("1.1.1.45"), // link
 			},
-			ConnectAttachmentId: adapters.PtrString("ca-1"), // link
-			ConnectPeerId:       adapters.PtrString("cp-1"),
-			CoreNetworkId:       adapters.PtrString("cn-1"), // link
-			EdgeLocation:        adapters.PtrString("us-west-2"),
+			ConnectAttachmentId: adapterhelpers.PtrString("ca-1"), // link
+			ConnectPeerId:       adapterhelpers.PtrString("cp-1"),
+			CoreNetworkId:       adapterhelpers.PtrString("cn-1"), // link
+			EdgeLocation:        adapterhelpers.PtrString("us-west-2"),
 			State:               types.ConnectPeerStateAvailable,
-			SubnetArn:           adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:subnet/subnet-1"), // link
+			SubnetArn:           adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:subnet/subnet-1"), // link
 		},
 	}, nil
 }
@@ -55,7 +56,7 @@ func TestConnectPeerGetFunc(t *testing.T) {
 		t.Fatalf("expected cp-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,

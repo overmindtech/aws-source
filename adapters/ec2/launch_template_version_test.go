@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -47,48 +48,48 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 	output := &ec2.DescribeLaunchTemplateVersionsOutput{
 		LaunchTemplateVersions: []types.LaunchTemplateVersion{
 			{
-				LaunchTemplateId:   adapters.PtrString("lt-015547202038ae102"),
-				LaunchTemplateName: adapters.PtrString("test"),
-				VersionNumber:      adapters.PtrInt64(1),
-				CreateTime:         adapters.PtrTime(time.Now()),
-				CreatedBy:          adapters.PtrString("arn:aws:sts::052392120703:assumed-role/AWSReservedSSO_AWSAdministratorAccess_c1c3c9c54821c68a/dylan@overmind.tech"),
-				DefaultVersion:     adapters.PtrBool(true),
+				LaunchTemplateId:   adapterhelpers.PtrString("lt-015547202038ae102"),
+				LaunchTemplateName: adapterhelpers.PtrString("test"),
+				VersionNumber:      adapterhelpers.PtrInt64(1),
+				CreateTime:         adapterhelpers.PtrTime(time.Now()),
+				CreatedBy:          adapterhelpers.PtrString("arn:aws:sts::052392120703:assumed-role/AWSReservedSSO_AWSAdministratorAccess_c1c3c9c54821c68a/dylan@overmind.tech"),
+				DefaultVersion:     adapterhelpers.PtrBool(true),
 				LaunchTemplateData: &types.ResponseLaunchTemplateData{
 					NetworkInterfaces: []types.LaunchTemplateInstanceNetworkInterfaceSpecification{
 						{
 							Ipv6Addresses: []types.InstanceIpv6Address{
 								{
-									Ipv6Address: adapters.PtrString("ipv6"),
+									Ipv6Address: adapterhelpers.PtrString("ipv6"),
 								},
 							},
-							NetworkInterfaceId: adapters.PtrString("networkInterface"),
+							NetworkInterfaceId: adapterhelpers.PtrString("networkInterface"),
 							PrivateIpAddresses: []types.PrivateIpAddressSpecification{
 								{
-									Primary:          adapters.PtrBool(true),
-									PrivateIpAddress: adapters.PtrString("ip"),
+									Primary:          adapterhelpers.PtrBool(true),
+									PrivateIpAddress: adapterhelpers.PtrString("ip"),
 								},
 							},
-							SubnetId:    adapters.PtrString("subnet"),
-							DeviceIndex: adapters.PtrInt32(0),
+							SubnetId:    adapterhelpers.PtrString("subnet"),
+							DeviceIndex: adapterhelpers.PtrInt32(0),
 							Groups: []string{
 								"sg-094e151c9fc5da181",
 							},
 						},
 					},
-					ImageId:      adapters.PtrString("ami-084e8c05825742534"),
+					ImageId:      adapterhelpers.PtrString("ami-084e8c05825742534"),
 					InstanceType: types.InstanceTypeT1Micro,
-					KeyName:      adapters.PtrString("dylan.ratcliffe"),
+					KeyName:      adapterhelpers.PtrString("dylan.ratcliffe"),
 					BlockDeviceMappings: []types.LaunchTemplateBlockDeviceMapping{
 						{
 							Ebs: &types.LaunchTemplateEbsBlockDevice{
-								SnapshotId: adapters.PtrString("snap"),
+								SnapshotId: adapterhelpers.PtrString("snap"),
 							},
 						},
 					},
 					CapacityReservationSpecification: &types.LaunchTemplateCapacityReservationSpecificationResponse{
 						CapacityReservationPreference: types.CapacityReservationPreferenceNone,
 						CapacityReservationTarget: &types.CapacityReservationTargetResponse{
-							CapacityReservationId: adapters.PtrString("cap"),
+							CapacityReservationId: adapterhelpers.PtrString("cap"),
 						},
 					},
 					CpuOptions:                   &types.LaunchTemplateCpuOptions{},
@@ -97,9 +98,9 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 					EnclaveOptions:               &types.LaunchTemplateEnclaveOptions{},
 					ElasticInferenceAccelerators: []types.LaunchTemplateElasticInferenceAcceleratorResponse{},
 					Placement: &types.LaunchTemplatePlacement{
-						AvailabilityZone: adapters.PtrString("foo"),
-						GroupId:          adapters.PtrString("placement"),
-						HostId:           adapters.PtrString("host"),
+						AvailabilityZone: adapterhelpers.PtrString("foo"),
+						GroupId:          adapterhelpers.PtrString("placement"),
+						HostId:           adapterhelpers.PtrString("host"),
 					},
 					SecurityGroupIds: []string{
 						"secGroup",
@@ -123,7 +124,7 @@ func TestLaunchTemplateVersionOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -207,7 +208,7 @@ func TestNewLaunchTemplateVersionAdapter(t *testing.T) {
 
 	adapter := NewLaunchTemplateVersionAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:           adapter,
 		Timeout:           10 * time.Second,
 		SkipNotFoundCheck: true,

@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -19,7 +20,7 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 	items := make([]*sdp.Item, 0)
 
 	for _, association := range output.DirectConnectGatewayAssociations {
-		attributes, err := adapters.ToAttributesWithExclude(association, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(association, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -88,8 +89,8 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_dx_gateway_association.id
 
-func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{
+func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

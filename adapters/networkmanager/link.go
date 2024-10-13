@@ -7,7 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 	for _, s := range output.Links {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(s, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -123,8 +124,8 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 // +overmind:terraform:queryMap aws_networkmanager_link.arn
 // +overmind:terraform:method SEARCH
 
-func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-link",
@@ -155,7 +156,7 @@ func NewLinkAdapter(client *networkmanager.Client, accountID string) *adapters.D
 				ErrorString: "list not supported for networkmanager-link, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetLinksInput) adapters.Paginator[*networkmanager.GetLinksOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetLinksInput) adapterhelpers.Paginator[*networkmanager.GetLinksOutput, *networkmanager.Options] {
 			return networkmanager.NewGetLinksPaginator(client, params)
 		},
 		OutputMapper: linkOutputMapper,

@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -113,7 +113,7 @@ func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetai
 }
 
 func userItemMapper(_, scope string, awsItem *UserDetails) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem.User)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem.User)
 
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return adapters.HandleTagsError(ctx, err), nil
+			return adapterhelpers.HandleTagsError(ctx, err), nil
 		}
 
 		for _, tag := range out.Tags {
@@ -181,8 +181,8 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_user.arn
 // +overmind:terraform:method SEARCH
 
-func NewUserAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{
+func NewUserAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-user",
 		Client:          client,
 		AccountID:       accountID,

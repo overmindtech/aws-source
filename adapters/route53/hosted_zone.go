@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -39,7 +40,7 @@ func hostedZoneListFunc(ctx context.Context, client *route53.Client, scope strin
 }
 
 func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -83,8 +84,8 @@ func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item
 // +overmind:terraform:queryMap aws_route53_zone.zone_id
 // +overmind:terraform:queryMap aws_route53_zone_association.zone_id
 
-func NewHostedZoneAdapter(client *route53.Client, accountID string, region string) *adapters.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options] {
-	return &adapters.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options]{
+func NewHostedZoneAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options] {
+	return &adapterhelpers.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options]{
 		ItemType:        "route53-hosted-zone",
 		Client:          client,
 		AccountID:       accountID,

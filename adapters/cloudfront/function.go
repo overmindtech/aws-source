@@ -5,12 +5,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -35,8 +36,8 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_function.name
 
-func NewFunctionAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
+func NewFunctionAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-function",
 		Client:          client,
 		AccountID:       accountID,

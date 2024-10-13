@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -24,7 +25,7 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 	items := make([]*sdp.Item, 0)
 
 	for _, reservation := range output.ReservedInstances {
-		attrs, err := adapters.ToAttributesWithExclude(reservation, "tags")
+		attrs, err := adapterhelpers.ToAttributesWithExclude(reservation, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -56,8 +57,8 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 // +overmind:search Search reserved EC2 instances by ARN
 // +overmind:group AWS
 
-func NewReservedInstanceAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
+func NewReservedInstanceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

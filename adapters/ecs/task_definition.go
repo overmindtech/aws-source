@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,7 +29,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	td := out.TaskDefinition
 
-	attributes, err := adapters.ToAttributesWithExclude(td)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(td)
 
 	if err != nil {
 		return nil, err
@@ -57,7 +58,7 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 		item.Health = sdp.Health_HEALTH_WARNING.Enum()
 	}
 
-	var a *adapters.ARN
+	var a *adapterhelpers.ARN
 	var link *sdp.LinkedItemQuery
 
 	for _, cd := range td.ContainerDefinitions {
@@ -86,14 +87,14 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	}
 
 	if td.ExecutionRoleArn != nil {
-		if a, err = adapters.ParseARN(*td.ExecutionRoleArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*td.ExecutionRoleArn); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *td.ExecutionRoleArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The role can affect the task definition
@@ -106,14 +107,14 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 	}
 
 	if td.TaskRoleArn != nil {
-		if a, err = adapters.ParseARN(*td.TaskRoleArn); err == nil {
+		if a, err = adapterhelpers.ParseARN(*td.TaskRoleArn); err == nil {
 			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *td.TaskRoleArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// The role can affect the task definition
@@ -132,10 +133,10 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 // secret is related to, if relevant
 func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 	if secret.ValueFrom != nil {
-		if a, err := adapters.ParseARN(*secret.ValueFrom); err == nil {
+		if a, err := adapterhelpers.ParseARN(*secret.ValueFrom); err == nil {
 			// The secret can refer to either something from secrets
 			// manager or SSN, so handle this
-			secretScope := adapters.FormatScope(a.AccountID, a.Region)
+			secretScope := adapterhelpers.FormatScope(a.AccountID, a.Region)
 
 			switch a.Service {
 			case "secretsmanager":
@@ -186,8 +187,8 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ecs_task_definition.family
 
-func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
+func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-task-definition",
 		Client:          client,
 		AccountID:       accountID,
@@ -199,19 +200,19 @@ func NewTaskDefinitionAdapter(client ECSClient, accountID string, region string)
 			// AWS actually supports "family:revision" format as an input here
 			// so we can just push it in directly
 			return &ecs.DescribeTaskDefinitionInput{
-				TaskDefinition: adapters.PtrString(query),
+				TaskDefinition: adapterhelpers.PtrString(query),
 			}
 		},
-		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListTaskDefinitionsInput) adapters.Paginator[*ecs.ListTaskDefinitionsOutput, *ecs.Options] {
+		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListTaskDefinitionsInput) adapterhelpers.Paginator[*ecs.ListTaskDefinitionsOutput, *ecs.Options] {
 			return ecs.NewListTaskDefinitionsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *ecs.ListTaskDefinitionsOutput, input *ecs.ListTaskDefinitionsInput) ([]*ecs.DescribeTaskDefinitionInput, error) {
 			getInputs := make([](*ecs.DescribeTaskDefinitionInput), 0)
 
 			for _, arn := range output.TaskDefinitionArns {
-				if a, err := adapters.ParseARN(arn); err == nil {
+				if a, err := adapterhelpers.ParseARN(arn); err == nil {
 					getInputs = append(getInputs, &ecs.DescribeTaskDefinitionInput{
-						TaskDefinition: adapters.PtrString(a.ResourceID()),
+						TaskDefinition: adapterhelpers.PtrString(a.ResourceID()),
 					})
 				}
 			}

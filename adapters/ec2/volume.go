@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 	for _, volume := range output.Volumes {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(volume, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(volume, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -76,8 +77,8 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_ebs_volume.id
 
-func NewVolumeAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
+func NewVolumeAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -88,7 +89,7 @@ func NewVolumeAdapter(client *ec2.Client, accountID string, region string) *adap
 		},
 		InputMapperGet:  volumeInputMapperGet,
 		InputMapperList: volumeInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumesInput) adapters.Paginator[*ec2.DescribeVolumesOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumesInput) adapterhelpers.Paginator[*ec2.DescribeVolumesOutput, *ec2.Options] {
 			return ec2.NewDescribeVolumesPaginator(client, params)
 		},
 		OutputMapper: volumeOutputMapper,

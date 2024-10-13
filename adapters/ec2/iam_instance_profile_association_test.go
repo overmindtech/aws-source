@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,14 +16,14 @@ func TestIamInstanceProfileAssociationOutputMapper(t *testing.T) {
 	output := ec2.DescribeIamInstanceProfileAssociationsOutput{
 		IamInstanceProfileAssociations: []types.IamInstanceProfileAssociation{
 			{
-				AssociationId: adapters.PtrString("eipassoc-1234567890abcdef0"),
+				AssociationId: adapterhelpers.PtrString("eipassoc-1234567890abcdef0"),
 				IamInstanceProfile: &types.IamInstanceProfile{
-					Arn: adapters.PtrString("arn:aws:iam::123456789012:instance-profile/webserver"), // link
-					Id:  adapters.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
+					Arn: adapterhelpers.PtrString("arn:aws:iam::123456789012:instance-profile/webserver"), // link
+					Id:  adapterhelpers.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
 				},
-				InstanceId: adapters.PtrString("i-1234567890abcdef0"), // link
+				InstanceId: adapterhelpers.PtrString("i-1234567890abcdef0"), // link
 				State:      types.IamInstanceProfileAssociationStateAssociated,
-				Timestamp:  adapters.PtrTime(time.Now()),
+				Timestamp:  adapterhelpers.PtrTime(time.Now()),
 			},
 		},
 	}
@@ -47,7 +48,7 @@ func TestIamInstanceProfileAssociationOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "iam-instance-profile",
 			ExpectedQuery:  "arn:aws:iam::123456789012:instance-profile/webserver",
@@ -70,7 +71,7 @@ func TestNewIamInstanceProfileAssociationAdapter(t *testing.T) {
 
 	adapter := NewIamInstanceProfileAssociationAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

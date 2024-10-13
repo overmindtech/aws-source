@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -23,7 +24,7 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	cn := out.CoreNetwork
 
-	attributes, err := adapters.ToAttributesWithExclude(cn)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(cn)
 
 	if err != nil {
 		return nil, err
@@ -120,8 +121,8 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
-func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
-	return &adapters.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
+func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
@@ -134,7 +135,7 @@ func NewCoreNetworkAdapter(client NetworkManagerClient, accountID, region string
 				CoreNetworkId: &query,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client NetworkManagerClient, input *networkmanager.ListCoreNetworksInput) adapters.Paginator[*networkmanager.ListCoreNetworksOutput, *networkmanager.Options] {
+		ListFuncPaginatorBuilder: func(client NetworkManagerClient, input *networkmanager.ListCoreNetworksInput) adapterhelpers.Paginator[*networkmanager.ListCoreNetworksOutput, *networkmanager.Options] {
 			return networkmanager.NewListCoreNetworksPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *networkmanager.ListCoreNetworksOutput, input *networkmanager.ListCoreNetworksInput) ([]*networkmanager.GetCoreNetworkInput, error) {

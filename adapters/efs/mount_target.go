@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -18,7 +18,7 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	items := make([]*sdp.Item, 0)
 
 	for _, mt := range output.MountTargets {
-		attrs, err := adapters.ToAttributesWithExclude(mt)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(mt)
 
 		if err != nil {
 			return nil, err
@@ -130,8 +130,8 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_mount_target.id
 
-func NewMountTargetAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
+func NewMountTargetAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-mount-target",
 		Region:          region,
 		Client:          client,

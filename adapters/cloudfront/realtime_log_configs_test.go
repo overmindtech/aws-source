@@ -5,21 +5,22 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 	x := types.RealtimeLogConfig{
-		Name:         adapters.PtrString("test"),
-		SamplingRate: adapters.PtrInt64(100),
-		ARN:          adapters.PtrString("arn:aws:cloudfront::123456789012:realtime-log-config/12345678-1234-1234-1234-123456789012"),
+		Name:         adapterhelpers.PtrString("test"),
+		SamplingRate: adapterhelpers.PtrInt64(100),
+		ARN:          adapterhelpers.PtrString("arn:aws:cloudfront::123456789012:realtime-log-config/12345678-1234-1234-1234-123456789012"),
 		EndPoints: []types.EndPoint{
 			{
-				StreamType: adapters.PtrString("Kinesis"),
+				StreamType: adapterhelpers.PtrString("Kinesis"),
 				KinesisStreamConfig: &types.KinesisStreamConfig{
-					RoleARN:   adapters.PtrString("arn:aws:iam::123456789012:role/CloudFront_Logger"),              // link
-					StreamARN: adapters.PtrString("arn:aws:kinesis:us-east-1:123456789012:stream/cloudfront-logs"), // link
+					RoleARN:   adapterhelpers.PtrString("arn:aws:iam::123456789012:role/CloudFront_Logger"),              // link
+					StreamARN: adapterhelpers.PtrString("arn:aws:kinesis:us-east-1:123456789012:stream/cloudfront-logs"), // link
 				},
 			},
 		},
@@ -38,7 +39,7 @@ func TestRealtimeLogConfigsItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "iam-role",
 			ExpectedQuery:  "arn:aws:iam::123456789012:role/CloudFront_Logger",
@@ -61,7 +62,7 @@ func TestNewRealtimeLogConfigsAdapter(t *testing.T) {
 
 	adapter := NewRealtimeLogConfigsAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

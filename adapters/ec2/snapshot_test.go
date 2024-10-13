@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -43,23 +44,23 @@ func TestSnapshotOutputMapper(t *testing.T) {
 	output := &ec2.DescribeSnapshotsOutput{
 		Snapshots: []types.Snapshot{
 			{
-				DataEncryptionKeyId: adapters.PtrString("ek"),
-				KmsKeyId:            adapters.PtrString("key"),
-				SnapshotId:          adapters.PtrString("id"),
-				Description:         adapters.PtrString("foo"),
-				Encrypted:           adapters.PtrBool(false),
-				OutpostArn:          adapters.PtrString("something"),
-				OwnerAlias:          adapters.PtrString("something"),
-				OwnerId:             adapters.PtrString("owner"),
-				Progress:            adapters.PtrString("50%"),
-				RestoreExpiryTime:   adapters.PtrTime(time.Now()),
-				StartTime:           adapters.PtrTime(time.Now()),
+				DataEncryptionKeyId: adapterhelpers.PtrString("ek"),
+				KmsKeyId:            adapterhelpers.PtrString("key"),
+				SnapshotId:          adapterhelpers.PtrString("id"),
+				Description:         adapterhelpers.PtrString("foo"),
+				Encrypted:           adapterhelpers.PtrBool(false),
+				OutpostArn:          adapterhelpers.PtrString("something"),
+				OwnerAlias:          adapterhelpers.PtrString("something"),
+				OwnerId:             adapterhelpers.PtrString("owner"),
+				Progress:            adapterhelpers.PtrString("50%"),
+				RestoreExpiryTime:   adapterhelpers.PtrTime(time.Now()),
+				StartTime:           adapterhelpers.PtrTime(time.Now()),
 				State:               types.SnapshotStatePending,
-				StateMessage:        adapters.PtrString("pending"),
+				StateMessage:        adapterhelpers.PtrString("pending"),
 				StorageTier:         types.StorageTierArchive,
 				Tags:                []types.Tag{},
-				VolumeId:            adapters.PtrString("volumeId"),
-				VolumeSize:          adapters.PtrInt32(1024),
+				VolumeId:            adapterhelpers.PtrString("volumeId"),
+				VolumeSize:          adapterhelpers.PtrInt32(1024),
 			},
 		},
 	}
@@ -78,7 +79,7 @@ func TestSnapshotOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-volume",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -96,7 +97,7 @@ func TestNewSnapshotAdapter(t *testing.T) {
 
 	adapter := NewSnapshotAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

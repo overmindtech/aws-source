@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/integration"
 	"github.com/overmindtech/aws-source/adapters/networkmanager"
 	"github.com/overmindtech/sdp-go"
@@ -60,7 +60,7 @@ func NetworkManager(t *testing.T) {
 		t.Fatalf("failed to validate NetworkManager device adapter: %v", err)
 	}
 
-	globalScope := adapters.FormatScope(accountID, "")
+	globalScope := adapterhelpers.FormatScope(accountID, "")
 
 	t.Run("Global Network", func(t *testing.T) {
 		// List global networks

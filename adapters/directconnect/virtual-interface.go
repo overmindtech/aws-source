@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,7 +16,7 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	items := make([]*sdp.Item, 0)
 
 	for _, virtualInterface := range output.VirtualInterfaces {
-		attributes, err := adapters.ToAttributesWithExclude(virtualInterface, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(virtualInterface, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -157,8 +158,8 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 // +overmind:terraform:queryMap aws_dx_public_virtual_interface.id
 // +overmind:terraform:queryMap aws_dx_transit_virtual_interface.id
 
-func NewVirtualInterfaceAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{
+func NewVirtualInterfaceAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

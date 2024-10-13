@@ -7,7 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 	"github.com/micahhausler/aws-iam-policy/policy"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/iam"
 	"github.com/overmindtech/sdp-go"
 
@@ -49,7 +50,7 @@ func restApiListFunc(ctx context.Context, client *apigateway.Client, _ string) (
 }
 
 func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem, "tags")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 			return nil, nil //nolint:nilerr
 		}
 
-		attributes, err = adapters.ToAttributesWithExclude(restApi, "tags")
+		attributes, err = adapterhelpers.ToAttributesWithExclude(restApi, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -154,8 +155,8 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_api_gateway_rest_api.id
 
-func NewRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapters.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
-	return &adapters.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{
+func NewRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
+	return &adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-rest-api",
 		Client:          client,
 		AccountID:       accountID,

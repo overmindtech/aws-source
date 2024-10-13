@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -18,7 +18,7 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	items := make([]*sdp.Item, 0)
 
 	for _, ap := range output.AccessPoints {
-		attrs, err := adapters.ToAttributesWithExclude(ap, "tags")
+		attrs, err := adapterhelpers.ToAttributesWithExclude(ap, "tags")
 
 		if err != nil {
 			return nil, err
@@ -64,8 +64,8 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_access_point.id
 
-func NewAccessPointAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
+func NewAccessPointAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-access-point",
 		Region:          region,
 		Client:          client,
@@ -74,7 +74,7 @@ func NewAccessPointAdapter(client *efs.Client, accountID string, region string) 
 		DescribeFunc: func(ctx context.Context, client *efs.Client, input *efs.DescribeAccessPointsInput) (*efs.DescribeAccessPointsOutput, error) {
 			return client.DescribeAccessPoints(ctx, input)
 		},
-		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeAccessPointsInput) adapters.Paginator[*efs.DescribeAccessPointsOutput, *efs.Options] {
+		PaginatorBuilder: func(client *efs.Client, params *efs.DescribeAccessPointsInput) adapterhelpers.Paginator[*efs.DescribeAccessPointsOutput, *efs.Options] {
 			return efs.NewDescribeAccessPointsPaginator(client, params)
 		},
 		InputMapperGet: func(scope, query string) (*efs.DescribeAccessPointsInput, error) {

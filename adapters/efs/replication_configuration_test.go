@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/efs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,31 +16,31 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 	output := &efs.DescribeReplicationConfigurationsOutput{
 		Replications: []types.ReplicationConfigurationDescription{
 			{
-				CreationTime: adapters.PtrTime(time.Now()),
+				CreationTime: adapterhelpers.PtrTime(time.Now()),
 				Destinations: []types.Destination{
 					{
-						FileSystemId:            adapters.PtrString("fs-12345678"),
-						Region:                  adapters.PtrString("eu-west-1"),
+						FileSystemId:            adapterhelpers.PtrString("fs-12345678"),
+						Region:                  adapterhelpers.PtrString("eu-west-1"),
 						Status:                  types.ReplicationStatusEnabled,
-						LastReplicatedTimestamp: adapters.PtrTime(time.Now()),
+						LastReplicatedTimestamp: adapterhelpers.PtrTime(time.Now()),
 					},
 					{
-						FileSystemId:            adapters.PtrString("fs-98765432"),
-						Region:                  adapters.PtrString("us-west-2"),
+						FileSystemId:            adapterhelpers.PtrString("fs-98765432"),
+						Region:                  adapterhelpers.PtrString("us-west-2"),
 						Status:                  types.ReplicationStatusError,
-						LastReplicatedTimestamp: adapters.PtrTime(time.Now()),
+						LastReplicatedTimestamp: adapterhelpers.PtrTime(time.Now()),
 					},
 				},
-				OriginalSourceFileSystemArn: adapters.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
-				SourceFileSystemArn:         adapters.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
-				SourceFileSystemId:          adapters.PtrString("fs-748927493"),
-				SourceFileSystemRegion:      adapters.PtrString("us-east-1"),
+				OriginalSourceFileSystemArn: adapterhelpers.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
+				SourceFileSystemArn:         adapterhelpers.PtrString("arn:aws:elasticfilesystem:eu-west-2:944651592624:file-system/fs-0c6f2f41e957f42a9"),
+				SourceFileSystemId:          adapterhelpers.PtrString("fs-748927493"),
+				SourceFileSystemRegion:      adapterhelpers.PtrString("us-east-1"),
 			},
 		},
 	}
 
 	accountID := "1234"
-	items, err := ReplicationConfigurationOutputMapper(context.Background(), nil, adapters.FormatScope(accountID, "eu-west-1"), nil, output)
+	items, err := ReplicationConfigurationOutputMapper(context.Background(), nil, adapterhelpers.FormatScope(accountID, "eu-west-1"), nil, output)
 
 	if err != nil {
 		t.Fatal(err)
@@ -59,24 +60,24 @@ func TestReplicationConfigurationOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "efs-file-system",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "fs-748927493",
-			ExpectedScope:  adapters.FormatScope(accountID, "us-east-1"),
+			ExpectedScope:  adapterhelpers.FormatScope(accountID, "us-east-1"),
 		},
 		{
 			ExpectedType:   "efs-file-system",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "fs-12345678",
-			ExpectedScope:  adapters.FormatScope(accountID, "eu-west-1"),
+			ExpectedScope:  adapterhelpers.FormatScope(accountID, "eu-west-1"),
 		},
 		{
 			ExpectedType:   "efs-file-system",
 			ExpectedMethod: sdp.QueryMethod_GET,
 			ExpectedQuery:  "fs-98765432",
-			ExpectedScope:  adapters.FormatScope(accountID, "us-west-2"),
+			ExpectedScope:  adapterhelpers.FormatScope(accountID, "us-west-2"),
 		},
 		{
 			ExpectedType:   "efs-file-system",

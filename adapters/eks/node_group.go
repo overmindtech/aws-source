@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/eks"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -23,7 +24,7 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(out.Nodegroup)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(out.Nodegroup)
 
 	if err != nil {
 		return nil, err
@@ -183,8 +184,8 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 // +overmind:terraform:queryMap aws_eks_node_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewNodegroupAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
+func NewNodegroupAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-nodegroup",
 		Client:           client,
 		AccountID:        accountID,
@@ -215,7 +216,7 @@ func NewNodegroupAdapter(client EKSClient, accountID string, region string) *ada
 				ClusterName:   &clusterName,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListNodegroupsInput) adapters.Paginator[*eks.ListNodegroupsOutput, *eks.Options] {
+		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListNodegroupsInput) adapterhelpers.Paginator[*eks.ListNodegroupsOutput, *eks.Options] {
 			return eks.NewListNodegroupsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListNodegroupsOutput, input *eks.ListNodegroupsInput) ([]*eks.DescribeNodegroupInput, error) {

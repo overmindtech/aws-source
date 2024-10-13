@@ -7,27 +7,28 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func (t TestCloudFrontClient) GetStreamingDistribution(ctx context.Context, params *cloudfront.GetStreamingDistributionInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetStreamingDistributionOutput, error) {
 	return &cloudfront.GetStreamingDistributionOutput{
-		ETag: adapters.PtrString("E2QWRUHAPOMQZL"),
+		ETag: adapterhelpers.PtrString("E2QWRUHAPOMQZL"),
 		StreamingDistribution: &types.StreamingDistribution{
-			ARN:              adapters.PtrString("arn:aws:cloudfront::123456789012:streaming-distribution/EDFDVBD632BHDS5"),
-			DomainName:       adapters.PtrString("d111111abcdef8.cloudfront.net"), // link
-			Id:               adapters.PtrString("EDFDVBD632BHDS5"),
-			Status:           adapters.PtrString("Deployed"), // health
-			LastModifiedTime: adapters.PtrTime(time.Now()),
+			ARN:              adapterhelpers.PtrString("arn:aws:cloudfront::123456789012:streaming-distribution/EDFDVBD632BHDS5"),
+			DomainName:       adapterhelpers.PtrString("d111111abcdef8.cloudfront.net"), // link
+			Id:               adapterhelpers.PtrString("EDFDVBD632BHDS5"),
+			Status:           adapterhelpers.PtrString("Deployed"), // health
+			LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
 			ActiveTrustedSigners: &types.ActiveTrustedSigners{
-				Enabled:  adapters.PtrBool(true),
-				Quantity: adapters.PtrInt32(1),
+				Enabled:  adapterhelpers.PtrBool(true),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []types.Signer{
 					{
-						AwsAccountNumber: adapters.PtrString("123456789012"),
+						AwsAccountNumber: adapterhelpers.PtrString("123456789012"),
 						KeyPairIds: &types.KeyPairIds{
-							Quantity: adapters.PtrInt32(1),
+							Quantity: adapterhelpers.PtrInt32(1),
 							Items: []string{
 								"APKAJDGKZRVEXAMPLE",
 							},
@@ -36,30 +37,30 @@ func (t TestCloudFrontClient) GetStreamingDistribution(ctx context.Context, para
 				},
 			},
 			StreamingDistributionConfig: &types.StreamingDistributionConfig{
-				CallerReference: adapters.PtrString("test"),
-				Comment:         adapters.PtrString("test"),
-				Enabled:         adapters.PtrBool(true),
+				CallerReference: adapterhelpers.PtrString("test"),
+				Comment:         adapterhelpers.PtrString("test"),
+				Enabled:         adapterhelpers.PtrBool(true),
 				S3Origin: &types.S3Origin{
-					DomainName:           adapters.PtrString("myawsbucket.s3.amazonaws.com"),                     // link
-					OriginAccessIdentity: adapters.PtrString("origin-access-identity/cloudfront/E127EXAMPLE51Z"), // link
+					DomainName:           adapterhelpers.PtrString("myawsbucket.s3.amazonaws.com"),                     // link
+					OriginAccessIdentity: adapterhelpers.PtrString("origin-access-identity/cloudfront/E127EXAMPLE51Z"), // link
 				},
 				TrustedSigners: &types.TrustedSigners{
-					Enabled:  adapters.PtrBool(true),
-					Quantity: adapters.PtrInt32(1),
+					Enabled:  adapterhelpers.PtrBool(true),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"self",
 					},
 				},
 				Aliases: &types.Aliases{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"example.com", // link
 					},
 				},
 				Logging: &types.StreamingLoggingConfig{
-					Bucket:  adapters.PtrString("myawslogbucket.s3.amazonaws.com"), // link
-					Enabled: adapters.PtrBool(true),
-					Prefix:  adapters.PtrString("myprefix"),
+					Bucket:  adapterhelpers.PtrString("myawslogbucket.s3.amazonaws.com"), // link
+					Enabled: adapterhelpers.PtrBool(true),
+					Prefix:  adapterhelpers.PtrString("myprefix"),
 				},
 				PriceClass: types.PriceClassPriceClassAll,
 			},
@@ -70,10 +71,10 @@ func (t TestCloudFrontClient) GetStreamingDistribution(ctx context.Context, para
 func (t TestCloudFrontClient) ListStreamingDistributions(ctx context.Context, params *cloudfront.ListStreamingDistributionsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListStreamingDistributionsOutput, error) {
 	return &cloudfront.ListStreamingDistributionsOutput{
 		StreamingDistributionList: &types.StreamingDistributionList{
-			IsTruncated: adapters.PtrBool(false),
+			IsTruncated: adapterhelpers.PtrBool(false),
 			Items: []types.StreamingDistributionSummary{
 				{
-					Id: adapters.PtrString("test-id"),
+					Id: adapterhelpers.PtrString("test-id"),
 				},
 			},
 		},
@@ -95,7 +96,7 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 		t.Errorf("expected health to be HEALTH_OK, got %s", item.GetHealth())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -108,12 +109,12 @@ func TestStreamingDistributionGetFunc(t *testing.T) {
 }
 
 func TestNewStreamingDistributionAdapter(t *testing.T) {
-	config, account, _ := adapters.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := cloudfront.NewFromConfig(config)
 
 	adapter := NewStreamingDistributionAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

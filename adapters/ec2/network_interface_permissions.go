@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 	for _, ni := range output.NetworkInterfacePermissions {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(ni)
+		attrs, err = adapterhelpers.ToAttributesWithExclude(ni)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -74,8 +75,8 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 // +overmind:search Search network interface permissions by ARN
 // +overmind:group AWS
 
-func NewNetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
+func NewNetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -86,7 +87,7 @@ func NewNetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, 
 		},
 		InputMapperGet:  networkInterfacePermissionInputMapperGet,
 		InputMapperList: networkInterfacePermissionInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacePermissionsInput) adapters.Paginator[*ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeNetworkInterfacePermissionsInput) adapterhelpers.Paginator[*ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Options] {
 			return ec2.NewDescribeNetworkInterfacePermissionsPaginator(client, params)
 		},
 		OutputMapper: networkInterfacePermissionOutputMapper,

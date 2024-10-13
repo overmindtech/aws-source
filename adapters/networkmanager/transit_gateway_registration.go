@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,7 +17,7 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 	for _, r := range output.TransitGatewayRegistrations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(r)
+		attrs, err = adapterhelpers.ToAttributesWithExclude(r)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -56,14 +57,14 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 
 		// ARN example: "arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234"
 		if r.TransitGatewayArn != nil {
-			if arn, err := adapters.ParseARN(*r.TransitGatewayArn); err == nil {
+			if arn, err := adapterhelpers.ParseARN(*r.TransitGatewayArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						// +overmind:link ec2-transit-gateway
 						Type:   "ec2-transit-gateway",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *r.TransitGatewayArn,
-						Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+						Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						In:  true,
@@ -87,8 +88,8 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 // +overmind:search Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId
 // +overmind:group AWS
 
-func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
@@ -119,7 +120,7 @@ func NewTransitGatewayRegistrationAdapter(client *networkmanager.Client, account
 				ErrorString: "list not supported for networkmanager-transit-gateway-registration, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetTransitGatewayRegistrationsInput) adapters.Paginator[*networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetTransitGatewayRegistrationsInput) adapterhelpers.Paginator[*networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetTransitGatewayRegistrationsPaginator(client, params)
 		},
 		OutputMapper: transitGatewayRegistrationOutputMapper,

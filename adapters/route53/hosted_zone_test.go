@@ -5,23 +5,24 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestHostedZoneItemMapper(t *testing.T) {
 	zone := types.HostedZone{
-		Id:              adapters.PtrString("/hostedzone/Z08416862SZP5DJXIDB29"),
-		Name:            adapters.PtrString("overmind-demo.com."),
-		CallerReference: adapters.PtrString("RISWorkflow-RD:144d3779-1574-42bf-9e75-f309838ea0a1"),
+		Id:              adapterhelpers.PtrString("/hostedzone/Z08416862SZP5DJXIDB29"),
+		Name:            adapterhelpers.PtrString("overmind-demo.com."),
+		CallerReference: adapterhelpers.PtrString("RISWorkflow-RD:144d3779-1574-42bf-9e75-f309838ea0a1"),
 		Config: &types.HostedZoneConfig{
-			Comment:     adapters.PtrString("HostedZone created by Route53 Registrar"),
+			Comment:     adapterhelpers.PtrString("HostedZone created by Route53 Registrar"),
 			PrivateZone: false,
 		},
-		ResourceRecordSetCount: adapters.PtrInt64(3),
+		ResourceRecordSetCount: adapterhelpers.PtrInt64(3),
 		LinkedService: &types.LinkedService{
-			Description:      adapters.PtrString("service description"),
-			ServicePrincipal: adapters.PtrString("principal"),
+			Description:      adapterhelpers.PtrString("service description"),
+			ServicePrincipal: adapterhelpers.PtrString("principal"),
 		},
 	}
 
@@ -35,7 +36,7 @@ func TestHostedZoneItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "route53-resource-record-set",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -52,7 +53,7 @@ func TestNewHostedZoneAdapter(t *testing.T) {
 
 	adapter := NewHostedZoneAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

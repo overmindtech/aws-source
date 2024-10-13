@@ -10,7 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -79,7 +80,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, desc := range output.TargetHealthDescriptions {
-		attrs, err := adapters.ToAttributesWithExclude(desc)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(desc)
 
 		if err != nil {
 			return nil, err
@@ -140,7 +141,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 		item.GetAttributes().Set("UniqueId", id.String())
 
 		// See if the ID is an ARN
-		a, err := adapters.ParseARN(*desc.Target.Id)
+		a, err := adapterhelpers.ParseARN(*desc.Target.Id)
 
 		if err == nil {
 			switch a.Service {
@@ -151,7 +152,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 						Type:   "lambda-function",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *desc.Target.Id,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Everything is tightly coupled with target health
@@ -166,7 +167,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 						Type:   "elbv2-load-balancer",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *desc.Target.Id,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						In:  true,
@@ -223,8 +224,8 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 // +overmind:search Search for target health by target group ARN
 // +overmind:group AWS
 
-func NewTargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
-	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{
+func NewTargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

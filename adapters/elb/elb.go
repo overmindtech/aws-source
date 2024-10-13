@@ -5,7 +5,8 @@ import (
 
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -54,7 +55,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 	}
 
 	for _, desc := range output.LoadBalancerDescriptions {
-		attrs, err := adapters.ToAttributesWithExclude(desc)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(desc)
 
 		if err != nil {
 			return nil, err
@@ -195,8 +196,8 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:terraform:queryMap aws_elb.arn
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
-	return &adapters.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
+func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -213,7 +214,7 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 		InputMapperList: func(scope string) (*elb.DescribeLoadBalancersInput, error) {
 			return &elb.DescribeLoadBalancersInput{}, nil
 		},
-		PaginatorBuilder: func(client elbClient, params *elb.DescribeLoadBalancersInput) adapters.Paginator[*elb.DescribeLoadBalancersOutput, *elb.Options] {
+		PaginatorBuilder: func(client elbClient, params *elb.DescribeLoadBalancersInput) adapterhelpers.Paginator[*elb.DescribeLoadBalancersOutput, *elb.Options] {
 			return elb.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,

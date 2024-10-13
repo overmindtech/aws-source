@@ -9,7 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -19,7 +20,7 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 	for _, s := range output.LinkAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(s, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -109,8 +110,8 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 // +overmind:search Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId
 // +overmind:group AWS
 
-func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-link-association",
@@ -141,7 +142,7 @@ func NewLinkAssociationAdapter(client *networkmanager.Client, accountID string) 
 				ErrorString: "list not supported for networkmanager-link-association, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetLinkAssociationsInput) adapters.Paginator[*networkmanager.GetLinkAssociationsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetLinkAssociationsInput) adapterhelpers.Paginator[*networkmanager.GetLinkAssociationsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetLinkAssociationsPaginator(client, params)
 		},
 		OutputMapper: linkAssociationOutputMapper,

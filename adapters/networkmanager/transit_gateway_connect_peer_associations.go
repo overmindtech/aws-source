@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,7 +17,7 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 	for _, a := range output.TransitGatewayConnectPeerAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(a, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(a, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -107,8 +108,8 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 // +overmind:search Search for Networkmanager TransitGatewayConnectPeerAssociations by GlobalNetworkId
 // +overmind:group AWS
 
-func NewTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
@@ -142,7 +143,7 @@ func NewTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Clien
 				ErrorString: "list not supported for networkmanager-transit-gateway-connect-peer-association, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetTransitGatewayConnectPeerAssociationsInput) adapters.Paginator[*networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetTransitGatewayConnectPeerAssociationsInput) adapterhelpers.Paginator[*networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetTransitGatewayConnectPeerAssociationsPaginator(client, params)
 		},
 		OutputMapper: transitGatewayConnectPeerAssociationsOutputMapper,

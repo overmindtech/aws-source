@@ -11,7 +11,7 @@ import (
 	"github.com/micahhausler/aws-iam-policy/policy"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 	"github.com/sourcegraph/conc/iter"
 )
@@ -220,7 +220,7 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 		enrichedRole.AssumeRolePolicyDocument = policyDoc
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(enrichedRole)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(enrichedRole)
 
 	if err != nil {
 		return nil, err
@@ -235,14 +235,14 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 
 	for _, policy := range awsItem.AttachedPolicies {
 		if policy.PolicyArn != nil {
-			if a, err := adapters.ParseARN(*policy.PolicyArn); err == nil {
+			if a, err := adapterhelpers.ParseARN(*policy.PolicyArn); err == nil {
 				// +overmind:link iam-policy
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *policy.PolicyArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changing the policy will affect the role
@@ -279,7 +279,7 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return adapters.HandleTagsError(ctx, err), nil
+			return adapterhelpers.HandleTagsError(ctx, err), nil
 		}
 
 		for _, tag := range out.Tags {
@@ -302,8 +302,8 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 // +overmind:terraform:queryMap aws_iam_role.arn
 // +overmind:terraform:method SEARCH
 
-func NewRoleAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{
+func NewRoleAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-role",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

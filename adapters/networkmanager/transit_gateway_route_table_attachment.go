@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -21,7 +22,7 @@ func getTransitGatewayRouteTableAttachmentGetFunc(ctx context.Context, client *n
 }
 
 func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *types.TransitGatewayRouteTableAttachment) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -74,14 +75,14 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 
 	// ARN example: "arn:aws:ec2:us-west-2:123456789012:transit-gateway-route-table/tgw-rtb-9876543210123456"
 	if awsItem.TransitGatewayRouteTableArn != nil {
-		if arn, err := adapters.ParseARN(*awsItem.TransitGatewayRouteTableArn); err == nil {
+		if arn, err := adapterhelpers.ParseARN(*awsItem.TransitGatewayRouteTableArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link ec2-transit-gateway-route-table
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *awsItem.TransitGatewayRouteTableArn,
-					Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+					Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					In:  true,
@@ -101,8 +102,8 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_transit_gateway_route_table_attachment.id
 
-func NewTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		ItemType:        "networkmanager-transit-gateway-route-table-attachment",

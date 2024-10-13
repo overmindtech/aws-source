@@ -5,12 +5,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -35,8 +36,8 @@ func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, er
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_key_group.id
 
-func NewKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
+func NewKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-key-group",
 		Client:          client,
 		AccountID:       accountID,

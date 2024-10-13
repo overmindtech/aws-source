@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -31,7 +32,7 @@ func layerListFunc(ctx context.Context, client *lambda.Client, scope string) ([]
 }
 
 func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -70,8 +71,8 @@ func layerItemMapper(_, scope string, awsItem *types.LayersListItem) (*sdp.Item,
 // +overmind:list List all lambda layers
 // +overmind:group AWS
 
-func NewLayerAdapter(client *lambda.Client, accountID string, region string) *adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options] {
-	return &adapters.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options]{
+func NewLayerAdapter(client *lambda.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options] {
+	return &adapterhelpers.GetListAdapter[*types.LayersListItem, *lambda.Client, *lambda.Options]{
 		ItemType:        "lambda-layer",
 		Client:          client,
 		AccountID:       accountID,

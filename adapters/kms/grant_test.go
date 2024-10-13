@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -54,14 +55,14 @@ func TestGrantOutputMapper(t *testing.T) {
 						"aws:dynamodb:tableName":    "Services",
 					},
 				},
-				IssuingAccount:    adapters.PtrString("arn:aws:iam::123456789012:root"),
-				Name:              adapters.PtrString("8276b9a6-6cf0-46f1-b2f0-7993a7f8c89a"),
+				IssuingAccount:    adapterhelpers.PtrString("arn:aws:iam::123456789012:root"),
+				Name:              adapterhelpers.PtrString("8276b9a6-6cf0-46f1-b2f0-7993a7f8c89a"),
 				Operations:        []types.GrantOperation{"Decrypt", "Encrypt", "GenerateDataKey", "ReEncryptFrom", "ReEncryptTo", "RetireGrant", "DescribeKey"},
-				GrantId:           adapters.PtrString("1667b97d27cf748cf05b487217dd4179526c949d14fb3903858e25193253fe59"),
-				KeyId:             adapters.PtrString("arn:aws:kms:us-west-2:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"),
-				RetiringPrincipal: adapters.PtrString("arn:aws:iam::account:role/role-name-with-path"),
-				GranteePrincipal:  adapters.PtrString("arn:aws:iam::account:user/user-name-with-path"),
-				CreationDate:      adapters.PtrTime(time.Now()),
+				GrantId:           adapterhelpers.PtrString("1667b97d27cf748cf05b487217dd4179526c949d14fb3903858e25193253fe59"),
+				KeyId:             adapterhelpers.PtrString("arn:aws:kms:us-west-2:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"),
+				RetiringPrincipal: adapterhelpers.PtrString("arn:aws:iam::account:role/role-name-with-path"),
+				GranteePrincipal:  adapterhelpers.PtrString("arn:aws:iam::account:user/user-name-with-path"),
+				CreationDate:      adapterhelpers.PtrTime(time.Now()),
 			},
 		},
 	}
@@ -83,9 +84,9 @@ func TestGrantOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	scope := adapters.FormatScope("123456789012", "us-west-2")
+	scope := adapterhelpers.FormatScope("123456789012", "us-west-2")
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kms-key",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -110,12 +111,12 @@ func TestGrantOutputMapper(t *testing.T) {
 }
 
 func TestNewGrantAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
 	adapter := NewGrantAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:  adapter,
 		Timeout:  10 * time.Second,
 		SkipList: true,

@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	for _, LaunchTemplate := range output.LaunchTemplates {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(LaunchTemplate, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(LaunchTemplate, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -59,8 +60,8 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_launch_template.id
 
-func NewLaunchTemplateAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
+func NewLaunchTemplateAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -71,7 +72,7 @@ func NewLaunchTemplateAdapter(client *ec2.Client, accountID string, region strin
 		},
 		InputMapperGet:  launchTemplateInputMapperGet,
 		InputMapperList: launchTemplateInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplatesInput) adapters.Paginator[*ec2.DescribeLaunchTemplatesOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeLaunchTemplatesInput) adapterhelpers.Paginator[*ec2.DescribeLaunchTemplatesOutput, *ec2.Options] {
 			return ec2.NewDescribeLaunchTemplatesPaginator(client, params)
 		},
 		OutputMapper: launchTemplateOutputMapper,

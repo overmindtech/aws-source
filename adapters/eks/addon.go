@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/eks"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -23,7 +24,7 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(out.Addon)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(out.Addon)
 
 	if err != nil {
 		return nil, err
@@ -53,8 +54,8 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 // +overmind:terraform:queryMap aws_eks_addon.arn
 // +overmind:terraform:method SEARCH
 
-func NewAddonAdapter(client EKSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
-	return &adapters.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
+func NewAddonAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-addon",
 		Client:          client,
 		AccountID:       accountID,
@@ -84,7 +85,7 @@ func NewAddonAdapter(client EKSClient, accountID string, region string) *adapter
 				ClusterName: &clusterName,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListAddonsInput) adapters.Paginator[*eks.ListAddonsOutput, *eks.Options] {
+		ListFuncPaginatorBuilder: func(client EKSClient, input *eks.ListAddonsInput) adapterhelpers.Paginator[*eks.ListAddonsOutput, *eks.Options] {
 			return eks.NewListAddonsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *eks.ListAddonsOutput, input *eks.ListAddonsInput) ([]*eks.DescribeAddonInput, error) {

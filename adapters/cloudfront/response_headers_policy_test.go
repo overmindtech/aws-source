@@ -5,73 +5,73 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestResponseHeadersPolicyItemMapper(t *testing.T) {
 	x := types.ResponseHeadersPolicy{
-		Id:               adapters.PtrString("test"),
-		LastModifiedTime: adapters.PtrTime(time.Now()),
+		Id:               adapterhelpers.PtrString("test"),
+		LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
 		ResponseHeadersPolicyConfig: &types.ResponseHeadersPolicyConfig{
-			Name:    adapters.PtrString("example-policy"),
-			Comment: adapters.PtrString("example comment"),
+			Name:    adapterhelpers.PtrString("example-policy"),
+			Comment: adapterhelpers.PtrString("example comment"),
 			CorsConfig: &types.ResponseHeadersPolicyCorsConfig{
-				AccessControlAllowCredentials: adapters.PtrBool(true),
+				AccessControlAllowCredentials: adapterhelpers.PtrBool(true),
 				AccessControlAllowHeaders: &types.ResponseHeadersPolicyAccessControlAllowHeaders{
 					Items:    []string{"X-Customer-Header"},
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 				},
 			},
 			CustomHeadersConfig: &types.ResponseHeadersPolicyCustomHeadersConfig{
-				Quantity: adapters.PtrInt32(1),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []types.ResponseHeadersPolicyCustomHeader{
 					{
-						Header:   adapters.PtrString("X-Customer-Header"),
-						Override: adapters.PtrBool(true),
-						Value:    adapters.PtrString("test"),
+						Header:   adapterhelpers.PtrString("X-Customer-Header"),
+						Override: adapterhelpers.PtrBool(true),
+						Value:    adapterhelpers.PtrString("test"),
 					},
 				},
 			},
 			RemoveHeadersConfig: &types.ResponseHeadersPolicyRemoveHeadersConfig{
-				Quantity: adapters.PtrInt32(1),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []types.ResponseHeadersPolicyRemoveHeader{
 					{
-						Header: adapters.PtrString("X-Private-Header"),
+						Header: adapterhelpers.PtrString("X-Private-Header"),
 					},
 				},
 			},
 			SecurityHeadersConfig: &types.ResponseHeadersPolicySecurityHeadersConfig{
 				ContentSecurityPolicy: &types.ResponseHeadersPolicyContentSecurityPolicy{
-					ContentSecurityPolicy: adapters.PtrString("default-src 'none';"),
-					Override:              adapters.PtrBool(true),
+					ContentSecurityPolicy: adapterhelpers.PtrString("default-src 'none';"),
+					Override:              adapterhelpers.PtrBool(true),
 				},
 				ContentTypeOptions: &types.ResponseHeadersPolicyContentTypeOptions{
-					Override: adapters.PtrBool(true),
+					Override: adapterhelpers.PtrBool(true),
 				},
 				FrameOptions: &types.ResponseHeadersPolicyFrameOptions{
 					FrameOption: types.FrameOptionsListDeny,
-					Override:    adapters.PtrBool(true),
+					Override:    adapterhelpers.PtrBool(true),
 				},
 				ReferrerPolicy: &types.ResponseHeadersPolicyReferrerPolicy{
-					Override:       adapters.PtrBool(true),
+					Override:       adapterhelpers.PtrBool(true),
 					ReferrerPolicy: types.ReferrerPolicyListNoReferrer,
 				},
 				StrictTransportSecurity: &types.ResponseHeadersPolicyStrictTransportSecurity{
-					AccessControlMaxAgeSec: adapters.PtrInt32(86400),
-					Override:               adapters.PtrBool(true),
-					IncludeSubdomains:      adapters.PtrBool(true),
-					Preload:                adapters.PtrBool(true),
+					AccessControlMaxAgeSec: adapterhelpers.PtrInt32(86400),
+					Override:               adapterhelpers.PtrBool(true),
+					IncludeSubdomains:      adapterhelpers.PtrBool(true),
+					Preload:                adapterhelpers.PtrBool(true),
 				},
 				XSSProtection: &types.ResponseHeadersPolicyXSSProtection{
-					Override:   adapters.PtrBool(true),
-					Protection: adapters.PtrBool(true),
-					ModeBlock:  adapters.PtrBool(true),
-					ReportUri:  adapters.PtrString("https://example.com/report"),
+					Override:   adapterhelpers.PtrBool(true),
+					Protection: adapterhelpers.PtrBool(true),
+					ModeBlock:  adapterhelpers.PtrBool(true),
+					ReportUri:  adapterhelpers.PtrString("https://example.com/report"),
 				},
 			},
 			ServerTimingHeadersConfig: &types.ResponseHeadersPolicyServerTimingHeadersConfig{
-				Enabled:      adapters.PtrBool(true),
-				SamplingRate: adapters.PtrFloat64(0.1),
+				Enabled:      adapterhelpers.PtrBool(true),
+				SamplingRate: adapterhelpers.PtrFloat64(0.1),
 			},
 		},
 	}
@@ -92,7 +92,7 @@ func TestNewResponseHeadersPolicyAdapter(t *testing.T) {
 
 	adapter := NewResponseHeadersPolicyAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

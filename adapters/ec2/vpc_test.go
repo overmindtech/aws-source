@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestVpcInputMapperGet(t *testing.T) {
@@ -42,38 +42,38 @@ func TestVpcOutputMapper(t *testing.T) {
 	output := &ec2.DescribeVpcsOutput{
 		Vpcs: []types.Vpc{
 			{
-				CidrBlock:       adapters.PtrString("172.31.0.0/16"),
-				DhcpOptionsId:   adapters.PtrString("dopt-0959b838bf4a4c7b8"),
+				CidrBlock:       adapterhelpers.PtrString("172.31.0.0/16"),
+				DhcpOptionsId:   adapterhelpers.PtrString("dopt-0959b838bf4a4c7b8"),
 				State:           types.VpcStateAvailable,
-				VpcId:           adapters.PtrString("vpc-0d7892e00e573e701"),
-				OwnerId:         adapters.PtrString("052392120703"),
+				VpcId:           adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
+				OwnerId:         adapterhelpers.PtrString("052392120703"),
 				InstanceTenancy: types.TenancyDefault,
 				CidrBlockAssociationSet: []types.VpcCidrBlockAssociation{
 					{
-						AssociationId: adapters.PtrString("vpc-cidr-assoc-0b77866f37f500af6"),
-						CidrBlock:     adapters.PtrString("172.31.0.0/16"),
+						AssociationId: adapterhelpers.PtrString("vpc-cidr-assoc-0b77866f37f500af6"),
+						CidrBlock:     adapterhelpers.PtrString("172.31.0.0/16"),
 						CidrBlockState: &types.VpcCidrBlockState{
 							State: types.VpcCidrBlockStateCodeAssociated,
 						},
 					},
 				},
-				IsDefault: adapters.PtrBool(false),
+				IsDefault: adapterhelpers.PtrBool(false),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("aws:cloudformation:logical-id"),
-						Value: adapters.PtrString("VPC"),
+						Key:   adapterhelpers.PtrString("aws:cloudformation:logical-id"),
+						Value: adapterhelpers.PtrString("VPC"),
 					},
 					{
-						Key:   adapters.PtrString("aws:cloudformation:stack-id"),
-						Value: adapters.PtrString("arn:aws:cloudformation:eu-west-2:052392120703:stack/StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243/ccde3240-7afa-11ed-81ff-02845d4c2702"),
+						Key:   adapterhelpers.PtrString("aws:cloudformation:stack-id"),
+						Value: adapterhelpers.PtrString("arn:aws:cloudformation:eu-west-2:052392120703:stack/StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243/ccde3240-7afa-11ed-81ff-02845d4c2702"),
 					},
 					{
-						Key:   adapters.PtrString("aws:cloudformation:stack-name"),
-						Value: adapters.PtrString("StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243"),
+						Key:   adapterhelpers.PtrString("aws:cloudformation:stack-name"),
+						Value: adapterhelpers.PtrString("StackSet-AWSControlTowerBP-VPC-ACCOUNT-FACTORY-V1-8c2a9348-a30c-4ac3-94c2-8279157c9243"),
 					},
 					{
-						Key:   adapters.PtrString("Name"),
-						Value: adapters.PtrString("aws-controltower-VPC"),
+						Key:   adapterhelpers.PtrString("Name"),
+						Value: adapterhelpers.PtrString("aws-controltower-VPC"),
 					},
 				},
 			},
@@ -102,7 +102,7 @@ func TestNewVpcAdapter(t *testing.T) {
 
 	adapter := NewVpcAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

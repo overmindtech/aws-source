@@ -5,7 +5,8 @@ import (
 	"errors"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -42,7 +43,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	}
 
 	for _, address := range output.Addresses {
-		attrs, err = adapters.ToAttributesWithExclude(address, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(address, "tags")
 
 		if err != nil {
 			return nil, err
@@ -149,8 +150,8 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 // +overmind:terraform:queryMap aws_eip_association.public_ip
 
 // NewAddressAdapter Creates a new adapter for aws-Address resources
-func NewAddressAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
+func NewAddressAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

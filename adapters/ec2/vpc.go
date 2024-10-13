@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 	for _, vpc := range output.Vpcs {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(vpc, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(vpc, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -58,8 +59,8 @@ func vpcOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.Desc
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_vpc.id
 
-func NewVpcAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
+func NewVpcAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcsInput, *ec2.DescribeVpcsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -70,7 +71,7 @@ func NewVpcAdapter(client *ec2.Client, accountID string, region string) *adapter
 		},
 		InputMapperGet:  vpcInputMapperGet,
 		InputMapperList: vpcInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcsInput) adapters.Paginator[*ec2.DescribeVpcsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcsInput) adapterhelpers.Paginator[*ec2.DescribeVpcsOutput, *ec2.Options] {
 			return ec2.NewDescribeVpcsPaginator(client, params)
 		},
 		OutputMapper: vpcOutputMapper,

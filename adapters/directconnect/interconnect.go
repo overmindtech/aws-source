@@ -6,7 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,7 +15,7 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 	items := make([]*sdp.Item, 0)
 
 	for _, interconnect := range output.Interconnects {
-		attributes, err := adapters.ToAttributesWithExclude(interconnect, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(interconnect, "tags")
 		if err != nil {
 			return nil, err
 		}
@@ -130,8 +131,8 @@ func interconnectOutputMapper(_ context.Context, _ *directconnect.Client, scope 
 // +overmind:search Search Interconnects by ARN
 // +overmind:group AWS
 
-func NewInterconnectAdapter(client *directconnect.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
-	return &adapters.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
+func NewInterconnectAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeInterconnectsInput, *directconnect.DescribeInterconnectsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

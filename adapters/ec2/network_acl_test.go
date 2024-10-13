@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -45,42 +46,42 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 			{
 				Associations: []types.NetworkAclAssociation{
 					{
-						NetworkAclAssociationId: adapters.PtrString("aclassoc-0f85f8b1fde0a5939"),
-						NetworkAclId:            adapters.PtrString("acl-0a346e8e6f5a9ad91"),
-						SubnetId:                adapters.PtrString("subnet-0450a637af9984235"),
+						NetworkAclAssociationId: adapterhelpers.PtrString("aclassoc-0f85f8b1fde0a5939"),
+						NetworkAclId:            adapterhelpers.PtrString("acl-0a346e8e6f5a9ad91"),
+						SubnetId:                adapterhelpers.PtrString("subnet-0450a637af9984235"),
 					},
 					{
-						NetworkAclAssociationId: adapters.PtrString("aclassoc-064b78003a2d309a4"),
-						NetworkAclId:            adapters.PtrString("acl-0a346e8e6f5a9ad91"),
-						SubnetId:                adapters.PtrString("subnet-06c0dea0437180c61"),
+						NetworkAclAssociationId: adapterhelpers.PtrString("aclassoc-064b78003a2d309a4"),
+						NetworkAclId:            adapterhelpers.PtrString("acl-0a346e8e6f5a9ad91"),
+						SubnetId:                adapterhelpers.PtrString("subnet-06c0dea0437180c61"),
 					},
 					{
-						NetworkAclAssociationId: adapters.PtrString("aclassoc-0575080579a7381f5"),
-						NetworkAclId:            adapters.PtrString("acl-0a346e8e6f5a9ad91"),
-						SubnetId:                adapters.PtrString("subnet-0d8ae4b4e07647efa"),
+						NetworkAclAssociationId: adapterhelpers.PtrString("aclassoc-0575080579a7381f5"),
+						NetworkAclId:            adapterhelpers.PtrString("acl-0a346e8e6f5a9ad91"),
+						SubnetId:                adapterhelpers.PtrString("subnet-0d8ae4b4e07647efa"),
 					},
 				},
 				Entries: []types.NetworkAclEntry{
 					{
-						CidrBlock:  adapters.PtrString("0.0.0.0/0"),
-						Egress:     adapters.PtrBool(true),
-						Protocol:   adapters.PtrString("-1"),
+						CidrBlock:  adapterhelpers.PtrString("0.0.0.0/0"),
+						Egress:     adapterhelpers.PtrBool(true),
+						Protocol:   adapterhelpers.PtrString("-1"),
 						RuleAction: types.RuleActionAllow,
-						RuleNumber: adapters.PtrInt32(100),
+						RuleNumber: adapterhelpers.PtrInt32(100),
 					},
 					{
-						CidrBlock:  adapters.PtrString("0.0.0.0/0"),
-						Egress:     adapters.PtrBool(true),
-						Protocol:   adapters.PtrString("-1"),
+						CidrBlock:  adapterhelpers.PtrString("0.0.0.0/0"),
+						Egress:     adapterhelpers.PtrBool(true),
+						Protocol:   adapterhelpers.PtrString("-1"),
 						RuleAction: types.RuleActionDeny,
-						RuleNumber: adapters.PtrInt32(32767),
+						RuleNumber: adapterhelpers.PtrInt32(32767),
 					},
 				},
-				IsDefault:    adapters.PtrBool(true),
-				NetworkAclId: adapters.PtrString("acl-0a346e8e6f5a9ad91"),
+				IsDefault:    adapterhelpers.PtrBool(true),
+				NetworkAclId: adapterhelpers.PtrString("acl-0a346e8e6f5a9ad91"),
 				Tags:         []types.Tag{},
-				VpcId:        adapters.PtrString("vpc-0d7892e00e573e701"),
-				OwnerId:      adapters.PtrString("052392120703"),
+				VpcId:        adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
+				OwnerId:      adapterhelpers.PtrString("052392120703"),
 			},
 		},
 	}
@@ -99,7 +100,7 @@ func TestNetworkAclOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-subnet",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -135,7 +136,7 @@ func TestNewNetworkAclAdapter(t *testing.T) {
 
 	adapter := NewNetworkAclAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

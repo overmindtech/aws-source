@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -12,7 +13,7 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 	items := make([]*sdp.Item, 0)
 
 	for _, assoc := range output.IamInstanceProfileAssociations {
-		attributes, err := adapters.ToAttributesWithExclude(assoc)
+		attributes, err := adapterhelpers.ToAttributesWithExclude(assoc)
 
 		if err != nil {
 			return nil, err
@@ -26,14 +27,14 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 		}
 
 		if assoc.IamInstanceProfile != nil && assoc.IamInstanceProfile.Arn != nil {
-			if arn, err := adapters.ParseARN(*assoc.IamInstanceProfile.Arn); err == nil {
+			if arn, err := adapterhelpers.ParseARN(*assoc.IamInstanceProfile.Arn); err == nil {
 				// +overmind:link iam-instance-profile
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-instance-profile",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *assoc.IamInstanceProfile.Arn,
-						Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+						Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to the profile will affect this
@@ -78,8 +79,8 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 // +overmind:group AWS
 
 // NewIamInstanceProfileAssociationAdapter Creates a new adapter for aws-IamInstanceProfileAssociation resources
-func NewIamInstanceProfileAssociationAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
+func NewIamInstanceProfileAssociationAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

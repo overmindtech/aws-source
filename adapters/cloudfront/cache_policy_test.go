@@ -7,33 +7,33 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 var testCachePolicy = &types.CachePolicy{
-	Id:               adapters.PtrString("test-id"),
-	LastModifiedTime: adapters.PtrTime(time.Now()),
+	Id:               adapterhelpers.PtrString("test-id"),
+	LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
 	CachePolicyConfig: &types.CachePolicyConfig{
-		MinTTL:     adapters.PtrInt64(1),
-		Name:       adapters.PtrString("test-name"),
-		Comment:    adapters.PtrString("test-comment"),
-		DefaultTTL: adapters.PtrInt64(1),
-		MaxTTL:     adapters.PtrInt64(1),
+		MinTTL:     adapterhelpers.PtrInt64(1),
+		Name:       adapterhelpers.PtrString("test-name"),
+		Comment:    adapterhelpers.PtrString("test-comment"),
+		DefaultTTL: adapterhelpers.PtrInt64(1),
+		MaxTTL:     adapterhelpers.PtrInt64(1),
 		ParametersInCacheKeyAndForwardedToOrigin: &types.ParametersInCacheKeyAndForwardedToOrigin{
 			CookiesConfig: &types.CachePolicyCookiesConfig{
 				CookieBehavior: types.CachePolicyCookieBehaviorAll,
 				Cookies: &types.CookieNames{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"test-cookie",
 					},
 				},
 			},
-			EnableAcceptEncodingGzip: adapters.PtrBool(true),
+			EnableAcceptEncodingGzip: adapterhelpers.PtrBool(true),
 			HeadersConfig: &types.CachePolicyHeadersConfig{
 				HeaderBehavior: types.CachePolicyHeaderBehaviorWhitelist,
 				Headers: &types.Headers{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"test-header",
 					},
@@ -42,13 +42,13 @@ var testCachePolicy = &types.CachePolicy{
 			QueryStringsConfig: &types.CachePolicyQueryStringsConfig{
 				QueryStringBehavior: types.CachePolicyQueryStringBehaviorWhitelist,
 				QueryStrings: &types.QueryStringNames{
-					Quantity: adapters.PtrInt32(1),
+					Quantity: adapterhelpers.PtrInt32(1),
 					Items: []string{
 						"test-query-string",
 					},
 				},
 			},
-			EnableAcceptEncodingBrotli: adapters.PtrBool(true),
+			EnableAcceptEncodingBrotli: adapterhelpers.PtrBool(true),
 		},
 	},
 }
@@ -89,7 +89,7 @@ func TestNewCachePolicyAdapter(t *testing.T) {
 
 	adapter := NewCachePolicyAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

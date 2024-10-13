@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ type ParameterGroup struct {
 }
 
 func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -43,8 +44,8 @@ func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.
 // +overmind:terraform:queryMap aws_db_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBParameterGroupAdapter(client rdsClient, accountID string, region string) *adapters.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options] {
-	return &adapters.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options]{
+func NewDBParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options] {
+	return &adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-parameter-group",
 		Client:          client,
 		AccountID:       accountID,

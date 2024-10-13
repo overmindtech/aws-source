@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -35,14 +36,14 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 	if err == nil {
 		tags = tagsToMap(tagsOut.Tags)
 	} else {
-		tags = adapters.HandleTagsError(ctx, err)
+		tags = adapterhelpers.HandleTagsError(ctx, err)
 	}
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tags for streaming distribution %v: %w", *d.Id, err)
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(d)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(d)
 
 	if err != nil {
 		return nil, err
@@ -170,15 +171,15 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 // +overmind:terraform:queryMap aws_cloudfront_Streamingdistribution.arn
 // +overmind:terraform:method SEARCH
 
-func NewStreamingDistributionAdapter(client CloudFrontClient, accountID string) *adapters.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
-	return &adapters.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
+func NewStreamingDistributionAdapter(client CloudFrontClient, accountID string) *adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:        "cloudfront-streaming-distribution",
 		Client:          client,
 		AccountID:       accountID,
 		Region:          "", // Cloudfront resources aren't tied to a region
 		AdapterMetadata: StreamingDistributionMetadata(),
 		ListInput:       &cloudfront.ListStreamingDistributionsInput{},
-		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListStreamingDistributionsInput) adapters.Paginator[*cloudfront.ListStreamingDistributionsOutput, *cloudfront.Options] {
+		ListFuncPaginatorBuilder: func(client CloudFrontClient, input *cloudfront.ListStreamingDistributionsInput) adapterhelpers.Paginator[*cloudfront.ListStreamingDistributionsOutput, *cloudfront.Options] {
 			return cloudfront.NewListStreamingDistributionsPaginator(client, input)
 		},
 		GetInputMapper: func(scope, query string) *cloudfront.GetStreamingDistributionInput {

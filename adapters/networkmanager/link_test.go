@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,10 +15,10 @@ func TestLinkOutputMapper(t *testing.T) {
 	output := networkmanager.GetLinksOutput{
 		Links: []types.Link{
 			{
-				LinkId:          adapters.PtrString("link-1"),
-				GlobalNetworkId: adapters.PtrString("default"),
-				SiteId:          adapters.PtrString("site-1"),
-				LinkArn:         adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
+				LinkId:          adapterhelpers.PtrString("link-1"),
+				GlobalNetworkId: adapterhelpers.PtrString("default"),
+				SiteId:          adapterhelpers.PtrString("site-1"),
+				LinkArn:         adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
 			},
 		},
 	}
@@ -51,7 +52,7 @@ func TestLinkOutputMapper(t *testing.T) {
 		t.Fatalf("expected default|link-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

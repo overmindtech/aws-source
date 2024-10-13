@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -67,7 +68,7 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 
 	wg.Wait()
 
-	attributes, err := adapters.ToAttributesWithExclude(uf)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(uf)
 
 	if err != nil {
 		return nil, err
@@ -181,14 +182,14 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 	}
 
 	if config.FirewallPolicyArn != nil {
-		if a, err := adapters.ParseARN(*config.FirewallPolicyArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(*config.FirewallPolicyArn); err == nil {
 			//+overmind:link network-firewall-firewall-policy
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "network-firewall-firewall-policy",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *config.FirewallPolicyArn,
-					Scope:  adapters.FormatScope(a.AccountID, a.Region),
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					// Policy will affect the firewall but not the other way around
@@ -269,8 +270,8 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkfirewall_firewall.name
 
-func NewFirewallAdapter(client networkFirewallClient, accountID string, region string) *adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
-	return &adapters.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
+func NewFirewallAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-firewall",
 		Client:          client,
 		AccountID:       accountID,
@@ -287,7 +288,7 @@ func NewFirewallAdapter(client networkFirewallClient, accountID string, region s
 				FirewallArn: &query,
 			}, nil
 		},
-		ListFuncPaginatorBuilder: func(client networkFirewallClient, input *networkfirewall.ListFirewallsInput) adapters.Paginator[*networkfirewall.ListFirewallsOutput, *networkfirewall.Options] {
+		ListFuncPaginatorBuilder: func(client networkFirewallClient, input *networkfirewall.ListFirewallsInput) adapterhelpers.Paginator[*networkfirewall.ListFirewallsOutput, *networkfirewall.Options] {
 			return networkfirewall.NewListFirewallsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *networkfirewall.ListFirewallsOutput, input *networkfirewall.ListFirewallsInput) ([]*networkfirewall.DescribeFirewallInput, error) {

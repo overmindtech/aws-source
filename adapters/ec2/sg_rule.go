@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 	for _, securityGroupRule := range output.SecurityGroupRules {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(securityGroupRule, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(securityGroupRule, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -97,8 +98,8 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 // +overmind:terraform:queryMap aws_vpc_security_group_ingress_rule.security_group_rule_id
 // +overmind:terraform:queryMap aws_vpc_security_group_egress_rule.security_group_rule_id
 
-func NewSecurityGroupRuleAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{
+func NewSecurityGroupRuleAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -109,7 +110,7 @@ func NewSecurityGroupRuleAdapter(client *ec2.Client, accountID string, region st
 		},
 		InputMapperGet:  securityGroupRuleInputMapperGet,
 		InputMapperList: securityGroupRuleInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSecurityGroupRulesInput) adapters.Paginator[*ec2.DescribeSecurityGroupRulesOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeSecurityGroupRulesInput) adapterhelpers.Paginator[*ec2.DescribeSecurityGroupRulesOutput, *ec2.Options] {
 			return ec2.NewDescribeSecurityGroupRulesPaginator(client, params)
 		},
 		OutputMapper: securityGroupRuleOutputMapper,

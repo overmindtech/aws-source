@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -22,7 +23,7 @@ func connectAttachmentGetFunc(ctx context.Context, client *networkmanager.Client
 }
 
 func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(ca)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(ca)
 
 	if err != nil {
 		return nil, err
@@ -59,14 +60,14 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 	}
 
 	if ca.Attachment.CoreNetworkArn != nil {
-		if arn, err := adapters.ParseARN(*ca.Attachment.CoreNetworkArn); err == nil {
+		if arn, err := adapterhelpers.ParseARN(*ca.Attachment.CoreNetworkArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					// +overmind:link networkmanager-core-network
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *ca.Attachment.CoreNetworkArn,
-					Scope:  adapters.FormatScope(arn.AccountID, arn.Region),
+					Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
 				},
 				BlastPropagation: &sdp.BlastPropagation{
 					In:  true,
@@ -88,8 +89,8 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
-func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,

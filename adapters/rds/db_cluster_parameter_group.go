@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ type ClusterParameterGroup struct {
 }
 
 func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParameterGroup) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -43,8 +44,8 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 // +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapters.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
-	return &adapters.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
+func NewDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
+	return &adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-cluster-parameter-group",
 		Client:          client,
 		AccountID:       accountID,

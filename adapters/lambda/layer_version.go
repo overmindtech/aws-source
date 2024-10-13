@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,7 +29,7 @@ func layerVersionGetInputMapper(scope, query string) *lambda.GetLayerVersionInpu
 
 	return &lambda.GetLayerVersionInput{
 		LayerName:     &name,
-		VersionNumber: adapters.PtrInt64(int64(versionInt)),
+		VersionNumber: adapterhelpers.PtrInt64(int64(versionInt)),
 	}
 }
 
@@ -46,7 +47,7 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 		return nil, err
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(out, "resultMetadata")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(out, "resultMetadata")
 
 	if err != nil {
 		return nil, err
@@ -65,18 +66,18 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 		Scope:           scope,
 	}
 
-	var a *adapters.ARN
+	var a *adapterhelpers.ARN
 
 	if out.Content != nil {
 		if out.Content.SigningJobArn != nil {
-			if a, err = adapters.ParseARN(*out.Content.SigningJobArn); err == nil {
+			if a, err = adapterhelpers.ParseARN(*out.Content.SigningJobArn); err == nil {
 				// +overmind:link signer-signing-job
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-job",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *out.Content.SigningJobArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Signing jobs can affect layers
@@ -89,14 +90,14 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 		}
 
 		if out.Content.SigningProfileVersionArn != nil {
-			if a, err = adapters.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
+			if a, err = adapterhelpers.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
 				// +overmind:link signer-signing-profile
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-profile",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *out.Content.SigningProfileVersionArn,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Signing profiles can affect layers
@@ -121,8 +122,8 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 // +overmind:terraform:queryMap aws_lambda_layer_version.arn
 // +overmind:terraform:method SEARCH
 
-func NewLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
-	return &adapters.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
+func NewLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
 		ItemType:        "lambda-layer-version",
 		Client:          client,
 		AccountID:       accountID,
@@ -135,7 +136,7 @@ func NewLayerVersionAdapter(client LambdaClient, accountID string, region string
 		ListFuncOutputMapper: func(output *lambda.ListLayerVersionsOutput, input *lambda.ListLayerVersionsInput) ([]*lambda.GetLayerVersionInput, error) {
 			return []*lambda.GetLayerVersionInput{}, nil
 		},
-		ListFuncPaginatorBuilder: func(client LambdaClient, input *lambda.ListLayerVersionsInput) adapters.Paginator[*lambda.ListLayerVersionsOutput, *lambda.Options] {
+		ListFuncPaginatorBuilder: func(client LambdaClient, input *lambda.ListLayerVersionsInput) adapterhelpers.Paginator[*lambda.ListLayerVersionsOutput, *lambda.Options] {
 			return lambda.NewListLayerVersionsPaginator(client, input)
 		},
 	}

@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,21 +16,21 @@ func TestSiteToSiteVpnAttachmentOutputMapper(t *testing.T) {
 		item           *types.SiteToSiteVpnAttachment
 		expectedHealth sdp.Health
 		expectedAttr   string
-		tests          adapters.QueryTests
+		tests          adapterhelpers.QueryTests
 	}{
 		{
 			name: "ok",
 			item: &types.SiteToSiteVpnAttachment{
 				Attachment: &types.Attachment{
-					AttachmentId:  adapters.PtrString("stsa-1"),
-					CoreNetworkId: adapters.PtrString("cn-1"),
+					AttachmentId:  adapterhelpers.PtrString("stsa-1"),
+					CoreNetworkId: adapterhelpers.PtrString("cn-1"),
 					State:         types.AttachmentStateAvailable,
 				},
-				VpnConnectionArn: adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/vpn-1234"),
+				VpnConnectionArn: adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/vpn-1234"),
 			},
 			expectedHealth: sdp.Health_HEALTH_OK,
 			expectedAttr:   "stsa-1",
-			tests: adapters.QueryTests{
+			tests: adapterhelpers.QueryTests{
 				{
 					ExpectedType:   "networkmanager-core-network",
 					ExpectedMethod: sdp.QueryMethod_GET,

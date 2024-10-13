@@ -11,7 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/micahhausler/aws-iam-policy/policy"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/conc/iter"
@@ -29,7 +30,7 @@ type PolicyDetails struct {
 
 func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
 	// Construct the ARN from the name etc.
-	a := adapters.ARN{
+	a := adapterhelpers.ARN{
 		ARN: arn.ARN{
 			Partition: "aws",
 			Service:   "iam",
@@ -39,7 +40,7 @@ func policyGetFunc(ctx context.Context, client IAMClient, scope, query string) (
 		},
 	}
 	out, err := client.GetPolicy(ctx, &iam.GetPolicyInput{
-		PolicyArn: adapters.PtrString(a.String()),
+		PolicyArn: adapterhelpers.PtrString(a.String()),
 	})
 	if err != nil {
 		return nil, err
@@ -206,7 +207,7 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 		Policy:   awsItem.Policy,
 		Document: awsItem.Document,
 	}
-	attributes, err := adapters.ToAttributesWithExclude(finalAttributes)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(finalAttributes)
 
 	if err != nil {
 		return nil, err
@@ -305,7 +306,7 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 		out, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			return adapters.HandleTagsError(ctx, err), nil
+			return adapterhelpers.HandleTagsError(ctx, err), nil
 		}
 
 		for _, tag := range out.Tags {
@@ -335,8 +336,8 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-adapter/issues/68
-func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapters.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
-	return &adapters.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options]{
+func NewPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-policy",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

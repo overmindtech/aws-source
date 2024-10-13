@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -45,8 +46,8 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_cache_policy.id
 
-func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapters.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
+func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
 		ItemType:               "cloudfront-cache-policy",
 		Client:                 client,
 		AccountID:              accountID,
@@ -66,7 +67,7 @@ func NewCachePolicyAdapter(client CloudFrontClient, accountID string) *adapters.
 		},
 		ListFunc: cachePolicyListFunc,
 		ItemMapper: func(_, scope string, awsItem *types.CachePolicy) (*sdp.Item, error) {
-			attributes, err := adapters.ToAttributesWithExclude(awsItem)
+			attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 			if err != nil {
 				return nil, err

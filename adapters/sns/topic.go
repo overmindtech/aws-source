@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/sns"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,7 +29,7 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(output.Attributes)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +75,8 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sns_topic.id
 
-func NewTopicAdapter(client topicClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
-	return &adapters.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{
+func NewTopicAdapter(client topicClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{
 		ItemType:        "sns-topic",
 		Client:          client,
 		AccountID:       accountID,
@@ -87,7 +88,7 @@ func NewTopicAdapter(client topicClient, accountID string, region string) *adapt
 				TopicArn: &query,
 			}
 		},
-		ListFuncPaginatorBuilder: func(client topicClient, input *sns.ListTopicsInput) adapters.Paginator[*sns.ListTopicsOutput, *sns.Options] {
+		ListFuncPaginatorBuilder: func(client topicClient, input *sns.ListTopicsInput) adapterhelpers.Paginator[*sns.ListTopicsOutput, *sns.Options] {
 			return sns.NewListTopicsPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *sns.ListTopicsOutput, input *sns.ListTopicsInput) ([]*sns.GetTopicAttributesInput, error) {

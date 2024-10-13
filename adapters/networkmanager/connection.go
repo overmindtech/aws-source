@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 	for _, s := range output.Connections {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(s, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(s, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -146,8 +147,8 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 // +overmind:terraform:queryMap aws_networkmanager_connection.arn
 // +overmind:terraform:method SEARCH
 
-func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adapters.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,
 		AccountID: accountID,
 		ItemType:  "networkmanager-connection",
@@ -178,7 +179,7 @@ func NewConnectionAdapter(client *networkmanager.Client, accountID string) *adap
 				ErrorString: "list not supported for networkmanager-connection, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetConnectionsInput) adapters.Paginator[*networkmanager.GetConnectionsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetConnectionsInput) adapterhelpers.Paginator[*networkmanager.GetConnectionsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetConnectionsPaginator(client, params)
 		},
 		OutputMapper: connectionOutputMapper,

@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/directconnect"
 	"github.com/aws/aws-sdk-go-v2/service/directconnect/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,23 +16,23 @@ func TestInterconnectOutputMapper(t *testing.T) {
 	output := &directconnect.DescribeInterconnectsOutput{
 		Interconnects: []types.Interconnect{
 			{
-				AwsDeviceV2:          adapters.PtrString("EqDC2-123h49s71dabc"),
-				AwsLogicalDeviceId:   adapters.PtrString("device-1"),
-				Bandwidth:            adapters.PtrString("1Gbps"),
+				AwsDeviceV2:          adapterhelpers.PtrString("EqDC2-123h49s71dabc"),
+				AwsLogicalDeviceId:   adapterhelpers.PtrString("device-1"),
+				Bandwidth:            adapterhelpers.PtrString("1Gbps"),
 				HasLogicalRedundancy: types.HasLogicalRedundancyUnknown,
-				InterconnectId:       adapters.PtrString("dxcon-fguhmqlc"),
-				InterconnectName:     adapters.PtrString("interconnect-1"),
+				InterconnectId:       adapterhelpers.PtrString("dxcon-fguhmqlc"),
+				InterconnectName:     adapterhelpers.PtrString("interconnect-1"),
 				InterconnectState:    types.InterconnectStateAvailable,
-				JumboFrameCapable:    adapters.PtrBool(true),
-				LagId:                adapters.PtrString("dxlag-ffrz71kw"),
-				LoaIssueTime:         adapters.PtrTime(time.Now()),
-				Location:             adapters.PtrString("EqDC2"),
-				Region:               adapters.PtrString("us-east-1"),
-				ProviderName:         adapters.PtrString("provider-1"),
+				JumboFrameCapable:    adapterhelpers.PtrBool(true),
+				LagId:                adapterhelpers.PtrString("dxlag-ffrz71kw"),
+				LoaIssueTime:         adapterhelpers.PtrTime(time.Now()),
+				Location:             adapterhelpers.PtrString("EqDC2"),
+				Region:               adapterhelpers.PtrString("us-east-1"),
+				ProviderName:         adapterhelpers.PtrString("provider-1"),
 				Tags: []types.Tag{
 					{
-						Key:   adapters.PtrString("foo"),
-						Value: adapters.PtrString("bar"),
+						Key:   adapterhelpers.PtrString("foo"),
+						Value: adapterhelpers.PtrString("bar"),
 					},
 				},
 			},
@@ -55,7 +56,7 @@ func TestInterconnectOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "directconnect-lag",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -125,7 +126,7 @@ func TestInterconnectHealth(t *testing.T) {
 			Interconnects: []types.Interconnect{
 				{
 					InterconnectState: c.state,
-					LagId:             adapters.PtrString("dxlag-fgsu9erb"),
+					LagId:             adapterhelpers.PtrString("dxlag-fgsu9erb"),
 				},
 			},
 		}
@@ -152,7 +153,7 @@ func TestNewInterconnectAdapter(t *testing.T) {
 
 	adapter := NewInterconnectAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 		// Listing these in our test account gives "An error occurred

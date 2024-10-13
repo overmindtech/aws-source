@@ -5,12 +5,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHeadersPolicy) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -35,8 +36,8 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_response_headers_policy.id
 
-func NewResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
+func NewResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-response-headers-policy",
 		Client:          client,
 		AccountID:       accountID,

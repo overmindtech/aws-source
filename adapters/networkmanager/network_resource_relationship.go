@@ -8,7 +8,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -25,13 +26,13 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		}
 
 		// Parse the ARNs
-		fromArn, err := adapters.ParseARN(*relationship.From)
+		fromArn, err := adapterhelpers.ParseARN(*relationship.From)
 
 		if err != nil {
 			return nil, err
 		}
 
-		toArn, err := adapters.ParseARN(*relationship.To)
+		toArn, err := adapterhelpers.ParseARN(*relationship.To)
 
 		if err != nil {
 			return nil, err
@@ -262,8 +263,8 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 // +overmind:search Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId
 // +overmind:group AWS
 
-func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
@@ -282,7 +283,7 @@ func NewNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accou
 				ErrorString: "list not supported for networkmanager-network-resource-relationship, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetNetworkResourceRelationshipsInput) adapters.Paginator[*networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetNetworkResourceRelationshipsInput) adapterhelpers.Paginator[*networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetNetworkResourceRelationshipsPaginator(client, params)
 		},
 		InputMapperSearch: func(ctx context.Context, client *networkmanager.Client, scope, query string) (*networkmanager.GetNetworkResourceRelationshipsInput, error) {

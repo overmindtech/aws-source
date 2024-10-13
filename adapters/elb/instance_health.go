@@ -10,7 +10,7 @@ import (
 	elb "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing/types"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -42,7 +42,7 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, is := range output.InstanceStates {
-		attrs, err := adapters.ToAttributesWithExclude(is)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(is)
 
 		if err != nil {
 			return nil, err
@@ -96,8 +96,8 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 // +overmind:list List all instance healths
 // +overmind:group AWS
 
-func NewInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
-	return &adapters.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
+func NewInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,

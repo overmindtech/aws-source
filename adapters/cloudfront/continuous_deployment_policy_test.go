@@ -5,18 +5,19 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 	item, err := continuousDeploymentPolicyItemMapper("", "test", &types.ContinuousDeploymentPolicy{
-		Id:               adapters.PtrString("test-id"),
-		LastModifiedTime: adapters.PtrTime(time.Now()),
+		Id:               adapterhelpers.PtrString("test-id"),
+		LastModifiedTime: adapterhelpers.PtrTime(time.Now()),
 		ContinuousDeploymentPolicyConfig: &types.ContinuousDeploymentPolicyConfig{
-			Enabled: adapters.PtrBool(true),
+			Enabled: adapterhelpers.PtrBool(true),
 			StagingDistributionDnsNames: &types.StagingDistributionDnsNames{
-				Quantity: adapters.PtrInt32(1),
+				Quantity: adapterhelpers.PtrInt32(1),
 				Items: []string{
 					"staging.test.com", // link
 				},
@@ -24,14 +25,14 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 			TrafficConfig: &types.TrafficConfig{
 				Type: types.ContinuousDeploymentPolicyTypeSingleWeight,
 				SingleHeaderConfig: &types.ContinuousDeploymentSingleHeaderConfig{
-					Header: adapters.PtrString("test-header"),
-					Value:  adapters.PtrString("test-value"),
+					Header: adapterhelpers.PtrString("test-header"),
+					Value:  adapterhelpers.PtrString("test-value"),
 				},
 				SingleWeightConfig: &types.ContinuousDeploymentSingleWeightConfig{
-					Weight: adapters.PtrFloat32(1),
+					Weight: adapterhelpers.PtrFloat32(1),
 					SessionStickinessConfig: &types.SessionStickinessConfig{
-						IdleTTL:    adapters.PtrInt32(1),
-						MaximumTTL: adapters.PtrInt32(2),
+						IdleTTL:    adapterhelpers.PtrInt32(1),
+						MaximumTTL: adapterhelpers.PtrInt32(2),
 					},
 				},
 			},
@@ -46,7 +47,7 @@ func TestContinuousDeploymentPolicyItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -63,7 +64,7 @@ func TestNewContinuousDeploymentPolicyAdapter(t *testing.T) {
 
 	adapter := NewContinuousDeploymentPolicyAdapter(client, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -44,62 +45,62 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 		NetworkInterfaces: []types.NetworkInterface{
 			{
 				Association: &types.NetworkInterfaceAssociation{
-					AllocationId:  adapters.PtrString("eipalloc-000a9739291350592"),
-					AssociationId: adapters.PtrString("eipassoc-049cda1f947e5efe6"),
-					IpOwnerId:     adapters.PtrString("052392120703"),
-					PublicDnsName: adapters.PtrString("ec2-18-170-133-9.eu-west-2.compute.amazonaws.com"),
-					PublicIp:      adapters.PtrString("18.170.133.9"),
+					AllocationId:  adapterhelpers.PtrString("eipalloc-000a9739291350592"),
+					AssociationId: adapterhelpers.PtrString("eipassoc-049cda1f947e5efe6"),
+					IpOwnerId:     adapterhelpers.PtrString("052392120703"),
+					PublicDnsName: adapterhelpers.PtrString("ec2-18-170-133-9.eu-west-2.compute.amazonaws.com"),
+					PublicIp:      adapterhelpers.PtrString("18.170.133.9"),
 				},
 				Attachment: &types.NetworkInterfaceAttachment{
-					AttachmentId:        adapters.PtrString("ela-attach-03e560efca8c9e5d8"),
-					DeleteOnTermination: adapters.PtrBool(false),
-					DeviceIndex:         adapters.PtrInt32(1),
-					InstanceOwnerId:     adapters.PtrString("amazon-aws"),
+					AttachmentId:        adapterhelpers.PtrString("ela-attach-03e560efca8c9e5d8"),
+					DeleteOnTermination: adapterhelpers.PtrBool(false),
+					DeviceIndex:         adapterhelpers.PtrInt32(1),
+					InstanceOwnerId:     adapterhelpers.PtrString("amazon-aws"),
 					Status:              types.AttachmentStatusAttached,
-					InstanceId:          adapters.PtrString("foo"),
+					InstanceId:          adapterhelpers.PtrString("foo"),
 				},
-				AvailabilityZone: adapters.PtrString("eu-west-2b"),
-				Description:      adapters.PtrString("Interface for NAT Gateway nat-0e07f7530ef076766"),
+				AvailabilityZone: adapterhelpers.PtrString("eu-west-2b"),
+				Description:      adapterhelpers.PtrString("Interface for NAT Gateway nat-0e07f7530ef076766"),
 				Groups: []types.GroupIdentifier{
 					{
-						GroupId:   adapters.PtrString("group-123"),
-						GroupName: adapters.PtrString("something"),
+						GroupId:   adapterhelpers.PtrString("group-123"),
+						GroupName: adapterhelpers.PtrString("something"),
 					},
 				},
 				InterfaceType: types.NetworkInterfaceTypeNatGateway,
 				Ipv6Addresses: []types.NetworkInterfaceIpv6Address{
 					{
-						Ipv6Address: adapters.PtrString("2001:db8:1234:0000:0000:0000:0000:0000"),
+						Ipv6Address: adapterhelpers.PtrString("2001:db8:1234:0000:0000:0000:0000:0000"),
 					},
 				},
-				MacAddress:         adapters.PtrString("0a:f4:55:b0:6c:be"),
-				NetworkInterfaceId: adapters.PtrString("eni-0b4652e6f2aa36d78"),
-				OwnerId:            adapters.PtrString("052392120703"),
-				PrivateDnsName:     adapters.PtrString("ip-172-31-35-98.eu-west-2.compute.internal"),
-				PrivateIpAddress:   adapters.PtrString("172.31.35.98"),
+				MacAddress:         adapterhelpers.PtrString("0a:f4:55:b0:6c:be"),
+				NetworkInterfaceId: adapterhelpers.PtrString("eni-0b4652e6f2aa36d78"),
+				OwnerId:            adapterhelpers.PtrString("052392120703"),
+				PrivateDnsName:     adapterhelpers.PtrString("ip-172-31-35-98.eu-west-2.compute.internal"),
+				PrivateIpAddress:   adapterhelpers.PtrString("172.31.35.98"),
 				PrivateIpAddresses: []types.NetworkInterfacePrivateIpAddress{
 					{
 						Association: &types.NetworkInterfaceAssociation{
-							AllocationId:    adapters.PtrString("eipalloc-000a9739291350592"),
-							AssociationId:   adapters.PtrString("eipassoc-049cda1f947e5efe6"),
-							IpOwnerId:       adapters.PtrString("052392120703"),
-							PublicDnsName:   adapters.PtrString("ec2-18-170-133-9.eu-west-2.compute.amazonaws.com"),
-							PublicIp:        adapters.PtrString("18.170.133.9"),
-							CarrierIp:       adapters.PtrString("18.170.133.10"),
-							CustomerOwnedIp: adapters.PtrString("18.170.133.11"),
+							AllocationId:    adapterhelpers.PtrString("eipalloc-000a9739291350592"),
+							AssociationId:   adapterhelpers.PtrString("eipassoc-049cda1f947e5efe6"),
+							IpOwnerId:       adapterhelpers.PtrString("052392120703"),
+							PublicDnsName:   adapterhelpers.PtrString("ec2-18-170-133-9.eu-west-2.compute.amazonaws.com"),
+							PublicIp:        adapterhelpers.PtrString("18.170.133.9"),
+							CarrierIp:       adapterhelpers.PtrString("18.170.133.10"),
+							CustomerOwnedIp: adapterhelpers.PtrString("18.170.133.11"),
 						},
-						Primary:          adapters.PtrBool(true),
-						PrivateDnsName:   adapters.PtrString("ip-172-31-35-98.eu-west-2.compute.internal"),
-						PrivateIpAddress: adapters.PtrString("172.31.35.98"),
+						Primary:          adapterhelpers.PtrBool(true),
+						PrivateDnsName:   adapterhelpers.PtrString("ip-172-31-35-98.eu-west-2.compute.internal"),
+						PrivateIpAddress: adapterhelpers.PtrString("172.31.35.98"),
 					},
 				},
-				RequesterId:      adapters.PtrString("440527171281"),
-				RequesterManaged: adapters.PtrBool(true),
-				SourceDestCheck:  adapters.PtrBool(false),
+				RequesterId:      adapterhelpers.PtrString("440527171281"),
+				RequesterManaged: adapterhelpers.PtrBool(true),
+				SourceDestCheck:  adapterhelpers.PtrBool(false),
 				Status:           types.NetworkInterfaceStatusInUse,
-				SubnetId:         adapters.PtrString("subnet-0d8ae4b4e07647efa"),
+				SubnetId:         adapterhelpers.PtrString("subnet-0d8ae4b4e07647efa"),
 				TagSet:           []types.Tag{},
-				VpcId:            adapters.PtrString("vpc-0d7892e00e573e701"),
+				VpcId:            adapterhelpers.PtrString("vpc-0d7892e00e573e701"),
 			},
 		},
 	}
@@ -124,7 +125,7 @@ func TestNetworkInterfaceOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-instance",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -202,7 +203,7 @@ func TestNewNetworkInterfaceAdapter(t *testing.T) {
 
 	adapter := NewNetworkInterfaceAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

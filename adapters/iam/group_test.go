@@ -7,16 +7,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestGroupItemMapper(t *testing.T) {
 	zone := types.Group{
-		Path:       adapters.PtrString("/"),
-		GroupName:  adapters.PtrString("power-users"),
-		GroupId:    adapters.PtrString("AGPA3VLV2U27T6SSLJMDS"),
-		Arn:        adapters.PtrString("arn:aws:iam::801795385023:group/power-users"),
-		CreateDate: adapters.PtrTime(time.Now()),
+		Path:       adapterhelpers.PtrString("/"),
+		GroupName:  adapterhelpers.PtrString("power-users"),
+		GroupId:    adapterhelpers.PtrString("AGPA3VLV2U27T6SSLJMDS"),
+		Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:group/power-users"),
+		CreateDate: adapterhelpers.PtrTime(time.Now()),
 	}
 
 	item, err := groupItemMapper("", "foo", &zone)
@@ -32,7 +32,7 @@ func TestGroupItemMapper(t *testing.T) {
 }
 
 func TestNewGroupAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
@@ -40,7 +40,7 @@ func TestNewGroupAdapter(t *testing.T) {
 
 	adapter := NewGroupAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}

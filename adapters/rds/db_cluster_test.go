@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,115 +16,115 @@ func TestDBClusterOutputMapper(t *testing.T) {
 	output := rds.DescribeDBClustersOutput{
 		DBClusters: []types.DBCluster{
 			{
-				AllocatedStorage: adapters.PtrInt32(100),
+				AllocatedStorage: adapterhelpers.PtrInt32(100),
 				AvailabilityZones: []string{
 					"eu-west-2c", // link
 				},
-				BackupRetentionPeriod:      adapters.PtrInt32(7),
-				DBClusterIdentifier:        adapters.PtrString("database-2"),
-				DBClusterParameterGroup:    adapters.PtrString("default.postgres13"),
-				DBSubnetGroup:              adapters.PtrString("default-vpc-0d7892e00e573e701"), // link
-				Status:                     adapters.PtrString("available"),
-				EarliestRestorableTime:     adapters.PtrTime(time.Now()),
-				Endpoint:                   adapters.PtrString("database-2.cluster-camcztjohmlj.eu-west-2.rds.amazonaws.com"),    // link
-				ReaderEndpoint:             adapters.PtrString("database-2.cluster-ro-camcztjohmlj.eu-west-2.rds.amazonaws.com"), // link
-				MultiAZ:                    adapters.PtrBool(true),
-				Engine:                     adapters.PtrString("postgres"),
-				EngineVersion:              adapters.PtrString("13.7"),
-				LatestRestorableTime:       adapters.PtrTime(time.Now()),
-				Port:                       adapters.PtrInt32(5432), // link
-				MasterUsername:             adapters.PtrString("postgres"),
-				PreferredBackupWindow:      adapters.PtrString("04:48-05:18"),
-				PreferredMaintenanceWindow: adapters.PtrString("fri:04:05-fri:04:35"),
+				BackupRetentionPeriod:      adapterhelpers.PtrInt32(7),
+				DBClusterIdentifier:        adapterhelpers.PtrString("database-2"),
+				DBClusterParameterGroup:    adapterhelpers.PtrString("default.postgres13"),
+				DBSubnetGroup:              adapterhelpers.PtrString("default-vpc-0d7892e00e573e701"), // link
+				Status:                     adapterhelpers.PtrString("available"),
+				EarliestRestorableTime:     adapterhelpers.PtrTime(time.Now()),
+				Endpoint:                   adapterhelpers.PtrString("database-2.cluster-camcztjohmlj.eu-west-2.rds.amazonaws.com"),    // link
+				ReaderEndpoint:             adapterhelpers.PtrString("database-2.cluster-ro-camcztjohmlj.eu-west-2.rds.amazonaws.com"), // link
+				MultiAZ:                    adapterhelpers.PtrBool(true),
+				Engine:                     adapterhelpers.PtrString("postgres"),
+				EngineVersion:              adapterhelpers.PtrString("13.7"),
+				LatestRestorableTime:       adapterhelpers.PtrTime(time.Now()),
+				Port:                       adapterhelpers.PtrInt32(5432), // link
+				MasterUsername:             adapterhelpers.PtrString("postgres"),
+				PreferredBackupWindow:      adapterhelpers.PtrString("04:48-05:18"),
+				PreferredMaintenanceWindow: adapterhelpers.PtrString("fri:04:05-fri:04:35"),
 				ReadReplicaIdentifiers: []string{
 					"arn:aws:rds:eu-west-1:052392120703:cluster:read-replica", // link
 				},
 				DBClusterMembers: []types.DBClusterMember{
 					{
-						DBInstanceIdentifier:          adapters.PtrString("database-2-instance-3"), // link
-						IsClusterWriter:               adapters.PtrBool(false),
-						DBClusterParameterGroupStatus: adapters.PtrString("in-sync"),
-						PromotionTier:                 adapters.PtrInt32(1),
+						DBInstanceIdentifier:          adapterhelpers.PtrString("database-2-instance-3"), // link
+						IsClusterWriter:               adapterhelpers.PtrBool(false),
+						DBClusterParameterGroupStatus: adapterhelpers.PtrString("in-sync"),
+						PromotionTier:                 adapterhelpers.PtrInt32(1),
 					},
 				},
 				VpcSecurityGroups: []types.VpcSecurityGroupMembership{
 					{
-						VpcSecurityGroupId: adapters.PtrString("sg-094e151c9fc5da181"), // link
-						Status:             adapters.PtrString("active"),
+						VpcSecurityGroupId: adapterhelpers.PtrString("sg-094e151c9fc5da181"), // link
+						Status:             adapterhelpers.PtrString("active"),
 					},
 				},
-				HostedZoneId:                     adapters.PtrString("Z1TTGA775OQIYO"), // link
-				StorageEncrypted:                 adapters.PtrBool(true),
-				KmsKeyId:                         adapters.PtrString("arn:aws:kms:eu-west-2:052392120703:key/9653cbdd-1590-464a-8456-67389cef6933"), // link
-				DbClusterResourceId:              adapters.PtrString("cluster-2EW4PDVN7F7V57CUJPYOEAA74M"),
-				DBClusterArn:                     adapters.PtrString("arn:aws:rds:eu-west-2:052392120703:cluster:database-2"),
-				IAMDatabaseAuthenticationEnabled: adapters.PtrBool(false),
-				ClusterCreateTime:                adapters.PtrTime(time.Now()),
-				EngineMode:                       adapters.PtrString("provisioned"),
-				DeletionProtection:               adapters.PtrBool(false),
-				HttpEndpointEnabled:              adapters.PtrBool(false),
+				HostedZoneId:                     adapterhelpers.PtrString("Z1TTGA775OQIYO"), // link
+				StorageEncrypted:                 adapterhelpers.PtrBool(true),
+				KmsKeyId:                         adapterhelpers.PtrString("arn:aws:kms:eu-west-2:052392120703:key/9653cbdd-1590-464a-8456-67389cef6933"), // link
+				DbClusterResourceId:              adapterhelpers.PtrString("cluster-2EW4PDVN7F7V57CUJPYOEAA74M"),
+				DBClusterArn:                     adapterhelpers.PtrString("arn:aws:rds:eu-west-2:052392120703:cluster:database-2"),
+				IAMDatabaseAuthenticationEnabled: adapterhelpers.PtrBool(false),
+				ClusterCreateTime:                adapterhelpers.PtrTime(time.Now()),
+				EngineMode:                       adapterhelpers.PtrString("provisioned"),
+				DeletionProtection:               adapterhelpers.PtrBool(false),
+				HttpEndpointEnabled:              adapterhelpers.PtrBool(false),
 				ActivityStreamStatus:             types.ActivityStreamStatusStopped,
-				CopyTagsToSnapshot:               adapters.PtrBool(false),
-				CrossAccountClone:                adapters.PtrBool(false),
+				CopyTagsToSnapshot:               adapterhelpers.PtrBool(false),
+				CrossAccountClone:                adapterhelpers.PtrBool(false),
 				DomainMemberships:                []types.DomainMembership{},
 				TagList:                          []types.Tag{},
-				DBClusterInstanceClass:           adapters.PtrString("db.m5d.large"),
-				StorageType:                      adapters.PtrString("io1"),
-				Iops:                             adapters.PtrInt32(1000),
-				PubliclyAccessible:               adapters.PtrBool(true),
-				AutoMinorVersionUpgrade:          adapters.PtrBool(true),
-				MonitoringInterval:               adapters.PtrInt32(0),
-				PerformanceInsightsEnabled:       adapters.PtrBool(false),
-				NetworkType:                      adapters.PtrString("IPV4"),
-				ActivityStreamKinesisStreamName:  adapters.PtrString("aws-rds-das-db-AB1CDEFG23GHIJK4LMNOPQRST"), // link
-				ActivityStreamKmsKeyId:           adapters.PtrString("ab12345e-1111-2bc3-12a3-ab1cd12345e"),      // Not linking at the moment because there are too many possible formats. If you want to change this, submit a PR
+				DBClusterInstanceClass:           adapterhelpers.PtrString("db.m5d.large"),
+				StorageType:                      adapterhelpers.PtrString("io1"),
+				Iops:                             adapterhelpers.PtrInt32(1000),
+				PubliclyAccessible:               adapterhelpers.PtrBool(true),
+				AutoMinorVersionUpgrade:          adapterhelpers.PtrBool(true),
+				MonitoringInterval:               adapterhelpers.PtrInt32(0),
+				PerformanceInsightsEnabled:       adapterhelpers.PtrBool(false),
+				NetworkType:                      adapterhelpers.PtrString("IPV4"),
+				ActivityStreamKinesisStreamName:  adapterhelpers.PtrString("aws-rds-das-db-AB1CDEFG23GHIJK4LMNOPQRST"), // link
+				ActivityStreamKmsKeyId:           adapterhelpers.PtrString("ab12345e-1111-2bc3-12a3-ab1cd12345e"),      // Not linking at the moment because there are too many possible formats. If you want to change this, submit a PR
 				ActivityStreamMode:               types.ActivityStreamModeAsync,
-				AutomaticRestartTime:             adapters.PtrTime(time.Now()),
+				AutomaticRestartTime:             adapterhelpers.PtrTime(time.Now()),
 				AssociatedRoles:                  []types.DBClusterRole{}, // EC2 classic roles, ignore
-				BacktrackConsumedChangeRecords:   adapters.PtrInt64(1),
-				BacktrackWindow:                  adapters.PtrInt64(2),
-				Capacity:                         adapters.PtrInt32(2),
-				CharacterSetName:                 adapters.PtrString("english"),
-				CloneGroupId:                     adapters.PtrString("id"),
+				BacktrackConsumedChangeRecords:   adapterhelpers.PtrInt64(1),
+				BacktrackWindow:                  adapterhelpers.PtrInt64(2),
+				Capacity:                         adapterhelpers.PtrInt32(2),
+				CharacterSetName:                 adapterhelpers.PtrString("english"),
+				CloneGroupId:                     adapterhelpers.PtrString("id"),
 				CustomEndpoints: []string{
 					"endpoint1", // link dns
 				},
 				DBClusterOptionGroupMemberships: []types.DBClusterOptionGroupStatus{
 					{
-						DBClusterOptionGroupName: adapters.PtrString("optionGroupName"), // link
-						Status:                   adapters.PtrString("good"),
+						DBClusterOptionGroupName: adapterhelpers.PtrString("optionGroupName"), // link
+						Status:                   adapterhelpers.PtrString("good"),
 					},
 				},
-				DBSystemId:            adapters.PtrString("systemId"),
-				DatabaseName:          adapters.PtrString("databaseName"),
-				EarliestBacktrackTime: adapters.PtrTime(time.Now()),
+				DBSystemId:            adapterhelpers.PtrString("systemId"),
+				DatabaseName:          adapterhelpers.PtrString("databaseName"),
+				EarliestBacktrackTime: adapterhelpers.PtrTime(time.Now()),
 				EnabledCloudwatchLogsExports: []string{
 					"logExport1",
 				},
-				GlobalWriteForwardingRequested: adapters.PtrBool(true),
+				GlobalWriteForwardingRequested: adapterhelpers.PtrBool(true),
 				GlobalWriteForwardingStatus:    types.WriteForwardingStatusDisabled,
 				MasterUserSecret: &types.MasterUserSecret{
-					KmsKeyId:     adapters.PtrString("arn:aws:kms:eu-west-2:052392120703:key/something"), // link
-					SecretArn:    adapters.PtrString("arn:aws:service:region:account:type/id"),           // link
-					SecretStatus: adapters.PtrString("okay"),
+					KmsKeyId:     adapterhelpers.PtrString("arn:aws:kms:eu-west-2:052392120703:key/something"), // link
+					SecretArn:    adapterhelpers.PtrString("arn:aws:service:region:account:type/id"),           // link
+					SecretStatus: adapterhelpers.PtrString("okay"),
 				},
-				MonitoringRoleArn:                  adapters.PtrString("arn:aws:service:region:account:type/id"), // link
+				MonitoringRoleArn:                  adapterhelpers.PtrString("arn:aws:service:region:account:type/id"), // link
 				PendingModifiedValues:              &types.ClusterPendingModifiedValues{},
-				PercentProgress:                    adapters.PtrString("99"),
-				PerformanceInsightsKMSKeyId:        adapters.PtrString("arn:aws:service:region:account:type/id"), // link, assuming it's an ARN
-				PerformanceInsightsRetentionPeriod: adapters.PtrInt32(99),
-				ReplicationSourceIdentifier:        adapters.PtrString("arn:aws:rds:eu-west-2:052392120703:cluster:database-1"), // link
+				PercentProgress:                    adapterhelpers.PtrString("99"),
+				PerformanceInsightsKMSKeyId:        adapterhelpers.PtrString("arn:aws:service:region:account:type/id"), // link, assuming it's an ARN
+				PerformanceInsightsRetentionPeriod: adapterhelpers.PtrInt32(99),
+				ReplicationSourceIdentifier:        adapterhelpers.PtrString("arn:aws:rds:eu-west-2:052392120703:cluster:database-1"), // link
 				ScalingConfigurationInfo: &types.ScalingConfigurationInfo{
-					AutoPause:             adapters.PtrBool(true),
-					MaxCapacity:           adapters.PtrInt32(10),
-					MinCapacity:           adapters.PtrInt32(1),
-					SecondsBeforeTimeout:  adapters.PtrInt32(10),
-					SecondsUntilAutoPause: adapters.PtrInt32(10),
-					TimeoutAction:         adapters.PtrString("error"),
+					AutoPause:             adapterhelpers.PtrBool(true),
+					MaxCapacity:           adapterhelpers.PtrInt32(10),
+					MinCapacity:           adapterhelpers.PtrInt32(1),
+					SecondsBeforeTimeout:  adapterhelpers.PtrInt32(10),
+					SecondsUntilAutoPause: adapterhelpers.PtrInt32(10),
+					TimeoutAction:         adapterhelpers.PtrString("error"),
 				},
 				ServerlessV2ScalingConfiguration: &types.ServerlessV2ScalingConfigurationInfo{
-					MaxCapacity: adapters.PtrFloat64(10),
-					MinCapacity: adapters.PtrFloat64(1),
+					MaxCapacity: adapterhelpers.PtrFloat64(10),
+					MinCapacity: adapterhelpers.PtrFloat64(1),
 				},
 			},
 		},
@@ -149,7 +150,7 @@ func TestDBClusterOutputMapper(t *testing.T) {
 		t.Errorf("expected tag key to be value, got %v", item.GetTags()["key"])
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "rds-db-subnet-group",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -256,7 +257,7 @@ func TestNewDBClusterAdapter(t *testing.T) {
 
 	adapter := NewDBClusterAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

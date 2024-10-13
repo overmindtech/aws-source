@@ -8,7 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
 )
@@ -81,7 +82,7 @@ func TestS3GetImpl(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "http",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -161,8 +162,8 @@ func TestS3SourceCaching(t *testing.T) {
 }
 
 var owner = types.Owner{
-	DisplayName: adapters.PtrString("dylan"),
-	ID:          adapters.PtrString("id"),
+	DisplayName: adapterhelpers.PtrString("dylan"),
+	ID:          adapterhelpers.PtrString("id"),
 }
 
 // TestS3Client A client that returns example data
@@ -172,8 +173,8 @@ func (t TestS3Client) ListBuckets(ctx context.Context, params *s3.ListBucketsInp
 	return &s3.ListBucketsOutput{
 		Buckets: []types.Bucket{
 			{
-				CreationDate: adapters.PtrTime(time.Now()),
-				Name:         adapters.PtrString("foo"),
+				CreationDate: adapterhelpers.PtrTime(time.Now()),
+				Name:         adapterhelpers.PtrString("foo"),
 			},
 		},
 		Owner: &owner,
@@ -186,10 +187,10 @@ func (t TestS3Client) GetBucketAcl(ctx context.Context, params *s3.GetBucketAclI
 			{
 				Grantee: &types.Grantee{
 					Type:         types.TypeAmazonCustomerByEmail,
-					DisplayName:  adapters.PtrString("dylan"),
-					EmailAddress: adapters.PtrString("dylan@company.com"),
-					ID:           adapters.PtrString("id"),
-					URI:          adapters.PtrString("uri"),
+					DisplayName:  adapterhelpers.PtrString("dylan"),
+					EmailAddress: adapterhelpers.PtrString("dylan@company.com"),
+					ID:           adapterhelpers.PtrString("id"),
+					URI:          adapterhelpers.PtrString("uri"),
 				},
 			},
 		},
@@ -200,15 +201,15 @@ func (t TestS3Client) GetBucketAcl(ctx context.Context, params *s3.GetBucketAclI
 func (t TestS3Client) GetBucketAnalyticsConfiguration(ctx context.Context, params *s3.GetBucketAnalyticsConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketAnalyticsConfigurationOutput, error) {
 	return &s3.GetBucketAnalyticsConfigurationOutput{
 		AnalyticsConfiguration: &types.AnalyticsConfiguration{
-			Id: adapters.PtrString("id"),
+			Id: adapterhelpers.PtrString("id"),
 			StorageClassAnalysis: &types.StorageClassAnalysis{
 				DataExport: &types.StorageClassAnalysisDataExport{
 					Destination: &types.AnalyticsExportDestination{
 						S3BucketDestination: &types.AnalyticsS3BucketDestination{
-							Bucket:          adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
+							Bucket:          adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 							Format:          types.AnalyticsS3ExportFileFormatCsv,
-							BucketAccountId: adapters.PtrString("id"),
-							Prefix:          adapters.PtrString("pre"),
+							BucketAccountId: adapterhelpers.PtrString("id"),
+							Prefix:          adapterhelpers.PtrString("pre"),
 						},
 					},
 					OutputSchemaVersion: types.StorageClassAnalysisSchemaVersionV1,
@@ -234,8 +235,8 @@ func (t TestS3Client) GetBucketCors(ctx context.Context, params *s3.GetBucketCor
 				ExposeHeaders: []string{
 					"foo",
 				},
-				ID:            adapters.PtrString("id"),
-				MaxAgeSeconds: adapters.PtrInt32(10),
+				ID:            adapterhelpers.PtrString("id"),
+				MaxAgeSeconds: adapterhelpers.PtrInt32(10),
 			},
 		},
 	}, nil
@@ -248,9 +249,9 @@ func (t TestS3Client) GetBucketEncryption(ctx context.Context, params *s3.GetBuc
 				{
 					ApplyServerSideEncryptionByDefault: &types.ServerSideEncryptionByDefault{
 						SSEAlgorithm:   types.ServerSideEncryptionAes256,
-						KMSMasterKeyID: adapters.PtrString("id"),
+						KMSMasterKeyID: adapterhelpers.PtrString("id"),
 					},
-					BucketKeyEnabled: adapters.PtrBool(true),
+					BucketKeyEnabled: adapterhelpers.PtrBool(true),
 				},
 			},
 		},
@@ -260,12 +261,12 @@ func (t TestS3Client) GetBucketEncryption(ctx context.Context, params *s3.GetBuc
 func (t TestS3Client) GetBucketIntelligentTieringConfiguration(ctx context.Context, params *s3.GetBucketIntelligentTieringConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketIntelligentTieringConfigurationOutput, error) {
 	return &s3.GetBucketIntelligentTieringConfigurationOutput{
 		IntelligentTieringConfiguration: &types.IntelligentTieringConfiguration{
-			Id:     adapters.PtrString("id"),
+			Id:     adapterhelpers.PtrString("id"),
 			Status: types.IntelligentTieringStatusEnabled,
 			Tierings: []types.Tiering{
 				{
 					AccessTier: types.IntelligentTieringAccessTierDeepArchiveAccess,
-					Days:       adapters.PtrInt32(100),
+					Days:       adapterhelpers.PtrInt32(100),
 				},
 			},
 			Filter: &types.IntelligentTieringFilter{},
@@ -278,20 +279,20 @@ func (t TestS3Client) GetBucketInventoryConfiguration(ctx context.Context, param
 		InventoryConfiguration: &types.InventoryConfiguration{
 			Destination: &types.InventoryDestination{
 				S3BucketDestination: &types.InventoryS3BucketDestination{
-					Bucket:    adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
+					Bucket:    adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 					Format:    types.InventoryFormatCsv,
-					AccountId: adapters.PtrString("id"),
+					AccountId: adapterhelpers.PtrString("id"),
 					Encryption: &types.InventoryEncryption{
 						SSEKMS: &types.SSEKMS{
-							KeyId: adapters.PtrString("key"),
+							KeyId: adapterhelpers.PtrString("key"),
 						},
 					},
-					Prefix: adapters.PtrString("pre"),
+					Prefix: adapterhelpers.PtrString("pre"),
 				},
 			},
-			Id:                     adapters.PtrString("id"),
+			Id:                     adapterhelpers.PtrString("id"),
 			IncludedObjectVersions: types.InventoryIncludedObjectVersionsAll,
-			IsEnabled:              adapters.PtrBool(true),
+			IsEnabled:              adapterhelpers.PtrBool(true),
 			Schedule: &types.InventorySchedule{
 				Frequency: types.InventoryFrequencyDaily,
 			},
@@ -305,30 +306,30 @@ func (t TestS3Client) GetBucketLifecycleConfiguration(ctx context.Context, param
 			{
 				Status: types.ExpirationStatusEnabled,
 				AbortIncompleteMultipartUpload: &types.AbortIncompleteMultipartUpload{
-					DaysAfterInitiation: adapters.PtrInt32(1),
+					DaysAfterInitiation: adapterhelpers.PtrInt32(1),
 				},
 				Expiration: &types.LifecycleExpiration{
-					Date:                      adapters.PtrTime(time.Now()),
-					Days:                      adapters.PtrInt32(3),
-					ExpiredObjectDeleteMarker: adapters.PtrBool(true),
+					Date:                      adapterhelpers.PtrTime(time.Now()),
+					Days:                      adapterhelpers.PtrInt32(3),
+					ExpiredObjectDeleteMarker: adapterhelpers.PtrBool(true),
 				},
-				ID: adapters.PtrString("id"),
+				ID: adapterhelpers.PtrString("id"),
 				NoncurrentVersionExpiration: &types.NoncurrentVersionExpiration{
-					NewerNoncurrentVersions: adapters.PtrInt32(3),
-					NoncurrentDays:          adapters.PtrInt32(1),
+					NewerNoncurrentVersions: adapterhelpers.PtrInt32(3),
+					NoncurrentDays:          adapterhelpers.PtrInt32(1),
 				},
 				NoncurrentVersionTransitions: []types.NoncurrentVersionTransition{
 					{
-						NewerNoncurrentVersions: adapters.PtrInt32(1),
-						NoncurrentDays:          adapters.PtrInt32(1),
+						NewerNoncurrentVersions: adapterhelpers.PtrInt32(1),
+						NoncurrentDays:          adapterhelpers.PtrInt32(1),
 						StorageClass:            types.TransitionStorageClassGlacierIr,
 					},
 				},
-				Prefix: adapters.PtrString("pre"),
+				Prefix: adapterhelpers.PtrString("pre"),
 				Transitions: []types.Transition{
 					{
-						Date:         adapters.PtrTime(time.Now()),
-						Days:         adapters.PtrInt32(12),
+						Date:         adapterhelpers.PtrTime(time.Now()),
+						Days:         adapterhelpers.PtrInt32(12),
 						StorageClass: types.TransitionStorageClassGlacierIr,
 					},
 				},
@@ -346,13 +347,13 @@ func (t TestS3Client) GetBucketLocation(ctx context.Context, params *s3.GetBucke
 func (t TestS3Client) GetBucketLogging(ctx context.Context, params *s3.GetBucketLoggingInput, optFns ...func(*s3.Options)) (*s3.GetBucketLoggingOutput, error) {
 	return &s3.GetBucketLoggingOutput{
 		LoggingEnabled: &types.LoggingEnabled{
-			TargetBucket: adapters.PtrString("bucket"),
-			TargetPrefix: adapters.PtrString("pre"),
+			TargetBucket: adapterhelpers.PtrString("bucket"),
+			TargetPrefix: adapterhelpers.PtrString("pre"),
 			TargetGrants: []types.TargetGrant{
 				{
 					Grantee: &types.Grantee{
 						Type: types.TypeGroup,
-						ID:   adapters.PtrString("id"),
+						ID:   adapterhelpers.PtrString("id"),
 					},
 				},
 			},
@@ -363,7 +364,7 @@ func (t TestS3Client) GetBucketLogging(ctx context.Context, params *s3.GetBucket
 func (t TestS3Client) GetBucketMetricsConfiguration(ctx context.Context, params *s3.GetBucketMetricsConfigurationInput, optFns ...func(*s3.Options)) (*s3.GetBucketMetricsConfigurationOutput, error) {
 	return &s3.GetBucketMetricsConfigurationOutput{
 		MetricsConfiguration: &types.MetricsConfiguration{
-			Id: adapters.PtrString("id"),
+			Id: adapterhelpers.PtrString("id"),
 		},
 	}, nil
 }
@@ -373,43 +374,43 @@ func (t TestS3Client) GetBucketNotificationConfiguration(ctx context.Context, pa
 		LambdaFunctionConfigurations: []types.LambdaFunctionConfiguration{
 			{
 				Events:            []types.Event{},
-				LambdaFunctionArn: adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
-				Id:                adapters.PtrString("id"),
+				LambdaFunctionArn: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
+				Id:                adapterhelpers.PtrString("id"),
 			},
 		},
 		EventBridgeConfiguration: &types.EventBridgeConfiguration{},
 		QueueConfigurations: []types.QueueConfiguration{
 			{
 				Events:   []types.Event{},
-				QueueArn: adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
+				QueueArn: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 				Filter: &types.NotificationConfigurationFilter{
 					Key: &types.S3KeyFilter{
 						FilterRules: []types.FilterRule{
 							{
 								Name:  types.FilterRuleNamePrefix,
-								Value: adapters.PtrString("foo"),
+								Value: adapterhelpers.PtrString("foo"),
 							},
 						},
 					},
 				},
-				Id: adapters.PtrString("id"),
+				Id: adapterhelpers.PtrString("id"),
 			},
 		},
 		TopicConfigurations: []types.TopicConfiguration{
 			{
 				Events:   []types.Event{},
-				TopicArn: adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
+				TopicArn: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"),
 				Filter: &types.NotificationConfigurationFilter{
 					Key: &types.S3KeyFilter{
 						FilterRules: []types.FilterRule{
 							{
 								Name:  types.FilterRuleNameSuffix,
-								Value: adapters.PtrString("fix"),
+								Value: adapterhelpers.PtrString("fix"),
 							},
 						},
 					},
 				},
-				Id: adapters.PtrString("id"),
+				Id: adapterhelpers.PtrString("id"),
 			},
 		},
 	}, nil
@@ -429,14 +430,14 @@ func (t TestS3Client) GetBucketOwnershipControls(ctx context.Context, params *s3
 
 func (t TestS3Client) GetBucketPolicy(ctx context.Context, params *s3.GetBucketPolicyInput, optFns ...func(*s3.Options)) (*s3.GetBucketPolicyOutput, error) {
 	return &s3.GetBucketPolicyOutput{
-		Policy: adapters.PtrString("policy"),
+		Policy: adapterhelpers.PtrString("policy"),
 	}, nil
 }
 
 func (t TestS3Client) GetBucketPolicyStatus(ctx context.Context, params *s3.GetBucketPolicyStatusInput, optFns ...func(*s3.Options)) (*s3.GetBucketPolicyStatusOutput, error) {
 	return &s3.GetBucketPolicyStatusOutput{
 		PolicyStatus: &types.PolicyStatus{
-			IsPublic: adapters.PtrBool(true),
+			IsPublic: adapterhelpers.PtrBool(true),
 		},
 	}, nil
 }
@@ -444,28 +445,28 @@ func (t TestS3Client) GetBucketPolicyStatus(ctx context.Context, params *s3.GetB
 func (t TestS3Client) GetBucketReplication(ctx context.Context, params *s3.GetBucketReplicationInput, optFns ...func(*s3.Options)) (*s3.GetBucketReplicationOutput, error) {
 	return &s3.GetBucketReplicationOutput{
 		ReplicationConfiguration: &types.ReplicationConfiguration{
-			Role: adapters.PtrString("role"),
+			Role: adapterhelpers.PtrString("role"),
 			Rules: []types.ReplicationRule{
 				{
 					Destination: &types.Destination{
-						Bucket: adapters.PtrString("bucket"),
+						Bucket: adapterhelpers.PtrString("bucket"),
 						AccessControlTranslation: &types.AccessControlTranslation{
 							Owner: types.OwnerOverrideDestination,
 						},
-						Account: adapters.PtrString("account"),
+						Account: adapterhelpers.PtrString("account"),
 						EncryptionConfiguration: &types.EncryptionConfiguration{
-							ReplicaKmsKeyID: adapters.PtrString("keyId"),
+							ReplicaKmsKeyID: adapterhelpers.PtrString("keyId"),
 						},
 						Metrics: &types.Metrics{
 							Status: types.MetricsStatusEnabled,
 							EventThreshold: &types.ReplicationTimeValue{
-								Minutes: adapters.PtrInt32(1),
+								Minutes: adapterhelpers.PtrInt32(1),
 							},
 						},
 						ReplicationTime: &types.ReplicationTime{
 							Status: types.ReplicationTimeStatusEnabled,
 							Time: &types.ReplicationTimeValue{
-								Minutes: adapters.PtrInt32(1),
+								Minutes: adapterhelpers.PtrInt32(1),
 							},
 						},
 						StorageClass: types.StorageClassGlacier,
@@ -498,23 +499,23 @@ func (t TestS3Client) GetBucketVersioning(ctx context.Context, params *s3.GetBuc
 func (t TestS3Client) GetBucketWebsite(ctx context.Context, params *s3.GetBucketWebsiteInput, optFns ...func(*s3.Options)) (*s3.GetBucketWebsiteOutput, error) {
 	return &s3.GetBucketWebsiteOutput{
 		ErrorDocument: &types.ErrorDocument{
-			Key: adapters.PtrString("key"),
+			Key: adapterhelpers.PtrString("key"),
 		},
 		IndexDocument: &types.IndexDocument{
-			Suffix: adapters.PtrString("html"),
+			Suffix: adapterhelpers.PtrString("html"),
 		},
 		RedirectAllRequestsTo: &types.RedirectAllRequestsTo{
-			HostName: adapters.PtrString("hostname"),
+			HostName: adapterhelpers.PtrString("hostname"),
 			Protocol: types.ProtocolHttps,
 		},
 		RoutingRules: []types.RoutingRule{
 			{
 				Redirect: &types.Redirect{
-					HostName:             adapters.PtrString("hostname"),
-					HttpRedirectCode:     adapters.PtrString("303"),
+					HostName:             adapterhelpers.PtrString("hostname"),
+					HttpRedirectCode:     adapterhelpers.PtrString("303"),
 					Protocol:             types.ProtocolHttp,
-					ReplaceKeyPrefixWith: adapters.PtrString("pre"),
-					ReplaceKeyWith:       adapters.PtrString("key"),
+					ReplaceKeyPrefixWith: adapterhelpers.PtrString("pre"),
+					ReplaceKeyWith:       adapterhelpers.PtrString("key"),
 				},
 			},
 		},
@@ -663,11 +664,11 @@ func (t TestS3FailClient) PutObject(ctx context.Context, params *s3.PutObjectInp
 }
 
 func TestNewS3Adapter(t *testing.T) {
-	config, account, _ := adapters.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 
 	adapter := NewS3Adapter(config, account)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

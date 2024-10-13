@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,23 +16,23 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 	output := rds.DescribeDBSubnetGroupsOutput{
 		DBSubnetGroups: []types.DBSubnetGroup{
 			{
-				DBSubnetGroupName:        adapters.PtrString("default-vpc-0d7892e00e573e701"),
-				DBSubnetGroupDescription: adapters.PtrString("Created from the RDS Management Console"),
-				VpcId:                    adapters.PtrString("vpc-0d7892e00e573e701"), // link
-				SubnetGroupStatus:        adapters.PtrString("Complete"),
+				DBSubnetGroupName:        adapterhelpers.PtrString("default-vpc-0d7892e00e573e701"),
+				DBSubnetGroupDescription: adapterhelpers.PtrString("Created from the RDS Management Console"),
+				VpcId:                    adapterhelpers.PtrString("vpc-0d7892e00e573e701"), // link
+				SubnetGroupStatus:        adapterhelpers.PtrString("Complete"),
 				Subnets: []types.Subnet{
 					{
-						SubnetIdentifier: adapters.PtrString("subnet-0450a637af9984235"), // link
+						SubnetIdentifier: adapterhelpers.PtrString("subnet-0450a637af9984235"), // link
 						SubnetAvailabilityZone: &types.AvailabilityZone{
-							Name: adapters.PtrString("eu-west-2c"), // link
+							Name: adapterhelpers.PtrString("eu-west-2c"), // link
 						},
 						SubnetOutpost: &types.Outpost{
-							Arn: adapters.PtrString("arn:aws:service:region:account:type/id"), // link
+							Arn: adapterhelpers.PtrString("arn:aws:service:region:account:type/id"), // link
 						},
-						SubnetStatus: adapters.PtrString("Active"),
+						SubnetStatus: adapterhelpers.PtrString("Active"),
 					},
 				},
-				DBSubnetGroupArn: adapters.PtrString("arn:aws:rds:eu-west-2:052392120703:subgrp:default-vpc-0d7892e00e573e701"),
+				DBSubnetGroupArn: adapterhelpers.PtrString("arn:aws:rds:eu-west-2:052392120703:subgrp:default-vpc-0d7892e00e573e701"),
 				SupportedNetworkTypes: []string{
 					"IPV4",
 				},
@@ -59,7 +60,7 @@ func TestDBSubnetGroupOutputMapper(t *testing.T) {
 		t.Errorf("expected key to be value, got %v", item.GetTags()["key"])
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-vpc",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -88,7 +89,7 @@ func TestNewDBSubnetGroupAdapter(t *testing.T) {
 
 	adapter := NewDBSubnetGroupAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

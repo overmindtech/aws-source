@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -27,7 +28,7 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 	for _, rt := range output.RouteTables {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(rt, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(rt, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -272,8 +273,8 @@ func routeTableOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 // +overmind:terraform:queryMap aws_default_route_table.default_route_table_id
 // +overmind:terraform:queryMap aws_route.route_table_id
 
-func NewRouteTableAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
+func NewRouteTableAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeRouteTablesInput, *ec2.DescribeRouteTablesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -284,7 +285,7 @@ func NewRouteTableAdapter(client *ec2.Client, accountID string, region string) *
 		},
 		InputMapperGet:  routeTableInputMapperGet,
 		InputMapperList: routeTableInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeRouteTablesInput) adapters.Paginator[*ec2.DescribeRouteTablesOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeRouteTablesInput) adapterhelpers.Paginator[*ec2.DescribeRouteTablesOutput, *ec2.Options] {
 			return ec2.NewDescribeRouteTablesPaginator(client, params)
 		},
 		OutputMapper: routeTableOutputMapper,

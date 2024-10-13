@@ -8,56 +8,57 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/route53/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestResourceRecordSetItemMapper(t *testing.T) {
 	recordSet := types.ResourceRecordSet{
-		Name: adapters.PtrString("overmind-demo.com."),
+		Name: adapterhelpers.PtrString("overmind-demo.com."),
 		Type: types.RRTypeNs,
-		TTL:  adapters.PtrInt64(172800),
+		TTL:  adapterhelpers.PtrInt64(172800),
 		GeoProximityLocation: &types.GeoProximityLocation{
-			AWSRegion:      adapters.PtrString("us-east-1"),
-			Bias:           adapters.PtrInt32(100),
+			AWSRegion:      adapterhelpers.PtrString("us-east-1"),
+			Bias:           adapterhelpers.PtrInt32(100),
 			Coordinates:    &types.Coordinates{},
-			LocalZoneGroup: adapters.PtrString("group"),
+			LocalZoneGroup: adapterhelpers.PtrString("group"),
 		},
 		ResourceRecords: []types.ResourceRecord{
 			{
-				Value: adapters.PtrString("ns-1673.awsdns-17.co.uk."), // link
+				Value: adapterhelpers.PtrString("ns-1673.awsdns-17.co.uk."), // link
 			},
 			{
-				Value: adapters.PtrString("ns-1505.awsdns-60.org."), // link
+				Value: adapterhelpers.PtrString("ns-1505.awsdns-60.org."), // link
 			},
 			{
-				Value: adapters.PtrString("ns-955.awsdns-55.net."), // link
+				Value: adapterhelpers.PtrString("ns-955.awsdns-55.net."), // link
 			},
 			{
-				Value: adapters.PtrString("ns-276.awsdns-34.com."), // link
+				Value: adapterhelpers.PtrString("ns-276.awsdns-34.com."), // link
 			},
 		},
 		AliasTarget: &types.AliasTarget{
-			DNSName:              adapters.PtrString("foo.bar.com"), // link
+			DNSName:              adapterhelpers.PtrString("foo.bar.com"), // link
 			EvaluateTargetHealth: true,
-			HostedZoneId:         adapters.PtrString("id"),
+			HostedZoneId:         adapterhelpers.PtrString("id"),
 		},
 		CidrRoutingConfig: &types.CidrRoutingConfig{
-			CollectionId: adapters.PtrString("id"),
-			LocationName: adapters.PtrString("somewhere"),
+			CollectionId: adapterhelpers.PtrString("id"),
+			LocationName: adapterhelpers.PtrString("somewhere"),
 		},
 		Failover: types.ResourceRecordSetFailoverPrimary,
 		GeoLocation: &types.GeoLocation{
-			ContinentCode:   adapters.PtrString("GB"),
-			CountryCode:     adapters.PtrString("GB"),
-			SubdivisionCode: adapters.PtrString("ENG"),
+			ContinentCode:   adapterhelpers.PtrString("GB"),
+			CountryCode:     adapterhelpers.PtrString("GB"),
+			SubdivisionCode: adapterhelpers.PtrString("ENG"),
 		},
-		HealthCheckId:           adapters.PtrString("id"), // link
-		MultiValueAnswer:        adapters.PtrBool(true),
+		HealthCheckId:           adapterhelpers.PtrString("id"), // link
+		MultiValueAnswer:        adapterhelpers.PtrBool(true),
 		Region:                  types.ResourceRecordSetRegionApEast1,
-		SetIdentifier:           adapters.PtrString("identifier"),
-		TrafficPolicyInstanceId: adapters.PtrString("id"),
-		Weight:                  adapters.PtrInt64(100),
+		SetIdentifier:           adapterhelpers.PtrString("identifier"),
+		TrafficPolicyInstanceId: adapterhelpers.PtrString("id"),
+		Weight:                  adapterhelpers.PtrInt64(100),
 	}
 
 	item, err := resourceRecordSetItemMapper("", "foo", &recordSet)
@@ -70,7 +71,7 @@ func TestResourceRecordSetItemMapper(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "dns",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -129,7 +130,7 @@ func TestNewResourceRecordSetAdapter(t *testing.T) {
 	adapter := NewResourceRecordSetAdapter(client, account, region)
 
 	search := zones[0].UniqueAttributeValue()
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter:         adapter,
 		Timeout:         10 * time.Second,
 		SkipGet:         true,

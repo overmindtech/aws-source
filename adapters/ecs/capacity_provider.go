@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -18,7 +19,7 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 	items := make([]*sdp.Item, 0)
 
 	for _, provider := range output.CapacityProviders {
-		attributes, err := adapters.ToAttributesWithExclude(provider, "tags")
+		attributes, err := adapterhelpers.ToAttributesWithExclude(provider, "tags")
 
 		if err != nil {
 			return nil, err
@@ -34,14 +35,14 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 
 		if provider.AutoScalingGroupProvider != nil {
 			if provider.AutoScalingGroupProvider.AutoScalingGroupArn != nil {
-				if a, err := adapters.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
+				if a, err := adapterhelpers.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
 					// +overmind:link autoscaling-auto-scaling-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "autoscaling-auto-scaling-group",
 							Method: sdp.QueryMethod_SEARCH,
 							Query:  *provider.AutoScalingGroupProvider.AutoScalingGroupArn,
-							Scope:  adapters.FormatScope(a.AccountID, a.Region),
+							Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// These are tightly linked
@@ -69,8 +70,8 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 // +overmind:terraform:queryMap aws_ecs_capacity_provider.arn
 // +overmind:terraform:method SEARCH
 
-func NewCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
-	return &adapters.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
+func NewCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-capacity-provider",
 		Region:          region,
 		AccountID:       accountID,
@@ -92,7 +93,7 @@ func NewCapacityProviderAdapter(client ECSClient, accountID string, region strin
 				Include: CapacityProviderIncludeFields,
 			}, nil
 		},
-		PaginatorBuilder: func(client ECSClient, params *ecs.DescribeCapacityProvidersInput) adapters.Paginator[*ecs.DescribeCapacityProvidersOutput, *ecs.Options] {
+		PaginatorBuilder: func(client ECSClient, params *ecs.DescribeCapacityProvidersInput) adapterhelpers.Paginator[*ecs.DescribeCapacityProvidersOutput, *ecs.Options] {
 			return NewDescribeCapacityProvidersPaginator(client, params)
 		},
 		OutputMapper: capacityProviderOutputMapper,

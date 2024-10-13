@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,7 +18,7 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 	for _, a := range output.ConnectPeerAssociations {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(a)
+		attrs, err = adapterhelpers.ToAttributesWithExclude(a)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -125,8 +126,8 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 // +overmind:search Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId
 // +overmind:group AWS
 
-func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
+func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,
@@ -158,7 +159,7 @@ func NewConnectPeerAssociationAdapter(client *networkmanager.Client, accountID s
 				ErrorString: "list not supported for networkmanager-connect-peer-association, use search",
 			}
 		},
-		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetConnectPeerAssociationsInput) adapters.Paginator[*networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Options] {
+		PaginatorBuilder: func(client *networkmanager.Client, params *networkmanager.GetConnectPeerAssociationsInput) adapterhelpers.Paginator[*networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Options] {
 			return networkmanager.NewGetConnectPeerAssociationsPaginator(client, params)
 		},
 		OutputMapper: connectPeerAssociationsOutputMapper,

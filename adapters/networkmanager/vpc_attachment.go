@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -21,7 +22,7 @@ func vpcAttachmentGetFunc(ctx context.Context, client *networkmanager.Client, _,
 }
 
 func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -67,8 +68,8 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
-func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
+func NewVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		Region:          region,
 		AccountID:       accountID,

@@ -4,66 +4,67 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
 func TestActionToRequests(t *testing.T) {
 	action := types.Action{
 		Type:  types.ActionTypeEnumFixedResponse,
-		Order: adapters.PtrInt32(1),
+		Order: adapterhelpers.PtrInt32(1),
 		FixedResponseConfig: &types.FixedResponseActionConfig{
-			StatusCode:  adapters.PtrString("404"),
-			ContentType: adapters.PtrString("text/plain"),
-			MessageBody: adapters.PtrString("not found"),
+			StatusCode:  adapterhelpers.PtrString("404"),
+			ContentType: adapterhelpers.PtrString("text/plain"),
+			MessageBody: adapterhelpers.PtrString("not found"),
 		},
 		AuthenticateCognitoConfig: &types.AuthenticateCognitoActionConfig{
-			UserPoolArn:      adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"), // link
-			UserPoolClientId: adapters.PtrString("clientID"),
-			UserPoolDomain:   adapters.PtrString("domain.com"),
+			UserPoolArn:      adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id"), // link
+			UserPoolClientId: adapterhelpers.PtrString("clientID"),
+			UserPoolDomain:   adapterhelpers.PtrString("domain.com"),
 			AuthenticationRequestExtraParams: map[string]string{
 				"foo": "bar",
 			},
 			OnUnauthenticatedRequest: types.AuthenticateCognitoActionConditionalBehaviorEnumAuthenticate,
-			Scope:                    adapters.PtrString("foo"),
-			SessionCookieName:        adapters.PtrString("cookie"),
-			SessionTimeout:           adapters.PtrInt64(10),
+			Scope:                    adapterhelpers.PtrString("foo"),
+			SessionCookieName:        adapterhelpers.PtrString("cookie"),
+			SessionTimeout:           adapterhelpers.PtrInt64(10),
 		},
 		AuthenticateOidcConfig: &types.AuthenticateOidcActionConfig{
-			AuthorizationEndpoint:            adapters.PtrString("https://auth.somewhere.com/app1"), // link
-			ClientId:                         adapters.PtrString("CLIENT-ID"),
-			Issuer:                           adapters.PtrString("Someone"),
-			TokenEndpoint:                    adapters.PtrString("https://auth.somewhere.com/app1/tokens"), // link
-			UserInfoEndpoint:                 adapters.PtrString("https://auth.somewhere.com/app1/users"),  // link
+			AuthorizationEndpoint:            adapterhelpers.PtrString("https://auth.somewhere.com/app1"), // link
+			ClientId:                         adapterhelpers.PtrString("CLIENT-ID"),
+			Issuer:                           adapterhelpers.PtrString("Someone"),
+			TokenEndpoint:                    adapterhelpers.PtrString("https://auth.somewhere.com/app1/tokens"), // link
+			UserInfoEndpoint:                 adapterhelpers.PtrString("https://auth.somewhere.com/app1/users"),  // link
 			AuthenticationRequestExtraParams: map[string]string{},
-			ClientSecret:                     adapters.PtrString("secret"), // Redact
+			ClientSecret:                     adapterhelpers.PtrString("secret"), // Redact
 			OnUnauthenticatedRequest:         types.AuthenticateOidcActionConditionalBehaviorEnumAllow,
-			Scope:                            adapters.PtrString("foo"),
-			SessionCookieName:                adapters.PtrString("cookie"),
-			SessionTimeout:                   adapters.PtrInt64(10),
-			UseExistingClientSecret:          adapters.PtrBool(true),
+			Scope:                            adapterhelpers.PtrString("foo"),
+			SessionCookieName:                adapterhelpers.PtrString("cookie"),
+			SessionTimeout:                   adapterhelpers.PtrInt64(10),
+			UseExistingClientSecret:          adapterhelpers.PtrBool(true),
 		},
 		ForwardConfig: &types.ForwardActionConfig{
 			TargetGroupStickinessConfig: &types.TargetGroupStickinessConfig{
-				DurationSeconds: adapters.PtrInt32(10),
-				Enabled:         adapters.PtrBool(true),
+				DurationSeconds: adapterhelpers.PtrInt32(10),
+				Enabled:         adapterhelpers.PtrBool(true),
 			},
 			TargetGroups: []types.TargetGroupTuple{
 				{
-					TargetGroupArn: adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id1"), // link
-					Weight:         adapters.PtrInt32(1),
+					TargetGroupArn: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id1"), // link
+					Weight:         adapterhelpers.PtrInt32(1),
 				},
 			},
 		},
 		RedirectConfig: &types.RedirectActionConfig{
 			StatusCode: types.RedirectActionStatusCodeEnumHttp302,
-			Host:       adapters.PtrString("somewhere.else.com"), // combine and link
-			Path:       adapters.PtrString("/login"),             // combine and link
-			Port:       adapters.PtrString("8080"),               // combine and link
-			Protocol:   adapters.PtrString("https"),              // combine and link
-			Query:      adapters.PtrString("foo=bar"),            // combine and link
+			Host:       adapterhelpers.PtrString("somewhere.else.com"), // combine and link
+			Path:       adapterhelpers.PtrString("/login"),             // combine and link
+			Port:       adapterhelpers.PtrString("8080"),               // combine and link
+			Protocol:   adapterhelpers.PtrString("https"),              // combine and link
+			Query:      adapterhelpers.PtrString("foo=bar"),            // combine and link
 		},
-		TargetGroupArn: adapters.PtrString("arn:partition:service:region:account-id:resource-type:resource-id2"), // link
+		TargetGroupArn: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type:resource-id2"), // link
 	}
 
 	item := sdp.Item{
@@ -74,7 +75,7 @@ func TestActionToRequests(t *testing.T) {
 		LinkedItemQueries: ActionToRequests(action),
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "cognito-idp-user-pool",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,

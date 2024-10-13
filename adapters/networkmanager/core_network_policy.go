@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -22,7 +23,7 @@ func coreNetworkPolicyGetFunc(ctx context.Context, client *networkmanager.Client
 }
 
 func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(cn)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(cn)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +64,8 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_networkmanager_core_network_policy.core_network_id
 
-func NewCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
-	return &adapters.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{
+func NewCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
+	return &adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
 		Region:          region,

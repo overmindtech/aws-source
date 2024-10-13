@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -32,7 +33,7 @@ func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension
 		Out: true,
 	}
 
-	accountID, _, err := adapters.ParseScope(scope)
+	accountID, _, err := adapterhelpers.ParseScope(scope)
 
 	if err != nil {
 		return nil, err
@@ -206,7 +207,7 @@ func SuggestedQuery(namespace string, scope string, dimensions []types.Dimension
 				Type:   "s3-bucket",
 				Method: sdp.QueryMethod_GET,
 				Query:  *d.Value,
-				Scope:  adapters.FormatScope(accountID, ""),
+				Scope:  adapterhelpers.FormatScope(accountID, ""),
 			}
 		}
 	case "AWS/NATGateway":

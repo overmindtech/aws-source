@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -38,7 +39,7 @@ func originAccessControlListFunc(ctx context.Context, client *cloudfront.Client,
 }
 
 func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessControl) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -63,8 +64,8 @@ func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessC
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_cloudfront_origin_access_control.id
 
-func NewOriginAccessControlAdapter(client *cloudfront.Client, accountID string) *adapters.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
-	return &adapters.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
+func NewOriginAccessControlAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
+	return &adapterhelpers.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-access-control",
 		Client:          client,
 		AccountID:       accountID,

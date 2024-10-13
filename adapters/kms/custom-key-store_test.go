@@ -8,7 +8,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/aws/aws-sdk-go-v2/service/kms/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,12 +17,12 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 	output := &kms.DescribeCustomKeyStoresOutput{
 		CustomKeyStores: []types.CustomKeyStoresListEntry{
 			{
-				CustomKeyStoreId:       adapters.PtrString("custom-key-store-1"),
-				CreationDate:           adapters.PtrTime(time.Now()),
-				CloudHsmClusterId:      adapters.PtrString("cloud-hsm-cluster-1"),
+				CustomKeyStoreId:       adapterhelpers.PtrString("custom-key-store-1"),
+				CreationDate:           adapterhelpers.PtrTime(time.Now()),
+				CloudHsmClusterId:      adapterhelpers.PtrString("cloud-hsm-cluster-1"),
 				ConnectionState:        types.ConnectionStateTypeConnected,
-				TrustAnchorCertificate: adapters.PtrString("-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwJ1z\n-----END CERTIFICATE-----"),
-				CustomKeyStoreName:     adapters.PtrString("key-store-1"),
+				TrustAnchorCertificate: adapterhelpers.PtrString("-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwJ1z\n-----END CERTIFICATE-----"),
+				CustomKeyStoreName:     adapterhelpers.PtrString("key-store-1"),
 			},
 		},
 	}
@@ -43,7 +44,7 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 
 	item := items[0]
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "cloudhsmv2-cluster",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -56,12 +57,12 @@ func TestCustomKeyStoreOutputMapper(t *testing.T) {
 }
 
 func TestNewCustomKeyStoreAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
 	adapter := NewCustomKeyStoreAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}
@@ -81,7 +82,7 @@ func TestHealthState(t *testing.T) {
 			output: &kms.DescribeCustomKeyStoresOutput{
 				CustomKeyStores: []types.CustomKeyStoresListEntry{
 					{
-						CustomKeyStoreId: adapters.PtrString("custom-key-store-1"),
+						CustomKeyStoreId: adapterhelpers.PtrString("custom-key-store-1"),
 						ConnectionState:  types.ConnectionStateTypeConnected,
 					},
 				},
@@ -93,7 +94,7 @@ func TestHealthState(t *testing.T) {
 			output: &kms.DescribeCustomKeyStoresOutput{
 				CustomKeyStores: []types.CustomKeyStoresListEntry{
 					{
-						CustomKeyStoreId: adapters.PtrString("custom-key-store-1"),
+						CustomKeyStoreId: adapterhelpers.PtrString("custom-key-store-1"),
 						ConnectionState:  types.ConnectionStateTypeConnecting,
 					},
 				},
@@ -105,7 +106,7 @@ func TestHealthState(t *testing.T) {
 			output: &kms.DescribeCustomKeyStoresOutput{
 				CustomKeyStores: []types.CustomKeyStoresListEntry{
 					{
-						CustomKeyStoreId: adapters.PtrString("custom-key-store-1"),
+						CustomKeyStoreId: adapterhelpers.PtrString("custom-key-store-1"),
 						ConnectionState:  types.ConnectionStateTypeDisconnected,
 					},
 				},
@@ -117,7 +118,7 @@ func TestHealthState(t *testing.T) {
 			output: &kms.DescribeCustomKeyStoresOutput{
 				CustomKeyStores: []types.CustomKeyStoresListEntry{
 					{
-						CustomKeyStoreId: adapters.PtrString("custom-key-store-1"),
+						CustomKeyStoreId: adapterhelpers.PtrString("custom-key-store-1"),
 						ConnectionState:  types.ConnectionStateTypeFailed,
 					},
 				},
@@ -129,7 +130,7 @@ func TestHealthState(t *testing.T) {
 			output: &kms.DescribeCustomKeyStoresOutput{
 				CustomKeyStores: []types.CustomKeyStoresListEntry{
 					{
-						CustomKeyStoreId: adapters.PtrString("custom-key-store-1"),
+						CustomKeyStoreId: adapterhelpers.PtrString("custom-key-store-1"),
 						ConnectionState:  "unknown-state",
 					},
 				},

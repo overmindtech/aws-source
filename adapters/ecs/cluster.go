@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -26,7 +27,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 		return nil, err
 	}
 
-	accountID, _, err := adapters.ParseScope(scope)
+	accountID, _, err := adapterhelpers.ParseScope(scope)
 
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 
 	cluster := out.Clusters[0]
 
-	attributes, err := adapters.ToAttributesWithExclude(cluster, "tags")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(cluster, "tags")
 
 	if err != nil {
 		return nil, err
@@ -177,7 +178,7 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 							Type:   "s3-bucket",
 							Method: sdp.QueryMethod_GET,
 							Query:  *cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName,
-							Scope:  adapters.FormatScope(accountID, ""),
+							Scope:  adapterhelpers.FormatScope(accountID, ""),
 						},
 						BlastPropagation: &sdp.BlastPropagation{
 							// These are tightly linked
@@ -220,8 +221,8 @@ func clusterGetFunc(ctx context.Context, client ECSClient, scope string, input *
 // +overmind:terraform:queryMap aws_ecs_cluster.arn
 // +overmind:terraform:method SEARCH
 
-func NewClusterAdapter(client ECSClient, accountID string, region string) *adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
-	return &adapters.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
+func NewClusterAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-cluster",
 		Client:          client,
 		AccountID:       accountID,
@@ -237,17 +238,17 @@ func NewClusterAdapter(client ECSClient, accountID string, region string) *adapt
 			}
 		},
 		ListInput: &ecs.ListClustersInput{},
-		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListClustersInput) adapters.Paginator[*ecs.ListClustersOutput, *ecs.Options] {
+		ListFuncPaginatorBuilder: func(client ECSClient, input *ecs.ListClustersInput) adapterhelpers.Paginator[*ecs.ListClustersOutput, *ecs.Options] {
 			return ecs.NewListClustersPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *ecs.ListClustersOutput, input *ecs.ListClustersInput) ([]*ecs.DescribeClustersInput, error) {
 			inputs := make([]*ecs.DescribeClustersInput, 0)
 
-			var a *adapters.ARN
+			var a *adapterhelpers.ARN
 			var err error
 
 			for _, arn := range output.ClusterArns {
-				a, err = adapters.ParseARN(arn)
+				a, err = adapterhelpers.ParseARN(arn)
 
 				if err != nil {
 					continue

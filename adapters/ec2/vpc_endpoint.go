@@ -7,7 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/micahhausler/aws-iam-policy/policy"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/iam"
 	"github.com/overmindtech/sdp-go"
 )
@@ -47,7 +48,7 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 			endpointWithPolicy.PolicyDocument = parsedPolicy
 		}
 
-		attrs, err = adapters.ToAttributesWithExclude(endpointWithPolicy, "tags")
+		attrs, err = adapterhelpers.ToAttributesWithExclude(endpointWithPolicy, "tags")
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -221,8 +222,8 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_vpc_endpoint.id
 
-func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
+func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -233,7 +234,7 @@ func NewVpcEndpointAdapter(client *ec2.Client, accountID string, region string) 
 		},
 		InputMapperGet:  vpcEndpointInputMapperGet,
 		InputMapperList: vpcEndpointInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcEndpointsInput) adapters.Paginator[*ec2.DescribeVpcEndpointsOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVpcEndpointsInput) adapterhelpers.Paginator[*ec2.DescribeVpcEndpointsOutput, *ec2.Options] {
 			return ec2.NewDescribeVpcEndpointsPaginator(client, params)
 		},
 		OutputMapper: vpcEndpointOutputMapper,

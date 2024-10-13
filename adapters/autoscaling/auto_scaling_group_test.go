@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -17,33 +18,33 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 	output := autoscaling.DescribeAutoScalingGroupsOutput{
 		AutoScalingGroups: []types.AutoScalingGroup{
 			{
-				AutoScalingGroupName: adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-				AutoScalingGroupARN:  adapters.PtrString("arn:aws:autoscaling:eu-west-2:944651592624:autoScalingGroup:1cbb0e22-818f-4d8b-8662-77f73d3713ca:autoScalingGroupName/eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+				AutoScalingGroupName: adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+				AutoScalingGroupARN:  adapterhelpers.PtrString("arn:aws:autoscaling:eu-west-2:944651592624:autoScalingGroup:1cbb0e22-818f-4d8b-8662-77f73d3713ca:autoScalingGroupName/eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
 				MixedInstancesPolicy: &types.MixedInstancesPolicy{
 					LaunchTemplate: &types.LaunchTemplate{
 						LaunchTemplateSpecification: &types.LaunchTemplateSpecification{
-							LaunchTemplateId:   adapters.PtrString("lt-0174ff2b8909d0c75"), // link
-							LaunchTemplateName: adapters.PtrString("eks-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-							Version:            adapters.PtrString("1"),
+							LaunchTemplateId:   adapterhelpers.PtrString("lt-0174ff2b8909d0c75"), // link
+							LaunchTemplateName: adapterhelpers.PtrString("eks-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+							Version:            adapterhelpers.PtrString("1"),
 						},
 						Overrides: []types.LaunchTemplateOverrides{
 							{
-								InstanceType: adapters.PtrString("t3.large"),
+								InstanceType: adapterhelpers.PtrString("t3.large"),
 							},
 						},
 					},
 					InstancesDistribution: &types.InstancesDistribution{
-						OnDemandAllocationStrategy:          adapters.PtrString("prioritized"),
-						OnDemandBaseCapacity:                adapters.PtrInt32(0),
-						OnDemandPercentageAboveBaseCapacity: adapters.PtrInt32(100),
-						SpotAllocationStrategy:              adapters.PtrString("lowest-price"),
-						SpotInstancePools:                   adapters.PtrInt32(2),
+						OnDemandAllocationStrategy:          adapterhelpers.PtrString("prioritized"),
+						OnDemandBaseCapacity:                adapterhelpers.PtrInt32(0),
+						OnDemandPercentageAboveBaseCapacity: adapterhelpers.PtrInt32(100),
+						SpotAllocationStrategy:              adapterhelpers.PtrString("lowest-price"),
+						SpotInstancePools:                   adapterhelpers.PtrInt32(2),
 					},
 				},
-				MinSize:         adapters.PtrInt32(1),
-				MaxSize:         adapters.PtrInt32(3),
-				DesiredCapacity: adapters.PtrInt32(1),
-				DefaultCooldown: adapters.PtrInt32(300),
+				MinSize:         adapterhelpers.PtrInt32(1),
+				MaxSize:         adapterhelpers.PtrInt32(3),
+				DesiredCapacity: adapterhelpers.PtrInt32(1),
+				DefaultCooldown: adapterhelpers.PtrInt32(300),
 				AvailabilityZones: []string{ // link
 					"eu-west-2c",
 					"eu-west-2a",
@@ -53,62 +54,62 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 				TargetGroupARNs: []string{
 					"arn:partition:service:region:account-id:resource-type/resource-id", // link
 				},
-				HealthCheckType:        adapters.PtrString("EC2"),
-				HealthCheckGracePeriod: adapters.PtrInt32(15),
+				HealthCheckType:        adapterhelpers.PtrString("EC2"),
+				HealthCheckGracePeriod: adapterhelpers.PtrInt32(15),
 				Instances: []types.Instance{
 					{
-						InstanceId:       adapters.PtrString("i-0be6c4fe789cb1b78"), // link
-						InstanceType:     adapters.PtrString("t3.large"),
-						AvailabilityZone: adapters.PtrString("eu-west-2c"),
+						InstanceId:       adapterhelpers.PtrString("i-0be6c4fe789cb1b78"), // link
+						InstanceType:     adapterhelpers.PtrString("t3.large"),
+						AvailabilityZone: adapterhelpers.PtrString("eu-west-2c"),
 						LifecycleState:   types.LifecycleStateInService,
-						HealthStatus:     adapters.PtrString("Healthy"),
+						HealthStatus:     adapterhelpers.PtrString("Healthy"),
 						LaunchTemplate: &types.LaunchTemplateSpecification{
-							LaunchTemplateId:   adapters.PtrString("lt-0174ff2b8909d0c75"), // Link
-							LaunchTemplateName: adapters.PtrString("eks-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-							Version:            adapters.PtrString("1"),
+							LaunchTemplateId:   adapterhelpers.PtrString("lt-0174ff2b8909d0c75"), // Link
+							LaunchTemplateName: adapterhelpers.PtrString("eks-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+							Version:            adapterhelpers.PtrString("1"),
 						},
-						ProtectedFromScaleIn: adapters.PtrBool(false),
+						ProtectedFromScaleIn: adapterhelpers.PtrBool(false),
 					},
 				},
-				CreatedTime:        adapters.PtrTime(time.Now()),
+				CreatedTime:        adapterhelpers.PtrTime(time.Now()),
 				SuspendedProcesses: []types.SuspendedProcess{},
-				VPCZoneIdentifier:  adapters.PtrString("subnet-0e234bef35fc4a9e1,subnet-09d5f6fa75b0b4569,subnet-0960234bbc4edca03"),
+				VPCZoneIdentifier:  adapterhelpers.PtrString("subnet-0e234bef35fc4a9e1,subnet-09d5f6fa75b0b4569,subnet-0960234bbc4edca03"),
 				EnabledMetrics:     []types.EnabledMetric{},
 				Tags: []types.TagDescription{
 					{
-						ResourceId:        adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-						ResourceType:      adapters.PtrString("auto-scaling-group"),
-						Key:               adapters.PtrString("eks:cluster-name"),
-						Value:             adapters.PtrString("dogfood"),
-						PropagateAtLaunch: adapters.PtrBool(true),
+						ResourceId:        adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+						ResourceType:      adapterhelpers.PtrString("auto-scaling-group"),
+						Key:               adapterhelpers.PtrString("eks:cluster-name"),
+						Value:             adapterhelpers.PtrString("dogfood"),
+						PropagateAtLaunch: adapterhelpers.PtrBool(true),
 					},
 					{
-						ResourceId:        adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-						ResourceType:      adapters.PtrString("auto-scaling-group"),
-						Key:               adapters.PtrString("eks:nodegroup-name"),
-						Value:             adapters.PtrString("default-20230117110031319900000013"),
-						PropagateAtLaunch: adapters.PtrBool(true),
+						ResourceId:        adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+						ResourceType:      adapterhelpers.PtrString("auto-scaling-group"),
+						Key:               adapterhelpers.PtrString("eks:nodegroup-name"),
+						Value:             adapterhelpers.PtrString("default-20230117110031319900000013"),
+						PropagateAtLaunch: adapterhelpers.PtrBool(true),
 					},
 					{
-						ResourceId:        adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-						ResourceType:      adapters.PtrString("auto-scaling-group"),
-						Key:               adapters.PtrString("k8s.io/cluster-autoscaler/dogfood"),
-						Value:             adapters.PtrString("owned"),
-						PropagateAtLaunch: adapters.PtrBool(true),
+						ResourceId:        adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+						ResourceType:      adapterhelpers.PtrString("auto-scaling-group"),
+						Key:               adapterhelpers.PtrString("k8s.io/cluster-autoscaler/dogfood"),
+						Value:             adapterhelpers.PtrString("owned"),
+						PropagateAtLaunch: adapterhelpers.PtrBool(true),
 					},
 					{
-						ResourceId:        adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-						ResourceType:      adapters.PtrString("auto-scaling-group"),
-						Key:               adapters.PtrString("k8s.io/cluster-autoscaler/enabled"),
-						Value:             adapters.PtrString("true"),
-						PropagateAtLaunch: adapters.PtrBool(true),
+						ResourceId:        adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+						ResourceType:      adapterhelpers.PtrString("auto-scaling-group"),
+						Key:               adapterhelpers.PtrString("k8s.io/cluster-autoscaler/enabled"),
+						Value:             adapterhelpers.PtrString("true"),
+						PropagateAtLaunch: adapterhelpers.PtrBool(true),
 					},
 					{
-						ResourceId:        adapters.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
-						ResourceType:      adapters.PtrString("auto-scaling-group"),
-						Key:               adapters.PtrString("kubernetes.io/cluster/dogfood"),
-						Value:             adapters.PtrString("owned"),
-						PropagateAtLaunch: adapters.PtrBool(true),
+						ResourceId:        adapterhelpers.PtrString("eks-default-20230117110031319900000013-96c2dfb1-a11b-b5e4-6efb-0fea7e22855c"),
+						ResourceType:      adapterhelpers.PtrString("auto-scaling-group"),
+						Key:               adapterhelpers.PtrString("kubernetes.io/cluster/dogfood"),
+						Value:             adapterhelpers.PtrString("owned"),
+						PropagateAtLaunch: adapterhelpers.PtrBool(true),
 					},
 				},
 				TerminationPolicies: []string{
@@ -116,36 +117,36 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 					"OldestLaunchTemplate",
 					"OldestInstance",
 				},
-				NewInstancesProtectedFromScaleIn: adapters.PtrBool(false),
-				ServiceLinkedRoleARN:             adapters.PtrString("arn:aws:iam::944651592624:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"), // link
-				CapacityRebalance:                adapters.PtrBool(true),
+				NewInstancesProtectedFromScaleIn: adapterhelpers.PtrBool(false),
+				ServiceLinkedRoleARN:             adapterhelpers.PtrString("arn:aws:iam::944651592624:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"), // link
+				CapacityRebalance:                adapterhelpers.PtrBool(true),
 				TrafficSources: []types.TrafficSourceIdentifier{
 					{
-						Identifier: adapters.PtrString("arn:partition:service:region:account-id:resource-type/resource-id"), // We will skip this for now since it's related to VPC lattice groups which are still in preview
+						Identifier: adapterhelpers.PtrString("arn:partition:service:region:account-id:resource-type/resource-id"), // We will skip this for now since it's related to VPC lattice groups which are still in preview
 					},
 				},
-				Context:                 adapters.PtrString("foo"),
-				DefaultInstanceWarmup:   adapters.PtrInt32(10),
-				DesiredCapacityType:     adapters.PtrString("foo"),
-				LaunchConfigurationName: adapters.PtrString("launchConfig"), // link
+				Context:                 adapterhelpers.PtrString("foo"),
+				DefaultInstanceWarmup:   adapterhelpers.PtrInt32(10),
+				DesiredCapacityType:     adapterhelpers.PtrString("foo"),
+				LaunchConfigurationName: adapterhelpers.PtrString("launchConfig"), // link
 				LaunchTemplate: &types.LaunchTemplateSpecification{
-					LaunchTemplateId:   adapters.PtrString("id"), // link
-					LaunchTemplateName: adapters.PtrString("launchTemplateName"),
+					LaunchTemplateId:   adapterhelpers.PtrString("id"), // link
+					LaunchTemplateName: adapterhelpers.PtrString("launchTemplateName"),
 				},
-				MaxInstanceLifetime: adapters.PtrInt32(30),
-				PlacementGroup:      adapters.PtrString("placementGroup"), // link (ec2)
-				PredictedCapacity:   adapters.PtrInt32(1),
-				Status:              adapters.PtrString("OK"),
+				MaxInstanceLifetime: adapterhelpers.PtrInt32(30),
+				PlacementGroup:      adapterhelpers.PtrString("placementGroup"), // link (ec2)
+				PredictedCapacity:   adapterhelpers.PtrInt32(1),
+				Status:              adapterhelpers.PtrString("OK"),
 				WarmPoolConfiguration: &types.WarmPoolConfiguration{
 					InstanceReusePolicy: &types.InstanceReusePolicy{
-						ReuseOnScaleIn: adapters.PtrBool(true),
+						ReuseOnScaleIn: adapterhelpers.PtrBool(true),
 					},
-					MaxGroupPreparedCapacity: adapters.PtrInt32(1),
-					MinSize:                  adapters.PtrInt32(1),
+					MaxGroupPreparedCapacity: adapterhelpers.PtrInt32(1),
+					MinSize:                  adapterhelpers.PtrInt32(1),
 					PoolState:                types.WarmPoolStateHibernated,
 					Status:                   types.WarmPoolStatusPendingDelete,
 				},
-				WarmPoolSize: adapters.PtrInt32(1),
+				WarmPoolSize: adapterhelpers.PtrInt32(1),
 			},
 		},
 	}
@@ -170,7 +171,7 @@ func TestAutoScalingGroupOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ec2-launch-template",
 			ExpectedMethod: sdp.QueryMethod_GET,

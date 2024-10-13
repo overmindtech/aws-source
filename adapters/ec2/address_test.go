@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -43,16 +44,16 @@ func TestAddressOutputMapper(t *testing.T) {
 	output := ec2.DescribeAddressesOutput{
 		Addresses: []types.Address{
 			{
-				PublicIp:           adapters.PtrString("3.11.82.6"),
-				AllocationId:       adapters.PtrString("eipalloc-030a6f43bc6086267"),
+				PublicIp:           adapterhelpers.PtrString("3.11.82.6"),
+				AllocationId:       adapterhelpers.PtrString("eipalloc-030a6f43bc6086267"),
 				Domain:             types.DomainTypeVpc,
-				PublicIpv4Pool:     adapters.PtrString("amazon"),
-				NetworkBorderGroup: adapters.PtrString("eu-west-2"),
-				InstanceId:         adapters.PtrString("instance"),
-				CarrierIp:          adapters.PtrString("3.11.82.7"),
-				CustomerOwnedIp:    adapters.PtrString("3.11.82.8"),
-				NetworkInterfaceId: adapters.PtrString("foo"),
-				PrivateIpAddress:   adapters.PtrString("3.11.82.9"),
+				PublicIpv4Pool:     adapterhelpers.PtrString("amazon"),
+				NetworkBorderGroup: adapterhelpers.PtrString("eu-west-2"),
+				InstanceId:         adapterhelpers.PtrString("instance"),
+				CarrierIp:          adapterhelpers.PtrString("3.11.82.7"),
+				CustomerOwnedIp:    adapterhelpers.PtrString("3.11.82.8"),
+				NetworkInterfaceId: adapterhelpers.PtrString("foo"),
+				PrivateIpAddress:   adapterhelpers.PtrString("3.11.82.9"),
 			},
 		},
 	}
@@ -77,7 +78,7 @@ func TestAddressOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "ip",
 			ExpectedMethod: sdp.QueryMethod_GET,
@@ -124,7 +125,7 @@ func TestNewAddressAdapter(t *testing.T) {
 
 	adapter := NewAddressAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

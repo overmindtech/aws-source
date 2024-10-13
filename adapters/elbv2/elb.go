@@ -5,7 +5,7 @@ import (
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -24,7 +24,7 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 	tagsMap := getTagsMap(ctx, client, arns)
 
 	for _, lb := range output.LoadBalancers {
-		attrs, err := adapters.ToAttributesWithExclude(lb)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(lb)
 
 		if err != nil {
 			return nil, err
@@ -273,8 +273,8 @@ func loadBalancerOutputMapper(ctx context.Context, client elbClient, scope strin
 // +overmind:terraform:queryMap aws_lb.id
 // +overmind:terraform:method SEARCH
 
-func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
+func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -296,7 +296,7 @@ func NewLoadBalancerAdapter(client elbClient, accountID string, region string) *
 				LoadBalancerArns: []string{query},
 			}, nil
 		},
-		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeLoadBalancersInput) adapters.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
+		PaginatorBuilder: func(client elbClient, params *elbv2.DescribeLoadBalancersInput) adapterhelpers.Paginator[*elbv2.DescribeLoadBalancersOutput, *elbv2.Options] {
 			return elbv2.NewDescribeLoadBalancersPaginator(client, params)
 		},
 		OutputMapper: loadBalancerOutputMapper,

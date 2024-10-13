@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 type testClient struct{}
@@ -53,7 +53,7 @@ func TestGetFunc(t *testing.T) {
 	cli := testClient{}
 
 	item, err := getFunc(ctx, cli, "scope", &sqs.GetQueueAttributesInput{
-		QueueUrl: adapters.PtrString("https://sqs.us-west-2.amazonaws.com/123456789012/MyQueue"),
+		QueueUrl: adapterhelpers.PtrString("https://sqs.us-west-2.amazonaws.com/123456789012/MyQueue"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -65,12 +65,12 @@ func TestGetFunc(t *testing.T) {
 }
 
 func TestNewQueueAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := sqs.NewFromConfig(config)
 
 	adapter := NewQueueAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

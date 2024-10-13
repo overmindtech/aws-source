@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -27,7 +28,7 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 	for _, volume := range output.VolumeStatuses {
 		var err error
 		var attrs *sdp.ItemAttributes
-		attrs, err = adapters.ToAttributesWithExclude(volume)
+		attrs, err = adapterhelpers.ToAttributesWithExclude(volume)
 
 		if err != nil {
 			return nil, &sdp.QueryError{
@@ -104,8 +105,8 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 // +overmind:search Search for volume statuses by ARN
 // +overmind:group AWS
 
-func NewVolumeStatusAdapter(client *ec2.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
-	return &adapters.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{
+func NewVolumeStatusAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
@@ -116,7 +117,7 @@ func NewVolumeStatusAdapter(client *ec2.Client, accountID string, region string)
 		},
 		InputMapperGet:  volumeStatusInputMapperGet,
 		InputMapperList: volumeStatusInputMapperList,
-		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumeStatusInput) adapters.Paginator[*ec2.DescribeVolumeStatusOutput, *ec2.Options] {
+		PaginatorBuilder: func(client *ec2.Client, params *ec2.DescribeVolumeStatusInput) adapterhelpers.Paginator[*ec2.DescribeVolumeStatusOutput, *ec2.Options] {
 			return ec2.NewDescribeVolumeStatusPaginator(client, params)
 		},
 		OutputMapper: volumeStatusOutputMapper,

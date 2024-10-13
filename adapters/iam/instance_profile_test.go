@@ -7,33 +7,33 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestInstanceProfileItemMapper(t *testing.T) {
 	profile := types.InstanceProfile{
-		Arn:                 adapters.PtrString("arn:aws:iam::123456789012:instance-profile/webserver"),
-		CreateDate:          adapters.PtrTime(time.Now()),
-		InstanceProfileId:   adapters.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
-		InstanceProfileName: adapters.PtrString("webserver"),
-		Path:                adapters.PtrString("/"),
+		Arn:                 adapterhelpers.PtrString("arn:aws:iam::123456789012:instance-profile/webserver"),
+		CreateDate:          adapterhelpers.PtrTime(time.Now()),
+		InstanceProfileId:   adapterhelpers.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
+		InstanceProfileName: adapterhelpers.PtrString("webserver"),
+		Path:                adapterhelpers.PtrString("/"),
 		Roles: []types.Role{
 			{
-				Arn:                      adapters.PtrString("arn:aws:iam::123456789012:role/webserver"), // link
-				CreateDate:               adapters.PtrTime(time.Now()),
-				Path:                     adapters.PtrString("/"),
-				RoleId:                   adapters.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
-				RoleName:                 adapters.PtrString("webserver"),
-				AssumeRolePolicyDocument: adapters.PtrString(`{}`),
-				Description:              adapters.PtrString("Allows EC2 instances to call AWS services on your behalf."),
-				MaxSessionDuration:       adapters.PtrInt32(3600),
+				Arn:                      adapterhelpers.PtrString("arn:aws:iam::123456789012:role/webserver"), // link
+				CreateDate:               adapterhelpers.PtrTime(time.Now()),
+				Path:                     adapterhelpers.PtrString("/"),
+				RoleId:                   adapterhelpers.PtrString("AIDACKCEVSQ6C2EXAMPLE"),
+				RoleName:                 adapterhelpers.PtrString("webserver"),
+				AssumeRolePolicyDocument: adapterhelpers.PtrString(`{}`),
+				Description:              adapterhelpers.PtrString("Allows EC2 instances to call AWS services on your behalf."),
+				MaxSessionDuration:       adapterhelpers.PtrInt32(3600),
 				PermissionsBoundary: &types.AttachedPermissionsBoundary{
-					PermissionsBoundaryArn:  adapters.PtrString("arn:aws:iam::123456789012:policy/XCompanyBoundaries"), // link
+					PermissionsBoundaryArn:  adapterhelpers.PtrString("arn:aws:iam::123456789012:policy/XCompanyBoundaries"), // link
 					PermissionsBoundaryType: types.PermissionsBoundaryAttachmentTypePolicy,
 				},
 				RoleLastUsed: &types.RoleLastUsed{
-					LastUsedDate: adapters.PtrTime(time.Now()),
-					Region:       adapters.PtrString("us-east-1"),
+					LastUsedDate: adapterhelpers.PtrTime(time.Now()),
+					Region:       adapterhelpers.PtrString("us-east-1"),
 				},
 			},
 		},
@@ -52,7 +52,7 @@ func TestInstanceProfileItemMapper(t *testing.T) {
 }
 
 func TestNewInstanceProfileAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
@@ -60,7 +60,7 @@ func TestNewInstanceProfileAdapter(t *testing.T) {
 
 	adapter := NewInstanceProfileAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 30 * time.Second,
 	}

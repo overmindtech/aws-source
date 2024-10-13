@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -15,22 +16,22 @@ func TestTransitGatewayPeeringOutputMapper(t *testing.T) {
 		item           *types.TransitGatewayPeering
 		expectedHealth sdp.Health
 		expectedAttr   string
-		tests          adapters.QueryTests
+		tests          adapterhelpers.QueryTests
 	}{
 		{
 			name: "ok",
 			item: &types.TransitGatewayPeering{
 				Peering: &types.Peering{
-					PeeringId:     adapters.PtrString("tgp-1"),
-					CoreNetworkId: adapters.PtrString("cn-1"),
+					PeeringId:     adapterhelpers.PtrString("tgp-1"),
+					CoreNetworkId: adapterhelpers.PtrString("cn-1"),
 					State:         types.PeeringStateAvailable,
 				},
-				TransitGatewayArn:                 adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234"),
-				TransitGatewayPeeringAttachmentId: adapters.PtrString("gpa-1"),
+				TransitGatewayArn:                 adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway/tgw-1234"),
+				TransitGatewayPeeringAttachmentId: adapterhelpers.PtrString("gpa-1"),
 			},
 			expectedHealth: sdp.Health_HEALTH_OK,
 			expectedAttr:   "tgp-1",
-			tests: adapters.QueryTests{
+			tests: adapterhelpers.QueryTests{
 				{
 					ExpectedType:   "networkmanager-core-network",
 					ExpectedMethod: sdp.QueryMethod_GET,

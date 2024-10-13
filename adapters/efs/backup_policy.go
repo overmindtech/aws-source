@@ -6,7 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/efs"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -27,7 +27,7 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 		return nil, errors.New("nil filesystem ID on input")
 	}
 
-	attrs, err := adapters.ToAttributesWithExclude(output)
+	attrs, err := adapterhelpers.ToAttributesWithExclude(output)
 
 	if err != nil {
 		return nil, err
@@ -58,8 +58,8 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_efs_backup_policy.id
 
-func NewBackupPolicyAdapter(client *efs.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
-	return &adapters.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
+func NewBackupPolicyAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-backup-policy",
 		Region:          region,
 		Client:          client,

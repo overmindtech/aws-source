@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,13 +29,13 @@ type networkFirewallClient interface {
 
 func encryptionConfigurationLink(config *types.EncryptionConfiguration, scope string) *sdp.LinkedItemQuery {
 	// This can be an ARN or an ID if it's in the same account
-	if a, err := adapters.ParseARN(*config.KeyId); err == nil {
+	if a, err := adapterhelpers.ParseARN(*config.KeyId); err == nil {
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-key",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *config.KeyId,
-				Scope:  adapters.FormatScope(a.AccountID, a.Region),
+				Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 			},
 			BlastPropagation: &sdp.BlastPropagation{
 				In:  true,

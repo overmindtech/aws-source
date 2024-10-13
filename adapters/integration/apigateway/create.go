@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters/integration"
 )
 
@@ -27,8 +27,8 @@ func createRestAPI(ctx context.Context, logger *slog.Logger, client *apigateway.
 	}
 
 	result, err := client.CreateRestApi(ctx, &apigateway.CreateRestApiInput{
-		Name:        adapters.PtrString(integration.ResourceName(integration.APIGateway, restAPISrc, testID)),
-		Description: adapters.PtrString("Test Rest API"),
+		Name:        adapterhelpers.PtrString(integration.ResourceName(integration.APIGateway, restAPISrc, testID)),
+		Description: adapterhelpers.PtrString("Test Rest API"),
 		Tags:        resourceTags(restAPISrc, testID),
 	})
 	if err != nil {
@@ -57,7 +57,7 @@ func createResource(ctx context.Context, logger *slog.Logger, client *apigateway
 	result, err := client.CreateResource(ctx, &apigateway.CreateResourceInput{
 		RestApiId: restAPIID,
 		ParentId:  parentID,
-		PathPart:  adapters.PtrString(path),
+		PathPart:  adapterhelpers.PtrString(path),
 	})
 	if err != nil {
 		return nil, err

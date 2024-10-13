@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,81 +17,81 @@ func TestNetworkResourceRelationshipOutputMapper(t *testing.T) {
 		name   string
 		input  networkmanager.GetNetworkResourceRelationshipsInput
 		output networkmanager.GetNetworkResourceRelationshipsOutput
-		tests  []adapters.QueryTests
+		tests  []adapterhelpers.QueryTests
 	}{
 		{
 			name: "ok, one entity",
 			input: networkmanager.GetNetworkResourceRelationshipsInput{
-				GlobalNetworkId: adapters.PtrString("default"),
+				GlobalNetworkId: adapterhelpers.PtrString("default"),
 			},
 			output: networkmanager.GetNetworkResourceRelationshipsOutput{
 				Relationships: []types.Relationship{
 					// connection, device
 					{
-						From: adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
-						To:   adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/d-1"),
+						From: adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
+						To:   adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/d-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
-						From: adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/d-1"),
+						To:   adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
+						From: adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:device/d-1"),
 					},
 					// link, site
 					{
-						From: adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
-						To:   adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:site/site-1"),
+						From: adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
+						To:   adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:site/site-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
-						From: adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:site/site-1"),
+						To:   adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:link/link-1"),
+						From: adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:site/site-1"),
 					},
 					// directconnect-connection, directconnect-direct-connect-gateway
 					{
-						From: adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:connection/dxconn-1"),
-						To:   adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:direct-connect-gateway/gw-1"),
+						From: adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:connection/dxconn-1"),
+						To:   adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:direct-connect-gateway/gw-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:connection/dxconn-1"),
-						From: adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:direct-connect-gateway/gw-1"),
+						To:   adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:connection/dxconn-1"),
+						From: adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:direct-connect-gateway/gw-1"),
 					},
 					// directconnect-virtual-interface, ec2-customer-gateway
 					{
-						From: adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:virtual-interface/vif-1"),
-						To:   adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:customer-gateway/gw-1"),
+						From: adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:virtual-interface/vif-1"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:customer-gateway/gw-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:directconnect:us-west-2:123456789012:virtual-interface/vif-1"),
-						From: adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:customer-gateway/gw-1"),
+						To:   adapterhelpers.PtrString("arn:aws:directconnect:us-west-2:123456789012:virtual-interface/vif-1"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:customer-gateway/gw-1"),
 					},
 					// ec2-transit-gateway, ec2-transit-gateway-attachment
 					{
-						From: adapters.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway/tgw-06910e97a1fbdf66a"),
-						To:   adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-attachment/tgwa-1"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway/tgw-06910e97a1fbdf66a"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-attachment/tgwa-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway/tgw-06910e97a1fbdf66a"),
-						From: adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-attachment/tgwa-1"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway/tgw-06910e97a1fbdf66a"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-attachment/tgwa-1"),
 					},
 					// ec2-transit-gateway-route-table, ec2-transit-gateway-connect-peer
 					{
-						From: adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-connect-peer/tgw-cnp-1"),
-						To:   adapters.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway-route-table/tgw-rtb-043b7b4c0db1e4833"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-connect-peer/tgw-cnp-1"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway-route-table/tgw-rtb-043b7b4c0db1e4833"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-connect-peer/tgw-cnp-1"),
-						From: adapters.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway-route-table/tgw-rtb-043b7b4c0db1e4833"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:transit-gateway-connect-peer/tgw-cnp-1"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-east-2:986543144159:transit-gateway-route-table/tgw-rtb-043b7b4c0db1e4833"),
 					},
 					// connection, ec2-vpn-connection
 					{
-						From: adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
-						To:   adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/conn-1"),
+						From: adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
+						To:   adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/conn-1"),
 					},
 					{
-						To:   adapters.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
-						From: adapters.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/conn-1"),
+						To:   adapterhelpers.PtrString("arn:aws:networkmanager:us-west-2:123456789012:connection/conn-1"),
+						From: adapterhelpers.PtrString("arn:aws:ec2:us-west-2:123456789012:vpn-connection/conn-1"),
 					},
 				},
 			},
-			tests: []adapters.QueryTests{
+			tests: []adapterhelpers.QueryTests{
 				// connection to device
 				{
 					{

@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,7 +17,7 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 	var err error
 
 	for _, asg := range output.AutoScalingGroups {
-		attributes, err = adapters.ToAttributesWithExclude(asg)
+		attributes, err = adapterhelpers.ToAttributesWithExclude(asg)
 
 		if err != nil {
 			return nil, err
@@ -63,18 +64,18 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 			}
 		}
 
-		var a *adapters.ARN
+		var a *adapterhelpers.ARN
 		var err error
 
 		for _, tgARN := range asg.TargetGroupARNs {
-			if a, err = adapters.ParseARN(tgARN); err == nil {
+			if a, err = adapterhelpers.ParseARN(tgARN); err == nil {
 				// +overmind:link elbv2-target-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-target-group",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  tgARN,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to a target group won't affect the ASG
@@ -129,14 +130,14 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 		}
 
 		if asg.ServiceLinkedRoleARN != nil {
-			if a, err = adapters.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
+			if a, err = adapterhelpers.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
 				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *asg.ServiceLinkedRoleARN,
-						Scope:  adapters.FormatScope(a.AccountID, a.Region),
+						Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
 					},
 					BlastPropagation: &sdp.BlastPropagation{
 						// Changes to a role can affect the functioning of the
@@ -220,8 +221,8 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 // +overmind:terraform:method SEARCH
 //
 //go:generate docgen ../../docs-data
-func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, region string) *adapters.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
-	return &adapters.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
+func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:        "autoscaling-auto-scaling-group",
 		AccountID:       accountID,
 		Region:          region,
@@ -235,7 +236,7 @@ func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, re
 		InputMapperList: func(scope string) (*autoscaling.DescribeAutoScalingGroupsInput, error) {
 			return &autoscaling.DescribeAutoScalingGroupsInput{}, nil
 		},
-		PaginatorBuilder: func(client *autoscaling.Client, params *autoscaling.DescribeAutoScalingGroupsInput) adapters.Paginator[*autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Options] {
+		PaginatorBuilder: func(client *autoscaling.Client, params *autoscaling.DescribeAutoScalingGroupsInput) adapterhelpers.Paginator[*autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Options] {
 			return autoscaling.NewDescribeAutoScalingGroupsPaginator(client, params)
 		},
 		DescribeFunc: func(ctx context.Context, client *autoscaling.Client, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {

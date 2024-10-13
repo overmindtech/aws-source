@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -38,7 +39,7 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(awsItem, "tags")
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +67,8 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_api_gateway_resource.id
 
-func NewResourceAdapter(client *apigateway.Client, accountID string, region string) *adapters.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
-	return &adapters.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options]{
+func NewResourceAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
+	return &adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-resource",
 		Client:          client,
 		AccountID:       accountID,

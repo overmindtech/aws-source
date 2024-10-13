@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,8 +15,8 @@ func TestSiteOutputMapper(t *testing.T) {
 	output := networkmanager.GetSitesOutput{
 		Sites: []types.Site{
 			{
-				SiteId:          adapters.PtrString("site1"),
-				GlobalNetworkId: adapters.PtrString("default"),
+				SiteId:          adapterhelpers.PtrString("site1"),
+				GlobalNetworkId: adapterhelpers.PtrString("default"),
 			},
 		},
 	}
@@ -49,7 +50,7 @@ func TestSiteOutputMapper(t *testing.T) {
 		t.Fatalf("expected default|site1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

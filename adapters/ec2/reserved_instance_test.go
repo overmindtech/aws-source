@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 )
 
 func TestReservedInstanceInputMapperGet(t *testing.T) {
@@ -42,12 +42,12 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 	output := &ec2.DescribeReservedInstancesOutput{
 		ReservedInstances: []types.ReservedInstances{
 			{
-				AvailabilityZone:   adapters.PtrString("az"),
+				AvailabilityZone:   adapterhelpers.PtrString("az"),
 				CurrencyCode:       types.CurrencyCodeValuesUsd,
-				Duration:           adapters.PtrInt64(100),
-				End:                adapters.PtrTime(time.Now()),
-				FixedPrice:         adapters.PtrFloat32(1.23),
-				InstanceCount:      adapters.PtrInt32(1),
+				Duration:           adapterhelpers.PtrInt64(100),
+				End:                adapterhelpers.PtrTime(time.Now()),
+				FixedPrice:         adapterhelpers.PtrFloat32(1.23),
+				InstanceCount:      adapterhelpers.PtrInt32(1),
 				InstanceTenancy:    types.TenancyDedicated,
 				InstanceType:       types.InstanceTypeA14xlarge,
 				OfferingClass:      types.OfferingClassTypeConvertible,
@@ -55,15 +55,15 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 				ProductDescription: types.RIProductDescription("foo"),
 				RecurringCharges: []types.RecurringCharge{
 					{
-						Amount:    adapters.PtrFloat64(1.111),
+						Amount:    adapterhelpers.PtrFloat64(1.111),
 						Frequency: types.RecurringChargeFrequencyHourly,
 					},
 				},
-				ReservedInstancesId: adapters.PtrString("id"),
+				ReservedInstancesId: adapterhelpers.PtrString("id"),
 				Scope:               types.ScopeAvailabilityZone,
-				Start:               adapters.PtrTime(time.Now()),
+				Start:               adapterhelpers.PtrTime(time.Now()),
 				State:               types.ReservedInstanceStateActive,
-				UsagePrice:          adapters.PtrFloat32(99.00000001),
+				UsagePrice:          adapterhelpers.PtrFloat32(99.00000001),
 			},
 		},
 	}
@@ -88,7 +88,7 @@ func TestReservedInstanceOutputMapper(t *testing.T) {
 
 	// It doesn't really make sense to test anything other than the linked items
 	// since the attributes are converted automatically
-	tests := adapters.QueryTests{}
+	tests := adapterhelpers.QueryTests{}
 
 	tests.Execute(t, item)
 
@@ -99,7 +99,7 @@ func TestNewReservedInstanceAdapter(t *testing.T) {
 
 	adapter := NewReservedInstanceAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

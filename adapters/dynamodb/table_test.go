@@ -7,7 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -16,46 +17,46 @@ func (t *TestClient) DescribeTable(context.Context, *dynamodb.DescribeTableInput
 		Table: &types.TableDescription{
 			AttributeDefinitions: []types.AttributeDefinition{
 				{
-					AttributeName: adapters.PtrString("ArtistId"),
+					AttributeName: adapterhelpers.PtrString("ArtistId"),
 					AttributeType: types.ScalarAttributeTypeS,
 				},
 				{
-					AttributeName: adapters.PtrString("Concert"),
+					AttributeName: adapterhelpers.PtrString("Concert"),
 					AttributeType: types.ScalarAttributeTypeS,
 				},
 				{
-					AttributeName: adapters.PtrString("TicketSales"),
+					AttributeName: adapterhelpers.PtrString("TicketSales"),
 					AttributeType: types.ScalarAttributeTypeS,
 				},
 			},
-			TableName: adapters.PtrString("test-DDBTable-1X52D7BWAAB2H"),
+			TableName: adapterhelpers.PtrString("test-DDBTable-1X52D7BWAAB2H"),
 			KeySchema: []types.KeySchemaElement{
 				{
-					AttributeName: adapters.PtrString("ArtistId"),
+					AttributeName: adapterhelpers.PtrString("ArtistId"),
 					KeyType:       types.KeyTypeHash,
 				},
 				{
-					AttributeName: adapters.PtrString("Concert"),
+					AttributeName: adapterhelpers.PtrString("Concert"),
 					KeyType:       types.KeyTypeRange,
 				},
 			},
 			TableStatus:      types.TableStatusActive,
-			CreationDateTime: adapters.PtrTime(time.Now()),
+			CreationDateTime: adapterhelpers.PtrTime(time.Now()),
 			ProvisionedThroughput: &types.ProvisionedThroughputDescription{
-				NumberOfDecreasesToday: adapters.PtrInt64(0),
-				ReadCapacityUnits:      adapters.PtrInt64(5),
-				WriteCapacityUnits:     adapters.PtrInt64(5),
+				NumberOfDecreasesToday: adapterhelpers.PtrInt64(0),
+				ReadCapacityUnits:      adapterhelpers.PtrInt64(5),
+				WriteCapacityUnits:     adapterhelpers.PtrInt64(5),
 			},
-			TableSizeBytes: adapters.PtrInt64(0),
-			ItemCount:      adapters.PtrInt64(0),
-			TableArn:       adapters.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H"),
-			TableId:        adapters.PtrString("32ef65bf-d6f3-4508-a3db-f201df09e437"),
+			TableSizeBytes: adapterhelpers.PtrInt64(0),
+			ItemCount:      adapterhelpers.PtrInt64(0),
+			TableArn:       adapterhelpers.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H"),
+			TableId:        adapterhelpers.PtrString("32ef65bf-d6f3-4508-a3db-f201df09e437"),
 			GlobalSecondaryIndexes: []types.GlobalSecondaryIndexDescription{
 				{
-					IndexName: adapters.PtrString("GSI"),
+					IndexName: adapterhelpers.PtrString("GSI"),
 					KeySchema: []types.KeySchemaElement{
 						{
-							AttributeName: adapters.PtrString("TicketSales"),
+							AttributeName: adapterhelpers.PtrString("TicketSales"),
 							KeyType:       types.KeyTypeHash,
 						},
 					},
@@ -64,35 +65,35 @@ func (t *TestClient) DescribeTable(context.Context, *dynamodb.DescribeTableInput
 					},
 					IndexStatus: types.IndexStatusActive,
 					ProvisionedThroughput: &types.ProvisionedThroughputDescription{
-						NumberOfDecreasesToday: adapters.PtrInt64(0),
-						ReadCapacityUnits:      adapters.PtrInt64(5),
-						WriteCapacityUnits:     adapters.PtrInt64(5),
+						NumberOfDecreasesToday: adapterhelpers.PtrInt64(0),
+						ReadCapacityUnits:      adapterhelpers.PtrInt64(5),
+						WriteCapacityUnits:     adapterhelpers.PtrInt64(5),
 					},
-					IndexSizeBytes: adapters.PtrInt64(0),
-					ItemCount:      adapters.PtrInt64(0),
-					IndexArn:       adapters.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/index/GSI"), // no link, t
+					IndexSizeBytes: adapterhelpers.PtrInt64(0),
+					ItemCount:      adapterhelpers.PtrInt64(0),
+					IndexArn:       adapterhelpers.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/index/GSI"), // no link, t
 				},
 			},
 			ArchivalSummary: &types.ArchivalSummary{
-				ArchivalBackupArn: adapters.PtrString("arn:aws:backups:eu-west-1:052392120703:some-backup/one"), // link
-				ArchivalDateTime:  adapters.PtrTime(time.Now()),
-				ArchivalReason:    adapters.PtrString("fear"),
+				ArchivalBackupArn: adapterhelpers.PtrString("arn:aws:backups:eu-west-1:052392120703:some-backup/one"), // link
+				ArchivalDateTime:  adapterhelpers.PtrTime(time.Now()),
+				ArchivalReason:    adapterhelpers.PtrString("fear"),
 			},
 			BillingModeSummary: &types.BillingModeSummary{
 				BillingMode: types.BillingModePayPerRequest,
 			},
-			GlobalTableVersion: adapters.PtrString("1"),
-			LatestStreamArn:    adapters.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/stream/2023-01-11T16:53:02.371"), // This doesn't get linked because there is no more data to get
-			LatestStreamLabel:  adapters.PtrString("2023-01-11T16:53:02.371"),
+			GlobalTableVersion: adapterhelpers.PtrString("1"),
+			LatestStreamArn:    adapterhelpers.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/stream/2023-01-11T16:53:02.371"), // This doesn't get linked because there is no more data to get
+			LatestStreamLabel:  adapterhelpers.PtrString("2023-01-11T16:53:02.371"),
 			LocalSecondaryIndexes: []types.LocalSecondaryIndexDescription{
 				{
-					IndexArn:       adapters.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/index/GSX"), // no link
-					IndexName:      adapters.PtrString("GSX"),
-					IndexSizeBytes: adapters.PtrInt64(29103),
-					ItemCount:      adapters.PtrInt64(234234),
+					IndexArn:       adapterhelpers.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H/index/GSX"), // no link
+					IndexName:      adapterhelpers.PtrString("GSX"),
+					IndexSizeBytes: adapterhelpers.PtrInt64(29103),
+					ItemCount:      adapterhelpers.PtrInt64(234234),
 					KeySchema: []types.KeySchemaElement{
 						{
-							AttributeName: adapters.PtrString("TicketSales"),
+							AttributeName: adapterhelpers.PtrString("TicketSales"),
 							KeyType:       types.KeyTypeHash,
 						},
 					},
@@ -108,11 +109,11 @@ func (t *TestClient) DescribeTable(context.Context, *dynamodb.DescribeTableInput
 				{
 					GlobalSecondaryIndexes: []types.ReplicaGlobalSecondaryIndexDescription{
 						{
-							IndexName: adapters.PtrString("name"),
+							IndexName: adapterhelpers.PtrString("name"),
 						},
 					},
-					KMSMasterKeyId: adapters.PtrString("keyID"),
-					RegionName:     adapters.PtrString("eu-west-2"), // link
+					KMSMasterKeyId: adapterhelpers.PtrString("keyID"),
+					RegionName:     adapterhelpers.PtrString("eu-west-2"), // link
 					ReplicaStatus:  types.ReplicaStatusActive,
 					ReplicaTableClassSummary: &types.TableClassSummary{
 						TableClass: types.TableClassStandard,
@@ -120,23 +121,23 @@ func (t *TestClient) DescribeTable(context.Context, *dynamodb.DescribeTableInput
 				},
 			},
 			RestoreSummary: &types.RestoreSummary{
-				RestoreDateTime:   adapters.PtrTime(time.Now()),
-				RestoreInProgress: adapters.PtrBool(false),
-				SourceBackupArn:   adapters.PtrString("arn:aws:backup:eu-west-1:052392120703:recovery-point:89d0f956-d3a6-42fd-abbd-7d397766bc7e"), // link
-				SourceTableArn:    adapters.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H"),                 // link
+				RestoreDateTime:   adapterhelpers.PtrTime(time.Now()),
+				RestoreInProgress: adapterhelpers.PtrBool(false),
+				SourceBackupArn:   adapterhelpers.PtrString("arn:aws:backup:eu-west-1:052392120703:recovery-point:89d0f956-d3a6-42fd-abbd-7d397766bc7e"), // link
+				SourceTableArn:    adapterhelpers.PtrString("arn:aws:dynamodb:eu-west-1:052392120703:table/test-DDBTable-1X52D7BWAAB2H"),                 // link
 			},
 			SSEDescription: &types.SSEDescription{
-				InaccessibleEncryptionDateTime: adapters.PtrTime(time.Now()),
-				KMSMasterKeyArn:                adapters.PtrString("arn:aws:service:region:account:type/id"), // link
+				InaccessibleEncryptionDateTime: adapterhelpers.PtrTime(time.Now()),
+				KMSMasterKeyArn:                adapterhelpers.PtrString("arn:aws:service:region:account:type/id"), // link
 				SSEType:                        types.SSETypeAes256,
 				Status:                         types.SSEStatusDisabling,
 			},
 			StreamSpecification: &types.StreamSpecification{
-				StreamEnabled:  adapters.PtrBool(true),
+				StreamEnabled:  adapterhelpers.PtrBool(true),
 				StreamViewType: types.StreamViewTypeKeysOnly,
 			},
 			TableClassSummary: &types.TableClassSummary{
-				LastUpdateDateTime: adapters.PtrTime(time.Now()),
+				LastUpdateDateTime: adapterhelpers.PtrTime(time.Now()),
 				TableClass:         types.TableClassStandard,
 			},
 		},
@@ -156,8 +157,8 @@ func (t *TestClient) DescribeKinesisStreamingDestination(ctx context.Context, pa
 		KinesisDataStreamDestinations: []types.KinesisDataStreamDestination{
 			{
 				DestinationStatus:            types.DestinationStatusActive,
-				DestinationStatusDescription: adapters.PtrString("description"),
-				StreamArn:                    adapters.PtrString("arn:aws:kinesis:eu-west-1:052392120703:stream/test"),
+				DestinationStatusDescription: adapterhelpers.PtrString("description"),
+				StreamArn:                    adapterhelpers.PtrString("arn:aws:kinesis:eu-west-1:052392120703:stream/test"),
 			},
 		},
 	}, nil
@@ -167,8 +168,8 @@ func (t *TestClient) ListTagsOfResource(context.Context, *dynamodb.ListTagsOfRes
 	return &dynamodb.ListTagsOfResourceOutput{
 		Tags: []types.Tag{
 			{
-				Key:   adapters.PtrString("key"),
-				Value: adapters.PtrString("value"),
+				Key:   adapterhelpers.PtrString("key"),
+				Value: adapterhelpers.PtrString("value"),
 			},
 		},
 		NextToken: nil,
@@ -190,7 +191,7 @@ func TestTableGetFunc(t *testing.T) {
 		t.Error(err)
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "kinesis-stream",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
@@ -221,12 +222,12 @@ func TestTableGetFunc(t *testing.T) {
 }
 
 func TestNewTableAdapter(t *testing.T) {
-	config, account, region := adapters.GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := dynamodb.NewFromConfig(config)
 
 	adapter := NewTableAdapter(client, account, region)
 
-	test := adapters.E2ETest{
+	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
 		Timeout: 10 * time.Second,
 	}

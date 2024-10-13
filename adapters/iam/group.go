@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
-	"github.com/overmindtech/aws-source/adapters"
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -40,7 +40,7 @@ func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.
 }
 
 func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
-	attributes, err := adapters.ToAttributesWithExclude(awsItem)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
 		return nil, err
@@ -66,8 +66,8 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 // +overmind:terraform:queryMap aws_iam_group.arn
 // +overmind:terraform:method SEARCH
 
-func NewGroupAdapter(client *iam.Client, accountID string, region string) *adapters.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
-	return &adapters.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
+func NewGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
+	return &adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time

@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager"
 	"github.com/aws/aws-sdk-go-v2/service/networkmanager/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -14,12 +15,12 @@ func TestConnectionOutputMapper(t *testing.T) {
 	output := networkmanager.GetConnectionsOutput{
 		Connections: []types.Connection{
 			{
-				GlobalNetworkId:   adapters.PtrString("default"),
-				ConnectionId:      adapters.PtrString("conn-1"),
-				DeviceId:          adapters.PtrString("dvc-1"),
-				ConnectedDeviceId: adapters.PtrString("dvc-2"),
-				LinkId:            adapters.PtrString("link-1"),
-				ConnectedLinkId:   adapters.PtrString("link-2"),
+				GlobalNetworkId:   adapterhelpers.PtrString("default"),
+				ConnectionId:      adapterhelpers.PtrString("conn-1"),
+				DeviceId:          adapterhelpers.PtrString("dvc-1"),
+				ConnectedDeviceId: adapterhelpers.PtrString("dvc-2"),
+				LinkId:            adapterhelpers.PtrString("link-1"),
+				ConnectedLinkId:   adapterhelpers.PtrString("link-2"),
 			},
 		},
 	}
@@ -53,7 +54,7 @@ func TestConnectionOutputMapper(t *testing.T) {
 		t.Fatalf("expected default|conn-1, got %v", item.UniqueAttributeValue())
 	}
 
-	tests := adapters.QueryTests{
+	tests := adapterhelpers.QueryTests{
 		{
 			ExpectedType:   "networkmanager-global-network",
 			ExpectedMethod: sdp.QueryMethod_GET,

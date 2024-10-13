@@ -5,7 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -28,7 +29,7 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 		}
 	}
 
-	attributes, err := adapters.ToAttributesWithExclude(output.Attributes)
+	attributes, err := adapterhelpers.ToAttributesWithExclude(output.Attributes)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +65,8 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 // +overmind:group AWS
 // +overmind:terraform:queryMap aws_sqs_queue.id
 
-func NewQueueAdapter(client sqsClient, accountID string, region string) *adapters.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
-	return &adapters.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
+func NewQueueAdapter(client sqsClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
+	return &adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
 		ItemType:        "sqs-queue",
 		Client:          client,
 		AccountID:       accountID,
@@ -79,7 +80,7 @@ func NewQueueAdapter(client sqsClient, accountID string, region string) *adapter
 				AttributeNames: []types.QueueAttributeName{"All"},
 			}
 		},
-		ListFuncPaginatorBuilder: func(client sqsClient, input *sqs.ListQueuesInput) adapters.Paginator[*sqs.ListQueuesOutput, *sqs.Options] {
+		ListFuncPaginatorBuilder: func(client sqsClient, input *sqs.ListQueuesInput) adapterhelpers.Paginator[*sqs.ListQueuesOutput, *sqs.Options] {
 			return sqs.NewListQueuesPaginator(client, input)
 		},
 		ListFuncOutputMapper: func(output *sqs.ListQueuesOutput, _ *sqs.ListQueuesInput) ([]*sqs.GetQueueAttributesInput, error) {

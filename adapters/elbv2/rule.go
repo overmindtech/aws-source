@@ -4,7 +4,8 @@ import (
 	"context"
 
 	elbv2 "github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/overmindtech/aws-source/adapters"
+
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -22,7 +23,7 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 	tagsMap := getTagsMap(ctx, client, ruleArns)
 
 	for _, rule := range output.Rules {
-		attrs, err := adapters.ToAttributesWithExclude(rule)
+		attrs, err := adapterhelpers.ToAttributesWithExclude(rule)
 
 		if err != nil {
 			return nil, err
@@ -85,8 +86,8 @@ func ruleOutputMapper(ctx context.Context, client elbClient, scope string, _ *el
 // +overmind:terraform:queryMap aws_lb_listener_rule.arn
 // +overmind:terraform:method SEARCH
 
-func NewRuleAdapter(client elbClient, accountID string, region string) *adapters.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
-	return &adapters.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
+func NewRuleAdapter(client elbClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options] {
+	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbClient, *elbv2.Options]{
 		Region:          region,
 		Client:          client,
 		AccountID:       accountID,
