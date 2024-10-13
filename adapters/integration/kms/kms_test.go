@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
-	"github.com/overmindtech/aws-source/adapters/kms"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -30,13 +30,13 @@ func KMS(t *testing.T) {
 
 	t.Log("Running KMS integration test")
 
-	keySource := kms.NewKeyAdapter(testClient, accountID, testAWSConfig.Region)
+	keySource := adapters.NewKMSKeyAdapter(testClient, accountID, testAWSConfig.Region)
 
-	aliasSource := kms.NewAliasAdapter(testClient, accountID, testAWSConfig.Region)
+	aliasSource := adapters.NewKMSAliasAdapter(testClient, accountID, testAWSConfig.Region)
 
-	grantSource := kms.NewGrantAdapter(testClient, accountID, testAWSConfig.Region)
+	grantSource := adapters.NewKMSGrantAdapter(testClient, accountID, testAWSConfig.Region)
 
-	keyPolicySource := kms.NewKeyPolicyAdapter(testClient, accountID, testAWSConfig.Region)
+	keyPolicySource := adapters.NewKMSKeyPolicyAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = keySource.Validate()
 	if err != nil {
@@ -58,7 +58,7 @@ func KMS(t *testing.T) {
 		t.Fatalf("failed to validate KMS key policy adapter: %v", err)
 	}
 
-	scope := adapters.FormatScope(accountID, testAWSConfig.Region)
+	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List keys
 	sdpListKeys, err := keySource.List(context.Background(), scope, true)

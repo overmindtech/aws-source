@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
-	"github.com/overmindtech/aws-source/adapters/networkmanager"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -30,37 +30,37 @@ func NetworkManager(t *testing.T) {
 
 	t.Logf("Running NetworkManager integration tests")
 
-	globalNetworkSource := networkmanager.NewGlobalNetworkAdapter(testClient, accountID)
+	globalNetworkSource := adapters.NewNetworkManagerGlobalNetworkAdapter(testClient, accountID)
 	if err := globalNetworkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager global network adapter: %v", err)
 	}
 
-	siteSource := networkmanager.NewSiteAdapter(testClient, accountID)
+	siteSource := adapters.NewNetworkManagerSiteAdapter(testClient, accountID)
 	if err := siteSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager site adapter: %v", err)
 	}
 
-	linkSource := networkmanager.NewLinkAdapter(testClient, accountID)
+	linkSource := adapters.NewNetworkManagerLinkAdapter(testClient, accountID)
 	if err := linkSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link adapter: %v", err)
 	}
 
-	linkAssociationSource := networkmanager.NewLinkAssociationAdapter(testClient, accountID)
+	linkAssociationSource := adapters.NewNetworkManagerLinkAssociationAdapter(testClient, accountID)
 	if err := linkAssociationSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager link association adapter: %v", err)
 	}
 
-	connectionSource := networkmanager.NewConnectionAdapter(testClient, accountID)
+	connectionSource := adapters.NewNetworkManagerConnectionAdapter(testClient, accountID)
 	if err := connectionSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager connection adapter: %v", err)
 	}
 
-	deviceSource := networkmanager.NewDeviceAdapter(testClient, accountID)
+	deviceSource := adapters.NewNetworkManagerDeviceAdapter(testClient, accountID)
 	if err := deviceSource.Validate(); err != nil {
 		t.Fatalf("failed to validate NetworkManager device adapter: %v", err)
 	}
 
-	globalScope := adapters.FormatScope(accountID, "")
+	globalScope := adapterhelpers.FormatScope(accountID, "")
 
 	t.Run("Global Network", func(t *testing.T) {
 		// List global networks
