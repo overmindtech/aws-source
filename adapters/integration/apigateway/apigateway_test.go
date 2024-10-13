@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
-	"github.com/overmindtech/aws-source/adapters/apigateway"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
 	"github.com/overmindtech/sdp-go"
 )
@@ -28,14 +28,14 @@ func APIGateway(t *testing.T) {
 
 	t.Log("Running APIGateway integration test")
 
-	restApiSource := apigateway.NewRestApiAdapter(testClient, accountID, testAWSConfig.Region)
+	restApiSource := adapters.NewRestApiAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = restApiSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate APIGateway restApi adapter: %v", err)
 	}
 
-	resourceApiSource := apigateway.NewResourceAdapter(testClient, accountID, testAWSConfig.Region)
+	resourceApiSource := adapters.NewResourceAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = resourceApiSource.Validate()
 	if err != nil {

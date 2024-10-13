@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
-	"github.com/overmindtech/aws-source/adapters/kms"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -30,13 +30,13 @@ func KMS(t *testing.T) {
 
 	t.Log("Running KMS integration test")
 
-	keySource := kms.NewKeyAdapter(testClient, accountID, testAWSConfig.Region)
+	keySource := adapters.NewKeyAdapter(testClient, accountID, testAWSConfig.Region)
 
-	aliasSource := kms.NewAliasAdapter(testClient, accountID, testAWSConfig.Region)
+	aliasSource := adapters.NewAliasAdapter(testClient, accountID, testAWSConfig.Region)
 
-	grantSource := kms.NewGrantAdapter(testClient, accountID, testAWSConfig.Region)
+	grantSource := adapters.NewGrantAdapter(testClient, accountID, testAWSConfig.Region)
 
-	keyPolicySource := kms.NewKeyPolicyAdapter(testClient, accountID, testAWSConfig.Region)
+	keyPolicySource := adapters.NewKeyPolicyAdapter(testClient, accountID, testAWSConfig.Region)
 
 	err = keySource.Validate()
 	if err != nil {
