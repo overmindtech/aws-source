@@ -136,7 +136,6 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 	if cn.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link networkmanager-core-network
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cn.CoreNetworkId,
@@ -196,13 +195,6 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-connect-peer
-// +overmind:descriptiveType Networkmanager Connect Peer
-// +overmind:get Get a Networkmanager Connect Peer by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_connect_peer.id
 
 func NewNetworkManagerConnectPeerAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{

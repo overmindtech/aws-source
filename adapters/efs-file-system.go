@@ -93,15 +93,6 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type efs-file-system
-// +overmind:descriptiveType EFS File System
-// +overmind:get Get an file system by ID
-// +overmind:list List all file systems
-// +overmind:search Search for an file system by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_efs_file_system.id
-
 func NewEFSFileSystemAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-file-system",

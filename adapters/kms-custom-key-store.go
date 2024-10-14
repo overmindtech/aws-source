@@ -47,7 +47,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 		}
 
 		if customKeyStore.CloudHsmClusterId != nil {
-			// +overmind:link cloudhsmv2-cluster
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "cloudhsmv2-cluster",
@@ -66,7 +65,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 
 		if customKeyStore.XksProxyConfiguration != nil &&
 			customKeyStore.XksProxyConfiguration.VpcEndpointServiceName != nil {
-			// +overmind:link ec2-vpc-endpoint-service
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc-endpoint-service",
@@ -88,15 +86,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type kms-custom-key-store
-// +overmind:descriptiveType Custom Key Store
-// +overmind:get Get a custom key store by its ID
-// +overmind:list List all custom key stores
-// +overmind:search Search custom key store by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_kms_custom_key_store.id
 
 func NewKMSCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{

@@ -31,14 +31,6 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-virtual-gateway
-// +overmind:descriptiveType Direct Connect Virtual Gateway
-// +overmind:get Get a virtual gateway by ID
-// +overmind:list List all virtual gateways
-// +overmind:search Search virtual gateways by ARN
-// +overmind:group AWS
-
 func NewDirectConnectVirtualGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

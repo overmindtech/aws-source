@@ -236,7 +236,6 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	for _, policy := range awsItem.AttachedPolicies {
 		if policy.PolicyArn != nil {
 			if a, err := adapterhelpers.ParseARN(*policy.PolicyArn); err == nil {
-				// +overmind:link iam-policy
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
@@ -291,16 +290,6 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 
 	return tags, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type iam-role
-// +overmind:descriptiveType IAM Role
-// +overmind:get Get an IAM role by name
-// +overmind:list List all IAM roles
-// +overmind:search Search for IAM roles by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_iam_role.arn
-// +overmind:terraform:method SEARCH
 
 func NewIAMRoleAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{

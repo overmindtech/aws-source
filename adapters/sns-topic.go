@@ -46,7 +46,6 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 	}
 
 	if kmsMasterKeyID, err := attributes.Get("kmsMasterKeyId"); err == nil {
-		// +overmind:link kms-key
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-key",
@@ -65,15 +64,6 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type sns-topic
-// +overmind:descriptiveType SNS Topic
-// +overmind:get Get an SNS topic by its ARN
-// +overmind:list List all SNS topics
-// +overmind:search Search SNS topic by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_sns_topic.id
 
 func NewSNSTopicAdapter(client topicClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{

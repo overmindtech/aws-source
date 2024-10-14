@@ -41,7 +41,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{
-					// +overmind:link eks-addon
 					Type:   "eks-addon",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.Name,
@@ -55,7 +54,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 			},
 			{
 				Query: &sdp.Query{
-					// +overmind:link eks-fargate-profile
 					Type:   "eks-fargate-profile",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.Name,
@@ -69,7 +67,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 			},
 			{
 				Query: &sdp.Query{
-					// +overmind:link eks-nodegroup
 					Type:   "eks-nodegroup",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.Name,
@@ -104,7 +101,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	if cluster.ConnectorConfig != nil {
 		if cluster.ConnectorConfig.RoleArn != nil {
 			if a, err = adapterhelpers.ParseARN(*cluster.ConnectorConfig.RoleArn); err == nil {
-				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -127,7 +123,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		if conf.Provider != nil {
 			if conf.Provider.KeyArn != nil {
 				if a, err = adapterhelpers.ParseARN(*conf.Provider.KeyArn); err == nil {
-					// +overmind:link kms-key
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kms-key",
@@ -148,7 +143,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	}
 
 	if cluster.Endpoint != nil {
-		// +overmind:link http
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "http",
@@ -166,7 +160,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.ResourcesVpcConfig != nil {
 		if cluster.ResourcesVpcConfig.ClusterSecurityGroupId != nil {
-			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -184,7 +177,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SecurityGroupIds {
-			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -202,7 +194,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		for _, id := range cluster.ResourcesVpcConfig.SubnetIds {
-			// +overmind:link ec2-subnet
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-subnet",
@@ -220,7 +211,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 		}
 
 		if cluster.ResourcesVpcConfig.VpcId != nil {
-			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -240,7 +230,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 	if cluster.RoleArn != nil {
 		if a, err = adapterhelpers.ParseARN(*cluster.RoleArn); err == nil {
-			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -261,16 +250,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 	return &item, nil
 
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type eks-cluster
-// +overmind:descriptiveType EKS Cluster
-// +overmind:get Get a cluster by name
-// +overmind:list List all clusters
-// +overmind:search Search for clusters by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_eks_cluster.arn
-// +overmind:terraform:method SEARCH
 
 func NewEKSClusterAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{

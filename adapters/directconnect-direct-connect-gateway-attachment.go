@@ -43,7 +43,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		}
 
 		if attachment.DirectConnectGatewayId != nil {
-			// +overmind:link directconnect-direct-connect-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -61,7 +60,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		}
 
 		if attachment.VirtualInterfaceId != nil {
-			// +overmind:link directconnect-virtual-interface
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-virtual-interface",
@@ -84,13 +82,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-direct-connect-gateway-attachment
-// +overmind:descriptiveType Direct Connect Gateway Attachment
-// +overmind:get Get a direct connect gateway attachment by "DirectConnectGatewayId/VirtualInterfaceId"
-// +overmind:search Search direct connect gateway attachments for given VirtualInterfaceId
-// +overmind:group AWS
 
 func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{

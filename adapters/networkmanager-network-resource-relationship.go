@@ -68,7 +68,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "networkmanager-connection":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-connection
 					Type:   "networkmanager-connection",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
@@ -82,7 +81,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "networkmanager-device":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-device
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
@@ -96,7 +94,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "networkmanager-link":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-link
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
@@ -110,7 +107,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "networkmanager-site":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-site
 					Type:   "networkmanager-site",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*input.GlobalNetworkId, toArn.ResourceID()),
@@ -124,7 +120,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "directconnect-connection":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link directconnect-connection
 					Type:   "directconnect-connection",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -138,7 +133,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "directconnect-direct-connect-gateway":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link directconnect-direct-connect-gateway
 					Type:   "directconnect-direct-connect-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -152,7 +146,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "directconnect-virtual-interface":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link directconnect-virtual-interface
 					Type:   "directconnect-virtual-interface",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -166,7 +159,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-customer-gateway":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-customer-gateway
 					Type:   "ec2-customer-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -180,7 +172,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-transit-gateway":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway
 					Type:   "ec2-transit-gateway",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -194,7 +185,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-transit-gateway-attachment":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway-attachment
 					Type:   "ec2-transit-gateway-attachment",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -208,7 +198,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-transit-gateway-connect-peer":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway-connect-peer
 					Type:   "ec2-transit-gateway-connect-peer",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -222,7 +211,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-transit-gateway-route-table":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway-route-table
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -236,7 +224,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 		case "ec2-vpn-connection":
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-vpn-connection
 					Type:   "ec2-vpn-connection",
 					Method: sdp.QueryMethod_GET,
 					Query:  toArn.ResourceID(),
@@ -256,12 +243,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-network-resource-relationship
-// +overmind:descriptiveType Networkmanager Network Resource Relationships
-// +overmind:search Search for Networkmanager NetworkResourceRelationships by GlobalNetworkId
-// +overmind:group AWS
 
 func NewNetworkManagerNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{

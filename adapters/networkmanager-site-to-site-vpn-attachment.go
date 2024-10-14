@@ -44,7 +44,6 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 		if awsItem.Attachment.CoreNetworkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-core-network
 					// Search for core network
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
@@ -74,7 +73,6 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 	if awsItem.VpnConnectionArn != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link ec2-vpn-connection
 				Type:   "ec2-vpn-connection",
 				Method: sdp.QueryMethod_SEARCH,
 				Query:  *awsItem.VpnConnectionArn,
@@ -89,13 +87,6 @@ func siteToSiteVpnAttachmentItemMapper(_, scope string, awsItem *types.SiteToSit
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-site-to-site-vpn-attachment
-// +overmind:descriptiveType Networkmanager Site To Site Vpn Attachment
-// +overmind:get Get a Networkmanager Site To Site Vpn Attachment by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_site_to_site_vpn_attachment.id
 
 func NewNetworkManagerSiteToSiteVpnAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.SiteToSiteVpnAttachment, *networkmanager.Client, *networkmanager.Options]{

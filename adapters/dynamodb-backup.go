@@ -48,7 +48,6 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 
 	if out.BackupDescription.SourceTableDetails != nil {
 		if out.BackupDescription.SourceTableDetails.TableName != nil {
-			// +overmind:link dynamodb-table
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dynamodb-table",
@@ -70,13 +69,6 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type dynamodb-backup
-// +overmind:descriptiveType DynamoDB Backup
-// +overmind:list List all DynamoDB backups
-// +overmind:search Search for a DynamoDB backup by table name
-// +overmind:group AWS
 
 // NewBackupAdapter This adapter is a bit strange. This is the only thing I've
 // found so far that can only be queries by ARN for Get. For this reason I'm

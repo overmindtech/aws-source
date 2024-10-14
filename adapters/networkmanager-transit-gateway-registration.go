@@ -41,7 +41,6 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *r.GlobalNetworkId,
@@ -60,7 +59,6 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 			if arn, err := adapterhelpers.ParseARN(*r.TransitGatewayArn); err == nil {
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
-						// +overmind:link ec2-transit-gateway
 						Type:   "ec2-transit-gateway",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *r.TransitGatewayArn,
@@ -79,14 +77,6 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-transit-gateway-registration
-// +overmind:descriptiveType Networkmanager Transit Gateway Registrations
-// +overmind:get Get a Networkmanager Transit Gateway Registrations
-// +overmind:list List all Networkmanager Transit Gateway Registrations
-// +overmind:search Search for Networkmanager Transit Gateway Registrations by GlobalNetworkId
-// +overmind:group AWS
 
 func NewNetworkManagerTransitGatewayRegistrationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{

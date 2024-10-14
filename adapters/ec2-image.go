@@ -62,15 +62,6 @@ func imageOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.De
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-image
-// +overmind:descriptiveType Amazon Machine Image (AMI)
-// +overmind:get Get an AMI by ID
-// +overmind:list List all AMIs
-// +overmind:search Search AMIs by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_ami.id
-
 func NewEC2ImageAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeImagesInput, *ec2.DescribeImagesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

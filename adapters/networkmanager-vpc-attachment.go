@@ -44,7 +44,6 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link networkmanager-core-network
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.Attachment.CoreNetworkId,
@@ -60,13 +59,6 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-vpc-attachment
-// +overmind:descriptiveType Networkmanager VPC Attachment
-// +overmind:get Get a Networkmanager VPC Attachment by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_vpc_attachment.id
 
 func NewNetworkManagerVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{

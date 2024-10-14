@@ -91,7 +91,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 	if awsItem.EndpointConfiguration != nil && awsItem.EndpointConfiguration.VpcEndpointIds != nil {
 		for _, vpcEndpointID := range awsItem.EndpointConfiguration.VpcEndpointIds {
-			// +overmind:link ec2-vpc-endpoint
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc-endpoint",
@@ -110,7 +109,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 	}
 
 	if awsItem.RootResourceId != nil {
-		// +overmind:link apigateway-resource
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "apigateway-resource",
@@ -126,7 +124,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 		})
 	}
 
-	// +overmind:link apigateway-resource
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 		Query: &sdp.Query{
 			Type:   "apigateway-resource",
@@ -144,15 +141,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type apigateway-rest-api
-// +overmind:descriptiveType REST API
-// +overmind:get Get a REST API by ID
-// +overmind:list List all REST APIs
-// +overmind:search Search for REST APIs their name
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_api_gateway_rest_api.id
 
 func NewAPIGatewayRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{

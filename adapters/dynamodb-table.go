@@ -76,7 +76,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 		for _, dest := range streamsOut.KinesisDataStreamDestinations {
 			if dest.StreamArn != nil {
 				if a, err = adapterhelpers.ParseARN(*dest.StreamArn); err == nil {
-					// +overmind:link kinesis-stream
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kinesis-stream",
@@ -101,7 +100,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	if table.RestoreSummary != nil {
 		if table.RestoreSummary.SourceBackupArn != nil {
 			if a, err = adapterhelpers.ParseARN(*table.RestoreSummary.SourceBackupArn); err == nil {
-				// +overmind:link backup-recovery-point
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "backup-recovery-point",
@@ -123,7 +121,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 		if table.RestoreSummary.SourceTableArn != nil {
 			if a, err = adapterhelpers.ParseARN(*table.RestoreSummary.SourceTableArn); err == nil {
-				// +overmind:link dynamodb-table
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dynamodb-table",
@@ -147,7 +144,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	if table.SSEDescription != nil {
 		if table.SSEDescription.KMSMasterKeyArn != nil {
 			if a, err = adapterhelpers.ParseARN(*table.SSEDescription.KMSMasterKeyArn); err == nil {
-				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -168,16 +164,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type dynamodb-table
-// +overmind:descriptiveType DynamoDB Table
-// +overmind:get Get a DynamoDB table by name
-// +overmind:list List all DynamoDB tables
-// +overmind:search Search for DynamoDB tables by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dynamodb_table.arn
-// +overmind:terraform:method SEARCH
 
 func NewDynamoDBTableAdapter(client Client, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{

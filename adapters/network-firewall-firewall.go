@@ -111,7 +111,6 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 				logGroup, ok := config.LogDestination["logGroup"]
 
 				if ok {
-					// +overmind:link logs-log-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "logs-log-group",
@@ -260,15 +259,6 @@ func firewallGetFunc(ctx context.Context, client networkFirewallClient, scope st
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type network-firewall-firewall
-// +overmind:descriptiveType Network Firewall
-// +overmind:get Get a Network Firewall by name
-// +overmind:list List Network Firewalls
-// +overmind:search Search for Network Firewalls by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkfirewall_firewall.name
 
 func NewNetworkFirewallFirewallAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallsInput, *networkfirewall.ListFirewallsOutput, *networkfirewall.DescribeFirewallInput, *networkfirewall.DescribeFirewallOutput, networkFirewallClient, *networkfirewall.Options]{

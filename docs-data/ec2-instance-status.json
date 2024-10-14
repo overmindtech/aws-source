@@ -1,9 +1,0 @@
-{
-	"type": "ec2-instance-status",
-	"descriptiveType": "EC2 Instance Status",
-	"getDescription": "Get an EC2 instance status by Instance ID",
-	"listDescription": "List all EC2 instance statuses",
-	"searchDescription": "Search EC2 instance statuses by ARN",
-	"group": "AWS",
-	"links": []
-}

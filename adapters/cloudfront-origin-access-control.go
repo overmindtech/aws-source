@@ -55,15 +55,6 @@ func originAccessControlItemMapper(_, scope string, awsItem *types.OriginAccessC
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-origin-access-control
-// +overmind:descriptiveType Cloudfront Origin Access Control
-// +overmind:get Get Origin Access Control by ID
-// +overmind:list List Origin Access Controls
-// +overmind:search Origin Access Control by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_origin_access_control.id
-
 func NewCloudfrontOriginAccessControlAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.OriginAccessControl, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-access-control",

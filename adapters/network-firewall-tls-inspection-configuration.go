@@ -156,14 +156,6 @@ func tlsInspectionConfigurationGetFunc(ctx context.Context, client networkFirewa
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type network-firewall-tls-inspection-configuration
-// +overmind:descriptiveType Network Firewall TLS Inspection Configuration
-// +overmind:get Get a Network Firewall TLS Inspection Configuration by name
-// +overmind:list List Network Firewall TLS Inspection Configurations
-// +overmind:search Search for Network Firewall TLS Inspection Configurations by ARN
-// +overmind:group AWS
-
 func NewNetworkFirewallTLSInspectionConfigurationAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListTLSInspectionConfigurationsInput, *networkfirewall.ListTLSInspectionConfigurationsOutput, *networkfirewall.DescribeTLSInspectionConfigurationInput, *networkfirewall.DescribeTLSInspectionConfigurationOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-tls-inspection-configuration",

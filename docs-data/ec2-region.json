@@ -1,8 +1,0 @@
-{
-	"type": "ec2-region",
-	"descriptiveType": "Region",
-	"getDescription": "Get a region by name",
-	"listDescription": "List all regions",
-	"group": "AWS",
-	"links": []
-}

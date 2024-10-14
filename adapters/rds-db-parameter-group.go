@@ -34,16 +34,6 @@ func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type rds-db-parameter-group
-// +overmind:descriptiveType RDS Parameter Group
-// +overmind:get Get a parameter group by name
-// +overmind:list List all parameter groups
-// +overmind:search Search for a parameter group by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_db_parameter_group.arn
-// +overmind:terraform:method SEARCH
-
 func NewRDSDBParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options] {
 	return &adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-parameter-group",

@@ -51,15 +51,6 @@ func keyPairOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-key-pair
-// +overmind:descriptiveType Key Pair
-// +overmind:get Get a key pair by name
-// +overmind:list List all key pairs
-// +overmind:search Search for key pairs by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_key_pair.id
-
 func NewEC2KeyPairAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeKeyPairsInput, *ec2.DescribeKeyPairsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

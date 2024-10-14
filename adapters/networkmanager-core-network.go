@@ -39,7 +39,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-core-network-policy
 					Type:   "networkmanager-core-network-policy",
 					Method: sdp.QueryMethod_GET,
 					Query:  *cn.CoreNetworkId,
@@ -52,7 +51,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 			},
 			{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-connect-peer
 					Type:   "networkmanager-connect-peer",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cn.CoreNetworkId,
@@ -69,7 +67,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 	if cn.GlobalNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link networkmanager-global-network
 				Type:   "networkmanager-global-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cn.GlobalNetworkId,
@@ -86,7 +83,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 		if edge.Asn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link rdap-asn
 					Type:   "rdap-asn",
 					Method: sdp.QueryMethod_GET,
 					Query:  strconv.FormatInt(*edge.Asn, 10),
@@ -113,13 +109,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-core-network
-// +overmind:descriptiveType Networkmanager Core Network
-// +overmind:get Get a Networkmanager Core Network by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_core_network.id
 
 func NewNetworkManagerCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{

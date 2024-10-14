@@ -44,7 +44,6 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -57,7 +56,6 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
 						Type:   "networkmanager-link",
 						Method: sdp.QueryMethod_GET,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId),
@@ -70,7 +68,6 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
 						Type:   "networkmanager-device",
 						Method: sdp.QueryMethod_GET,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
@@ -102,13 +99,6 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-link-association
-// +overmind:descriptiveType Networkmanager LinkAssociation
-// +overmind:get Get a Networkmanager Link Association
-// +overmind:search Search for Networkmanager Link Associations by GlobalNetworkId and DeviceId or LinkId
-// +overmind:group AWS
 
 func NewNetworkManagerLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{

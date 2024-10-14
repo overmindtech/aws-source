@@ -108,15 +108,6 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type network-firewall-rule-group
-// +overmind:descriptiveType Network Firewall Rule Group
-// +overmind:get Get a Network Firewall Rule Group by name
-// +overmind:list List Network Firewall Rule Groups
-// +overmind:search Search for Network Firewall Rule Groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkfirewall_rule_group.name
-
 func NewNetworkFirewallRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-rule-group",

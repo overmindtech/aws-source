@@ -44,7 +44,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 			if asg.MixedInstancesPolicy.LaunchTemplate != nil {
 				if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification != nil {
 					if asg.MixedInstancesPolicy.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateId != nil {
-						// +overmind:link ec2-launch-template
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ec2-launch-template",
@@ -69,7 +68,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 		for _, tgARN := range asg.TargetGroupARNs {
 			if a, err = adapterhelpers.ParseARN(tgARN); err == nil {
-				// +overmind:link elbv2-target-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-target-group",
@@ -89,7 +87,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 		for _, instance := range asg.Instances {
 			if instance.InstanceId != nil {
-				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-instance",
@@ -110,7 +107,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 			if instance.LaunchTemplate != nil {
 				if instance.LaunchTemplate.LaunchTemplateId != nil {
-					// +overmind:link ec2-launch-template
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-launch-template",
@@ -131,7 +127,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 		if asg.ServiceLinkedRoleARN != nil {
 			if a, err = adapterhelpers.ParseARN(*asg.ServiceLinkedRoleARN); err == nil {
-				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -151,7 +146,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 		}
 
 		if asg.LaunchConfigurationName != nil {
-			// +overmind:link autoscaling-launch-configuration
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "autoscaling-launch-configuration",
@@ -169,7 +163,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 
 		if asg.LaunchTemplate != nil {
 			if asg.LaunchTemplate.LaunchTemplateId != nil {
-				// +overmind:link ec2-launch-template
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-launch-template",
@@ -188,7 +181,6 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 		}
 
 		if asg.PlacementGroup != nil {
-			// +overmind:link ec2-placement-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-placement-group",
@@ -211,16 +203,8 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 	return items, nil
 }
 
-// +overmind:type autoscaling-auto-scaling-group
-// +overmind:descriptiveType Autoscaling Group
-// +overmind:get Get an Autoscaling Group by name
-// +overmind:list List Autoscaling Groups
-// +overmind:search Search for Autoscaling Groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_autoscaling_group.arn
-// +overmind:terraform:method SEARCH
 //
-//go:generate docgen ../../docs-data
+
 func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:        "autoscaling-auto-scaling-group",

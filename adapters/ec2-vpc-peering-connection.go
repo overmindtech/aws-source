@@ -56,7 +56,6 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 				if connection.AccepterVpcInfo.VpcId != nil && connection.AccepterVpcInfo.OwnerId != nil {
 					pairedScope := adapterhelpers.FormatScope(*connection.AccepterVpcInfo.OwnerId, *connection.AccepterVpcInfo.Region)
 
-					// +overmind:link ec2-vpc
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-vpc",
@@ -81,7 +80,6 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 				if connection.RequesterVpcInfo.VpcId != nil && connection.RequesterVpcInfo.OwnerId != nil {
 					pairedScope := adapterhelpers.FormatScope(*connection.RequesterVpcInfo.OwnerId, *connection.RequesterVpcInfo.Region)
 
-					// +overmind:link ec2-vpc
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-vpc",
@@ -105,17 +103,6 @@ func vpcPeeringConnectionOutputMapper(_ context.Context, _ *ec2.Client, scope st
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-vpc-peering-connection
-// +overmind:descriptiveType VPC Peering Connection
-// +overmind:get Get VPC Peering Connection by ID
-// +overmind:list List VPC Peering Connections
-// +overmind:search Search VPC Peering Connections by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_vpc_peering_connection.id
-// +overmind:terraform:queryMap aws_vpc_peering_connection_accepter.id
-// +overmind:terraform:queryMap aws_vpc_peering_connection_options.vpc_peering_connection_id
 
 func NewEC2VpcPeeringConnectionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcPeeringConnectionsInput, *ec2.DescribeVpcPeeringConnectionsOutput, *ec2.Client, *ec2.Options]{

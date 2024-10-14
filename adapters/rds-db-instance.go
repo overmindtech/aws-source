@@ -121,7 +121,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.Endpoint != nil {
 			if instance.Endpoint.Address != nil {
-				// +overmind:link dns
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -138,7 +137,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			}
 
 			if instance.Endpoint.HostedZoneId != nil {
-				// +overmind:link route53-hosted-zone
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "route53-hosted-zone",
@@ -158,7 +156,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		for _, sg := range instance.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
-				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -178,7 +175,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		for _, paramGroup := range instance.DBParameterGroups {
 			if paramGroup.DBParameterGroupName != nil {
-				// +overmind:link rds-db-parameter-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-db-parameter-group",
@@ -197,7 +193,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if dbSubnetGroup != nil {
-			// +overmind:link rds-db-subnet-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rds-db-subnet-group",
@@ -215,7 +210,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if instance.DBClusterIdentifier != nil {
-			// +overmind:link rds-db-cluster
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rds-db-cluster",
@@ -234,7 +228,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.KmsKeyId != nil {
 			// This actually uses the ARN not the id
 			if a, err = adapterhelpers.ParseARN(*instance.KmsKeyId); err == nil {
-				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -254,7 +247,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.EnhancedMonitoringResourceArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.EnhancedMonitoringResourceArn); err == nil {
-				// +overmind:link logs-log-stream
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "logs-log-stream",
@@ -273,7 +265,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.MonitoringRoleArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.MonitoringRoleArn); err == nil {
-				// +overmind:link iam-role
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -294,7 +285,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.PerformanceInsightsKMSKeyId != nil {
 			// This is an ARN
 			if a, err = adapterhelpers.ParseARN(*instance.PerformanceInsightsKMSKeyId); err == nil {
-				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -315,7 +305,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		for _, role := range instance.AssociatedRoles {
 			if role.RoleArn != nil {
 				if a, err = adapterhelpers.ParseARN(*role.RoleArn); err == nil {
-					// +overmind:link iam-role
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
@@ -335,7 +324,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if instance.ActivityStreamKinesisStreamName != nil {
-			// +overmind:link kinesis-stream
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "kinesis-stream",
@@ -353,7 +341,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.AwsBackupRecoveryPointArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.AwsBackupRecoveryPointArn); err == nil {
-				// +overmind:link backup-recovery-point
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "backup-recovery-point",
@@ -373,7 +360,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.CustomIamInstanceProfile != nil {
 			// This is almost certainly an ARN since IAM basically always is
 			if a, err = adapterhelpers.ParseARN(*instance.CustomIamInstanceProfile); err == nil {
-				// +overmind:link iam-instance-profile
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-instance-profile",
@@ -394,7 +380,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		for _, replication := range instance.DBInstanceAutomatedBackupsReplications {
 			if replication.DBInstanceAutomatedBackupsArn != nil {
 				if a, err = adapterhelpers.ParseARN(*replication.DBInstanceAutomatedBackupsArn); err == nil {
-					// +overmind:link rds-db-instance-automated-backup
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "rds-db-instance-automated-backup",
@@ -414,7 +399,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.ListenerEndpoint != nil {
 			if instance.ListenerEndpoint.Address != nil {
-				// +overmind:link dns
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -431,7 +415,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			}
 
 			if instance.ListenerEndpoint.HostedZoneId != nil {
-				// +overmind:link route53-hosted-zone
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "route53-hosted-zone",
@@ -451,7 +434,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.MasterUserSecret != nil {
 			if instance.MasterUserSecret.KmsKeyId != nil {
-				// +overmind:link kms-key
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -470,7 +452,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 			if instance.MasterUserSecret.SecretArn != nil {
 				if a, err = adapterhelpers.ParseARN(*instance.MasterUserSecret.SecretArn); err == nil {
-					// +overmind:link secretsmanager-secret
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "secretsmanager-secret",
@@ -494,16 +475,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type rds-db-instance
-// +overmind:descriptiveType RDS Instance
-// +overmind:get Get an instance by ID
-// +overmind:list List all instances
-// +overmind:search Search for instances by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_db_instance.identifier
-// +overmind:terraform:queryMap aws_db_instance_role_association.db_instance_identifier
 
 func NewRDSDBInstanceAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{

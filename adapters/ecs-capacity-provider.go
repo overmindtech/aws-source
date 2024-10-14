@@ -36,7 +36,6 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 		if provider.AutoScalingGroupProvider != nil {
 			if provider.AutoScalingGroupProvider.AutoScalingGroupArn != nil {
 				if a, err := adapterhelpers.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
-					// +overmind:link autoscaling-auto-scaling-group
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "autoscaling-auto-scaling-group",
@@ -59,16 +58,6 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ecs-capacity-provider
-// +overmind:descriptiveType Capacity Provider
-// +overmind:get Get a capacity provider by name
-// +overmind:list List all capacity providers
-// +overmind:search Search capacity providers by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_ecs_capacity_provider.arn
-// +overmind:terraform:method SEARCH
 
 func NewECSCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{

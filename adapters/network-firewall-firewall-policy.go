@@ -117,15 +117,6 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type network-firewall-firewall-policy
-// +overmind:descriptiveType Network Firewall Policy
-// +overmind:get Get a Network Firewall Policy by name
-// +overmind:list List Network Firewall Policies
-// +overmind:search Search for Network Firewall Policies by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkfirewall_firewall_policy.name
-
 func NewNetworkFirewallFirewallPolicyAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-firewall-policy",

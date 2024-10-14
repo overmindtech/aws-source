@@ -213,14 +213,6 @@ func vpcEndpointOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-vpc-endpoint
-// +overmind:descriptiveType VPC Endpoint
-// +overmind:get Get a VPC Endpoint by ID
-// +overmind:list List all VPC Endpoints
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_vpc_endpoint.id
-
 func NewEC2VpcEndpointAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVpcEndpointsInput, *ec2.DescribeVpcEndpointsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

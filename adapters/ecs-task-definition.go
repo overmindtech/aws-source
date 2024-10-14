@@ -88,7 +88,6 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.ExecutionRoleArn != nil {
 		if a, err = adapterhelpers.ParseARN(*td.ExecutionRoleArn); err == nil {
-			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -108,7 +107,6 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.TaskRoleArn != nil {
 		if a, err = adapterhelpers.ParseARN(*td.TaskRoleArn); err == nil {
-			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -140,7 +138,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 
 			switch a.Service {
 			case "secretsmanager":
-				// +overmind:link secretsmanager-secret
 				return &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "secretsmanager-secret",
@@ -156,7 +153,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 					},
 				}
 			case "ssm":
-				// +overmind:link ssm-parameter
 				return &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ssm-parameter",
@@ -177,15 +173,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 
 	return nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ecs-task-definition
-// +overmind:descriptiveType Task Definition
-// +overmind:get Get a task definition by revision name ({family}:{revision})
-// +overmind:list List all task definitions
-// +overmind:search Search for task definitions by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_ecs_task_definition.family
 
 func NewECSTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{

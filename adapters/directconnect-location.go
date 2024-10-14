@@ -31,15 +31,6 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-location
-// +overmind:descriptiveType Direct Connect Location
-// +overmind:get Get a Location by its code
-// +overmind:list List all Direct Connect Locations
-// +overmind:search Search Direct Connect Locations by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_location.location_code
-
 func NewDirectConnectLocationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

@@ -50,14 +50,6 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 	return []*sdp.Item{&item}, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type efs-backup-policy
-// +overmind:descriptiveType EFS Backup Policy
-// +overmind:get Get an Backup Policy by file system ID
-// +overmind:search Search for an Backup Policy by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_efs_backup_policy.id
-
 func NewEFSBackupPolicyAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-backup-policy",

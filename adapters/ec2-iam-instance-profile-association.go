@@ -28,7 +28,6 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 
 		if assoc.IamInstanceProfile != nil && assoc.IamInstanceProfile.Arn != nil {
 			if arn, err := adapterhelpers.ParseARN(*assoc.IamInstanceProfile.Arn); err == nil {
-				// +overmind:link iam-instance-profile
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-instance-profile",
@@ -47,7 +46,6 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 		}
 
 		if assoc.InstanceId != nil {
-			// +overmind:link ec2-instance
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -69,14 +67,6 @@ func iamInstanceProfileAssociationOutputMapper(_ context.Context, _ *ec2.Client,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-iam-instance-profile-association
-// +overmind:descriptiveType IAM Instance Profile Association
-// +overmind:get Get an IAM Instance Profile Association
-// +overmind:list List IAM Instance Profile Associations
-// +overmind:search Search IAM Instance Profile Associations by ARN
-// +overmind:group AWS
 
 // NewIamInstanceProfileAssociationAdapter Creates a new adapter for aws-IamInstanceProfileAssociation resources
 func NewEC2IamInstanceProfileAssociationAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeIamInstanceProfileAssociationsInput, *ec2.DescribeIamInstanceProfileAssociationsOutput, *ec2.Client, *ec2.Options] {

@@ -1,9 +1,0 @@
-{
-	"type": "lambda-layer",
-	"descriptiveType": "Lambda Layer",
-	"listDescription": "List all lambda layers",
-	"group": "AWS",
-	"links": [
-		"lambda-layer-version"
-	]
-}

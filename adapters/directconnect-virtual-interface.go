@@ -30,7 +30,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.ConnectionId != nil {
-			// +overmind:link directconnect-connection
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-connection",
@@ -48,7 +47,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.DirectConnectGatewayId != nil {
-			// +overmind:link directconnect-direct-connect-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -66,7 +64,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.AmazonAddress != nil {
-			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rdap-ip-network",
@@ -83,7 +80,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.CustomerAddress != nil {
-			// +overmind:link ip
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rdap-ip-network",
@@ -101,7 +97,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 		// Pinpoint a single attachment
 		if virtualInterface.DirectConnectGatewayId != nil && virtualInterface.VirtualInterfaceId != nil {
-			// +overmind:link directconnect-direct-connect-gateway-attachment
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway-attachment",
@@ -122,7 +117,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 		// Find all affected attachments
 		if virtualInterface.VirtualInterfaceId != nil {
-			// +overmind:link directconnect-direct-connect-gateway-attachment
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway-attachment",
@@ -146,17 +140,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-virtual-interface
-// +overmind:descriptiveType Virtual Interface
-// +overmind:get Get a virtual interface by ID
-// +overmind:list List all virtual interfaces
-// +overmind:search Search virtual interfaces by connection ID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_private_virtual_interface.id
-// +overmind:terraform:queryMap aws_dx_public_virtual_interface.id
-// +overmind:terraform:queryMap aws_dx_transit_virtual_interface.id
 
 func NewDirectConnectVirtualInterfaceAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{

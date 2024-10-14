@@ -34,16 +34,6 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type rds-db-cluster-parameter-group
-// +overmind:descriptiveType RDS Cluster Parameter Group
-// +overmind:get Get a parameter group by name
-// +overmind:list List all RDS parameter groups
-// +overmind:search Search for a parameter group by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_rds_cluster_parameter_group.arn
-// +overmind:terraform:method SEARCH
-
 func NewRDSDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
 	return &adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-cluster-parameter-group",

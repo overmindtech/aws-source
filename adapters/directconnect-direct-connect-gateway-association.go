@@ -40,7 +40,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 		}
 
 		if association.DirectConnectGatewayId != nil {
-			// +overmind:link directconnect-direct-connect-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -58,7 +57,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 		}
 
 		if association.VirtualGatewayId != nil {
-			// +overmind:link directconnect-virtual-gateway
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-virtual-gateway",
@@ -80,14 +78,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-direct-connect-gateway-association
-// +overmind:descriptiveType Direct Connect Gateway Association
-// +overmind:get Get a direct connect gateway association by direct connect gateway ID and virtual gateway ID
-// +overmind:search Search direct connect gateway associations by direct connect gateway ID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_gateway_association.id
 
 func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{

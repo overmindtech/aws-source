@@ -45,7 +45,6 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		if at := ew.AssociationTarget; at != nil {
 			for _, id := range at.DedicatedHostIds {
-				// +overmind:link ec2-host
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-host",
@@ -63,7 +62,6 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 			}
 
 			for _, id := range at.InstanceIds {
-				// +overmind:link ec2-instance
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-instance",
@@ -86,14 +84,6 @@ func instanceEventWindowOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-instance-event-window
-// +overmind:descriptiveType EC2 Instance Event Window
-// +overmind:get Get an event window by ID
-// +overmind:list List all event windows
-// +overmind:search Search for event windows by ARN
-// +overmind:group AWS
 
 func NewEC2InstanceEventWindowAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceEventWindowsInput, *ec2.DescribeInstanceEventWindowsOutput, *ec2.Client, *ec2.Options]{

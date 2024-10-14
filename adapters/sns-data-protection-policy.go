@@ -44,7 +44,6 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 	}
 
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-		// +overmind:link sns-topic
 		Query: &sdp.Query{
 			Type:   "sns-topic",
 			Method: sdp.QueryMethod_GET,
@@ -63,14 +62,6 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type sns-data-protection-policy
-// +overmind:descriptiveType SNS Data Protection Policy
-// +overmind:get Get an SNS data protection policy by associated topic ARN
-// +overmind:search Search SNS data protection policies by its ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_sns_topic_data_protection_policy.arn
 
 func NewSNSDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{

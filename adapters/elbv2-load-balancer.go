@@ -45,7 +45,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		if lb.LoadBalancerArn != nil {
-			// +overmind:link elbv2-target-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "elbv2-target-group",
@@ -60,7 +59,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 				},
 			})
 
-			// +overmind:link elbv2-listener
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "elbv2-listener",
@@ -77,7 +75,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		if lb.DNSName != nil {
-			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -94,7 +91,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		if lb.CanonicalHostedZoneId != nil {
-			// +overmind:link route53-hosted-zone
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "route53-hosted-zone",
@@ -112,7 +108,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		if lb.VpcId != nil {
-			// +overmind:link ec2-vpc
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -131,7 +126,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 
 		for _, az := range lb.AvailabilityZones {
 			if az.SubnetId != nil {
-				// +overmind:link ec2-subnet
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -149,7 +143,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 			}
 
 			for _, address := range az.LoadBalancerAddresses {
-				// +overmind:link ec2-address
 				if address.AllocationId != nil {
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
@@ -168,7 +161,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 				}
 
 				if address.IPv6Address != nil {
-					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -185,7 +177,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 				}
 
 				if address.IpAddress != nil {
-					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -202,7 +193,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 				}
 
 				if address.PrivateIPv4Address != nil {
-					// +overmind:link ip
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -221,7 +211,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		for _, sg := range lb.SecurityGroups {
-			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -239,7 +228,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 		}
 
 		if lb.CustomerOwnedIpv4Pool != nil {
-			// +overmind:link ec2-coip-pool
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-coip-pool",
@@ -261,17 +249,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type elbv2-load-balancer
-// +overmind:descriptiveType Elastic Load Balancer
-// +overmind:get Get an ELB by name
-// +overmind:list List all ELBs
-// +overmind:search Search for ELBs by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_lb.arn
-// +overmind:terraform:queryMap aws_lb.id
-// +overmind:terraform:method SEARCH
 
 func NewELBv2LoadBalancerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbv2Client, *elbv2.Options]{

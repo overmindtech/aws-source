@@ -45,7 +45,6 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 		}
 
 		if ni.NetworkInterfaceId != nil {
-			// +overmind:link ec2-network-interface
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-network-interface",
@@ -66,14 +65,6 @@ func networkInterfacePermissionOutputMapper(_ context.Context, _ *ec2.Client, sc
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-network-interface-permission
-// +overmind:descriptiveType Network Interface Permission
-// +overmind:get Get a network interface permission by ID
-// +overmind:list List all network interface permissions
-// +overmind:search Search network interface permissions by ARN
-// +overmind:group AWS
 
 func NewEC2NetworkInterfacePermissionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacePermissionsInput, *ec2.DescribeNetworkInterfacePermissionsOutput, *ec2.Client, *ec2.Options]{

@@ -122,14 +122,6 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type efs-mount-target
-// +overmind:descriptiveType EFS Mount Target
-// +overmind:get Get an mount target by ID
-// +overmind:search Search for mount targets by file system ID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_efs_mount_target.id
-
 func NewEFSMountTargetAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-mount-target",

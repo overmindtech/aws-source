@@ -36,7 +36,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-site
 						Type:   "networkmanager-site",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -49,7 +48,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-transit-gateway-registration
 						Type:   "networkmanager-transit-gateway-registration",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -62,7 +60,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-connect-peer-association
 						Type:   "networkmanager-connect-peer-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -75,7 +72,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-transit-gateway-connect-peer-association
 						Type:   "networkmanager-transit-gateway-connect-peer-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -88,7 +84,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-network-resource
 						Type:   "networkmanager-network-resource",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -101,7 +96,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-network-resource-relationship
 						Type:   "networkmanager-network-resource-relationship",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -114,7 +108,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
 						Type:   "networkmanager-link",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -127,7 +120,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
 						Type:   "networkmanager-device",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -140,7 +132,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-connection
 						Type:   "networkmanager-connection",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -168,16 +159,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-global-network
-// +overmind:descriptiveType Network Manager Global Network
-// +overmind:get Get a global network by id
-// +overmind:list List all global networks
-// +overmind:search Search for a global network by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_global_network.arn
-// +overmind:terraform:method SEARCH
 
 func NewNetworkManagerGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{

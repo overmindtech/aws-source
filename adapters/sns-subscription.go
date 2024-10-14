@@ -46,7 +46,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 	}
 
 	if topicArn, err := attributes.Get("topicArn"); err == nil {
-		// +overmind:link sns-topic
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "sns-topic",
@@ -65,7 +64,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 
 	if subsRoleArn, err := attributes.Get("subscriptionRoleArn"); err == nil {
 		if arn, err := adapterhelpers.ParseARN(fmt.Sprint(subsRoleArn)); err == nil {
-			// +overmind:link iam-role
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -85,15 +83,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type sns-subscription
-// +overmind:descriptiveType SNS Subscription
-// +overmind:get Get an SNS subscription by its ARN
-// +overmind:list List all SNS subscriptions
-// +overmind:search Search SNS subscription by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_sns_topic_subscription.id
 
 func NewSNSSubscriptionAdapter(client subsCli, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{

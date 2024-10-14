@@ -68,7 +68,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	if awsItem.AliasTarget != nil {
 		if awsItem.AliasTarget.DNSName != nil {
-			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -87,7 +86,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	for _, record := range awsItem.ResourceRecords {
 		if record.Value != nil {
-			// +overmind:link dns
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -105,7 +103,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 	}
 
 	if awsItem.HealthCheckId != nil {
-		// +overmind:link route53-health-check
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "route53-health-check",
@@ -123,17 +120,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type route53-resource-record-set
-// +overmind:descriptiveType Route53 Record Set
-// +overmind:get Get a Route53 record Set by name
-// +overmind:list List all record sets
-// +overmind:search Search for a record set by hosted zone ID in the format "/hostedzone/JJN928734JH7HV" or "JJN928734JH7HV" or by terraform ID in the format "{hostedZone}_{recordName}_{type}"
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_route53_record.arn
-// +overmind:terraform:queryMap aws_route53_record.id
-// +overmind:terraform:method SEARCH
 
 func NewRoute53ResourceRecordSetAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options]{

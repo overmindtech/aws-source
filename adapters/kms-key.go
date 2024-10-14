@@ -54,7 +54,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 	}
 
 	if output.KeyMetadata.CustomKeyStoreId != nil {
-		// +overmind:link kms-custom-key-store
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-custom-key-store",
@@ -71,7 +70,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 		})
 	}
 
-	// +overmind:link kms-key-policy
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 		Query: &sdp.Query{
 			Type:   "kms-key-policy",
@@ -86,7 +84,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 		},
 	})
 
-	// +overmind:link kms-grant
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 		Query: &sdp.Query{
 			Type:   "kms-grant",
@@ -121,15 +118,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type kms-key
-// +overmind:descriptiveType KMS Key
-// +overmind:get Get a KMS Key by its ID
-// +overmind:list List all KMS Keys
-// +overmind:search Search for KMS Keys by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_kms_key.key_id
 
 func NewKMSKeyAdapter(client kmsClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{

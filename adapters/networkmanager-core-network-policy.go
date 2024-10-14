@@ -40,7 +40,6 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-core-network
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
 					Query:  *cn.CoreNetworkId,
@@ -56,13 +55,6 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-core-network-policy
-// +overmind:descriptiveType Networkmanager Core Network Policy
-// +overmind:get Get a Networkmanager Core Network Policy by Core Network id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_core_network_policy.core_network_id
 
 func NewNetworkManagerCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{

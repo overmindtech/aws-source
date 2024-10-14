@@ -56,15 +56,6 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 	}, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type sqs-queue
-// +overmind:descriptiveType SQS Queue
-// +overmind:get Get an SQS queue attributes by its URL
-// +overmind:list List all SQS queue URLs
-// +overmind:search Search SQS queue by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_sqs_queue.id
-
 func NewSQSQueueAdapter(client sqsClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
 		ItemType:        "sqs-queue",

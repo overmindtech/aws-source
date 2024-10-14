@@ -46,7 +46,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 		}
 
 		if securityGroupRule.GroupId != nil {
-			// +overmind:link ec2-security-group
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -64,7 +63,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 
 		if rg := securityGroupRule.ReferencedGroupInfo; rg != nil {
 			if rg.GroupId != nil {
-				// +overmind:link ec2-security-group
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -86,17 +84,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-security-group-rule
-// +overmind:descriptiveType Security Group Rule
-// +overmind:get Get a security group rule by ID
-// +overmind:list List all security group rules
-// +overmind:search Search security group rules by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_security_group_rule.security_group_rule_id
-// +overmind:terraform:queryMap aws_vpc_security_group_ingress_rule.security_group_rule_id
-// +overmind:terraform:queryMap aws_vpc_security_group_egress_rule.security_group_rule_id
 
 func NewEC2SecurityGroupRuleAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{

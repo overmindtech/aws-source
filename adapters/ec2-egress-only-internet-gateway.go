@@ -47,7 +47,6 @@ func egressOnlyInternetGatewayOutputMapper(_ context.Context, _ *ec2.Client, sco
 
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
-				// +overmind:link ec2-vpc
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-vpc",
@@ -70,15 +69,6 @@ func egressOnlyInternetGatewayOutputMapper(_ context.Context, _ *ec2.Client, sco
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-egress-only-internet-gateway
-// +overmind:descriptiveType Egress Only Internet Gateway
-// +overmind:get Get an egress only internet gateway by ID
-// +overmind:list List all egress only internet gateways
-// +overmind:search Search egress only internet gateways by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap egress_only_internet_gateway.id
 
 func NewEC2EgressOnlyInternetGatewayAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeEgressOnlyInternetGatewaysInput, *ec2.DescribeEgressOnlyInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

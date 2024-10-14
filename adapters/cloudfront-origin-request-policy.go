@@ -27,15 +27,6 @@ func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequest
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-origin-request-policy
-// +overmind:descriptiveType CloudFront Origin Request Policy
-// +overmind:get Get Origin Request Policy by ID
-// +overmind:list List Origin Request Policies
-// +overmind:search Origin Request Policy by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_origin_request_policy.id
-
 func NewCloudfrontOriginRequestPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-request-policy",

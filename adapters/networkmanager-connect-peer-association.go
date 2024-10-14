@@ -42,7 +42,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.GlobalNetworkId,
@@ -55,7 +54,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-connect-peer
 						Type:   "networkmanager-connect-peer",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.ConnectPeerId,
@@ -83,7 +81,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 		if a.DeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-device
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
@@ -99,7 +96,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 		if a.LinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-link
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
@@ -117,14 +113,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-connect-peer-association
-// +overmind:descriptiveType Networkmanager Connect Peer Associations
-// +overmind:get Get a Networkmanager Connect Peer Associations
-// +overmind:list List all Networkmanager Connect Peer Associations
-// +overmind:search Search for Networkmanager ConnectPeerAssociations by GlobalNetworkId
-// +overmind:group AWS
 
 func NewNetworkManagerConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{

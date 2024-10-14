@@ -76,16 +76,6 @@ func ruleOutputMapper(ctx context.Context, client elbv2Client, scope string, _ *
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type elbv2-rule
-// +overmind:descriptiveType ELB Rule
-// +overmind:get Get a rule by ARN
-// +overmind:search Search for rules by listener ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_alb_listener_rule.arn
-// +overmind:terraform:queryMap aws_lb_listener_rule.arn
-// +overmind:terraform:method SEARCH
-
 func NewELBv2RuleAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbv2Client, *elbv2.Options]{
 		Region:          region,

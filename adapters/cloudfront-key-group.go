@@ -27,15 +27,6 @@ func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, er
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-key-group
-// +overmind:descriptiveType CloudFront Key Group
-// +overmind:get Get a CloudFront Key Group by ID
-// +overmind:list List CloudFront Key Groups
-// +overmind:search Search CloudFront Key Groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_key_group.id
-
 func NewCloudfrontKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-key-group",

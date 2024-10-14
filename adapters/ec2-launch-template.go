@@ -51,15 +51,6 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-launch-template
-// +overmind:descriptiveType Launch Template
-// +overmind:get Get a launch template by ID
-// +overmind:list List all launch templates
-// +overmind:search Search for launch templates by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_launch_template.id
-
 func NewEC2LaunchTemplateAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

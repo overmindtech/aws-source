@@ -55,15 +55,6 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type efs-access-point
-// +overmind:descriptiveType EFS Access Point
-// +overmind:get Get an access point by ID
-// +overmind:list List all access points
-// +overmind:search Search for an access point by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_efs_access_point.id
-
 func NewEFSAccessPointAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-access-point",

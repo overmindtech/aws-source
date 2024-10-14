@@ -37,7 +37,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.GlobalNetworkId,
@@ -54,7 +53,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 		if a.DeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-device
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
@@ -70,7 +68,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 		if a.LinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-link
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
@@ -99,14 +96,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-transit-gateway-connect-peer-association
-// +overmind:descriptiveType Networkmanager Connect Peer Associations
-// +overmind:get Get a Networkmanager Transit GatewayConnect Peer Association
-// +overmind:list List all Networkmanager Transit Gateway Connect Peer Associations
-// +overmind:search Search for Networkmanager TransitGatewayConnectPeerAssociations by GlobalNetworkId
-// +overmind:group AWS
 
 func NewNetworkManagerTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{

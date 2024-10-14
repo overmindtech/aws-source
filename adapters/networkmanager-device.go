@@ -43,7 +43,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -56,7 +55,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-link-association
 						Type:   "networkmanager-link-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, "device", *s.DeviceId),
@@ -69,7 +67,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-connection
 						Type:   "networkmanager-connection",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
@@ -86,7 +83,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 		if s.SiteId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-site
 					Type:   "networkmanager-site",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -102,7 +98,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 		if s.DeviceArn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-network-resource-relationship
 					Type:   "networkmanager-network-resource-relationship",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceArn),
@@ -131,15 +126,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-device
-// +overmind:descriptiveType Networkmanager Device
-// +overmind:get Get a Networkmanager Device
-// +overmind:search Search for Networkmanager Devices by GlobalNetworkId, or by GlobalNetworkId with SiteId
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_device.arn
-// +overmind:terraform:method SEARCH
 
 func NewNetworkManagerDeviceAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{
