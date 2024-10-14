@@ -201,7 +201,7 @@ var globalNetworkAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 			TerraformMethod:   sdp.QueryMethod_SEARCH,
 		},
 	},
-	PotentialLinks: []string{"networkmanager-site", "networkmanager-transit-gateway-registration", "networkmanager-connect-peer-association", "networkmanager-transit-gateway-connect-peer-association", "networkmanager-network-resource", "networkmanager-network-resource-relationship", "networkmanager-link", "networkmanager-device", "networkmanager-connection"},
+	PotentialLinks: []string{"networkmanager-site", "networkmanager-transit-gateway-registration", "networkmanager-connect-peer-association", "networkmanager-transit-gateway-connect-peer-association", "networkmanager-network-resource-relationship", "networkmanager-link", "networkmanager-device", "networkmanager-connection"},
 	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_NETWORK,
 })
 
