@@ -214,7 +214,11 @@ var streamingDistributionAdapterMetadata = Metadata.Register(&sdp.AdapterMetadat
 	TerraformMappings: []*sdp.TerraformMapping{
 		{
 			TerraformMethod:   sdp.QueryMethod_SEARCH,
-			TerraformQueryMap: "aws_cloudfront_Streamingdistribution.arn",
+			TerraformQueryMap: "aws_cloudfront_distribution.arn",
+		},
+		{
+			TerraformMethod:   sdp.QueryMethod_GET,
+			TerraformQueryMap: "aws_cloudfront_distribution.id",
 		},
 	},
 	PotentialLinks: []string{"dns"},
