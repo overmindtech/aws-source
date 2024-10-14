@@ -44,7 +44,6 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.Attachment.CoreNetworkId,
@@ -60,6 +59,8 @@ func vpcAttachmentItemMapper(_, scope string, awsItem *types.VpcAttachment) (*sd
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerVPCAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.VpcAttachment, *networkmanager.Client, *networkmanager.Options]{

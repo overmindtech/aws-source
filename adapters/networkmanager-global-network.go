@@ -36,7 +36,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-site",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -49,7 +48,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-transit-gateway-registration",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -62,7 +60,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-connect-peer-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -75,7 +72,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-transit-gateway-connect-peer-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -88,7 +84,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-network-resource",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -101,7 +96,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-network-resource-relationship",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -114,7 +108,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-link",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -127,7 +120,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-device",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -140,7 +132,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-connection",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  *gn.GlobalNetworkId,
@@ -168,6 +159,8 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{

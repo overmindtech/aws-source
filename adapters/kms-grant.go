@@ -136,11 +136,9 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 				adapter, query := iamSourceAndQuery(arn.Resource)
 				switch adapter {
 				case "user":
-
 					lIQ.Query.Type = "iam-user"
 					lIQ.Query.Query = query
 				case "role":
-
 					lIQ.Query.Type = "iam-role"
 					lIQ.Query.Query = query
 				default:
@@ -168,6 +166,8 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewKMSGrantAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{

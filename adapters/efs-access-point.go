@@ -55,6 +55,8 @@ func AccessPointOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEFSAccessPointAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeAccessPointsInput, *efs.DescribeAccessPointsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-access-point",

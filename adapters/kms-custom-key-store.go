@@ -47,7 +47,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 		}
 
 		if customKeyStore.CloudHsmClusterId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "cloudhsmv2-cluster",
@@ -66,7 +65,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 
 		if customKeyStore.XksProxyConfiguration != nil &&
 			customKeyStore.XksProxyConfiguration.VpcEndpointServiceName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc-endpoint-service",
@@ -88,6 +86,8 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewKMSCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{

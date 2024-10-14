@@ -74,7 +74,6 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 
 		for _, event := range volume.Events {
 			if event.InstanceId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-instance",
@@ -96,6 +95,8 @@ func volumeStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2VolumeStatusAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumeStatusInput, *ec2.DescribeVolumeStatusOutput, *ec2.Client, *ec2.Options]{

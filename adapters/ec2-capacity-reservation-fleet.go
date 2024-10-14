@@ -30,7 +30,6 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 
 		for _, spec := range cr.InstanceTypeSpecifications {
 			if spec.CapacityReservationId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-capacity-reservation",
@@ -74,6 +73,8 @@ func capacityReservationFleetOutputMapper(_ context.Context, _ *ec2.Client, scop
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2CapacityReservationFleetAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationFleetsInput, *ec2.DescribeCapacityReservationFleetsOutput, *ec2.Client, *ec2.Options]{

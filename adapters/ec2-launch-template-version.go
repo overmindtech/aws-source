@@ -72,7 +72,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			for _, ni := range lt.NetworkInterfaces {
 				for _, ip := range ni.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
-
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ip",
@@ -90,7 +89,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if ni.NetworkInterfaceId != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-network-interface",
@@ -109,7 +107,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 				for _, ip := range ni.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
-
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ip",
@@ -127,7 +124,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if ni.SubnetId != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-subnet",
@@ -145,7 +141,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				for _, group := range ni.Groups {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-security-group",
@@ -166,7 +161,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			if lt.ImageId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-image",
@@ -184,7 +178,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			if lt.KeyName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-key-pair",
@@ -203,7 +196,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 			for _, mapping := range lt.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.SnapshotId != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-snapshot",
@@ -224,7 +216,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			if spec := lt.CapacityReservationSpecification; spec != nil {
 				if target := spec.CapacityReservationTarget; target != nil {
 					if target.CapacityReservationId != nil {
-
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ec2-capacity-reservation",
@@ -247,7 +238,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 			if lt.Placement != nil {
 				if lt.Placement.GroupId != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-placement-group",
@@ -267,7 +257,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if lt.Placement.HostId != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-host",
@@ -286,7 +275,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			for _, id := range lt.SecurityGroupIds {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -310,6 +298,8 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2LaunchTemplateVersionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{

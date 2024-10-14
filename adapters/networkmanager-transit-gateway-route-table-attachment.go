@@ -44,7 +44,6 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.Attachment.CoreNetworkId,
@@ -60,7 +59,6 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 	if awsItem.PeeringId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "networkmanager-transit-gateway-peering",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.PeeringId,
@@ -78,7 +76,6 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 		if arn, err := adapterhelpers.ParseARN(*awsItem.TransitGatewayRouteTableArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *awsItem.TransitGatewayRouteTableArn,
@@ -94,6 +91,8 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{

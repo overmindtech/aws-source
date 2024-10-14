@@ -43,7 +43,6 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -56,7 +55,6 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-link",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -69,7 +67,6 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-device",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -98,6 +95,8 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerSiteAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{

@@ -59,6 +59,8 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewAPIGatewayResourceAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-resource",

@@ -30,7 +30,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.ConnectionId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-connection",
@@ -48,7 +47,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.DirectConnectGatewayId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -66,7 +64,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.AmazonAddress != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rdap-ip-network",
@@ -83,7 +80,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if virtualInterface.CustomerAddress != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rdap-ip-network",
@@ -101,7 +97,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 		// Pinpoint a single attachment
 		if virtualInterface.DirectConnectGatewayId != nil && virtualInterface.VirtualInterfaceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway-attachment",
@@ -122,7 +117,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 		// Find all affected attachments
 		if virtualInterface.VirtualInterfaceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway-attachment",
@@ -146,6 +140,8 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectVirtualInterfaceAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{

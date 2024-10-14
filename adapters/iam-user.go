@@ -127,7 +127,6 @@ func userItemMapper(_, scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	}
 
 	for _, group := range awsItem.UserGroups {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-group",
@@ -170,6 +169,8 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 
 	return tags, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewIAMUserAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{

@@ -93,6 +93,8 @@ func FileSystemOutputMapper(_ context.Context, _ *efs.Client, scope string, inpu
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEFSFileSystemAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeFileSystemsInput, *efs.DescribeFileSystemsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-file-system",

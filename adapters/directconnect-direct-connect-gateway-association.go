@@ -40,7 +40,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 		}
 
 		if association.DirectConnectGatewayId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -58,7 +57,6 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 		}
 
 		if association.VirtualGatewayId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-virtual-gateway",
@@ -80,6 +78,8 @@ func directConnectGatewayAssociationOutputMapper(_ context.Context, _ *directcon
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectGatewayAssociationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationsInput, *directconnect.DescribeDirectConnectGatewayAssociationsOutput, *directconnect.Client, *directconnect.Options]{

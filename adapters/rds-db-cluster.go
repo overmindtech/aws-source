@@ -43,7 +43,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		var a *adapterhelpers.ARN
 
 		if cluster.DBSubnetGroup != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rds-db-subnet-group",
@@ -61,7 +60,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		for _, endpoint := range []*string{cluster.Endpoint, cluster.ReaderEndpoint} {
 			if endpoint != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -80,7 +78,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		for _, replica := range cluster.ReadReplicaIdentifiers {
 			if a, err = adapterhelpers.ParseARN(replica); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-db-cluster",
@@ -99,7 +96,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		for _, member := range cluster.DBClusterMembers {
 			if member.DBInstanceIdentifier != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-db-instance",
@@ -118,7 +114,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		for _, sg := range cluster.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -137,7 +132,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		}
 
 		if cluster.HostedZoneId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "route53-hosted-zone",
@@ -156,7 +150,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		if cluster.KmsKeyId != nil {
 			if a, err = adapterhelpers.ParseARN(*cluster.KmsKeyId); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -175,7 +168,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		}
 
 		if cluster.ActivityStreamKinesisStreamName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "kinesis-stream",
@@ -193,7 +185,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		}
 
 		for _, endpoint := range cluster.CustomEndpoints {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -211,7 +202,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		for _, optionGroup := range cluster.DBClusterOptionGroupMemberships {
 			if optionGroup.DBClusterOptionGroupName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-option-group",
@@ -232,7 +222,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		if cluster.MasterUserSecret != nil {
 			if cluster.MasterUserSecret.KmsKeyId != nil {
 				if a, err = adapterhelpers.ParseARN(*cluster.MasterUserSecret.KmsKeyId); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kms-key",
@@ -252,7 +241,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 			if cluster.MasterUserSecret.SecretArn != nil {
 				if a, err = adapterhelpers.ParseARN(*cluster.MasterUserSecret.SecretArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "secretsmanager-secret",
@@ -273,7 +261,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		if cluster.MonitoringRoleArn != nil {
 			if a, err = adapterhelpers.ParseARN(*cluster.MonitoringRoleArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -294,7 +281,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 		if cluster.PerformanceInsightsKMSKeyId != nil {
 			// This is an ARN
 			if a, err = adapterhelpers.ParseARN(*cluster.PerformanceInsightsKMSKeyId); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -314,7 +300,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 		if cluster.ReplicationSourceIdentifier != nil {
 			if a, err = adapterhelpers.ParseARN(*cluster.ReplicationSourceIdentifier); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-db-cluster",
@@ -336,6 +321,8 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewRDSDBClusterAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{

@@ -58,7 +58,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.RemoteAccess != nil {
 		if ng.RemoteAccess.Ec2SshKey != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-key-pair",
@@ -76,7 +75,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		for _, sg := range ng.RemoteAccess.SourceSecurityGroups {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -95,7 +93,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	}
 
 	for _, subnet := range ng.Subnets {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ec2-subnet",
@@ -115,7 +112,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	if ng.Resources != nil {
 		for _, g := range ng.Resources.AutoScalingGroups {
 			if g.Name != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "autoscaling-auto-scaling-group",
@@ -133,7 +129,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 		}
 
 		if ng.Resources.RemoteAccessSecurityGroup != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -153,7 +148,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	if ng.LaunchTemplate != nil {
 		if ng.LaunchTemplate.Id != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-launch-template",
@@ -173,6 +167,8 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEKSNodegroupAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{

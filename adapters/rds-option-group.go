@@ -46,6 +46,8 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewRDSOptionGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:        "rds-option-group",

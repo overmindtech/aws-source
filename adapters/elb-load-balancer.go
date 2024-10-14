@@ -80,7 +80,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		if desc.DNSName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -90,7 +89,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		if desc.CanonicalHostedZoneName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "dns",
 				Method: sdp.QueryMethod_SEARCH,
@@ -100,7 +98,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		if desc.CanonicalHostedZoneNameID != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "route53-hosted-zone",
 				Method: sdp.QueryMethod_GET,
@@ -110,7 +107,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		for _, subnet := range desc.Subnets {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-subnet",
 				Method: sdp.QueryMethod_GET,
@@ -120,7 +116,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		if desc.VPCId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-vpc",
 				Method: sdp.QueryMethod_GET,
@@ -131,7 +126,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 
 		for _, instance := range desc.Instances {
 			if instance.InstanceId != nil {
-
 				// The EC2 instance itself
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -159,7 +153,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 
 		if desc.SourceSecurityGroup != nil {
 			if desc.SourceSecurityGroup.GroupName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 					Type:   "ec2-security-group",
 					Method: sdp.QueryMethod_SEARCH,
@@ -170,7 +163,6 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 		}
 
 		for _, sg := range desc.SecurityGroups {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{Query: &sdp.Query{
 				Type:   "ec2-security-group",
 				Method: sdp.QueryMethod_GET,
@@ -184,6 +176,8 @@ func elbLoadBalancerOutputMapper(ctx context.Context, client elbClient, scope st
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewELBLoadBalancerAdapter(client elbClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elb.DescribeLoadBalancersInput, *elb.DescribeLoadBalancersOutput, elbClient, *elb.Options]{

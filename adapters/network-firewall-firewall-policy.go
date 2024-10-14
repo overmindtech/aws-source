@@ -117,6 +117,8 @@ func firewallPolicyGetFunc(ctx context.Context, client networkFirewallClient, sc
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewNetworkFirewallFirewallPolicyAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListFirewallPoliciesInput, *networkfirewall.ListFirewallPoliciesOutput, *networkfirewall.DescribeFirewallPolicyInput, *networkfirewall.DescribeFirewallPolicyOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-firewall-policy",

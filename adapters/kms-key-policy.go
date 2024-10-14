@@ -84,6 +84,8 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 	return item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewKMSKeyPolicyAdapter(client keyPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options]{
 		ItemType:        "kms-key-policy",

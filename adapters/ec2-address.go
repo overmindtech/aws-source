@@ -69,7 +69,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.InstanceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -82,7 +81,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.CarrierIp != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -95,7 +93,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.CustomerOwnedIp != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -108,7 +105,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.NetworkInterfaceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-network-interface",
@@ -121,7 +117,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.PrivateIpAddress != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -138,6 +133,8 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 // NewAddressAdapter Creates a new adapter for aws-Address resources
 func NewEC2AddressAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {

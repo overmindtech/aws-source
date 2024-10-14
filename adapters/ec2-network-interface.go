@@ -47,7 +47,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 		if ni.Attachment != nil {
 			if ni.Attachment.InstanceId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-instance",
@@ -67,7 +66,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 		for _, sg := range ni.Groups {
 			if sg.GroupId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -87,7 +85,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 		for _, ip := range ni.Ipv6Addresses {
 			if ip.Ipv6Address != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ip",
@@ -107,7 +104,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 		for _, ip := range ni.PrivateIpAddresses {
 			if assoc := ip.Association; assoc != nil {
 				if assoc.PublicDnsName != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "dns",
@@ -124,7 +120,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 				}
 
 				if assoc.PublicIp != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -141,7 +136,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 				}
 
 				if assoc.CarrierIp != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -158,7 +152,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 				}
 
 				if assoc.CustomerOwnedIp != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ip",
@@ -176,7 +169,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 			}
 
 			if ip.PrivateDnsName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -193,7 +185,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 			}
 
 			if ip.PrivateIpAddress != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ip",
@@ -211,7 +202,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 		}
 
 		if ni.SubnetId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-subnet",
@@ -230,7 +220,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 		}
 
 		if ni.VpcId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -252,6 +241,8 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2NetworkInterfaceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{

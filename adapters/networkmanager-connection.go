@@ -43,7 +43,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -60,7 +59,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 		if s.LinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkId),
@@ -76,7 +74,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 		if s.ConnectedLinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedLinkId),
@@ -92,7 +89,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 		if s.DeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
@@ -108,7 +104,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 		if s.ConnectedDeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.ConnectedDeviceId),
@@ -137,6 +132,8 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerConnectionAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{

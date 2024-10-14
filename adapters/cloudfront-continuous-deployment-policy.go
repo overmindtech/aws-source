@@ -26,7 +26,6 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 	if awsItem.ContinuousDeploymentPolicyConfig != nil && awsItem.ContinuousDeploymentPolicyConfig.StagingDistributionDnsNames != nil {
 		for _, name := range awsItem.ContinuousDeploymentPolicyConfig.StagingDistributionDnsNames.Items {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -45,6 +44,8 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 // Terraform is not yet supported for this: https://github.com/hashicorp/terraform-provider-aws/issues/28920
 

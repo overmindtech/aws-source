@@ -121,7 +121,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.Endpoint != nil {
 			if instance.Endpoint.Address != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -138,7 +137,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			}
 
 			if instance.Endpoint.HostedZoneId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "route53-hosted-zone",
@@ -158,7 +156,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		for _, sg := range instance.VpcSecurityGroups {
 			if sg.VpcSecurityGroupId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -178,7 +175,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		for _, paramGroup := range instance.DBParameterGroups {
 			if paramGroup.DBParameterGroupName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "rds-db-parameter-group",
@@ -197,7 +193,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if dbSubnetGroup != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rds-db-subnet-group",
@@ -215,7 +210,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if instance.DBClusterIdentifier != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "rds-db-cluster",
@@ -234,7 +228,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.KmsKeyId != nil {
 			// This actually uses the ARN not the id
 			if a, err = adapterhelpers.ParseARN(*instance.KmsKeyId); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -254,7 +247,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.EnhancedMonitoringResourceArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.EnhancedMonitoringResourceArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "logs-log-stream",
@@ -273,7 +265,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.MonitoringRoleArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.MonitoringRoleArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -294,7 +285,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.PerformanceInsightsKMSKeyId != nil {
 			// This is an ARN
 			if a, err = adapterhelpers.ParseARN(*instance.PerformanceInsightsKMSKeyId); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -315,7 +305,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		for _, role := range instance.AssociatedRoles {
 			if role.RoleArn != nil {
 				if a, err = adapterhelpers.ParseARN(*role.RoleArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
@@ -335,7 +324,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		}
 
 		if instance.ActivityStreamKinesisStreamName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "kinesis-stream",
@@ -353,7 +341,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.AwsBackupRecoveryPointArn != nil {
 			if a, err = adapterhelpers.ParseARN(*instance.AwsBackupRecoveryPointArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "backup-recovery-point",
@@ -373,7 +360,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		if instance.CustomIamInstanceProfile != nil {
 			// This is almost certainly an ARN since IAM basically always is
 			if a, err = adapterhelpers.ParseARN(*instance.CustomIamInstanceProfile); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-instance-profile",
@@ -394,7 +380,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 		for _, replication := range instance.DBInstanceAutomatedBackupsReplications {
 			if replication.DBInstanceAutomatedBackupsArn != nil {
 				if a, err = adapterhelpers.ParseARN(*replication.DBInstanceAutomatedBackupsArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "rds-db-instance-automated-backup",
@@ -414,7 +399,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.ListenerEndpoint != nil {
 			if instance.ListenerEndpoint.Address != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -431,7 +415,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 			}
 
 			if instance.ListenerEndpoint.HostedZoneId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "route53-hosted-zone",
@@ -451,7 +434,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 		if instance.MasterUserSecret != nil {
 			if instance.MasterUserSecret.KmsKeyId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -470,7 +452,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 			if instance.MasterUserSecret.SecretArn != nil {
 				if a, err = adapterhelpers.ParseARN(*instance.MasterUserSecret.SecretArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "secretsmanager-secret",
@@ -494,6 +475,8 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewRDSDBInstanceAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{

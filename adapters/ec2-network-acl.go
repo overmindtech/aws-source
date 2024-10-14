@@ -47,7 +47,6 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -66,7 +65,6 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 		}
 
 		if networkAcl.VpcId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -88,6 +86,8 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2NetworkAclAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{

@@ -69,7 +69,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{
-
 					// Search for all container instances on this cluster
 					Type:   "ecs-container-instance",
 					Method: sdp.QueryMethod_SEARCH,
@@ -86,7 +85,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 			},
 			{
 				Query: &sdp.Query{
-
 					Type:   "ecs-service",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ClusterName,
@@ -101,7 +99,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 			},
 			{
 				Query: &sdp.Query{
-
 					Type:   "ecs-task",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *cluster.ClusterName,
@@ -136,7 +133,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 	if cluster.Configuration != nil {
 		if cluster.Configuration.ExecuteCommandConfiguration != nil {
 			if cluster.Configuration.ExecuteCommandConfiguration.KmsKeyId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -155,7 +151,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 
 			if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration != nil {
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.CloudWatchLogGroupName != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "logs-log-group",
@@ -172,7 +167,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 				}
 
 				if cluster.Configuration.ExecuteCommandConfiguration.LogConfiguration.S3BucketName != nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "s3-bucket",
@@ -192,7 +186,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 	}
 
 	for _, provider := range cluster.CapacityProviders {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ecs-capacity-provider",
@@ -210,6 +203,8 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewECSClusterAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{

@@ -43,7 +43,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		}
 
 		if attachment.DirectConnectGatewayId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-direct-connect-gateway",
@@ -61,7 +60,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 		}
 
 		if attachment.VirtualInterfaceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-virtual-interface",
@@ -84,6 +82,8 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{

@@ -76,6 +76,8 @@ func ruleOutputMapper(ctx context.Context, client elbv2Client, scope string, _ *
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewELBv2RuleAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeRulesInput, *elbv2.DescribeRulesOutput, elbv2Client, *elbv2.Options]{
 		Region:          region,

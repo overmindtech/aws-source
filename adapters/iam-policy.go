@@ -235,7 +235,6 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, group := range awsItem.PolicyGroups {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-group",
@@ -253,7 +252,6 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, user := range awsItem.PolicyUsers {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-user",
@@ -271,7 +269,6 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, role := range awsItem.PolicyRoles {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-role",
@@ -318,6 +315,8 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 
 	return tags, nil
 }
+
+//go:generate docgen ../../docs-data
 
 // NewPolicyAdapter Note that this policy adapter only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"

@@ -67,7 +67,6 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 
 		if listener.LoadBalancerArn != nil {
 			if a, err := adapterhelpers.ParseARN(*listener.LoadBalancerArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
@@ -101,7 +100,6 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 		for _, cert := range listener.Certificates {
 			if cert.CertificateArn != nil {
 				if a, err := adapterhelpers.ParseARN(*cert.CertificateArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "acm-certificate",
@@ -134,6 +132,8 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewELBv2ListenerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options]{

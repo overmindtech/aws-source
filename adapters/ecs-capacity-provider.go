@@ -36,7 +36,6 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 		if provider.AutoScalingGroupProvider != nil {
 			if provider.AutoScalingGroupProvider.AutoScalingGroupArn != nil {
 				if a, err := adapterhelpers.ParseARN(*provider.AutoScalingGroupProvider.AutoScalingGroupArn); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "autoscaling-auto-scaling-group",
@@ -59,6 +58,8 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewECSCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{

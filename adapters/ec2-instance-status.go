@@ -78,6 +78,8 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEC2InstanceStatusAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

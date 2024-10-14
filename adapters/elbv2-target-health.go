@@ -146,7 +146,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 		if err == nil {
 			switch a.Service {
 			case "lambda":
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "lambda-function",
@@ -161,7 +160,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 					},
 				})
 			case "elasticloadbalancing":
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
@@ -179,7 +177,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			// In this case it could be an instance ID or an IP. We will check
 			// for IP first
 			if net.ParseIP(*desc.Target.Id) != nil {
-
 				// This means it's an IP
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
@@ -194,7 +191,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 					},
 				})
 			} else {
-
 				// If all else fails it must be an instance ID
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
@@ -216,6 +212,8 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewELBv2TargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{

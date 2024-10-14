@@ -66,6 +66,8 @@ var s3Metadata = Metadata.Register(&sdp.AdapterMetadata{
 	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 })
 
+//go:generate docgen ../../docs-data
+
 type S3Source struct {
 	// AWS Config including region and credentials
 	config aws.Config
@@ -458,7 +460,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
 			if a, err = adapterhelpers.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "lambda-function",
@@ -479,7 +480,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
 			if a, err = adapterhelpers.ParseARN(*q.QueueArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "sqs-queue",
@@ -500,7 +500,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
 			if a, err = adapterhelpers.ParseARN(*topic.TopicArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "sns-topic",
@@ -520,7 +519,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 
 	if bucket.LoggingEnabled != nil {
 		if bucket.LoggingEnabled.TargetBucket != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "s3-bucket",
@@ -542,7 +540,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
 					if a, err = adapterhelpers.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
-
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "s3-bucket",
@@ -571,7 +568,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
 							if a, err = adapterhelpers.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
-
 								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 									Query: &sdp.Query{
 										Type:   "s3-bucket",

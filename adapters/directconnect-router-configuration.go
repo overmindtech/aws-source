@@ -27,7 +27,6 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 	}
 
 	if output.VirtualInterfaceId != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
@@ -47,6 +46,8 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 		&item,
 	}, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectRouterConfigurationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{

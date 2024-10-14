@@ -67,7 +67,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 	}
 
 	if d.DomainName != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "dns",
@@ -86,7 +85,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 	if dc := d.StreamingDistributionConfig; dc != nil {
 		if dc.S3Origin != nil {
 			if dc.S3Origin.DomainName != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -103,7 +101,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 			}
 
 			if dc.S3Origin.OriginAccessIdentity != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-cloud-front-origin-access-identity",
@@ -123,7 +120,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 
 		if dc.Aliases != nil {
 			for _, alias := range dc.Aliases.Items {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -141,7 +137,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 		}
 
 		if dc.Logging != nil && dc.Logging.Bucket != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -160,6 +155,8 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewCloudfrontStreamingDistributionAdapter(client CloudFrontClient, accountID string) *adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{

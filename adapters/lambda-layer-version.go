@@ -71,7 +71,6 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 	if out.Content != nil {
 		if out.Content.SigningJobArn != nil {
 			if a, err = adapterhelpers.ParseARN(*out.Content.SigningJobArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-job",
@@ -91,7 +90,6 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 		if out.Content.SigningProfileVersionArn != nil {
 			if a, err = adapterhelpers.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-profile",
@@ -112,6 +110,8 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewLambdaLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{

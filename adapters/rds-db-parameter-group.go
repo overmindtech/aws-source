@@ -34,6 +34,8 @@ func dBParameterGroupItemMapper(_, scope string, awsItem *ParameterGroup) (*sdp.
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewRDSDBParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options] {
 	return &adapterhelpers.GetListAdapter[*ParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-parameter-group",

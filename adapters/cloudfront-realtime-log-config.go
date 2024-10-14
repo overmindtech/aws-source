@@ -28,7 +28,6 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 		if endpoint.KinesisStreamConfig != nil {
 			if endpoint.KinesisStreamConfig.RoleARN != nil {
 				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.RoleARN); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
@@ -48,7 +47,6 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 			if endpoint.KinesisStreamConfig.StreamARN != nil {
 				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.StreamARN); err == nil {
-
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kinesis-stream",
@@ -70,6 +68,8 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewCloudfrontRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{

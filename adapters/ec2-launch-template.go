@@ -51,6 +51,8 @@ func launchTemplateOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEC2LaunchTemplateAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplatesInput, *ec2.DescribeLaunchTemplatesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

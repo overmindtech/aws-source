@@ -151,7 +151,6 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 		// Link to the suppressor alarm
 		if alarm.Composite != nil && alarm.Composite.ActionsSuppressor != nil {
 			if arn, err := adapterhelpers.ParseARN(*alarm.Composite.ActionsSuppressor); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudwatch-alarm",
@@ -186,6 +185,8 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewCloudwatchAlarmAdapter(client *cloudwatch.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
@@ -305,7 +306,6 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 
 	switch arn.Service {
 	case "autoscaling":
-
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "autoscaling-policy",
@@ -321,7 +321,6 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "sns":
-
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "sns-topic",
@@ -337,7 +336,6 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "ssm":
-
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ssm-ops-item",
@@ -353,7 +351,6 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "ssm-incidents":
-
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ssm-incidents-response-plan",

@@ -54,7 +54,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 	}
 
 	if output.KeyMetadata.CustomKeyStoreId != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-custom-key-store",
@@ -119,6 +118,8 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 
 	return item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewKMSKeyAdapter(client kmsClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{

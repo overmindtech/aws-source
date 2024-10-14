@@ -40,7 +40,6 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 		LinkedItemQueries: []*sdp.LinkedItemQuery{
 			{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
 					Query:  *cn.CoreNetworkId,
@@ -56,6 +55,8 @@ func coreNetworkPolicyItemMapper(_, scope string, cn *types.CoreNetworkPolicy) (
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerCoreNetworkPolicyAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.CoreNetworkPolicy, *networkmanager.Client, *networkmanager.Options]{

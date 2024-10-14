@@ -48,7 +48,6 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 		// VPC
 		if securityGroup.VpcId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -73,6 +72,8 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2SecurityGroupAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{

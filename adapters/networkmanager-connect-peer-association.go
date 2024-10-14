@@ -42,7 +42,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.GlobalNetworkId,
@@ -55,7 +54,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-connect-peer",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.ConnectPeerId,
@@ -83,7 +81,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 		if a.DeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
@@ -99,7 +96,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 		if a.LinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
@@ -117,6 +113,8 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{

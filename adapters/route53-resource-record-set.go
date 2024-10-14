@@ -68,7 +68,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	if awsItem.AliasTarget != nil {
 		if awsItem.AliasTarget.DNSName != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -87,7 +86,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	for _, record := range awsItem.ResourceRecords {
 		if record.Value != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -105,7 +103,6 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 	}
 
 	if awsItem.HealthCheckId != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "route53-health-check",
@@ -123,6 +120,8 @@ func resourceRecordSetItemMapper(_, scope string, awsItem *types.ResourceRecordS
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewRoute53ResourceRecordSetAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ResourceRecordSet, *route53.Client, *route53.Options]{

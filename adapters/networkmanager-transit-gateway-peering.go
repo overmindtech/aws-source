@@ -45,7 +45,6 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 		if awsItem.Peering.CoreNetworkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
 					Query:  *awsItem.Peering.CoreNetworkId,
@@ -72,7 +71,6 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 	if awsItem.TransitGatewayPeeringAttachmentId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "ec2-transit-gateway-peering-attachment",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.TransitGatewayPeeringAttachmentId,
@@ -90,7 +88,6 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 		if arn, err := adapterhelpers.ParseARN(*awsItem.TransitGatewayArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "ec2-transit-gateway",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *awsItem.TransitGatewayArn,
@@ -106,6 +103,8 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{

@@ -136,7 +136,6 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 	if cn.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *cn.CoreNetworkId,
@@ -196,6 +195,8 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerConnectPeerAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{

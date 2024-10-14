@@ -44,7 +44,6 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 
 	if out.FargateProfile.PodExecutionRoleArn != nil {
 		if a, err := adapterhelpers.ParseARN(*out.FargateProfile.PodExecutionRoleArn); err == nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -63,7 +62,6 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 	}
 
 	for _, subnet := range out.FargateProfile.Subnets {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ec2-subnet",
@@ -82,6 +80,8 @@ func fargateProfileGetFunc(ctx context.Context, client EKSClient, scope string, 
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEKSFargateProfileAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListFargateProfilesInput, *eks.ListFargateProfilesOutput, *eks.DescribeFargateProfileInput, *eks.DescribeFargateProfileOutput, EKSClient, *eks.Options]{

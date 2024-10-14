@@ -46,7 +46,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 		}
 
 		if securityGroupRule.GroupId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-security-group",
@@ -64,7 +63,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 
 		if rg := securityGroupRule.ReferencedGroupInfo; rg != nil {
 			if rg.GroupId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -86,6 +84,8 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2SecurityGroupRuleAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{

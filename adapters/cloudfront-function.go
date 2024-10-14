@@ -27,6 +27,8 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 	return &item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewCloudfrontCloudfrontFunctionAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-function",

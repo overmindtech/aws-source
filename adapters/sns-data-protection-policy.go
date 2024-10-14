@@ -44,7 +44,6 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 	}
 
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-
 		Query: &sdp.Query{
 			Type:   "sns-topic",
 			Method: sdp.QueryMethod_GET,
@@ -63,6 +62,8 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 
 	return item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewSNSDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{

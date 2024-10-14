@@ -56,6 +56,8 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 	}, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewSQSQueueAdapter(client sqsClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sqs.ListQueuesInput, *sqs.ListQueuesOutput, *sqs.GetQueueAttributesInput, *sqs.GetQueueAttributesOutput, sqsClient, *sqs.Options]{
 		ItemType:        "sqs-queue",

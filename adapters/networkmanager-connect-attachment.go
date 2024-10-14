@@ -46,7 +46,6 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 	if ca.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *ca.Attachment.CoreNetworkId,
@@ -63,7 +62,6 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 		if arn, err := adapterhelpers.ParseARN(*ca.Attachment.CoreNetworkArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *ca.Attachment.CoreNetworkArn,
@@ -81,6 +79,8 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{

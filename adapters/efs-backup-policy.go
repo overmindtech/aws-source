@@ -50,6 +50,8 @@ func BackupPolicyOutputMapper(_ context.Context, _ *efs.Client, scope string, in
 	return []*sdp.Item{&item}, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEFSBackupPolicyAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeBackupPolicyInput, *efs.DescribeBackupPolicyOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-backup-policy",

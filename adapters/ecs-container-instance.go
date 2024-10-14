@@ -66,7 +66,6 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	}
 
 	if containerInstance.Ec2InstanceId != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ec2-instance",
@@ -115,6 +114,8 @@ func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOut
 
 	return inputs, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewECSContainerInstanceAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{

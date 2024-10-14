@@ -122,6 +122,8 @@ func MountTargetOutputMapper(_ context.Context, _ *efs.Client, scope string, inp
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewEFSMountTargetAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeMountTargetsInput, *efs.DescribeMountTargetsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-mount-target",

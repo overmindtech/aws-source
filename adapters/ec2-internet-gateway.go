@@ -48,7 +48,6 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 		// VPCs
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-vpc",
@@ -71,6 +70,8 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2InternetGatewayAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

@@ -43,7 +43,6 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 		var a *adapterhelpers.ARN
 
 		if sg.VpcId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -62,7 +61,6 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -82,7 +80,6 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 			if subnet.SubnetOutpost != nil {
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = adapterhelpers.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
-
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "outposts-outpost",
@@ -107,6 +104,8 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewRDSDBSubnetGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{

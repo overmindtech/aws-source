@@ -27,7 +27,6 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if connection.LagId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-lag",
@@ -45,7 +44,6 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if connection.Location != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-location",
@@ -63,7 +61,6 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		if connection.LoaIssueTime != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-loa",
@@ -81,7 +78,6 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 		}
 
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
 				Method: sdp.QueryMethod_SEARCH,
@@ -101,6 +97,8 @@ func hostedConnectionOutputMapper(_ context.Context, _ *directconnect.Client, sc
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectHostedConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeHostedConnectionsInput, *directconnect.DescribeHostedConnectionsOutput, *directconnect.Client, *directconnect.Options]{

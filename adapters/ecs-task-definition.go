@@ -88,7 +88,6 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.ExecutionRoleArn != nil {
 		if a, err = adapterhelpers.ParseARN(*td.ExecutionRoleArn); err == nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -108,7 +107,6 @@ func taskDefinitionGetFunc(ctx context.Context, client ECSClient, scope string, 
 
 	if td.TaskRoleArn != nil {
 		if a, err = adapterhelpers.ParseARN(*td.TaskRoleArn); err == nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -140,7 +138,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 
 			switch a.Service {
 			case "secretsmanager":
-
 				return &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "secretsmanager-secret",
@@ -156,7 +153,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 					},
 				}
 			case "ssm":
-
 				return &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ssm-parameter",
@@ -177,6 +173,8 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 
 	return nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewECSTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{

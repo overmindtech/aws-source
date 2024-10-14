@@ -236,7 +236,6 @@ func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	for _, policy := range awsItem.AttachedPolicies {
 		if policy.PolicyArn != nil {
 			if a, err := adapterhelpers.ParseARN(*policy.PolicyArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
@@ -291,6 +290,8 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 
 	return tags, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewIAMRoleAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{

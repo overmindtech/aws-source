@@ -46,7 +46,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 	}
 
 	if topicArn, err := attributes.Get("topicArn"); err == nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "sns-topic",
@@ -65,7 +64,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 
 	if subsRoleArn, err := attributes.Get("subscriptionRoleArn"); err == nil {
 		if arn, err := adapterhelpers.ParseARN(fmt.Sprint(subsRoleArn)); err == nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -85,6 +83,8 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 
 	return item, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewSNSSubscriptionAdapter(client subsCli, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{

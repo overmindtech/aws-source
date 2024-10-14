@@ -47,7 +47,6 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 
 		for _, connection := range lag.Connections {
 			if connection.ConnectionId != nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "directconnect-connection",
@@ -66,7 +65,6 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 		}
 
 		if lag.LagId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-hosted-connection",
@@ -84,7 +82,6 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 		}
 
 		if lag.Location != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-location",
@@ -107,6 +104,8 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewDirectConnectLagAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{

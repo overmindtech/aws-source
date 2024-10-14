@@ -28,7 +28,6 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 		}
 
 		if cr.CapacityReservationFleetId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-capacity-reservation-fleet",
@@ -47,7 +46,6 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		if cr.OutpostArn != nil {
 			if arn, err := adapterhelpers.ParseARN(*cr.OutpostArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "outposts-outpost",
@@ -67,7 +65,6 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		if cr.PlacementGroupArn != nil {
 			if arn, err := adapterhelpers.ParseARN(*cr.PlacementGroupArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-placement-group",
@@ -90,6 +87,8 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewEC2CapacityReservationAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{

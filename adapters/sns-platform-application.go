@@ -67,6 +67,8 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 	return item, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewSNSPlatformApplicationAdapter(client platformApplicationClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{
 		ItemType:        "sns-platform-application",

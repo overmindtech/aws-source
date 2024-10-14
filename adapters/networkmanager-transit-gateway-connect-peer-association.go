@@ -37,7 +37,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *a.GlobalNetworkId,
@@ -54,7 +53,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 		if a.DeviceId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-device",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.DeviceId),
@@ -70,7 +68,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 		if a.LinkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-link",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  idWithGlobalNetwork(*a.GlobalNetworkId, *a.LinkId),
@@ -99,6 +96,8 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{

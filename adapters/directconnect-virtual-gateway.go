@@ -31,6 +31,8 @@ func virtualGatewayOutputMapper(_ context.Context, _ *directconnect.Client, scop
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewDirectConnectVirtualGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualGatewaysInput, *directconnect.DescribeVirtualGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

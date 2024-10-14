@@ -55,7 +55,6 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 
 	for _, role := range awsItem.Roles {
 		if arn, err := adapterhelpers.ParseARN(*role.Arn); err == nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -74,7 +73,6 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 
 		if role.PermissionsBoundary != nil {
 			if arn, err := adapterhelpers.ParseARN(*role.PermissionsBoundary.PermissionsBoundaryArn); err == nil {
-
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
@@ -119,6 +117,8 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 
 	return tags
 }
+
+//go:generate docgen ../../docs-data
 
 func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{

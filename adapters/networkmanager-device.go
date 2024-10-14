@@ -43,7 +43,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -56,7 +55,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-link-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, "device", *s.DeviceId),
@@ -69,7 +67,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 				},
 				{
 					Query: &sdp.Query{
-
 						Type:   "networkmanager-connection",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceId),
@@ -86,7 +83,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 		if s.SiteId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-site",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -102,7 +98,6 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 		if s.DeviceArn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-
 					Type:   "networkmanager-network-resource-relationship",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.DeviceArn),
@@ -131,6 +126,8 @@ func deviceOutputMapper(_ context.Context, _ *networkmanager.Client, scope strin
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewNetworkManagerDeviceAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetDevicesInput, *networkmanager.GetDevicesOutput, *networkmanager.Client, *networkmanager.Options]{

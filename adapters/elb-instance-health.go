@@ -67,7 +67,6 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 		}
 
 		if is.InstanceId != nil {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -88,6 +87,8 @@ func instanceHealthOutputMapper(_ context.Context, _ *elb.Client, scope string, 
 
 	return items, nil
 }
+
+//go:generate docgen ../../docs-data
 
 func NewELBInstanceHealthAdapter(client *elasticloadbalancing.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elb.DescribeInstanceHealthInput, *elb.DescribeInstanceHealthOutput, *elb.Client, *elb.Options]{

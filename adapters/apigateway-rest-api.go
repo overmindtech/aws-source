@@ -91,7 +91,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 	if awsItem.EndpointConfiguration != nil && awsItem.EndpointConfiguration.VpcEndpointIds != nil {
 		for _, vpcEndpointID := range awsItem.EndpointConfiguration.VpcEndpointIds {
-
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc-endpoint",
@@ -110,7 +109,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 	}
 
 	if awsItem.RootResourceId != nil {
-
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "apigateway-resource",
@@ -143,6 +141,15 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 
 	return &item, nil
 }
+
+//go:generate docgen ../../docs-data
+
+
+
+
+
+
+
 
 func NewAPIGatewayRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{

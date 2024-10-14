@@ -31,6 +31,8 @@ func locationOutputMapper(_ context.Context, _ *directconnect.Client, scope stri
 	return items, nil
 }
 
+//go:generate docgen ../../docs-data
+
 func NewDirectConnectLocationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLocationsInput, *directconnect.DescribeLocationsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,
