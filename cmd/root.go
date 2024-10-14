@@ -15,7 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/nats-io/jwt/v2"
 	"github.com/nats-io/nkeys"
-	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/proc"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
@@ -273,7 +272,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(docJSONCmd)
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -437,17 +435,4 @@ func (t TerminationLogHook) Fire(e *log.Entry) error {
 	_, err = tLog.WriteString(message)
 
 	return err
-}
-
-// documentation subcommand for generating json
-var docJSONCmd = &cobra.Command{
-	Use:   "docs",
-	Short: "Generate JSON documentation",
-	Long:  `Generate JSON documentation for the source`,
-	Run: func(cmd *cobra.Command, args []string) {
-		err := discovery.AdapterMetadataToJSONFile(adapters.Metadata.AllAdapterMetadata(), "docs-data")
-		if err != nil {
-			log.WithError(err).Fatal("Could not generate JSON documentation")
-		}
-	},
 }
