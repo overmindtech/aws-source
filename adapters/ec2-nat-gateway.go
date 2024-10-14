@@ -47,7 +47,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		for _, address := range ng.NatGatewayAddresses {
 			if address.NetworkInterfaceId != nil {
-				// +overmind:link ec2-network-interface
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-network-interface",
@@ -65,7 +65,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 			}
 
 			if address.PrivateIp != nil {
-				// +overmind:link ip
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ip",
@@ -82,7 +82,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 			}
 
 			if address.PublicIp != nil {
-				// +overmind:link ip
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ip",
@@ -100,7 +100,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 		}
 
 		if ng.SubnetId != nil {
-			// +overmind:link ec2-subnet
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-subnet",
@@ -119,7 +119,7 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 		}
 
 		if ng.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -141,15 +141,6 @@ func natGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-nat-gateway
-// +overmind:descriptiveType NAT Gateway
-// +overmind:get Get a NAT Gateway by ID
-// +overmind:list List all NAT gateways
-// +overmind:search Search for NAT gateways by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_nat_gateway.id
 
 func NewEC2NatGatewayAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNatGatewaysInput, *ec2.DescribeNatGatewaysOutput, *ec2.Client, *ec2.Options]{

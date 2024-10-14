@@ -46,7 +46,7 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 		}
 
 		for _, attachment := range volume.Attachments {
-			// +overmind:link ec2-instance
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -67,15 +67,6 @@ func volumeOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-volume
-// +overmind:descriptiveType EC2 Volume
-// +overmind:get Get a volume by ID
-// +overmind:list List all volumes
-// +overmind:search Search volumes by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_ebs_volume.id
 
 func NewEC2VolumeAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeVolumesInput, *ec2.DescribeVolumesOutput, *ec2.Client, *ec2.Options]{

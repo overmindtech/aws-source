@@ -27,7 +27,7 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 	}
 
 	if output.VirtualInterfaceId != nil {
-		// +overmind:link directconnect-virtual-interface
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
@@ -47,14 +47,6 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 		&item,
 	}, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-router-configuration
-// +overmind:descriptiveType Direct Connect Router Configuration
-// +overmind:get Get a Router Configuration by Virtual Interface ID
-// +overmind:search Search Router Configuration by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_router_configuration.virtual_interface_id
 
 func NewDirectConnectRouterConfigurationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{

@@ -67,7 +67,6 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 		Scope:           scope,
 	}
 
-	// +overmind:link kms-key
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 		Query: &sdp.Query{
 			Type:   "kms-key",
@@ -84,14 +83,6 @@ func getKeyPolicyFunc(ctx context.Context, client keyPolicyClient, scope string,
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type kms-key-policy
-// +overmind:descriptiveType KMS Key Policy
-// +overmind:get Get a KMS key policy by its Key ID
-// +overmind:search Search KMS key policies by Key ID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_kms_key_policy.key_id
 
 func NewKMSKeyPolicyAdapter(client keyPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*kms.ListKeyPoliciesInput, *kms.ListKeyPoliciesOutput, *kms.GetKeyPolicyInput, *kms.GetKeyPolicyOutput, keyPolicyClient, *kms.Options]{

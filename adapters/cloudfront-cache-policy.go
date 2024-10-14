@@ -37,15 +37,6 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 	return policies, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-cache-policy
-// +overmind:descriptiveType CloudFront Cache Policy
-// +overmind:get Get a CloudFront Cache Policy
-// +overmind:list List CloudFront Cache Policies
-// +overmind:search Search CloudFront Cache Policies by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_cache_policy.id
-
 func NewCloudfrontCachePolicyAdapter(client CloudFrontClient, accountID string) *adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
 		ItemType:               "cloudfront-cache-policy",

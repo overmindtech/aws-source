@@ -96,7 +96,7 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 	})
 
 	if err == nil {
-		// +overmind:link cloudwatch-alarm
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "cloudwatch-alarm",
@@ -130,15 +130,6 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type route53-health-check
-// +overmind:descriptiveType Route53 Health Check
-// +overmind:get Get health check by ID
-// +overmind:list List all health checks
-// +overmind:search Search for health checks by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_route53_health_check.id
 
 func NewRoute53HealthCheckAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options]{

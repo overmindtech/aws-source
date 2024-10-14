@@ -26,7 +26,7 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 	if awsItem.ContinuousDeploymentPolicyConfig != nil && awsItem.ContinuousDeploymentPolicyConfig.StagingDistributionDnsNames != nil {
 		for _, name := range awsItem.ContinuousDeploymentPolicyConfig.StagingDistributionDnsNames.Items {
-			// +overmind:link dns
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -45,14 +45,6 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-continuous-deployment-policy
-// +overmind:descriptiveType CloudFront Continuous Deployment Policy
-// +overmind:get Get a CloudFront Continuous Deployment Policy by ID
-// +overmind:list List CloudFront Continuous Deployment Policies
-// +overmind:search Search CloudFront Continuous Deployment Policies by ARN
-// +overmind:group AWS
 
 // Terraform is not yet supported for this: https://github.com/hashicorp/terraform-provider-aws/issues/28920
 

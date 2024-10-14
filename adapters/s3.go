@@ -66,35 +66,6 @@ var s3Metadata = Metadata.Register(&sdp.AdapterMetadata{
 	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 })
 
-//go:generate docgen ../../docs-data
-// +overmind:descriptiveType S3 Bucket
-// +overmind:get Get an S3 bucket by name
-// +overmind:list List all S3 buckets
-// +overmind:search Search for S3 buckets by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_s3_bucket_acl.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_analytics_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_cors_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_intelligent_tiering_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_inventory.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_lifecycle_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_logging.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_metric.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_notification.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_object_lock_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_object.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_ownership_controls.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_policy.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_public_access_block.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_replication_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_request_payment_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_server_side_encryption_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_versioning.bucket
-// +overmind:terraform:queryMap aws_s3_bucket_website_configuration.bucket
-// +overmind:terraform:queryMap aws_s3_bucket.id
-// +overmind:terraform:queryMap aws_s3_object_copy.bucket
-// +overmind:terraform:queryMap aws_s3_object.bucket
-
 type S3Source struct {
 	// AWS Config including region and credentials
 	config aws.Config
@@ -146,7 +117,7 @@ func (s *S3Source) Client() *s3.Client {
 
 // Type The type of items that this adapter is capable of finding
 func (s *S3Source) Type() string {
-	// +overmind:type s3-bucket
+
 	return "s3-bucket"
 }
 
@@ -466,7 +437,6 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 				url = "https://" + *bucket.RedirectAllRequestsTo.HostName
 			}
 
-			// +overmind:link http
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "http",
@@ -488,7 +458,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, lambdaConfig := range bucket.LambdaFunctionConfigurations {
 		if lambdaConfig.LambdaFunctionArn != nil {
 			if a, err = adapterhelpers.ParseARN(*lambdaConfig.LambdaFunctionArn); err == nil {
-				// +overmind:link lambda-function
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "lambda-function",
@@ -509,7 +479,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, q := range bucket.QueueConfigurations {
 		if q.QueueArn != nil {
 			if a, err = adapterhelpers.ParseARN(*q.QueueArn); err == nil {
-				// +overmind:link sqs-queue
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "sqs-queue",
@@ -530,7 +500,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 	for _, topic := range bucket.TopicConfigurations {
 		if topic.TopicArn != nil {
 			if a, err = adapterhelpers.ParseARN(*topic.TopicArn); err == nil {
-				// +overmind:link sns-topic
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "sns-topic",
@@ -550,7 +520,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 
 	if bucket.LoggingEnabled != nil {
 		if bucket.LoggingEnabled.TargetBucket != nil {
-			// +overmind:link s3-bucket
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "s3-bucket",
@@ -572,7 +542,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 			if bucket.InventoryConfiguration.Destination.S3BucketDestination != nil {
 				if bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket != nil {
 					if a, err = adapterhelpers.ParseARN(*bucket.InventoryConfiguration.Destination.S3BucketDestination.Bucket); err == nil {
-						// +overmind:link s3-bucket
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "s3-bucket",
@@ -601,7 +571,7 @@ func getImpl(ctx context.Context, cache *sdpcache.Cache, client S3Client, scope 
 					if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination != nil {
 						if bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket != nil {
 							if a, err = adapterhelpers.ParseARN(*bucket.AnalyticsConfiguration.StorageClassAnalysis.DataExport.Destination.S3BucketDestination.Bucket); err == nil {
-								// +overmind:link s3-bucket
+
 								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 									Query: &sdp.Query{
 										Type:   "s3-bucket",

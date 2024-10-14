@@ -78,14 +78,6 @@ func instanceStatusOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-instance-status
-// +overmind:descriptiveType EC2 Instance Status
-// +overmind:get Get an EC2 instance status by Instance ID
-// +overmind:list List all EC2 instance statuses
-// +overmind:search Search EC2 instance statuses by ARN
-// +overmind:group AWS
-
 func NewEC2InstanceStatusAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInstanceStatusInput, *ec2.DescribeInstanceStatusOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

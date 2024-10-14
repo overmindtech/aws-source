@@ -72,7 +72,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			for _, ni := range lt.NetworkInterfaces {
 				for _, ip := range ni.Ipv6Addresses {
 					if ip.Ipv6Address != nil {
-						// +overmind:link ip
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ip",
@@ -90,7 +90,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if ni.NetworkInterfaceId != nil {
-					// +overmind:link ec2-network-interface
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-network-interface",
@@ -109,7 +109,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 				for _, ip := range ni.PrivateIpAddresses {
 					if ip.PrivateIpAddress != nil {
-						// +overmind:link ip
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ip",
@@ -127,7 +127,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if ni.SubnetId != nil {
-					// +overmind:link ec2-subnet
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-subnet",
@@ -145,7 +145,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				for _, group := range ni.Groups {
-					// +overmind:link ec2-security-group
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-security-group",
@@ -166,7 +166,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			if lt.ImageId != nil {
-				// +overmind:link ec2-image
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-image",
@@ -184,7 +184,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			if lt.KeyName != nil {
-				// +overmind:link ec2-key-pair
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-key-pair",
@@ -203,7 +203,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 			for _, mapping := range lt.BlockDeviceMappings {
 				if mapping.Ebs != nil && mapping.Ebs.SnapshotId != nil {
-					// +overmind:link ec2-snapshot
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-snapshot",
@@ -224,7 +224,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			if spec := lt.CapacityReservationSpecification; spec != nil {
 				if target := spec.CapacityReservationTarget; target != nil {
 					if target.CapacityReservationId != nil {
-						// +overmind:link ec2-capacity-reservation
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "ec2-capacity-reservation",
@@ -247,7 +247,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 			if lt.Placement != nil {
 				if lt.Placement.GroupId != nil {
-					// +overmind:link ec2-placement-group
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-placement-group",
@@ -267,7 +267,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 				}
 
 				if lt.Placement.HostId != nil {
-					// +overmind:link ec2-host
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "ec2-host",
@@ -286,7 +286,7 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 			}
 
 			for _, id := range lt.SecurityGroupIds {
-				// +overmind:link ec2-security-group
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -310,14 +310,6 @@ func launchTemplateVersionOutputMapper(_ context.Context, _ *ec2.Client, scope s
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-launch-template-version
-// +overmind:descriptiveType Launch Template Version
-// +overmind:get Get a launch template version by {templateId}.{version}
-// +overmind:list List all launch template versions
-// +overmind:search Search launch template versions by ARN
-// +overmind:group AWS
 
 func NewEC2LaunchTemplateVersionAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeLaunchTemplateVersionsInput, *ec2.DescribeLaunchTemplateVersionsOutput, *ec2.Client, *ec2.Options]{

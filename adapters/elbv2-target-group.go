@@ -45,7 +45,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbv2Client, scope stri
 		}
 
 		if tg.TargetGroupArn != nil {
-			// +overmind:link elbv2-target-health
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "elbv2-target-health",
@@ -62,7 +62,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbv2Client, scope stri
 		}
 
 		if tg.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -81,7 +81,7 @@ func targetGroupOutputMapper(ctx context.Context, client elbv2Client, scope stri
 
 		for _, lbArn := range tg.LoadBalancerArns {
 			if a, err := adapterhelpers.ParseARN(lbArn); err == nil {
-				// +overmind:link elbv2-load-balancer
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
@@ -103,17 +103,6 @@ func targetGroupOutputMapper(ctx context.Context, client elbv2Client, scope stri
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type elbv2-target-group
-// +overmind:descriptiveType Target Group
-// +overmind:get Get a target group by name
-// +overmind:list List all target groups
-// +overmind:search Search for target groups by load balancer ARN or target group ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_alb_target_group.arn
-// +overmind:terraform:queryMap aws_lb_target_group.arn
-// +overmind:terraform:method SEARCH
 
 func NewELBv2TargetGroupAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbv2Client, *elbv2.Options]{

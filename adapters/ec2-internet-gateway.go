@@ -48,7 +48,7 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 		// VPCs
 		for _, attachment := range gw.Attachments {
 			if attachment.VpcId != nil {
-				// +overmind:link ec2-vpc
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-vpc",
@@ -71,15 +71,6 @@ func internetGatewayOutputMapper(_ context.Context, _ *ec2.Client, scope string,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-internet-gateway
-// +overmind:descriptiveType Internet Gateway
-// +overmind:get Get an internet gateway by ID
-// +overmind:list List all internet gateways
-// +overmind:search Search internet gateways by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_internet_gateway.id
 
 func NewEC2InternetGatewayAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeInternetGatewaysInput, *ec2.DescribeInternetGatewaysOutput, *ec2.Client, *ec2.Options]{

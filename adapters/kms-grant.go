@@ -56,7 +56,6 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 		scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
 
-		// +overmind:link kms-key
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "kms-key",
@@ -137,11 +136,11 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 				adapter, query := iamSourceAndQuery(arn.Resource)
 				switch adapter {
 				case "user":
-					// +overmind:link iam-user
+
 					lIQ.Query.Type = "iam-user"
 					lIQ.Query.Query = query
 				case "role":
-					// +overmind:link iam-role
+
 					lIQ.Query.Type = "iam-role"
 					lIQ.Query.Query = query
 				default:
@@ -169,14 +168,6 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type kms-grant
-// +overmind:descriptiveType KMS Grant
-// +overmind:get Get a grant by keyID/grantId
-// +overmind:search Search grants by keyID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_kms_grant.grant_id
 
 func NewKMSGrantAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{

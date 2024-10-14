@@ -52,13 +52,6 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type sns-endpoint
-// +overmind:descriptiveType SNS Endpoint
-// +overmind:get Get an SNS endpoint by its ARN
-// +overmind:search Search SNS endpoints by associated Platform Application ARN
-// +overmind:group AWS
-
 func NewSNSEndpointAdapter(client endpointClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options]{
 		ItemType:        "sns-endpoint",

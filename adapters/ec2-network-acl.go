@@ -47,7 +47,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 		for _, assoc := range networkAcl.Associations {
 			if assoc.SubnetId != nil {
-				// +overmind:link ec2-subnet
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -66,7 +66,7 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 		}
 
 		if networkAcl.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -88,15 +88,6 @@ func networkAclOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *e
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-network-acl
-// +overmind:descriptiveType Network ACL
-// +overmind:get Get a network ACL
-// +overmind:list List all network ACLs
-// +overmind:search Search for network ACLs by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_network_acl.id
 
 func NewEC2NetworkAclAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkAclsInput, *ec2.DescribeNetworkAclsOutput, *ec2.Client, *ec2.Options]{

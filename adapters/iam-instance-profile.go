@@ -55,7 +55,7 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 
 	for _, role := range awsItem.Roles {
 		if arn, err := adapterhelpers.ParseARN(*role.Arn); err == nil {
-			// +overmind:link iam-role
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "iam-role",
@@ -74,7 +74,7 @@ func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) 
 
 		if role.PermissionsBoundary != nil {
 			if arn, err := adapterhelpers.ParseARN(*role.PermissionsBoundary.PermissionsBoundaryArn); err == nil {
-				// +overmind:link iam-policy
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-policy",
@@ -119,16 +119,6 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 
 	return tags
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type iam-instance-profile
-// +overmind:descriptiveType IAM instance profile
-// +overmind:get Get an IAM instance profile
-// +overmind:list List IAM instance profiles
-// +overmind:search Search IAM instance profiles by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_iam_instance_profile.arn
-// +overmind:terraform:method SEARCH
 
 func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{

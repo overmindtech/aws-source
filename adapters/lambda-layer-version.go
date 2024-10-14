@@ -71,7 +71,7 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 	if out.Content != nil {
 		if out.Content.SigningJobArn != nil {
 			if a, err = adapterhelpers.ParseARN(*out.Content.SigningJobArn); err == nil {
-				// +overmind:link signer-signing-job
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-job",
@@ -91,7 +91,7 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 		if out.Content.SigningProfileVersionArn != nil {
 			if a, err = adapterhelpers.ParseARN(*out.Content.SigningProfileVersionArn); err == nil {
-				// +overmind:link signer-signing-profile
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-profile",
@@ -112,15 +112,6 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type lambda-layer-version
-// +overmind:descriptiveType Lambda Layer Version
-// +overmind:get Get a layer version by full name ({layerName}:{versionNumber})
-// +overmind:search Search for layer versions by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_lambda_layer_version.arn
-// +overmind:terraform:method SEARCH
 
 func NewLambdaLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{

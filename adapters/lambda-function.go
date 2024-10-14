@@ -124,7 +124,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 	if function.Code != nil {
 		if function.Code.Location != nil {
-			// +overmind:link http
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "http",
@@ -141,7 +141,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		}
 
 		if function.Code.ImageUri != nil {
-			// +overmind:link http
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "http",
@@ -159,7 +159,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		}
 
 		if function.Code.ResolvedImageUri != nil {
-			// +overmind:link http
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "http",
@@ -193,7 +193,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.Role != nil {
 			if a, err = adapterhelpers.ParseARN(*function.Configuration.Role); err == nil {
-				// +overmind:link iam-role
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-role",
@@ -230,7 +230,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 		for _, fsConfig := range function.Configuration.FileSystemConfigs {
 			if fsConfig.Arn != nil {
 				if a, err = adapterhelpers.ParseARN(*fsConfig.Arn); err == nil {
-					// +overmind:link efs-access-point
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "efs-access-point",
@@ -250,7 +250,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.KMSKeyArn != nil {
 			if a, err = adapterhelpers.ParseARN(*function.Configuration.KMSKeyArn); err == nil {
-				// +overmind:link kms-key
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "kms-key",
@@ -274,7 +274,6 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 					// Strip the leading "layer:"
 					name := strings.TrimPrefix(a.Resource, "layer:")
 
-					// +overmind:link lambda-layer-version
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "lambda-layer-version",
@@ -293,7 +292,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 			if layer.SigningJobArn != nil {
 				if a, err = adapterhelpers.ParseARN(*layer.SigningJobArn); err == nil {
-					// +overmind:link signer-signing-job
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "signer-signing-job",
@@ -313,7 +312,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 			if layer.SigningProfileVersionArn != nil {
 				if a, err = adapterhelpers.ParseARN(*layer.SigningProfileVersionArn); err == nil {
-					// +overmind:link signer-signing-profile
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "signer-signing-profile",
@@ -334,7 +333,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.MasterArn != nil {
 			if a, err = adapterhelpers.ParseARN(*function.Configuration.MasterArn); err == nil {
-				// +overmind:link lambda-function
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "lambda-function",
@@ -353,7 +352,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.SigningJobArn != nil {
 			if a, err = adapterhelpers.ParseARN(*function.Configuration.SigningJobArn); err == nil {
-				// +overmind:link signer-signing-job
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-job",
@@ -373,7 +372,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.SigningProfileVersionArn != nil {
 			if a, err = adapterhelpers.ParseARN(*function.Configuration.SigningProfileVersionArn); err == nil {
-				// +overmind:link signer-signing-profile
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "signer-signing-profile",
@@ -393,7 +392,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 		if function.Configuration.VpcConfig != nil {
 			for _, id := range function.Configuration.VpcConfig.SecurityGroupIds {
-				// +overmind:link ec2-security-group
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-security-group",
@@ -411,7 +410,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			}
 
 			for _, id := range function.Configuration.VpcConfig.SubnetIds {
-				// +overmind:link ec2-subnet
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -429,7 +428,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			}
 
 			if function.Configuration.VpcConfig.VpcId != nil {
-				// +overmind:link ec2-vpc
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-vpc",
@@ -445,7 +444,7 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 
 	for _, config := range function.UrlConfigs {
 		if config.FunctionUrl != nil {
-			// +overmind:link http
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "http",
@@ -467,10 +466,6 @@ func functionGetFunc(ctx context.Context, client LambdaClient, scope string, inp
 			if config.DestinationConfig.OnFailure != nil {
 				if config.DestinationConfig.OnFailure.Destination != nil {
 					// Possible links from `GetEventLinkedItem()`
-					// +overmind:link sns-topic
-					// +overmind:link sqs-queue
-					// +overmind:link lambda-function
-					// +overmind:link events-event-bus
 
 					lir, err := GetEventLinkedItem(*config.DestinationConfig.OnFailure.Destination)
 
@@ -628,18 +623,6 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 
 	return nil, errors.New("could not find matching request")
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type lambda-function
-// +overmind:descriptiveType Lambda Function
-// +overmind:get Get a lambda function by name
-// +overmind:list List all lambda functions
-// +overmind:search Search for lambda functions by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_lambda_function.arn
-// +overmind:terraform:queryMap aws_lambda_function_event_invoke_config.id
-// +overmind:terraform:queryMap aws_lambda_function_url.function_arn
-// +overmind:terraform:method SEARCH
 
 func NewLambdaFunctionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{

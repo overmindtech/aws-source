@@ -43,7 +43,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 		var a *adapterhelpers.ARN
 
 		if sg.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -62,7 +62,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 		for _, subnet := range sg.Subnets {
 			if subnet.SubnetIdentifier != nil {
-				// +overmind:link ec2-subnet
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-subnet",
@@ -82,7 +82,7 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 			if subnet.SubnetOutpost != nil {
 				if subnet.SubnetOutpost.Arn != nil {
 					if a, err = adapterhelpers.ParseARN(*subnet.SubnetOutpost.Arn); err == nil {
-						// +overmind:link outposts-outpost
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "outposts-outpost",
@@ -107,16 +107,6 @@ func dBSubnetGroupOutputMapper(ctx context.Context, client rdsClient, scope stri
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type rds-db-subnet-group
-// +overmind:descriptiveType RDS Subnet Group
-// +overmind:get Get a subnet group by name
-// +overmind:list List all subnet groups
-// +overmind:search Search for subnet groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_db_subnet_group.arn
-// +overmind:terraform:method SEARCH
 
 func NewRDSDBSubnetGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBSubnetGroupsInput, *rds.DescribeDBSubnetGroupsOutput, rdsClient, *rds.Options]{

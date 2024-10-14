@@ -65,7 +65,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 	}
 
 	if d.DomainName != nil {
-		// +overmind:link dns
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "dns",
@@ -84,7 +84,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 	if d.ActiveTrustedKeyGroups != nil {
 		for _, keyGroup := range d.ActiveTrustedKeyGroups.Items {
 			if keyGroup.KeyGroupId != nil {
-				// +overmind:link cloudfront-key-group
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-key-group",
@@ -105,7 +105,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 	for _, record := range d.AliasICPRecordals {
 		if record.CNAME != nil {
-			// +overmind:link dns
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -125,7 +125,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 	if dc := d.DistributionConfig; dc != nil {
 		if dc.Aliases != nil {
 			for _, alias := range dc.Aliases.Items {
-				// +overmind:link dns
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "dns",
@@ -143,7 +143,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		}
 
 		if dc.ContinuousDeploymentPolicyId != nil && *dc.ContinuousDeploymentPolicyId != "" {
-			// +overmind:link cloudfront-continuous-deployment-policy
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "cloudfront-continuous-deployment-policy",
@@ -162,7 +162,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		if dc.CacheBehaviors != nil {
 			for _, behavior := range dc.CacheBehaviors.Items {
 				if behavior.CachePolicyId != nil {
-					// +overmind:link cloudfront-cache-policy
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-cache-policy",
@@ -180,7 +180,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 
 				if behavior.FieldLevelEncryptionId != nil {
-					// +overmind:link cloudfront-field-level-encryption
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-field-level-encryption",
@@ -198,7 +198,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 
 				if behavior.OriginRequestPolicyId != nil {
-					// +overmind:link cloudfront-origin-request-policy
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-origin-request-policy",
@@ -217,7 +217,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 				if behavior.RealtimeLogConfigArn != nil {
 					if arn, err := adapterhelpers.ParseARN(*behavior.RealtimeLogConfigArn); err == nil {
-						// +overmind:link cloudfront-realtime-log-config
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "cloudfront-realtime-log-config",
@@ -236,7 +236,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 
 				if behavior.ResponseHeadersPolicyId != nil {
-					// +overmind:link cloudfront-response-headers-policy
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-response-headers-policy",
@@ -255,7 +255,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 				if behavior.TrustedKeyGroups != nil {
 					for _, keyGroup := range behavior.TrustedKeyGroups.Items {
-						// +overmind:link cloudfront-key-group
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "cloudfront-key-group",
@@ -277,7 +277,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 					for _, function := range behavior.FunctionAssociations.Items {
 						if function.FunctionARN != nil {
 							if arn, err := adapterhelpers.ParseARN(*function.FunctionARN); err == nil {
-								// +overmind:link cloudfront-function
+
 								item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 									Query: &sdp.Query{
 										Type:   "cloudfront-function",
@@ -300,7 +300,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				if behavior.LambdaFunctionAssociations != nil {
 					for _, function := range behavior.LambdaFunctionAssociations.Items {
 						if arn, err := adapterhelpers.ParseARN(*function.LambdaFunctionARN); err == nil {
-							// +overmind:link lambda-function
+
 							item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 								Query: &sdp.Query{
 									Type:   "lambda-function",
@@ -324,7 +324,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		if dc.Origins != nil {
 			for _, origin := range dc.Origins.Items {
 				if origin.DomainName != nil {
-					// +overmind:link dns
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "dns",
@@ -341,7 +341,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 
 				if origin.OriginAccessControlId != nil {
-					// +overmind:link cloudfront-origin-access-control
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-origin-access-control",
@@ -365,7 +365,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 						matches := s3DnsRegex.FindStringSubmatch(*origin.DomainName)
 
 						if len(matches) == 3 {
-							// +overmind:link s3-bucket
+
 							item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 								Query: &sdp.Query{
 									Type:   "s3-bucket",
@@ -384,7 +384,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 					}
 
 					if origin.S3OriginConfig.OriginAccessIdentity != nil {
-						// +overmind:link cloudfront-cloud-front-origin-access-identity
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "cloudfront-cloud-front-origin-access-identity",
@@ -406,7 +406,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 		if dc.DefaultCacheBehavior != nil {
 			if dc.DefaultCacheBehavior.CachePolicyId != nil {
-				// +overmind:link cloudfront-cache-policy
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-cache-policy",
@@ -424,7 +424,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			}
 
 			if dc.DefaultCacheBehavior.FieldLevelEncryptionId != nil {
-				// +overmind:link cloudfront-field-level-encryption
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-field-level-encryption",
@@ -442,7 +442,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			}
 
 			if dc.DefaultCacheBehavior.OriginRequestPolicyId != nil {
-				// +overmind:link cloudfront-origin-request-policy
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-origin-request-policy",
@@ -461,7 +461,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 			if dc.DefaultCacheBehavior.RealtimeLogConfigArn != nil {
 				if arn, err := adapterhelpers.ParseARN(*dc.DefaultCacheBehavior.RealtimeLogConfigArn); err == nil {
-					// +overmind:link cloudfront-realtime-log-config
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-realtime-log-config",
@@ -480,7 +480,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			}
 
 			if dc.DefaultCacheBehavior.ResponseHeadersPolicyId != nil {
-				// +overmind:link cloudfront-response-headers-policy
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudfront-response-headers-policy",
@@ -499,7 +499,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 			if dc.DefaultCacheBehavior.TrustedKeyGroups != nil {
 				for _, keyGroup := range dc.DefaultCacheBehavior.TrustedKeyGroups.Items {
-					// +overmind:link cloudfront-key-group
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "cloudfront-key-group",
@@ -521,7 +521,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				for _, function := range dc.DefaultCacheBehavior.FunctionAssociations.Items {
 					if function.FunctionARN != nil {
 						if arn, err := adapterhelpers.ParseARN(*function.FunctionARN); err == nil {
-							// +overmind:link cloudfront-function
+
 							item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 								Query: &sdp.Query{
 									Type:   "cloudfront-function",
@@ -544,7 +544,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 			if dc.DefaultCacheBehavior.LambdaFunctionAssociations != nil {
 				for _, function := range dc.DefaultCacheBehavior.LambdaFunctionAssociations.Items {
 					if arn, err := adapterhelpers.ParseARN(*function.LambdaFunctionARN); err == nil {
-						// +overmind:link lambda-function
+
 						item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 							Query: &sdp.Query{
 								Type:   "lambda-function",
@@ -565,7 +565,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		}
 
 		if dc.Logging != nil && dc.Logging.Bucket != nil {
-			// +overmind:link dns
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "dns",
@@ -584,7 +584,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 		if dc.ViewerCertificate != nil {
 			if dc.ViewerCertificate.ACMCertificateArn != nil {
 				if arn, err := adapterhelpers.ParseARN(*dc.ViewerCertificate.ACMCertificateArn); err == nil {
-					// +overmind:link acm-certificate
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "acm-certificate",
@@ -602,7 +602,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				}
 			}
 			if dc.ViewerCertificate.IAMCertificateId != nil {
-				// +overmind:link iam-server-certificate
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "iam-server-certificate",
@@ -622,7 +622,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 		if dc.WebACLId != nil {
 			if arn, err := adapterhelpers.ParseARN(*dc.WebACLId); err == nil {
-				// +overmind:link wafv2-web-acl
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "wafv2-web-acl",
@@ -639,7 +639,7 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 				})
 			} else {
 				// Else assume it's a V1 ID
-				// +overmind:link waf-web-acl
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "waf-web-acl",
@@ -660,16 +660,6 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-distribution
-// +overmind:descriptiveType CloudFront Distribution
-// +overmind:get Get distribution by ID
-// +overmind:list List all distributions
-// +overmind:search Search distributions by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_distribution.arn
-// +overmind:terraform:method SEARCH
 
 func NewCloudfrontDistributionAdapter(client CloudFrontClient, accountID string) *adapterhelpers.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{

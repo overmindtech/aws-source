@@ -74,15 +74,6 @@ func directconnectARN(region, accountID, gatewayID string) string {
 	return fmt.Sprintf("arn:aws:directconnect:%s:%s:dx-gateway/%s", region, accountID, gatewayID)
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-direct-connect-gateway
-// +overmind:descriptiveType Direct Connect Gateway
-// +overmind:get Get a direct connect gateway by ID
-// +overmind:list List all direct connect gateways
-// +overmind:search Search direct connect gateway by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_gateway.id
-
 func NewDirectConnectGatewayAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewaysInput, *directconnect.DescribeDirectConnectGatewaysOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

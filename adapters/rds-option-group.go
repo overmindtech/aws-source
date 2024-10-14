@@ -46,16 +46,6 @@ func optionGroupOutputMapper(ctx context.Context, client rdsClient, scope string
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type rds-option-group
-// +overmind:descriptiveType RDS Option Group
-// +overmind:get Get an option group by name
-// +overmind:list List all RDS option groups
-// +overmind:search Search for an option group by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_db_option_group.arn
-// +overmind:terraform:method SEARCH
-
 func NewRDSOptionGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeOptionGroupsInput, *rds.DescribeOptionGroupsOutput, rdsClient, *rds.Options]{
 		ItemType:        "rds-option-group",

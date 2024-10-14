@@ -49,7 +49,6 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 		item.Tags = tagsToMap(resourceTags)
 	}
 
-	// +overmind:link sns-endpoint
 	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 		Query: &sdp.Query{
 			Type:   "sns-endpoint",
@@ -67,15 +66,6 @@ func getPlatformApplicationFunc(ctx context.Context, client platformApplicationC
 
 	return item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type sns-platform-application
-// +overmind:descriptiveType SNS Platform Application
-// +overmind:get Get an SNS platform application by its ARN
-// +overmind:list List all SNS platform applications
-// +overmind:search Search SNS platform applications by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_sns_platform_application.id
 
 func NewSNSPlatformApplicationAdapter(client platformApplicationClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListPlatformApplicationsInput, *sns.ListPlatformApplicationsOutput, *sns.GetPlatformApplicationAttributesInput, *sns.GetPlatformApplicationAttributesOutput, platformApplicationClient, *sns.Options]{

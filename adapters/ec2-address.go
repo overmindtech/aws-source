@@ -69,7 +69,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.InstanceId != nil {
-			// +overmind:link ec2-instance
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-instance",
@@ -82,7 +82,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.CarrierIp != nil {
-			// +overmind:link ip
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -95,7 +95,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.CustomerOwnedIp != nil {
-			// +overmind:link ip
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -108,7 +108,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.NetworkInterfaceId != nil {
-			// +overmind:link ec2-network-interface
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-network-interface",
@@ -121,7 +121,7 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 		}
 
 		if address.PrivateIpAddress != nil {
-			// +overmind:link ip
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ip",
@@ -138,16 +138,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-address
-// +overmind:descriptiveType EC2 Address
-// +overmind:get Get an EC2 address by Public IP
-// +overmind:list List EC2 addresses
-// +overmind:search Search for EC2 addresses by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_eip.public_ip
-// +overmind:terraform:queryMap aws_eip_association.public_ip
 
 // NewAddressAdapter Creates a new adapter for aws-Address resources
 func NewEC2AddressAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {

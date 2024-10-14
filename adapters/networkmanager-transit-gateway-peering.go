@@ -45,7 +45,7 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 		if awsItem.Peering.CoreNetworkId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-core-network
+
 					Type:   "networkmanager-core-network",
 					Method: sdp.QueryMethod_GET,
 					Query:  *awsItem.Peering.CoreNetworkId,
@@ -72,7 +72,7 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 	if awsItem.TransitGatewayPeeringAttachmentId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link ec2-transit-gateway-peering-attachment
+
 				Type:   "ec2-transit-gateway-peering-attachment",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.TransitGatewayPeeringAttachmentId,
@@ -90,7 +90,7 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 		if arn, err := adapterhelpers.ParseARN(*awsItem.TransitGatewayArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway
+
 					Type:   "ec2-transit-gateway",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *awsItem.TransitGatewayArn,
@@ -106,13 +106,6 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-transit-gateway-peering
-// +overmind:descriptiveType Networkmanager Transit Gateway Peering
-// +overmind:get Get a Networkmanager Transit Gateway Peering by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_transit_gateway_peering.id
 
 func NewNetworkManagerTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{

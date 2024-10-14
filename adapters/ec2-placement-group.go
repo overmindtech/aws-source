@@ -51,15 +51,6 @@ func placementGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-placement-group
-// +overmind:descriptiveType Placement Group
-// +overmind:get Get a placement group by ID
-// +overmind:list List all placement groups
-// +overmind:search Search for placement groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_placement_group.id
-
 func NewEC2PlacementGroupAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribePlacementGroupsInput, *ec2.DescribePlacementGroupsOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

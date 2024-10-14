@@ -27,15 +27,6 @@ func functionItemMapper(_, scope string, awsItem *types.FunctionSummary) (*sdp.I
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-function
-// +overmind:descriptiveType CloudFront Function
-// +overmind:get Get a CloudFront Function by name
-// +overmind:list List CloudFront Functions
-// +overmind:search Search CloudFront Functions by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_function.name
-
 func NewCloudfrontCloudfrontFunctionAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.FunctionSummary, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-function",

@@ -43,7 +43,7 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
+
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -56,7 +56,7 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-link
+
 						Type:   "networkmanager-link",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -69,7 +69,7 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-device
+
 						Type:   "networkmanager-device",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -98,15 +98,6 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-site
-// +overmind:descriptiveType Networkmanager Site
-// +overmind:get Get a Networkmanager Site
-// +overmind:search Search for Networkmanager Sites by GlobalNetworkId
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_site.arn
-// +overmind:terraform:method SEARCH
 
 func NewNetworkManagerSiteAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{

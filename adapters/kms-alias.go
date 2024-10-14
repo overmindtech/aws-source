@@ -57,7 +57,7 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 		}
 
 		if alias.TargetKeyId != nil {
-			// +overmind:link kms-key
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "kms-key",
@@ -79,15 +79,6 @@ func aliasOutputMapper(_ context.Context, _ *kms.Client, scope string, _ *kms.Li
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type kms-alias
-// +overmind:descriptiveType KMS Alias
-// +overmind:get Get an alias by keyID/aliasName
-// +overmind:list List all aliases
-// +overmind:search Search aliases by keyID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_kms_alias.arn
 
 func NewKMSAliasAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.ListAliasesInput, *kms.ListAliasesOutput, *kms.Client, *kms.Options]{

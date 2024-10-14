@@ -28,7 +28,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 		}
 
 		if cr.CapacityReservationFleetId != nil {
-			// +overmind:link ec2-capacity-reservation-fleet
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-capacity-reservation-fleet",
@@ -47,7 +47,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		if cr.OutpostArn != nil {
 			if arn, err := adapterhelpers.ParseARN(*cr.OutpostArn); err == nil {
-				// +overmind:link outposts-outpost
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "outposts-outpost",
@@ -67,7 +67,7 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 		if cr.PlacementGroupArn != nil {
 			if arn, err := adapterhelpers.ParseARN(*cr.PlacementGroupArn); err == nil {
-				// +overmind:link ec2-placement-group
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "ec2-placement-group",
@@ -90,15 +90,6 @@ func capacityReservationOutputMapper(_ context.Context, _ *ec2.Client, scope str
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-capacity-reservation
-// +overmind:descriptiveType Capacity Reservation
-// +overmind:get Get a capacity reservation by ID
-// +overmind:list List all capacity reservations
-// +overmind:search Search capacity reservations by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_ec2_capacity_reservation.id
 
 func NewEC2CapacityReservationAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeCapacityReservationsInput, *ec2.DescribeCapacityReservationsOutput, *ec2.Client, *ec2.Options]{

@@ -27,7 +27,7 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 		}
 
 		if connection.LagId != nil {
-			// +overmind:link directconnect-lag
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-lag",
@@ -45,7 +45,7 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 		}
 
 		if connection.Location != nil {
-			// +overmind:link directconnect-location
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-location",
@@ -63,7 +63,7 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 		}
 
 		if connection.LoaIssueTime != nil {
-			// +overmind:link directconnect-loa
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-loa",
@@ -82,7 +82,7 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 
 		// Virtual Interfaces
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
-			// +overmind:link directconnect-virtual-interface
+
 			Query: &sdp.Query{
 				Type:   "directconnect-virtual-interface",
 				Method: sdp.QueryMethod_SEARCH,
@@ -102,15 +102,6 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-connection
-// +overmind:descriptiveType Connection
-// +overmind:get Get a connection by ID
-// +overmind:list List all connections
-// +overmind:search Search connection by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_connection.id
 
 func NewDirectConnectConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeConnectionsInput, *directconnect.DescribeConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeConnectionsInput, *directconnect.DescribeConnectionsOutput, *directconnect.Client, *directconnect.Options]{

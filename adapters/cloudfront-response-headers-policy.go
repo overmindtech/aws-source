@@ -27,15 +27,6 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-response-headers-policy
-// +overmind:descriptiveType CloudFront Response Headers Policy
-// +overmind:get Get Response Headers Policy by ID
-// +overmind:list List Response Headers Policies
-// +overmind:search Response Headers Policy by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_response_headers_policy.id
-
 func NewCloudfrontResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-response-headers-policy",

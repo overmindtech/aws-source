@@ -44,16 +44,6 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type eks-addon
-// +overmind:descriptiveType EKS Addon
-// +overmind:get Get an addon by unique name ({clusterName}/{addonName})
-// +overmind:list List all addons
-// +overmind:search Search addons by cluster name
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_eks_addon.arn
-// +overmind:terraform:method SEARCH
-
 func NewEKSAddonAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-addon",

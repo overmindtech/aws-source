@@ -151,7 +151,7 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 		// Link to the suppressor alarm
 		if alarm.Composite != nil && alarm.Composite.ActionsSuppressor != nil {
 			if arn, err := adapterhelpers.ParseARN(*alarm.Composite.ActionsSuppressor); err == nil {
-				// +overmind:link cloudwatch-alarm
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "cloudwatch-alarm",
@@ -172,26 +172,6 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 		if alarm.Metric != nil && alarm.Metric.Namespace != nil {
 			// Possible links for a metric alarm
 			//
-			// +overmind:link acm-certificate
-			// +overmind:link autoscaling-auto-scaling-group
-			// +overmind:link backup-backup-vault
-			// +overmind:link dynamodb-table
-			// +overmind:link ec2-image
-			// +overmind:link ec2-instance
-			// +overmind:link ec2-nat-gateway
-			// +overmind:link ec2-volume
-			// +overmind:link ecs-cluster
-			// +overmind:link ecs-service
-			// +overmind:link efs-file-system
-			// +overmind:link elb-load-balancer
-			// +overmind:link elbv2-load-balancer
-			// +overmind:link elbv2-target-group
-			// +overmind:link lambda-function
-			// +overmind:link rds-db-cluster
-			// +overmind:link rds-db-instance
-			// +overmind:link route53-health-check
-			// +overmind:link route53-hosted-zone
-			// +overmind:link s3-bucket
 
 			// Check for links based on the metric that is being monitored
 			q, err := SuggestedQuery(*alarm.Metric.Namespace, scope, alarm.Metric.Dimensions)
@@ -206,15 +186,6 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type cloudwatch-alarm
-// +overmind:descriptiveType CloudWatch Alarm
-// +overmind:get Get an alarm by name
-// +overmind:list List all alarms
-// +overmind:search Search for alarms. This accepts JSON in the format of `cloudwatch.DescribeAlarmsForMetricInput`
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudwatch_metric_alarm.alarm_name
 
 func NewCloudwatchAlarmAdapter(client *cloudwatch.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
@@ -334,7 +305,7 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 
 	switch arn.Service {
 	case "autoscaling":
-		// +overmind:link autoscaling-policy
+
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "autoscaling-policy",
@@ -350,7 +321,7 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "sns":
-		// +overmind:link sns-topic
+
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "sns-topic",
@@ -366,7 +337,7 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "ssm":
-		// +overmind:link ssm-ops-item
+
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ssm-ops-item",
@@ -382,7 +353,7 @@ func actionToLink(action string) (*sdp.LinkedItemQuery, error) {
 			},
 		}, nil
 	case "ssm-incidents":
-		// +overmind:link ssm-incidents-response-plan
+
 		return &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ssm-incidents-response-plan",

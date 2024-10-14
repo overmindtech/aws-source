@@ -56,16 +56,6 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type iam-group
-// +overmind:descriptiveType IAM Group
-// +overmind:get Get a group by name
-// +overmind:list List all IAM groups
-// +overmind:search Search for a group by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_iam_group.arn
-// +overmind:terraform:method SEARCH
-
 func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",

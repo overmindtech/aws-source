@@ -235,7 +235,7 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, group := range awsItem.PolicyGroups {
-		// +overmind:link iam-group
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-group",
@@ -253,7 +253,7 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, user := range awsItem.PolicyUsers {
-		// +overmind:link iam-user
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-user",
@@ -271,7 +271,7 @@ func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error
 	}
 
 	for _, role := range awsItem.PolicyRoles {
-		// +overmind:link iam-role
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-role",
@@ -318,17 +318,6 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 
 	return tags, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type iam-policy
-// +overmind:descriptiveType IAM Policy
-// +overmind:get Get an IAM policy by policyFullName ({path} + {policyName})
-// +overmind:list List all IAM policies
-// +overmind:search Search for IAM policies by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_iam_policy.arn
-// +overmind:terraform:queryMap aws_iam_user_policy_attachment.policy_arn
-// +overmind:terraform:method SEARCH
 
 // NewPolicyAdapter Note that this policy adapter only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"

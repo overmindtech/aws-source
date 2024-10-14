@@ -127,7 +127,7 @@ func userItemMapper(_, scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	}
 
 	for _, group := range awsItem.UserGroups {
-		// +overmind:link iam-group
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "iam-group",
@@ -170,16 +170,6 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 
 	return tags, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type iam-user
-// +overmind:descriptiveType IAM User
-// +overmind:get Get a user by name
-// +overmind:list List all users
-// +overmind:search Search for users by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_iam_user.arn
-// +overmind:terraform:method SEARCH
 
 func NewIAMUserAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{

@@ -28,7 +28,7 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 		if endpoint.KinesisStreamConfig != nil {
 			if endpoint.KinesisStreamConfig.RoleARN != nil {
 				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.RoleARN); err == nil {
-					// +overmind:link iam-role
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "iam-role",
@@ -48,7 +48,7 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 			if endpoint.KinesisStreamConfig.StreamARN != nil {
 				if arn, err := adapterhelpers.ParseARN(*endpoint.KinesisStreamConfig.StreamARN); err == nil {
-					// +overmind:link kinesis-stream
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "kinesis-stream",
@@ -70,16 +70,6 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type cloudfront-realtime-log-config
-// +overmind:descriptiveType CloudFront Realtime Log Config
-// +overmind:get Get Realtime Log Config by Name
-// +overmind:list List Realtime Log Configs
-// +overmind:search Search Realtime Log Configs by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_cloudfront_realtime_log_config.arn
-// +overmind:terraform:method SEARCH
 
 func NewCloudfrontRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{

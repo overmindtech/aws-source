@@ -59,14 +59,6 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type apigateway-resource
-// +overmind:descriptiveType API Gateway Resource
-// +overmind:get Get a Resource by rest-api-id/resource-id
-// +overmind:search Search Resources by REST API ID
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_api_gateway_resource.id
-
 func NewAPIGatewayResourceAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Resource, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-resource",

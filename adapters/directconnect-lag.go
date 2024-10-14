@@ -47,7 +47,7 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 
 		for _, connection := range lag.Connections {
 			if connection.ConnectionId != nil {
-				// +overmind:link directconnect-connection
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "directconnect-connection",
@@ -66,7 +66,7 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 		}
 
 		if lag.LagId != nil {
-			// +overmind:link directconnect-hosted-connection
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-hosted-connection",
@@ -84,7 +84,7 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 		}
 
 		if lag.Location != nil {
-			// +overmind:link directconnect-location
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "directconnect-location",
@@ -107,15 +107,6 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-lag
-// +overmind:descriptiveType Direct Connect Link Aggregation Group
-// +overmind:get Get a Link Aggregation Group by ID
-// +overmind:list List all Link Aggregation Groups
-// +overmind:search Search Link Aggregation Group by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_dx_lag.id
 
 func NewDirectConnectLagAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{

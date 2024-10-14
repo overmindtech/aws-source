@@ -46,7 +46,7 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 		}
 
 		if subnet.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -68,16 +68,6 @@ func subnetOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.D
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-subnet
-// +overmind:descriptiveType EC2 Subnet
-// +overmind:get Get a subnet by ID
-// +overmind:list List all subnets
-// +overmind:search Search for subnets by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_route_table_association.subnet_id
-// +overmind:terraform:queryMap aws_subnet.id
 
 func NewEC2SubnetAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSubnetsInput, *ec2.DescribeSubnetsOutput, *ec2.Client, *ec2.Options]{

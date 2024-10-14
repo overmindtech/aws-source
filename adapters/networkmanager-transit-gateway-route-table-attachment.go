@@ -44,7 +44,7 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 	if awsItem.Attachment != nil && awsItem.Attachment.CoreNetworkId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link networkmanager-core-network
+
 				Type:   "networkmanager-core-network",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.Attachment.CoreNetworkId,
@@ -60,7 +60,7 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 	if awsItem.PeeringId != nil {
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
-				// +overmind:link networkmanager-transit-gateway-peering
+
 				Type:   "networkmanager-transit-gateway-peering",
 				Method: sdp.QueryMethod_GET,
 				Query:  *awsItem.PeeringId,
@@ -78,7 +78,7 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 		if arn, err := adapterhelpers.ParseARN(*awsItem.TransitGatewayRouteTableArn); err == nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link ec2-transit-gateway-route-table
+
 					Type:   "ec2-transit-gateway-route-table",
 					Method: sdp.QueryMethod_SEARCH,
 					Query:  *awsItem.TransitGatewayRouteTableArn,
@@ -94,13 +94,6 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 
 	return &item, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-transit-gateway-route-table-attachment
-// +overmind:descriptiveType Networkmanager Transit Gateway Route Table Attachment
-// +overmind:get Get a Networkmanager Transit Gateway Route Table Attachment by id
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_transit_gateway_route_table_attachment.id
 
 func NewNetworkManagerTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{

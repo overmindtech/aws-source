@@ -48,7 +48,7 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 		// VPC
 		if securityGroup.VpcId != nil {
-			// +overmind:link ec2-vpc
+
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
 					Type:   "ec2-vpc",
@@ -73,16 +73,6 @@ func securityGroupOutputMapper(_ context.Context, _ *ec2.Client, scope string, _
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-security-group
-// +overmind:descriptiveType Security Group
-// +overmind:get Get a security group by ID
-// +overmind:list List all security groups
-// +overmind:search Search for security groups by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_security_group.id
-// +overmind:terraform:queryMap aws_security_group_rule.security_group_id
 
 func NewEC2SecurityGroupAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupsInput, *ec2.DescribeSecurityGroupsOutput, *ec2.Client, *ec2.Options]{

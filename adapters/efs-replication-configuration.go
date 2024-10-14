@@ -124,15 +124,6 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type efs-replication-configuration
-// +overmind:descriptiveType EFS Replication Configuration
-// +overmind:get Get a replication configuration by file system ID
-// +overmind:list List all replication configurations
-// +overmind:search Search for a replication configuration by ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_efs_replication_configuration.source_file_system_id
-
 func NewEFSReplicationConfigurationAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-replication-configuration",

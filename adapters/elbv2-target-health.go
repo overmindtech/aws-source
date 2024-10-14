@@ -146,7 +146,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 		if err == nil {
 			switch a.Service {
 			case "lambda":
-				// +overmind:link lambda-function
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "lambda-function",
@@ -161,7 +161,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 					},
 				})
 			case "elasticloadbalancing":
-				// +overmind:link elbv2-load-balancer
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
@@ -179,7 +179,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 			// In this case it could be an instance ID or an IP. We will check
 			// for IP first
 			if net.ParseIP(*desc.Target.Id) != nil {
-				// +overmind:link ip
+
 				// This means it's an IP
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
@@ -194,7 +194,7 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 					},
 				})
 			} else {
-				// +overmind:link ec2-instance
+
 				// If all else fails it must be an instance ID
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
@@ -216,13 +216,6 @@ func targetHealthOutputMapper(_ context.Context, _ *elbv2.Client, scope string, 
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type elbv2-target-health
-// +overmind:descriptiveType ELB Target Health
-// +overmind:get Get target health by unique ID ({TargetGroupArn}|{Id}|{AvailabilityZone}|{Port})
-// +overmind:search Search for target health by target group ARN
-// +overmind:group AWS
 
 func NewELBv2TargetHealthAdapter(client *elasticloadbalancingv2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetHealthInput, *elbv2.DescribeTargetHealthOutput, *elbv2.Client, *elbv2.Options]{

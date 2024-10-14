@@ -31,14 +31,6 @@ func customerMetadataOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type directconnect-customer-metadata
-// +overmind:descriptiveType Direct Connect Customer Metadata
-// +overmind:get Get a Customer Agreement by Name
-// +overmind:list List all Customer Agreements
-// +overmind:search Search Customer Agreements by ARN
-// +overmind:group AWS
-
 func NewDirectConnectCustomerMetadataAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

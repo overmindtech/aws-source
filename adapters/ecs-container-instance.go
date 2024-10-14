@@ -66,7 +66,7 @@ func containerInstanceGetFunc(ctx context.Context, client ECSClient, scope strin
 	}
 
 	if containerInstance.Ec2InstanceId != nil {
-		// +overmind:link ec2-instance
+
 		item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 			Query: &sdp.Query{
 				Type:   "ec2-instance",
@@ -115,14 +115,6 @@ func containerInstanceListFuncOutputMapper(output *ecs.ListContainerInstancesOut
 
 	return inputs, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type ecs-container-instance
-// +overmind:descriptiveType Container Instance
-// +overmind:get Get a container instance by ID which consists of {clusterName}/{id}
-// +overmind:list List all container instances
-// +overmind:search Search for container instances by cluster
-// +overmind:group AWS
 
 func NewECSContainerInstanceAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListContainerInstancesInput, *ecs.ListContainerInstancesOutput, *ecs.DescribeContainerInstancesInput, *ecs.DescribeContainerInstancesOutput, ECSClient, *ecs.Options]{

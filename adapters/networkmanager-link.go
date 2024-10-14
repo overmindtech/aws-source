@@ -39,7 +39,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 			LinkedItemQueries: []*sdp.LinkedItemQuery{
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-global-network
+
 						Type:   "networkmanager-global-network",
 						Method: sdp.QueryMethod_GET,
 						Query:  *s.GlobalNetworkId,
@@ -52,7 +52,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 				},
 				{
 					Query: &sdp.Query{
-						// +overmind:link networkmanager-link-association
+
 						Type:   "networkmanager-link-association",
 						Method: sdp.QueryMethod_SEARCH,
 						Query:  idWithTypeAndGlobalNetwork(*s.GlobalNetworkId, "link", *s.LinkId),
@@ -69,7 +69,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 		if s.SiteId != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-site
+
 					Type:   "networkmanager-site",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.SiteId),
@@ -85,7 +85,7 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 		if s.LinkArn != nil {
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
-					// +overmind:link networkmanager-network-resource-relationship
+
 					Type:   "networkmanager-network-resource-relationship",
 					Method: sdp.QueryMethod_GET,
 					Query:  idWithGlobalNetwork(*s.GlobalNetworkId, *s.LinkArn),
@@ -114,15 +114,6 @@ func linkOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type networkmanager-link
-// +overmind:descriptiveType Networkmanager Link
-// +overmind:get Get a Networkmanager Link
-// +overmind:search Search for Networkmanager Links by GlobalNetworkId, or by GlobalNetworkId with SiteId
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_networkmanager_link.arn
-// +overmind:terraform:method SEARCH
 
 func NewNetworkManagerLinkAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinksInput, *networkmanager.GetLinksOutput, *networkmanager.Client, *networkmanager.Options]{

@@ -49,14 +49,6 @@ func reservedInstanceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-// +overmind:type ec2-reserved-instance
-// +overmind:descriptiveType Reserved EC2 Instance
-// +overmind:get Get a reserved EC2 instance by ID
-// +overmind:list List all reserved EC2 instances
-// +overmind:search Search reserved EC2 instances by ARN
-// +overmind:group AWS
-
 func NewEC2ReservedInstanceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeReservedInstancesInput, *ec2.DescribeReservedInstancesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

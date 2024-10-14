@@ -67,7 +67,7 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 
 		if listener.LoadBalancerArn != nil {
 			if a, err := adapterhelpers.ParseARN(*listener.LoadBalancerArn); err == nil {
-				// +overmind:link elbv2-load-balancer
+
 				item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 					Query: &sdp.Query{
 						Type:   "elbv2-load-balancer",
@@ -101,7 +101,7 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 		for _, cert := range listener.Certificates {
 			if cert.CertificateArn != nil {
 				if a, err := adapterhelpers.ParseARN(*cert.CertificateArn); err == nil {
-					// +overmind:link acm-certificate
+
 					item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 						Query: &sdp.Query{
 							Type:   "acm-certificate",
@@ -124,9 +124,6 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 
 		for _, action := range listener.DefaultActions {
 			// These types can be returned by `ActionToRequests()`
-			// +overmind:link cognito-idp-user-pool
-			// +overmind:link http
-			// +overmind:link elbv2-target-group
 
 			requests = ActionToRequests(action)
 			item.LinkedItemQueries = append(item.LinkedItemQueries, requests...)
@@ -137,16 +134,6 @@ func listenerOutputMapper(ctx context.Context, client elbv2Client, scope string,
 
 	return items, nil
 }
-
-//go:generate docgen ../../docs-data
-// +overmind:type elbv2-listener
-// +overmind:descriptiveType ELB Listener
-// +overmind:get Get a listener by ARN
-// +overmind:search Search for listeners by load balancer ARN
-// +overmind:group AWS
-// +overmind:terraform:queryMap aws_alb_listener.arn
-// +overmind:terraform:queryMap aws_lb_listener.arn
-// +overmind:terraform:method SEARCH
 
 func NewELBv2ListenerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeListenersInput, *elbv2.DescribeListenersOutput, elbv2Client, *elbv2.Options]{
