@@ -476,8 +476,6 @@ func dBInstanceOutputMapper(ctx context.Context, client rdsClient, scope string,
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewRDSDBInstanceAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBInstancesInput, *rds.DescribeDBInstancesOutput, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-instance",

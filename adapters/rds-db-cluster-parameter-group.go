@@ -34,8 +34,6 @@ func dBClusterParameterGroupItemMapper(_, scope string, awsItem *ClusterParamete
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewRDSDBClusterParameterGroupAdapter(client rdsClient, accountID string, region string) *adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options] {
 	return &adapterhelpers.GetListAdapter[*ClusterParameterGroup, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-cluster-parameter-group",

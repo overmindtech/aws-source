@@ -97,8 +97,6 @@ func transitGatewayConnectPeerAssociationsOutputMapper(_ context.Context, _ *net
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerTransitGatewayConnectPeerAssociationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayConnectPeerAssociationsInput, *networkmanager.GetTransitGatewayConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

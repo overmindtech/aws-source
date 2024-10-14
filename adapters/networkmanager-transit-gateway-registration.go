@@ -78,8 +78,6 @@ func transitGatewayRegistrationOutputMapper(_ context.Context, _ *networkmanager
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerTransitGatewayRegistrationAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetTransitGatewayRegistrationsInput, *networkmanager.GetTransitGatewayRegistrationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

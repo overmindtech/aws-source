@@ -134,8 +134,6 @@ func addressOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2.
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 // NewAddressAdapter Creates a new adapter for aws-Address resources
 func NewEC2AddressAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeAddressesInput, *ec2.DescribeAddressesOutput, *ec2.Client, *ec2.Options]{

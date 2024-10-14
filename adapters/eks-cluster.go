@@ -251,8 +251,6 @@ func clusterGetFunc(ctx context.Context, client EKSClient, scope string, input *
 
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEKSClusterAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListClustersInput, *eks.ListClustersOutput, *eks.DescribeClusterInput, *eks.DescribeClusterOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-cluster",

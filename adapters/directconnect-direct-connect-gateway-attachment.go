@@ -83,8 +83,6 @@ func directConnectGatewayAttachmentOutputMapper(_ context.Context, _ *directconn
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectGatewayAttachmentAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAttachmentsInput, *directconnect.DescribeDirectConnectGatewayAttachmentsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

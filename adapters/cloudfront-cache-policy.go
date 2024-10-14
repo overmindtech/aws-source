@@ -37,8 +37,6 @@ func cachePolicyListFunc(ctx context.Context, client CloudFrontClient, scope str
 	return policies, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontCachePolicyAdapter(client CloudFrontClient, accountID string) *adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.CachePolicy, CloudFrontClient, *cloudfront.Options]{
 		ItemType:               "cloudfront-cache-policy",

@@ -31,8 +31,6 @@ func customerMetadataOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectCustomerMetadataAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeCustomerMetadataInput, *directconnect.DescribeCustomerMetadataOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

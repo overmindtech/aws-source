@@ -101,8 +101,6 @@ func targetGroupOutputMapper(ctx context.Context, client elbv2Client, scope stri
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewELBv2TargetGroupAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeTargetGroupsInput, *elbv2.DescribeTargetGroupsOutput, elbv2Client, *elbv2.Options]{
 		Region:          region,

@@ -59,8 +59,6 @@ func capacityProviderOutputMapper(_ context.Context, _ ECSClient, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewECSCapacityProviderAdapter(client ECSClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ecs.DescribeCapacityProvidersInput, *ecs.DescribeCapacityProvidersOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-capacity-provider",

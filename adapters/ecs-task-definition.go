@@ -174,8 +174,6 @@ func getSecretLinkedItem(secret types.Secret) *sdp.LinkedItemQuery {
 	return nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewECSTaskDefinitionAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTaskDefinitionsInput, *ecs.ListTaskDefinitionsOutput, *ecs.DescribeTaskDefinitionInput, *ecs.DescribeTaskDefinitionOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-task-definition",

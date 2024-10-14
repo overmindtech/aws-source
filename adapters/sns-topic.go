@@ -65,8 +65,6 @@ func getTopicFunc(ctx context.Context, client topicClient, scope string, input *
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewSNSTopicAdapter(client topicClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListTopicsInput, *sns.ListTopicsOutput, *sns.GetTopicAttributesInput, *sns.GetTopicAttributesOutput, topicClient, *sns.Options]{
 		ItemType:        "sns-topic",

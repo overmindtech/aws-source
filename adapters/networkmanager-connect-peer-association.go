@@ -114,8 +114,6 @@ func connectPeerAssociationsOutputMapper(_ context.Context, _ *networkmanager.Cl
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerConnectPeerAssociationAdapter(client *networkmanager.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectPeerAssociationsInput, *networkmanager.GetConnectPeerAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

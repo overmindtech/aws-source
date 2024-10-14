@@ -244,8 +244,6 @@ func networkResourceRelationshipOutputMapper(_ context.Context, _ *networkmanage
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerNetworkResourceRelationshipsAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetNetworkResourceRelationshipsInput, *networkmanager.GetNetworkResourceRelationshipsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

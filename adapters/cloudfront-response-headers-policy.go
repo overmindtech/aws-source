@@ -27,8 +27,6 @@ func ResponseHeadersPolicyItemMapper(_, scope string, awsItem *types.ResponseHea
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontResponseHeadersPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ResponseHeadersPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-response-headers-policy",

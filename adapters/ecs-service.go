@@ -368,8 +368,6 @@ func serviceListFuncOutputMapper(output *ecs.ListServicesOutput, input *ecs.List
 	return inputs, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewECSServiceAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListServicesInput, *ecs.ListServicesOutput, *ecs.DescribeServicesInput, *ecs.DescribeServicesOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-service",

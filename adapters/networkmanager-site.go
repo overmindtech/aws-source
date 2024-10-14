@@ -96,8 +96,6 @@ func siteOutputMapper(_ context.Context, _ *networkmanager.Client, scope string,
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerSiteAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetSitesInput, *networkmanager.GetSitesOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

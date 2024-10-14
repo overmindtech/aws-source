@@ -160,8 +160,6 @@ func globalNetworkOutputMapper(_ context.Context, client *networkmanager.Client,
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerGlobalNetworkAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.DescribeGlobalNetworksInput, *networkmanager.DescribeGlobalNetworksOutput, *networkmanager.Client, *networkmanager.Options]{
 		ItemType:        "networkmanager-global-network",

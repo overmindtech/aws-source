@@ -52,8 +52,6 @@ func getEndpointFunc(ctx context.Context, client endpointClient, scope string, i
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewSNSEndpointAdapter(client endpointClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListEndpointsByPlatformApplicationInput, *sns.ListEndpointsByPlatformApplicationOutput, *sns.GetEndpointAttributesInput, *sns.GetEndpointAttributesOutput, endpointClient, *sns.Options]{
 		ItemType:        "sns-endpoint",

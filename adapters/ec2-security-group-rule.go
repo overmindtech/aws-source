@@ -85,8 +85,6 @@ func securityGroupRuleOutputMapper(_ context.Context, _ *ec2.Client, scope strin
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEC2SecurityGroupRuleAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeSecurityGroupRulesInput, *ec2.DescribeSecurityGroupRulesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

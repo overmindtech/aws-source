@@ -168,8 +168,6 @@ func nodegroupGetFunc(ctx context.Context, client EKSClient, scope string, input
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEKSNodegroupAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListNodegroupsInput, *eks.ListNodegroupsOutput, *eks.DescribeNodegroupInput, *eks.DescribeNodegroupOutput, EKSClient, *eks.Options]{
 		ItemType:         "eks-nodegroup",

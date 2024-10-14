@@ -110,8 +110,6 @@ func coreNetworkGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerCoreNetworkAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListCoreNetworksInput, *networkmanager.ListCoreNetworksOutput, *networkmanager.GetCoreNetworkInput, *networkmanager.GetCoreNetworkOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:          client,

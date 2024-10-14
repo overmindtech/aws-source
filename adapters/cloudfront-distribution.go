@@ -631,8 +631,6 @@ func distributionGetFunc(ctx context.Context, client CloudFrontClient, scope str
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontDistributionAdapter(client CloudFrontClient, accountID string) *adapterhelpers.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*cloudfront.ListDistributionsInput, *cloudfront.ListDistributionsOutput, *cloudfront.GetDistributionInput, *cloudfront.GetDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:        "cloudfront-distribution",

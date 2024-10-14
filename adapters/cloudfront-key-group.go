@@ -27,8 +27,6 @@ func KeyGroupItemMapper(_, scope string, awsItem *types.KeyGroup) (*sdp.Item, er
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontKeyGroupAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.KeyGroup, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-key-group",

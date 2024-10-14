@@ -118,8 +118,6 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 	return tags
 }
 
-//go:generate docgen ../../docs-data
-
 func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:        "iam-instance-profile",

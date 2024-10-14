@@ -84,8 +84,6 @@ func getSubsFunc(ctx context.Context, client subsCli, scope string, input *sns.G
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewSNSSubscriptionAdapter(client subsCli, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*sns.ListSubscriptionsInput, *sns.ListSubscriptionsOutput, *sns.GetSubscriptionAttributesInput, *sns.GetSubscriptionAttributesOutput, subsCli, *sns.Options]{
 		ItemType:        "sns-subscription",

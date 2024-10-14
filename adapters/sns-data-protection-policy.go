@@ -63,8 +63,6 @@ func getDataProtectionPolicyFunc(ctx context.Context, client dataProtectionPolic
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewSNSDataProtectionPolicyAdapter(client dataProtectionPolicyClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[any, any, *sns.GetDataProtectionPolicyInput, *sns.GetDataProtectionPolicyOutput, dataProtectionPolicyClient, *sns.Options]{
 		ItemType:        "sns-data-protection-policy",

@@ -133,8 +133,6 @@ func connectionOutputMapper(_ context.Context, _ *networkmanager.Client, scope s
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerConnectionAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetConnectionsInput, *networkmanager.GetConnectionsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:    client,

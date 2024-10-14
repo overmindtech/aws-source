@@ -130,8 +130,6 @@ func healthCheckItemMapper(_, scope string, awsItem *HealthCheck) (*sdp.Item, er
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewRoute53HealthCheckAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*HealthCheck, *route53.Client, *route53.Options]{
 		ItemType:        "route53-health-check",

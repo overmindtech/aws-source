@@ -70,8 +70,6 @@ func backupGetFunc(ctx context.Context, client Client, scope string, input *dyna
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 // NewBackupAdapter This adapter is a bit strange. This is the only thing I've
 // found so far that can only be queries by ARN for Get. For this reason I'm
 // going to just disable GET. LIST works fine and allows it to be linked to the

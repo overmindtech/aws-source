@@ -165,8 +165,6 @@ func tableGetFunc(ctx context.Context, client Client, scope string, input *dynam
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDynamoDBTableAdapter(client Client, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*dynamodb.ListTablesInput, *dynamodb.ListTablesOutput, *dynamodb.DescribeTableInput, *dynamodb.DescribeTableOutput, Client, *dynamodb.Options]{
 		ItemType:        "dynamodb-table",

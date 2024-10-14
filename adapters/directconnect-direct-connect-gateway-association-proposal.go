@@ -50,8 +50,6 @@ func directConnectGatewayAssociationProposalOutputMapper(_ context.Context, _ *d
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectGatewayAssociationProposalAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeDirectConnectGatewayAssociationProposalsInput, *directconnect.DescribeDirectConnectGatewayAssociationProposalsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

@@ -99,8 +99,6 @@ func directconnectConnectionOutputMapper(_ context.Context, _ *directconnect.Cli
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectConnectionAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeConnectionsInput, *directconnect.DescribeConnectionsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeConnectionsInput, *directconnect.DescribeConnectionsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

@@ -156,8 +156,6 @@ func streamingDistributionGetFunc(ctx context.Context, client CloudFrontClient, 
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontStreamingDistributionAdapter(client CloudFrontClient, accountID string) *adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*cloudfront.ListStreamingDistributionsInput, *cloudfront.ListStreamingDistributionsOutput, *cloudfront.GetStreamingDistributionInput, *cloudfront.GetStreamingDistributionOutput, CloudFrontClient, *cloudfront.Options]{
 		ItemType:        "cloudfront-streaming-distribution",

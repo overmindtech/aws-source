@@ -242,8 +242,6 @@ func networkInterfaceOutputMapper(_ context.Context, _ *ec2.Client, scope string
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEC2NetworkInterfaceAdapter(client *ec2.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ec2.DescribeNetworkInterfacesInput, *ec2.DescribeNetworkInterfacesOutput, *ec2.Client, *ec2.Options]{
 		Region:          region,

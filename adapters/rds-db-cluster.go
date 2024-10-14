@@ -322,8 +322,6 @@ func dBClusterOutputMapper(ctx context.Context, client rdsClient, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewRDSDBClusterAdapter(client rdsClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*rds.DescribeDBClustersInput, *rds.DescribeDBClustersOutput, rdsClient, *rds.Options]{
 		ItemType:        "rds-db-cluster",

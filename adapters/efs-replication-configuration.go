@@ -124,8 +124,6 @@ func ReplicationConfigurationOutputMapper(_ context.Context, _ *efs.Client, scop
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEFSReplicationConfigurationAdapter(client *efs.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*efs.DescribeReplicationConfigurationsInput, *efs.DescribeReplicationConfigurationsOutput, *efs.Client, *efs.Options]{
 		ItemType:        "efs-replication-configuration",

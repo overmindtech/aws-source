@@ -141,8 +141,6 @@ func virtualInterfaceOutputMapper(_ context.Context, _ *directconnect.Client, sc
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectVirtualInterfaceAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeVirtualInterfacesInput, *directconnect.DescribeVirtualInterfacesOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

@@ -92,8 +92,6 @@ func transitGatewayRouteTableAttachmentItemMapper(_, scope string, awsItem *type
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerTransitGatewayRouteTableAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

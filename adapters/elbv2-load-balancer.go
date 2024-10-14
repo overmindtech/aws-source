@@ -250,8 +250,6 @@ func elbv2LoadBalancerOutputMapper(ctx context.Context, client elbv2Client, scop
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewELBv2LoadBalancerAdapter(client elbv2Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbv2Client, *elbv2.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*elbv2.DescribeLoadBalancersInput, *elbv2.DescribeLoadBalancersOutput, elbv2Client, *elbv2.Options]{
 		Region:          region,

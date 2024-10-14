@@ -45,8 +45,6 @@ func continuousDeploymentPolicyItemMapper(_, scope string, awsItem *types.Contin
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 // Terraform is not yet supported for this: https://github.com/hashicorp/terraform-provider-aws/issues/28920
 
 func NewCloudfrontContinuousDeploymentPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.ContinuousDeploymentPolicy, *cloudfront.Client, *cloudfront.Options] {

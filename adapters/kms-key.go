@@ -119,8 +119,6 @@ func kmsKeyGetFunc(ctx context.Context, client kmsClient, scope string, input *k
 	return item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewKMSKeyAdapter(client kmsClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*kms.ListKeysInput, *kms.ListKeysOutput, *kms.DescribeKeyInput, *kms.DescribeKeyOutput, kmsClient, *kms.Options]{
 		ItemType:        "kms-key",

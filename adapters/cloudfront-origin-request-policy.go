@@ -27,8 +27,6 @@ func originRequestPolicyItemMapper(_, scope string, awsItem *types.OriginRequest
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontOriginRequestPolicyAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.OriginRequestPolicy, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-origin-request-policy",

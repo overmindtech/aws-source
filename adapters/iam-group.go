@@ -56,8 +56,6 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",

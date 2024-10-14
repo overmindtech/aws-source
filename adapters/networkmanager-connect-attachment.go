@@ -80,8 +80,6 @@ func connectAttachmentItemMapper(_, scope string, ca *types.ConnectAttachment) (
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerConnectAttachmentAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.ConnectAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

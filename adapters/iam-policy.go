@@ -316,8 +316,6 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 	return tags, nil
 }
 
-//go:generate docgen ../../docs-data
-
 // NewPolicyAdapter Note that this policy adapter only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"
 // in scope. In order to get this to work I'd have to change the way the adapter

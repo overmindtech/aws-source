@@ -142,15 +142,6 @@ func restApiOutputMapper(scope string, awsItem *types.RestApi) (*sdp.Item, error
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
-
-
-
-
-
-
-
 func NewAPIGatewayRestApiAdapter(client *apigateway.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RestApi, *apigateway.Client, *apigateway.Options]{
 		ItemType:        "apigateway-rest-api",

@@ -44,8 +44,6 @@ func addonGetFunc(ctx context.Context, client EKSClient, scope string, input *ek
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewEKSAddonAdapter(client EKSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*eks.ListAddonsInput, *eks.ListAddonsOutput, *eks.DescribeAddonInput, *eks.DescribeAddonOutput, EKSClient, *eks.Options]{
 		ItemType:        "eks-addon",

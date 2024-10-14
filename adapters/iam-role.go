@@ -291,8 +291,6 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 	return tags, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewIAMRoleAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{
 		ItemType:        "iam-role",

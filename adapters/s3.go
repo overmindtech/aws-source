@@ -66,8 +66,6 @@ var s3Metadata = Metadata.Register(&sdp.AdapterMetadata{
 	Category:       sdp.AdapterCategory_ADAPTER_CATEGORY_STORAGE,
 })
 
-//go:generate docgen ../../docs-data
-
 type S3Source struct {
 	// AWS Config including region and credentials
 	config aws.Config

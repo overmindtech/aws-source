@@ -105,8 +105,6 @@ func lagOutputMapper(_ context.Context, _ *directconnect.Client, scope string, _
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectLagAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeLagsInput, *directconnect.DescribeLagsOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

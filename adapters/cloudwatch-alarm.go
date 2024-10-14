@@ -186,8 +186,6 @@ func alarmOutputMapper(ctx context.Context, client CloudwatchClient, scope strin
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudwatchAlarmAdapter(client *cloudwatch.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*cloudwatch.DescribeAlarmsInput, *cloudwatch.DescribeAlarmsOutput, CloudwatchClient, *cloudwatch.Options]{
 		ItemType:        "cloudwatch-alarm",

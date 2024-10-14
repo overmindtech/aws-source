@@ -47,8 +47,6 @@ func routerConfigurationOutputMapper(_ context.Context, _ *directconnect.Client,
 	}, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewDirectConnectRouterConfigurationAdapter(client *directconnect.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*directconnect.DescribeRouterConfigurationInput, *directconnect.DescribeRouterConfigurationOutput, *directconnect.Client, *directconnect.Options]{
 		Region:          region,

@@ -69,8 +69,6 @@ func realtimeLogConfigsItemMapper(_, scope string, awsItem *types.RealtimeLogCon
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewCloudfrontRealtimeLogConfigsAdapter(client *cloudfront.Client, accountID string) *adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options] {
 	return &adapterhelpers.GetListAdapter[*types.RealtimeLogConfig, *cloudfront.Client, *cloudfront.Options]{
 		ItemType:        "cloudfront-realtime-log-config",

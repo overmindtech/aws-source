@@ -104,8 +104,6 @@ func transitGatewayPeeringItemMapper(_, scope string, awsItem *types.TransitGate
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerTransitGatewayPeeringAdapter(client *networkmanager.Client, accountID, region string) *adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayPeering, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

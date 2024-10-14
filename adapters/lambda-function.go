@@ -609,8 +609,6 @@ func GetEventLinkedItem(destinationARN string) (*sdp.LinkedItemQuery, error) {
 	return nil, errors.New("could not find matching request")
 }
 
-//go:generate docgen ../../docs-data
-
 func NewLambdaFunctionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListFunctionsInput, *lambda.ListFunctionsOutput, *lambda.GetFunctionInput, *lambda.GetFunctionOutput, LambdaClient, *lambda.Options]{
 		ItemType:        "lambda-function",

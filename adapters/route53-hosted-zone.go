@@ -72,8 +72,6 @@ func hostedZoneItemMapper(_, scope string, awsItem *types.HostedZone) (*sdp.Item
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewRoute53HostedZoneAdapter(client *route53.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options] {
 	return &adapterhelpers.GetListAdapter[*types.HostedZone, *route53.Client, *route53.Options]{
 		ItemType:        "route53-hosted-zone",

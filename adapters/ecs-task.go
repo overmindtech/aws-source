@@ -228,8 +228,6 @@ func tasksListFuncOutputMapper(output *ecs.ListTasksOutput, input *ecs.ListTasks
 	return inputs, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewECSTaskAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListTasksInput, *ecs.ListTasksOutput, *ecs.DescribeTasksInput, *ecs.DescribeTasksOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-task",

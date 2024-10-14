@@ -108,8 +108,6 @@ func ruleGroupGetFunc(ctx context.Context, client networkFirewallClient, scope s
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkFirewallRuleGroupAdapter(client networkFirewallClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkfirewall.ListRuleGroupsInput, *networkfirewall.ListRuleGroupsOutput, *networkfirewall.DescribeRuleGroupInput, *networkfirewall.DescribeRuleGroupOutput, networkFirewallClient, *networkfirewall.Options]{
 		ItemType:        "network-firewall-rule-group",

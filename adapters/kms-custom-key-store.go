@@ -87,8 +87,6 @@ func customKeyStoreOutputMapper(_ context.Context, _ *kms.Client, scope string, 
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewKMSCustomKeyStoreAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.DescribeCustomKeyStoresInput, *kms.DescribeCustomKeyStoresOutput, *kms.Client, *kms.Options]{
 		Region:          region,

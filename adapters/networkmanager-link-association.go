@@ -100,8 +100,6 @@ func linkAssociationOutputMapper(_ context.Context, _ *networkmanager.Client, sc
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerLinkAssociationAdapter(client *networkmanager.Client, accountID string) *adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*networkmanager.GetLinkAssociationsInput, *networkmanager.GetLinkAssociationsOutput, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,

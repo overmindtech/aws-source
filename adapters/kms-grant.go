@@ -167,8 +167,6 @@ func grantOutputMapper(ctx context.Context, _ *kms.Client, scope string, _ *kms.
 	return items, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewKMSGrantAdapter(client *kms.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*kms.ListGrantsInput, *kms.ListGrantsOutput, *kms.Client, *kms.Options]{
 		ItemType:        "kms-grant",

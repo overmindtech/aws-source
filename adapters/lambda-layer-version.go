@@ -111,8 +111,6 @@ func layerVersionGetFunc(ctx context.Context, client LambdaClient, scope string,
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewLambdaLayerVersionAdapter(client LambdaClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*lambda.ListLayerVersionsInput, *lambda.ListLayerVersionsOutput, *lambda.GetLayerVersionInput, *lambda.GetLayerVersionOutput, LambdaClient, *lambda.Options]{
 		ItemType:        "lambda-layer-version",

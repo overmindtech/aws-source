@@ -196,8 +196,6 @@ func connectPeerGetFunc(ctx context.Context, client NetworkManagerClient, scope 
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewNetworkManagerConnectPeerAdapter(client NetworkManagerClient, accountID, region string) *adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*networkmanager.ListConnectPeersInput, *networkmanager.ListConnectPeersOutput, *networkmanager.GetConnectPeerInput, *networkmanager.GetConnectPeerOutput, NetworkManagerClient, *networkmanager.Options]{
 		Client:          client,

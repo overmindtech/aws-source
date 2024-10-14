@@ -204,7 +204,7 @@ func autoScalingGroupOutputMapper(_ context.Context, _ *autoscaling.Client, scop
 }
 
 //
-//go:generate docgen ../../docs-data
+
 func NewAutoScalingGroupAdapter(client *autoscaling.Client, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*autoscaling.DescribeAutoScalingGroupsInput, *autoscaling.DescribeAutoScalingGroupsOutput, *autoscaling.Client, *autoscaling.Options]{
 		ItemType:        "autoscaling-auto-scaling-group",

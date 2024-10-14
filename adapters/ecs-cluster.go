@@ -204,8 +204,6 @@ func ecsClusterGetFunc(ctx context.Context, client ECSClient, scope string, inpu
 	return &item, nil
 }
 
-//go:generate docgen ../../docs-data
-
 func NewECSClusterAdapter(client ECSClient, accountID string, region string) *adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options] {
 	return &adapterhelpers.AlwaysGetAdapter[*ecs.ListClustersInput, *ecs.ListClustersOutput, *ecs.DescribeClustersInput, *ecs.DescribeClustersOutput, ECSClient, *ecs.Options]{
 		ItemType:        "ecs-cluster",
