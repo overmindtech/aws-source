@@ -9,15 +9,15 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.28.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.41
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.27.2
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.45.2
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.46.0
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.40.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.42.2
 	github.com/aws/aws-sdk-go-v2/service/directconnect v1.29.2
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.36.2
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.182.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.47.4
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.186.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.48.0
 	github.com/aws/aws-sdk-go-v2/service/efs v1.33.2
-	github.com/aws/aws-sdk-go-v2/service/eks v1.50.2
+	github.com/aws/aws-sdk-go-v2/service/eks v1.51.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.28.2
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.40.0
 	github.com/aws/aws-sdk-go-v2/service/iam v1.37.2
@@ -25,7 +25,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.63.2
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.43.2
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.31.2
-	github.com/aws/aws-sdk-go-v2/service/rds v1.87.3
+	github.com/aws/aws-sdk-go-v2/service/rds v1.88.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.45.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.66.0
 	github.com/aws/aws-sdk-go-v2/service/sns v1.33.2
