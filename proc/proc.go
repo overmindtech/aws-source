@@ -32,7 +32,6 @@ import (
 	awssns "github.com/aws/aws-sdk-go-v2/service/sns"
 	awssqs "github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/cenkalti/backoff/v4"
-	"github.com/google/uuid"
 	"github.com/sourcegraph/conc/pool"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -198,8 +197,8 @@ func CreateAWSConfigs(awsAuthConfig AwsAuthConfig) ([]aws.Config, error) {
 // engine, and an error if any. The context provided will be used for the rate
 // limit buckets and should not be cancelled until the source is shut down. AWS
 // configs should be provided for each region that is enabled
-func InitializeAwsSourceEngine(ctx context.Context, name string, version string, engineUUID uuid.UUID, natsOptions auth.NATSOptions, heartbeatOptions *discovery.HeartbeatOptions, maxParallel int, maxRetries uint64, configs ...aws.Config) (*discovery.Engine, error) {
-	e, err := discovery.NewEngine()
+func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, natsOptions auth.NATSOptions, heartbeatOptions *discovery.HeartbeatOptions, maxRetries uint64, configs ...aws.Config) (*discovery.Engine, error) {
+	e, err := discovery.NewEngine(ec)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing Engine: %w", err)
 	}
@@ -215,22 +214,13 @@ func InitializeAwsSourceEngine(ctx context.Context, name string, version string,
 		e.HeartbeatOptions = heartbeatOptions
 	}
 
-	e.Name = "aws-source"
 	e.NATSOptions = &natsOptions
-	e.MaxParallelExecutions = maxParallel
-	e.Version = version
-	e.Name = name
-	e.UUID = engineUUID
-	e.Type = "aws"
-
 	e.StartSendingHeartbeats(ctx)
-
 	if len(configs) == 0 {
 		return nil, errors.New("No configs specified")
 	}
 
 	var globalDone atomic.Bool
-
 	var b backoff.BackOff
 	b = backoff.NewExponentialBackOff(
 		backoff.WithMaxInterval(30*time.Second),
