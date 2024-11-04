@@ -36,7 +36,7 @@ require (
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/nats-io/jwt/v2 v2.7.2
 	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.31.1
+	github.com/overmindtech/discovery v0.31.2
 	github.com/overmindtech/sdp-go v0.99.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
@@ -52,7 +52,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.31.0
 	go.opentelemetry.io/otel/trace v1.31.0
 	go.uber.org/automaxprocs v1.6.0
-	golang.org/x/oauth2 v0.24.0
+	golang.org/x/oauth2 v0.24.0 // indirect
 	google.golang.org/protobuf v1.35.1
 )
 
