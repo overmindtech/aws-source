@@ -480,6 +480,7 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						// ApiGateway
 						adapters.NewAPIGatewayRestApiAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 						adapters.NewAPIGatewayResourceAdapter(apigatewayClient, *callerID.Account, cfg.Region),
+						adapters.NewAPIGatewayDomainNameAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 					}
 
 					e.AddAdapters(configuredAdapters...)
