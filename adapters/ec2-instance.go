@@ -82,6 +82,8 @@ func instanceOutputMapper(_ context.Context, _ *ec2.Client, scope string, _ *ec2
 					item.Health = sdp.Health_HEALTH_PENDING.Enum()
 				case codeStopping:
 					item.Health = sdp.Health_HEALTH_PENDING.Enum()
+				case codeTerminated, codeStopped:
+					// No health for things that aren't running
 				}
 			}
 
