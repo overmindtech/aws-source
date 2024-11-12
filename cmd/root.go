@@ -19,14 +19,11 @@ import (
 	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdp-go/auth"
-	"github.com/overmindtech/sdp-go/sdpconnect"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	"golang.org/x/oauth2"
 )
 
 var cfgFile string
@@ -51,8 +48,6 @@ var rootCmd = &cobra.Command{
 		natsServers := viper.GetStringSlice("nats-servers")
 		natsJWT := viper.GetString("nats-jwt")
 		natsNKeySeed := viper.GetString("nats-nkey-seed")
-		apiKey := viper.GetString("api-key")
-		app := viper.GetString("app")
 		healthCheckPort := viper.GetInt("health-check-port")
 		natsConnectionName := viper.GetString("nats-connection-name")
 
@@ -94,56 +89,36 @@ var rootCmd = &cobra.Command{
 			"aws-profile":          awsAuthConfig.Profile,
 			"auto-config":          awsAuthConfig.AutoConfig,
 			"health-check-port":    healthCheckPort,
-			"app":                  app,
+			"app":                  engineConfig.App,
 			"source-name":          engineConfig.SourceName,
 			"source-uuid":          engineConfig.SourceUUID,
 		}).Info("Got config")
 
-		// Determine the required Overmind URLs
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		oi, err := sdp.NewOvermindInstance(ctx, app)
-		if err != nil {
-			log.WithError(err).Fatal("Could not determine Overmind instance URLs")
-		}
-
 		// Validate the auth params and create a token client if we are using
 		// auth
-		var natsTokenClient auth.TokenClient
-		var authenticatedClient http.Client
+		var tokenClient auth.TokenClient
 		var heartbeatOptions *discovery.HeartbeatOptions
-		if apiKey != "" {
-			natsTokenClient, err = auth.NewAPIKeyClient(oi.ApiUrl.String(), apiKey)
-
+		if engineConfig.ApiKey != "" || engineConfig.SourceAccessToken != "" {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			oi, err := sdp.NewOvermindInstance(ctx, engineConfig.App)
+			if err != nil {
+				log.WithError(err).Fatal("Could not determine Overmind instance URLs")
+			}
+			tokenClient, heartbeatOptions, err = engineConfig.CreateClients(oi)
 			if err != nil {
 				sentry.CaptureException(err)
-
-				log.WithError(err).Fatal("Could not create API key client")
-			}
-
-			tokenSource := auth.NewAPIKeyTokenSource(apiKey, oi.ApiUrl.String())
-			transport := oauth2.Transport{
-				Source: tokenSource,
-				Base:   http.DefaultTransport,
-			}
-			authenticatedClient = http.Client{
-				Transport: otelhttp.NewTransport(&transport),
-			}
-
-			heartbeatOptions = &discovery.HeartbeatOptions{
-				ManagementClient: sdpconnect.NewManagementServiceClient(
-					&authenticatedClient,
-					oi.ApiUrl.String(),
-				),
-				Frequency: time.Second * 30,
+				log.WithError(err).Fatal("could not auth create clients")
 			}
 		} else if natsJWT != "" || natsNKeySeed != "" {
-			natsTokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
+			tokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
 			log.Info("Using NATS authentication, no heartbeat will be sent")
 
 			if err != nil {
 				log.WithError(err).Fatal("Error validating NATS authentication info")
 			}
+		} else {
+			log.Fatal("No authentication method was provided")
 		}
 
 		natsOptions := auth.NATSOptions{
@@ -155,7 +130,7 @@ var rootCmd = &cobra.Command{
 			MaxReconnects:     -1,
 			ReconnectWait:     1 * time.Second,
 			ReconnectJitter:   1 * time.Second,
-			TokenClient:       natsTokenClient,
+			TokenClient:       tokenClient,
 		}
 
 		rateLimitContext, rateLimitCancel := context.WithCancel(context.Background())
