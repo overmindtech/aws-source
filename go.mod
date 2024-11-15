@@ -6,31 +6,31 @@ go 1.22.5
 require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go-v2 v1.32.4
-	github.com/aws/aws-sdk-go-v2/config v1.28.3
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.44
+	github.com/aws/aws-sdk-go-v2/config v1.28.4
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.45
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.27.5
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.48.0
-	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.40.4
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.41.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.42.4
 	github.com/aws/aws-sdk-go-v2/service/directconnect v1.29.5
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.36.5
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.187.1
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.37.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.188.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.49.2
 	github.com/aws/aws-sdk-go-v2/service/efs v1.33.5
-	github.com/aws/aws-sdk-go-v2/service/eks v1.51.3
+	github.com/aws/aws-sdk-go-v2/service/eks v1.52.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.28.4
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/iam v1.37.4
+	github.com/aws/aws-sdk-go-v2/service/iam v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/kms v1.37.5
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.64.3
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.66.0
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.2
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.31.5
-	github.com/aws/aws-sdk-go-v2/service/rds v1.89.1
+	github.com/aws/aws-sdk-go-v2/service/rds v1.89.2
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.46.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.66.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.67.0
 	github.com/aws/aws-sdk-go-v2/service/sns v1.33.4
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.0
-	github.com/aws/aws-sdk-go-v2/service/sts v1.32.4
+	github.com/aws/aws-sdk-go-v2/service/sts v1.33.0
 	github.com/aws/smithy-go v1.22.0
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/micahhausler/aws-iam-policy v0.4.2
