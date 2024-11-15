@@ -53,7 +53,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.31.0
 	go.uber.org/automaxprocs v1.6.0
 	golang.org/x/oauth2 v0.24.0 // indirect
-	google.golang.org/protobuf v1.35.1
+	google.golang.org/protobuf v1.35.2
 )
 
 // Transitive dependencies
