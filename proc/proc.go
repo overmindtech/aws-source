@@ -41,7 +41,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/discovery"
-	"github.com/overmindtech/sdp-go/auth"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
@@ -197,7 +196,7 @@ func CreateAWSConfigs(awsAuthConfig AwsAuthConfig) ([]aws.Config, error) {
 // engine, and an error if any. The context provided will be used for the rate
 // limit buckets and should not be cancelled until the source is shut down. AWS
 // configs should be provided for each region that is enabled
-func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, natsOptions auth.NATSOptions, heartbeatOptions *discovery.HeartbeatOptions, maxRetries uint64, configs ...aws.Config) (*discovery.Engine, error) {
+func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, maxRetries uint64, configs ...aws.Config) (*discovery.Engine, error) {
 	e, err := discovery.NewEngine(ec)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing Engine: %w", err)
@@ -205,16 +204,14 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 
 	var startupErrorMutex sync.Mutex
 	startupError := errors.New("source is starting")
-	if heartbeatOptions != nil {
-		heartbeatOptions.HealthCheck = func() error {
+	if ec.HeartbeatOptions != nil {
+		ec.HeartbeatOptions.HealthCheck = func() error {
 			startupErrorMutex.Lock()
 			defer startupErrorMutex.Unlock()
 			return startupError
 		}
-		e.HeartbeatOptions = heartbeatOptions
 	}
 
-	e.NATSOptions = &natsOptions
 	e.StartSendingHeartbeats(ctx)
 	if len(configs) == 0 {
 		return nil, errors.New("No configs specified")

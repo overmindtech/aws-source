@@ -34,9 +34,9 @@ require (
 	github.com/aws/smithy-go v1.22.1
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/micahhausler/aws-iam-policy v0.4.2
-	github.com/nats-io/jwt/v2 v2.7.2
-	github.com/nats-io/nkeys v0.4.7
-	github.com/overmindtech/discovery v0.31.2
+	github.com/nats-io/jwt/v2 v2.7.2 // indirect
+	github.com/nats-io/nkeys v0.4.7 // indirect
+	github.com/overmindtech/discovery v0.31.3
 	github.com/overmindtech/sdp-go v0.101.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3

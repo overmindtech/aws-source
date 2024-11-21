@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,13 +11,9 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
-	"github.com/nats-io/jwt/v2"
-	"github.com/nats-io/nkeys"
 	"github.com/overmindtech/aws-source/proc"
 	"github.com/overmindtech/aws-source/tracing"
 	"github.com/overmindtech/discovery"
-	"github.com/overmindtech/sdp-go"
-	"github.com/overmindtech/sdp-go/auth"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -44,12 +39,7 @@ var rootCmd = &cobra.Command{
 				panic(err)
 			}
 		}()
-		// Get srcman supplied config
-		natsServers := viper.GetStringSlice("nats-servers")
-		natsJWT := viper.GetString("nats-jwt")
-		natsNKeySeed := viper.GetString("nats-nkey-seed")
 		healthCheckPort := viper.GetInt("health-check-port")
-		natsConnectionName := viper.GetString("nats-connection-name")
 
 		awsAuthConfig := proc.AwsAuthConfig{
 			Strategy:        viper.GetString("aws-access-strategy"),
@@ -66,71 +56,25 @@ var rootCmd = &cobra.Command{
 			log.WithError(err).Fatal("Could not parse aws-regions")
 		}
 
-		var natsNKeySeedLog string
-		if natsNKeySeed != "" {
-			natsNKeySeedLog = "[REDACTED]"
-		}
-
 		engineConfig, err := discovery.EngineConfigFromViper("aws", tracing.ServiceVersion)
 		if err != nil {
 			log.WithError(err).Fatal("Could not create engine config")
 		}
 
 		log.WithFields(log.Fields{
-			"nats-servers":         natsServers,
-			"nats-jwt":             natsJWT,
-			"nats-nkey-seed":       natsNKeySeedLog,
-			"nats-connection-name": natsConnectionName,
-			"max-parallel":         engineConfig.MaxParallelExecutions,
-			"aws-regions":          awsAuthConfig.Regions,
-			"aws-access-strategy":  awsAuthConfig.Strategy,
-			"aws-external-id":      awsAuthConfig.ExternalID,
-			"aws-target-role-arn":  awsAuthConfig.TargetRoleARN,
-			"aws-profile":          awsAuthConfig.Profile,
-			"auto-config":          awsAuthConfig.AutoConfig,
-			"health-check-port":    healthCheckPort,
-			"app":                  engineConfig.App,
-			"source-name":          engineConfig.SourceName,
-			"source-uuid":          engineConfig.SourceUUID,
+			"aws-regions":         awsAuthConfig.Regions,
+			"aws-access-strategy": awsAuthConfig.Strategy,
+			"aws-external-id":     awsAuthConfig.ExternalID,
+			"aws-target-role-arn": awsAuthConfig.TargetRoleARN,
+			"aws-profile":         awsAuthConfig.Profile,
+			"auto-config":         awsAuthConfig.AutoConfig,
+			"health-check-port":   healthCheckPort,
 		}).Info("Got config")
 
-		// Validate the auth params and create a token client if we are using
-		// auth
-		var tokenClient auth.TokenClient
-		var heartbeatOptions *discovery.HeartbeatOptions
-		if engineConfig.ApiKey != "" || engineConfig.SourceAccessToken != "" {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-			oi, err := sdp.NewOvermindInstance(ctx, engineConfig.App)
-			if err != nil {
-				log.WithError(err).Fatal("Could not determine Overmind instance URLs")
-			}
-			tokenClient, heartbeatOptions, err = engineConfig.CreateClients(oi)
-			if err != nil {
-				sentry.CaptureException(err)
-				log.WithError(err).Fatal("could not auth create clients")
-			}
-		} else if natsJWT != "" || natsNKeySeed != "" {
-			tokenClient, err = createTokenClient(natsJWT, natsNKeySeed)
-			log.Info("Using NATS authentication, no heartbeat will be sent")
-
-			if err != nil {
-				log.WithError(err).Fatal("Error validating NATS authentication info")
-			}
-		} else {
-			log.Fatal("No authentication method was provided")
-		}
-
-		natsOptions := auth.NATSOptions{
-			NumRetries:        -1,
-			RetryDelay:        5 * time.Second,
-			Servers:           natsServers,
-			ConnectionName:    natsConnectionName,
-			ConnectionTimeout: (10 * time.Second), // TODO: Make configurable
-			MaxReconnects:     -1,
-			ReconnectWait:     1 * time.Second,
-			ReconnectJitter:   1 * time.Second,
-			TokenClient:       tokenClient,
+		err = engineConfig.CreateClients()
+		if err != nil {
+			sentry.CaptureException(err)
+			log.WithError(err).Fatal("could not auth create clients")
 		}
 
 		rateLimitContext, rateLimitCancel := context.WithCancel(context.Background())
@@ -145,8 +89,6 @@ var rootCmd = &cobra.Command{
 		e, err := proc.InitializeAwsSourceEngine(
 			rateLimitContext,
 			engineConfig,
-			natsOptions,
-			heartbeatOptions,
 			999_999, // Very high max retries as it'll time out after 15min anyway
 			configs...,
 		)
@@ -239,24 +181,12 @@ func init() {
 	// will be global for your application.
 	var logLevel string
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.WithError(err).Fatal("Could not determine hostname for use in NATS connection name and source name")
-	}
-
 	// add engine flags
 	discovery.AddEngineFlags(rootCmd)
 
 	// General config options
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "/etc/srcman/config/source.yaml", "config file path")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log", "info", "Set the log level. Valid values: panic, fatal, error, warn, info, debug, trace")
-
-	// Config required by all sources in order to connect to NATS. You shouldn't
-	// need to change these
-	rootCmd.PersistentFlags().StringArray("nats-servers", []string{"nats://localhost:4222", "nats://nats:4222"}, "A list of NATS servers to connect to")
-	rootCmd.PersistentFlags().String("nats-jwt", "", "The JWT token that should be used to authenticate to NATS, provided in raw format e.g. eyJ0eXAiOiJKV1Q...")
-	rootCmd.PersistentFlags().String("nats-nkey-seed", "", "The NKey seed which corresponds to the NATS JWT e.g. SUAFK6QUC...")
-	rootCmd.PersistentFlags().String("nats-connection-name", hostname, "The name that the source should use to connect to NATS")
 
 	// Custom flags for this source
 	rootCmd.PersistentFlags().String("aws-access-strategy", "defaults", "The strategy to use to access this customer's AWS account. Valid values: 'access-key', 'external-id', 'sso-profile', 'defaults'. Default: 'defaults'.")
@@ -294,7 +224,7 @@ func init() {
 		cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) {
 			// Bind the flag to viper only if it has a non-empty default
 			if f.DefValue != "" || f.Changed {
-				err = viper.BindPFlag(f.Name, f)
+				err := viper.BindPFlag(f.Name, f)
 				if err != nil {
 					log.WithError(err).Fatal("could not bind flag to viper")
 				}
@@ -332,31 +262,6 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Infof("Using config file: %v", viper.ConfigFileUsed())
 	}
-}
-
-// createTokenClient Creates a basic token client that will authenticate to NATS
-// using the given values
-func createTokenClient(natsJWT string, natsNKeySeed string) (auth.TokenClient, error) {
-	var kp nkeys.KeyPair
-	var err error
-
-	if natsJWT == "" {
-		return nil, errors.New("nats-jwt was blank. This is required when using authentication")
-	}
-
-	if natsNKeySeed == "" {
-		return nil, errors.New("nats-nkey-seed was blank. This is required when using authentication")
-	}
-
-	if _, err = jwt.DecodeUserClaims(natsJWT); err != nil {
-		return nil, fmt.Errorf("could not parse nats-jwt: %w", err)
-	}
-
-	if kp, err = nkeys.FromSeed([]byte(natsNKeySeed)); err != nil {
-		return nil, fmt.Errorf("could not parse nats-nkey-seed: %w", err)
-	}
-
-	return auth.NewBasicTokenClient(natsJWT, kp), nil
 }
 
 // TerminationLogHook A hook that logs fatal errors to the termination log
