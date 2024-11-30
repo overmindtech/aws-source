@@ -35,26 +35,39 @@ func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, sc
 	var out *route53.ListResourceRecordSetsOutput
 	var err error
 	if len(splits) == 3 {
+		hostedZoneID := splits[0]
+		recordName := splits[1]
+		recordType := splits[2]
+
 		var zoneResp *route53.GetHostedZoneOutput
 		// In this case we have a terraform ID. We have to get the details of the hosted zone first
 		zoneResp, err = client.GetHostedZone(ctx, &route53.GetHostedZoneInput{
-			Id: &splits[0],
+			Id: &hostedZoneID,
 		})
 		if err != nil {
 			return nil, err
 		}
 		if zoneResp.HostedZone == nil {
-			return nil, fmt.Errorf("hosted zone %s not found", splits[0])
+			return nil, fmt.Errorf("hosted zone %s not found", hostedZoneID)
 		}
 
-		// Calculate the full FQDN based on the hosted zone name and the record name
-		fullName := splits[1] + "." + *zoneResp.HostedZone.Name
+		// If the name is the same as the FQDN of the hosted zone, we don't have
+		// to append it otherwise it'll be in there twice. It seems that NS and
+		// MX records sometimes have the full FQDN in the name
+		zoneFQDN := strings.TrimSuffix(*zoneResp.HostedZone.Name, ".")
+		var fullName string
+		if recordName == zoneFQDN {
+			fullName = recordName
+		} else {
+			// Calculate the full FQDN based on the hosted zone name and the record name
+			fullName = recordName + "." + *zoneResp.HostedZone.Name
+		}
 
 		var max int32 = 1
 		req := route53.ListResourceRecordSetsInput{
-			HostedZoneId:    &splits[0],
+			HostedZoneId:    &hostedZoneID,
 			StartRecordName: &fullName,
-			StartRecordType: types.RRType(splits[2]),
+			StartRecordType: types.RRType(recordType),
 			MaxItems:        &max,
 		}
 		out, err = client.ListResourceRecordSets(ctx, &req)
