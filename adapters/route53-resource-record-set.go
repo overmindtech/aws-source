@@ -3,6 +3,7 @@ package adapters
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/route53"
@@ -17,21 +18,59 @@ func resourceRecordSetGetFunc(ctx context.Context, client *route53.Client, scope
 }
 
 // ResourceRecordSetSearchFunc Search func that accepts a hosted zone or a
-// terraform ID in the format {hostedZone}_{recordName}_{type}
+// terraform ID in the format {hostedZone}_{recordName}_{type}. Unfortunately
+// the "name" means the record name within the scope of the hosted zone, not the
+// full FQDN. This is something that Terraform does to match the AWS GUI, where
+// you specify a name like "foo" and then you end up with a record like
+// "foo.example.com.". That record has a "name" attribute, but it's set to
+// "foo.example.com.".
+//
+// Because of this behaviour we need to construct the full name, rather than
+// just the half-name. You can see that the terraform provider itself also does
+// this in `findResourceRecordSetByFourPartKey`:
+// https://github.com/hashicorp/terraform-provider-aws/blob/main/internal/service/route53/record.go#L786-L825
 func resourceRecordSetSearchFunc(ctx context.Context, client *route53.Client, scope, query string) ([]*types.ResourceRecordSet, error) {
 	splits := strings.Split(query, "_")
 
 	var out *route53.ListResourceRecordSetsOutput
 	var err error
 	if len(splits) == 3 {
-		// In this case we have a terraform ID
-		var max int32 = 1
-		out, err = client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{
-			HostedZoneId:    &splits[0],
-			StartRecordName: &splits[1],
-			StartRecordType: types.RRType(splits[2]),
-			MaxItems:        &max,
+		hostedZoneID := splits[0]
+		recordName := splits[1]
+		recordType := splits[2]
+
+		var zoneResp *route53.GetHostedZoneOutput
+		// In this case we have a terraform ID. We have to get the details of the hosted zone first
+		zoneResp, err = client.GetHostedZone(ctx, &route53.GetHostedZoneInput{
+			Id: &hostedZoneID,
 		})
+		if err != nil {
+			return nil, err
+		}
+		if zoneResp.HostedZone == nil {
+			return nil, fmt.Errorf("hosted zone %s not found", hostedZoneID)
+		}
+
+		// If the name is the same as the FQDN of the hosted zone, we don't have
+		// to append it otherwise it'll be in there twice. It seems that NS and
+		// MX records sometimes have the full FQDN in the name
+		zoneFQDN := strings.TrimSuffix(*zoneResp.HostedZone.Name, ".")
+		var fullName string
+		if recordName == zoneFQDN {
+			fullName = recordName
+		} else {
+			// Calculate the full FQDN based on the hosted zone name and the record name
+			fullName = recordName + "." + *zoneResp.HostedZone.Name
+		}
+
+		var max int32 = 1
+		req := route53.ListResourceRecordSetsInput{
+			HostedZoneId:    &hostedZoneID,
+			StartRecordName: &fullName,
+			StartRecordType: types.RRType(recordType),
+			MaxItems:        &max,
+		}
+		out, err = client.ListResourceRecordSets(ctx, &req)
 	} else {
 		// In this case we have a hosted zone ID
 		out, err = client.ListResourceRecordSets(ctx, &route53.ListResourceRecordSetsInput{

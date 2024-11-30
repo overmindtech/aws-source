@@ -157,12 +157,17 @@ func TestNewRoute53ResourceRecordSetAdapter(t *testing.T) {
 		t.Errorf("expected %d items, got %d", numItems, len(items))
 	}
 
-	if len(items) > 0 {
-		item := items[0]
+	for _, item := range items {
+		// Only use CNAME records
+		typ, _ := item.GetAttributes().Get("Type")
+		if typ != "CNAME" {
+			continue
+		}
 
 		// Construct a terraform style ID
-		name, _ := item.GetAttributes().Get("Name")
-		typ, _ := item.GetAttributes().Get("Type")
+		fqdn, _ := item.GetAttributes().Get("Name")
+		sections := strings.Split(fqdn.(string), ".")
+		name := sections[0]
 		search = fmt.Sprintf("%s_%s_%s", rawZone, name, typ)
 
 		items, err := adapter.Search(context.Background(), zoneSource.Scopes()[0], search, true)
@@ -173,5 +178,8 @@ func TestNewRoute53ResourceRecordSetAdapter(t *testing.T) {
 		if len(items) != 1 {
 			t.Errorf("expected 1 item, got %d", len(items))
 		}
+
+		// Only need to test this once
+		break
 	}
 }
