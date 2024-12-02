@@ -36,8 +36,8 @@ require (
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/nats-io/jwt/v2 v2.7.2 // indirect
 	github.com/nats-io/nkeys v0.4.8 // indirect
-	github.com/overmindtech/discovery v0.31.3
-	github.com/overmindtech/sdp-go v0.101.2
+	github.com/overmindtech/discovery v0.32.0
+	github.com/overmindtech/sdp-go v0.101.3
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
