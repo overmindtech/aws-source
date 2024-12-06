@@ -339,6 +339,15 @@ func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchARN(ct
 		return nil, WrapAWSError(err)
 	}
 
+	if a.ContainsWildcard() {
+		// We can't handle wildcards by default so bail out
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: fmt.Sprintf("wildcards are not supported by adapter %v", s.Name()),
+			Scope:       scope,
+		}
+	}
+
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,

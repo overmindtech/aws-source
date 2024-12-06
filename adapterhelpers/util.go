@@ -150,6 +150,11 @@ func (a *ARN) IAMWildcardMatches(arn string) bool {
 	return true
 }
 
+func (a *ARN) ContainsWildcard() bool {
+	possibleWildcardLocations := a.Partition + a.Region + a.AccountID + a.Resource
+	return strings.Contains(possibleWildcardLocations, "*") || strings.Contains(possibleWildcardLocations, "?")
+}
+
 // ParseARN Parses an ARN and tries to determine the resource ID from it. The
 // logic is that the resource ID will be the last component when separated by
 // slashes or colons: https://devopscube.com/aws-arn-guide/

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/micahhausler/aws-iam-policy/policy"
@@ -90,12 +89,6 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 			for _, resource := range statement.Resource.Values() {
 				arn, err = adapterhelpers.ParseARN(resource)
 				if err != nil {
-					continue
-				}
-
-				// If the ARN contains a wildcard then we want to bail out
-				possibleWildcards := arn.AccountID + arn.Type() + arn.ResourceID()
-				if strings.Contains(possibleWildcards, "*") {
 					continue
 				}
 
