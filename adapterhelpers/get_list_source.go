@@ -262,6 +262,15 @@ func (s *GetListAdapter[AWSItem, ClientStruct, Options]) SearchARN(ctx context.C
 		return nil, WrapAWSError(err)
 	}
 
+	if a.ContainsWildcard() {
+		// We can't handle wildcards by default so bail out
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: fmt.Sprintf("wildcards are not supported by adapter %v", s.Name()),
+			Scope:       scope,
+		}
+	}
+
 	if arnScope := FormatScope(a.AccountID, a.Region); !s.hasScope(arnScope) {
 		return nil, &sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
