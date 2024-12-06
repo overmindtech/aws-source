@@ -97,8 +97,14 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 				// accepts ARNs
 				scope := sdp.WILDCARD
 				if arn.AccountID != "aws" {
-					// If we have an account and region, then use those
-					scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
+					if arn.AccountID != "*" && arn.Region != "*" {
+						// If we have an account and region, then use those
+						scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
+					} else {
+						// If we have wildcards then we need to search all
+						// accounts and regions
+						scope = "*"
+					}
 				}
 
 				// It would be good here if we had a way to definitely know what
