@@ -31,6 +31,7 @@ import (
 	awsroute53 "github.com/aws/aws-sdk-go-v2/service/route53"
 	awssns "github.com/aws/aws-sdk-go-v2/service/sns"
 	awssqs "github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/sourcegraph/conc/pool"
 
@@ -322,6 +323,9 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 					apigatewayClient := awsapigateway.NewFromConfig(cfg, func(o *awsapigateway.Options) {
 						o.RetryMode = aws.RetryModeAdaptive
 					})
+					ssmClient := ssm.NewFromConfig(cfg, func(o *ssm.Options) {
+						o.RetryMode = aws.RetryModeAdaptive
+					})
 
 					configuredAdapters := []discovery.Adapter{
 						// EC2
@@ -478,6 +482,9 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						adapters.NewAPIGatewayRestApiAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 						adapters.NewAPIGatewayResourceAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 						adapters.NewAPIGatewayDomainNameAdapter(apigatewayClient, *callerID.Account, cfg.Region),
+
+						// SSM
+						adapters.NewSSMParameterAdapter(ssmClient, *callerID.Account, cfg.Region),
 					}
 
 					e.AddAdapters(configuredAdapters...)
