@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -96,6 +97,57 @@ func (a *ARN) Type() string {
 
 	// Keep the first field since this is the type, then remove the rest
 	return a.Resource[:separatorLocation]
+}
+
+// Matches checks if the IAM wildcards included in the ARN match another ARN
+// using the logic that IAM uses. For example if the ARN is
+// "arn:aws:s3:::amzn-s3-demo-bucket/*" then it will match
+// "arn:aws:s3:::amzn-s3-demo-bucket/thing" but not
+// "arn:aws:s3:::some-other-bucket/object"
+func (a *ARN) IAMWildcardMatches(arn string) bool {
+	targetARN, err := ParseARN(arn)
+	if err != nil {
+		return false
+	}
+
+	// You can't use a wildcard in the service segment
+	if a.Service != targetARN.Service {
+		return false
+	}
+
+	// Convert * wildcard to regex pattern and escape other special chars
+	convertToPattern := func(s string) string {
+		// Escape regex special chars except * and ?
+		special := []string{".", "+", "^", "$", "(", ")", "[", "]", "{", "}", "|"}
+		escaped := s
+		for _, ch := range special {
+			escaped = strings.ReplaceAll(escaped, ch, "\\"+ch)
+		}
+		// Convert * to .* and ? to . for regex
+		escaped = strings.ReplaceAll(escaped, "*", ".*")
+		escaped = strings.ReplaceAll(escaped, "?", ".")
+		return "^" + escaped + "$"
+	}
+
+	// Check each component using pattern matching
+	components := []struct {
+		pattern string
+		target  string
+	}{
+		{a.Region, targetARN.Region},
+		{a.AccountID, targetARN.AccountID},
+		{a.Resource, targetARN.Resource},
+	}
+
+	for _, c := range components {
+		pattern := convertToPattern(c.pattern)
+		matched, err := regexp.MatchString(pattern, c.target)
+		if err != nil || !matched {
+			return false
+		}
+	}
+
+	return true
 }
 
 // ParseARN Parses an ARN and tries to determine the resource ID from it. The

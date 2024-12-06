@@ -62,7 +62,8 @@ func TestGetTopicFunc(t *testing.T) {
 }
 
 func TestNewSNSTopicAdapter(t *testing.T) {
-	client, account, region := GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
+	client := sns.NewFromConfig(config)
 
 	adapter := NewSNSTopicAdapter(client, account, region)
 

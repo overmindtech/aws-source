@@ -43,6 +43,22 @@ type DescribeOnlyAdapter[Input InputType, Output OutputType, ClientStruct Client
 	// unset then a search request will default to searching by ARN
 	InputMapperSearch func(ctx context.Context, client ClientStruct, scope string, query string) (Input, error)
 
+	// A PostSearchFilter, if set, will be called after the search has been
+	// completed. This can be used to filter the results of the search before
+	// they are returned to the user, based on the query. This is used in
+	// situations where the underlying API doesn't allow for granular enough
+	// searching to match a given query string, and we need to apply some
+	// additional filtering to the response.
+	//
+	// A good example if this is allowing users to search using ARNs that
+	// contain IAM-Style wildcards. Since IAM is enforced *after* a query is
+	// run, most APIs don't provide detailed enough search options to completely
+	// replicate this functionality in the query, and instead we need to filter
+	// the results ourselves.
+	//
+	// This will only be applied when the InputMapperSearch function is also set
+	PostSearchFilter func(ctx context.Context, query string, items []*sdp.Item) ([]*sdp.Item, error)
+
 	// A function that returns a paginator for this API. If this is nil, we will
 	// assume that the API is not paginated e.g.
 	// https://aws.github.io/aws-sdk-go-v2/docs/making-requests/#using-paginators
@@ -361,6 +377,14 @@ func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchCustom
 	if err != nil {
 		err = s.processError(err, ck)
 		return nil, err
+	}
+
+	if s.PostSearchFilter != nil {
+		items, err = s.PostSearchFilter(ctx, query, items)
+		if err != nil {
+			err = s.processError(err, ck)
+			return nil, err
+		}
 	}
 
 	for _, item := range items {
