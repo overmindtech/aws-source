@@ -65,7 +65,8 @@ func TestSNSGetFunc(t *testing.T) {
 }
 
 func TestNewSNSSubscriptionAdapter(t *testing.T) {
-	client, account, region := GetAutoConfig(t)
+	config, account, region := adapterhelpers.GetAutoConfig(t)
+	client := sns.NewFromConfig(config)
 
 	adapter := NewSNSSubscriptionAdapter(client, account, region)
 
