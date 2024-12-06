@@ -312,6 +312,22 @@ func TestSearchCustom(t *testing.T) {
 	if items[0].UniqueAttributeValue() != "custom" {
 		t.Errorf("expected item to be 'custom', got %v", items[0].UniqueAttributeValue())
 	}
+
+	t.Run("with a post-search filter", func(t *testing.T) {
+		s.PostSearchFilter = func(ctx context.Context, query string, items []*sdp.Item) ([]*sdp.Item, error) {
+			return nil, nil
+		}
+
+		items, err := s.Search(context.Background(), "account-id.region", "bar", false)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(items) != 0 {
+			t.Errorf("expected 0 item, got %v", len(items))
+		}
+	})
 }
 
 func TestNoInputMapper(t *testing.T) {
