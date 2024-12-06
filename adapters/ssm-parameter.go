@@ -94,7 +94,7 @@ func ssmParameterInputMapperSearch(ctx context.Context, client ssmClient, scope,
 			}
 		}
 
-		// If we have no valid segments after splitting (e.g. "***"), return error
+		// If we have no valid segments after splitting (e.g. "***")
 		if longestSegment == "" {
 			// If it's all wildcards then search for everything
 			return &ssm.DescribeParametersInput{}, nil
