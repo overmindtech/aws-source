@@ -127,3 +127,132 @@ func TestParseARN(t *testing.T) {
 		}
 	})
 }
+
+func TestIAMWildcardMatches(t *testing.T) {
+	tests := []struct {
+		Name           string
+		ARN            string
+		ShouldMatch    []string
+		ShouldNotMatch []string
+	}{
+		{
+			Name: "ARN with no wildcards",
+			ARN:  "arn:aws:iam::123456789:user/Bob",
+			ShouldMatch: []string{
+				"arn:aws:iam::123456789:user/Bob",
+			},
+			ShouldNotMatch: []string{
+				"arn:aws:iam::123456789:user/Alice",
+				"arn:aws:iam::123456789:role/Bob",
+				"arn:aws:iam::123456789:role/Alice",
+			},
+		},
+		{
+			Name: "Complex multi-wildcard ARN",
+			// The asterisk (*) character can expand to replace everything
+			// within a segment, including characters like a forward slash (/)
+			// that may otherwise appear to be a delimiter within a given
+			// service namespace. For example, consider the following Amazon S3
+			// ARN as the same wildcard expansion logic applies to all services.
+			ARN: "arn:aws:s3:::amzn-s3-demo-bucket/*/test/*",
+			// The wildcards in the ARN apply to all of the following objects in
+			// the bucket, not only the first object listed.
+			ShouldMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test/3/object.jpg ",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/3/test/4/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1///test///object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket//test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/",
+			},
+			// Consider the last two objects in the previous list. An Amazon S3
+			// object name can begin or end with the conventional delimiter
+			// forward slash (/) character. While / works as a delimiter, there
+			// is no specific significance when this character is used within a
+			// resource ARN. It is treated the same as any other valid
+			// character. The ARN would not match the following objects:
+			ShouldNotMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1-test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test.jpg",
+			},
+		},
+		{
+			Name: "* at the end",
+			ARN:  "arn:aws:s3:::amzn-s3-demo-bucket/*",
+			ShouldMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test/3/object.jpg ",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/3/test/4/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1///test///object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket//test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/test/",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1-test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/test/object.jpg",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/test.jpg",
+			},
+		},
+		{
+			Name: "ARN using a ? wildcard",
+			ARN:  "arn:aws:s3:::amzn-s3-demo-bucket/??",
+			ShouldMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/11",
+				"arn:aws:s3:::amzn-s3-demo-bucket/ab",
+				"arn:aws:s3:::amzn-s3-demo-bucket///",
+			},
+			ShouldNotMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/3",
+			},
+		},
+		{
+			Name: "ARN using a ? wildcard in the middle",
+			ARN:  "arn:aws:s3:::amzn-s3-demo-bucket/1?/2",
+			ShouldMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1a/2",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1b/2",
+			},
+			ShouldNotMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/3",
+			},
+		},
+		{
+			Name: "ARN using a ? and * wildcard",
+			ARN:  "arn:aws:s3:::amzn-s3-demo-bucket/1?/2*",
+			ShouldMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1a/234567890",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1b/2c",
+			},
+			ShouldNotMatch: []string{
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2",
+				"arn:aws:s3:::amzn-s3-demo-bucket/1/2/3",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			a, err := ParseARN(test.ARN)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for _, match := range test.ShouldMatch {
+				if !a.IAMWildcardMatches(match) {
+					t.Errorf("expected %v to match %v", a.String(), match)
+				}
+			}
+
+			for _, match := range test.ShouldNotMatch {
+				if a.IAMWildcardMatches(match) {
+					t.Errorf("expected %v to not match %v", a.String(), match)
+				}
+			}
+		})
+	}
+}
