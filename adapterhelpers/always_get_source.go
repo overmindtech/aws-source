@@ -269,7 +269,12 @@ func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStru
 		}
 	}
 
-	return p.Wait()
+	// We are deciding to throw the errors away from the Get requests, this
+	// probably isn't the best idea, but we don't want to fail the whole list
+	// because a Get failed. We might want to revisit this logic in the future
+	items, _ := p.Wait()
+
+	return items, nil
 }
 
 // Search Searches for AWS resources by ARN
