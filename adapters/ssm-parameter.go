@@ -271,7 +271,9 @@ func NewSSMParameterAdapter(client ssmClient, accountID string, region string) *
 		InputMapperSearch: ssmParameterInputMapperSearch,
 		PostSearchFilter:  ssmParameterPostSearchFilter,
 		PaginatorBuilder: func(client ssmClient, params *ssm.DescribeParametersInput) adapterhelpers.Paginator[*ssm.DescribeParametersOutput, *ssm.Options] {
-			return ssm.NewDescribeParametersPaginator(client, params)
+			return ssm.NewDescribeParametersPaginator(client, params, func(dppo *ssm.DescribeParametersPaginatorOptions) {
+				dppo.Limit = 50
+			})
 		},
 		DescribeFunc: func(ctx context.Context, client ssmClient, input *ssm.DescribeParametersInput) (*ssm.DescribeParametersOutput, error) {
 			return client.DescribeParameters(ctx, input)
