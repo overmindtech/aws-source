@@ -7,10 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
-	log "github.com/sirupsen/logrus"
+	"github.com/sourcegraph/conc/pool"
 )
 
 // MaxParallel An integer that defaults to 10
@@ -240,65 +239,12 @@ func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStru
 func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStruct, Options]) listInternal(ctx context.Context, scope string, input ListInput) ([]*sdp.Item, error) {
 	var output ListOutput
 	var err error
-	items := make([]*sdp.Item, 0)
-	itemsChan := make(chan *sdp.Item)
-	getInputs := make(chan GetInput)
-	doneChan := make(chan struct{})
 
 	if err = s.Validate(); err != nil {
 		return nil, WrapAWSError(err)
 	}
 
-	// Create a channel of permissions to allow only a certain number of Get requests to tun in parallel
-	permissions := make(chan struct{}, s.MaxParallel.Value())
-	for i := 0; i < s.MaxParallel.Value(); i++ {
-		permissions <- struct{}{}
-	}
-
-	// Create a process to take queries and run them using Get
-	go func() {
-		defer sentry.Recover()
-		var wg sync.WaitGroup
-		for i := range getInputs {
-			<-permissions
-			wg.Add(1)
-			go func(input GetInput) {
-				defer sentry.Recover()
-				defer wg.Done()
-				item, err := s.GetFunc(ctx, s.Client, scope, input)
-
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error": err,
-						"input": input,
-						"scope": scope,
-					}).Error("Error running Get for List item")
-				} else {
-					itemsChan <- item
-				}
-
-				// Give the permission back
-				permissions <- struct{}{}
-			}(i)
-		}
-
-		// Wait for all Gets to finish
-		wg.Wait()
-
-		// Close channel as there will be no more items
-		close(itemsChan)
-	}()
-
-	// Create a process to collect items
-	go func() {
-		defer sentry.Recover()
-		for item := range itemsChan {
-			items = append(items, item)
-		}
-
-		// Close the doneChan to signal that everything is done
-		close(doneChan)
-	}()
+	p := pool.NewWithResults[*sdp.Item]().WithErrors().WithContext(ctx).WithMaxGoroutines(s.MaxParallel.Value())
 
 	paginator := s.ListFuncPaginatorBuilder(s.Client, input)
 	var newGetInputs []GetInput
@@ -316,17 +262,17 @@ func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStru
 			return nil, err
 		}
 
-		// Push new queries onto the channel for processing
-		for _, q := range newGetInputs {
-			getInputs <- q
+		for _, input := range newGetInputs {
+			p.Go(func(ctx context.Context) (*sdp.Item, error) {
+				return s.GetFunc(ctx, s.Client, scope, input)
+			})
 		}
 	}
 
-	// Close queries channel
-	close(getInputs)
-
-	// Wait for all processing to be complete
-	<-doneChan
+	// We are deciding to throw the errors away from the Get requests, this
+	// probably isn't the best idea, but we don't want to fail the whole list
+	// because a Get failed. We might want to revisit this logic in the future
+	items, _ := p.Wait()
 
 	return items, nil
 }
