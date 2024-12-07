@@ -7,11 +7,14 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/overmindtech/sdp-go"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 const (
@@ -85,7 +88,20 @@ type AWSCfg struct {
 }
 
 func AWSSettings(ctx context.Context) (*AWSCfg, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
+	newRetryer := func() aws.Retryer {
+
+		var r aws.Retryer
+		r = retry.NewAdaptiveMode()
+		r = retry.AddWithMaxAttempts(r, 10)
+		r = retry.AddWithMaxBackoffDelay(r, 1*time.Second)
+
+		return r
+	}
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRetryer(newRetryer),
+		config.WithClientLogMode(aws.LogRetries),
+		config.WithHTTPClient(otelhttp.DefaultClient),
+	)
 	if err != nil {
 		return nil, err
 	}
