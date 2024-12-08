@@ -9,8 +9,53 @@ import (
 	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
+
+func searchSync(adapter discovery.StreamingAdapter, ctx context.Context, scope, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.SearchStream(ctx, scope, query, ignoreCache, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("failed to search: %v", errs)
+	}
+
+	return items, nil
+}
+
+func listSync(adapter discovery.StreamingAdapter, ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.ListStream(ctx, scope, ignoreCache, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("failed to List: %v", errs)
+	}
+
+	return items, nil
+}
 
 func KMS(t *testing.T) {
 	ctx := context.Background()
@@ -61,7 +106,7 @@ func KMS(t *testing.T) {
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List keys
-	sdpListKeys, err := keySource.List(context.Background(), scope, true)
+	sdpListKeys, err := listSync(keySource, context.Background(), scope, true)
 	if err != nil {
 		t.Fatalf("failed to list KMS keys: %v", err)
 	}
@@ -94,7 +139,7 @@ func KMS(t *testing.T) {
 
 	// Search keys
 	keyARN := fmt.Sprintf("arn:aws:kms:%s:%s:key/%s", testAWSConfig.Region, accountID, keyID)
-	sdpSearchKeys, err := keySource.Search(context.Background(), scope, keyARN, true)
+	sdpSearchKeys, err := searchSync(keySource, context.Background(), scope, keyARN, true)
 	if err != nil {
 		t.Fatalf("failed to search KMS keys: %v", err)
 	}
@@ -113,7 +158,7 @@ func KMS(t *testing.T) {
 	}
 
 	// List aliases
-	sdpListAliases, err := aliasSource.List(context.Background(), scope, true)
+	sdpListAliases, err := listSync(aliasSource, context.Background(), scope, true)
 	if err != nil {
 		t.Fatalf("failed to list KMS aliases: %v", err)
 	}
@@ -157,7 +202,7 @@ func KMS(t *testing.T) {
 	}
 
 	// Search aliases
-	sdpSearchAliases, err := aliasSource.Search(context.Background(), scope, keyID, true)
+	sdpSearchAliases, err := searchSync(aliasSource, context.Background(), scope, keyID, true)
 	if err != nil {
 		t.Fatalf("failed to search KMS aliases: %v", err)
 	}
@@ -176,7 +221,7 @@ func KMS(t *testing.T) {
 	}
 
 	// List grants is not supported
-	sdpListGrants, err := grantSource.List(context.Background(), scope, true)
+	sdpListGrants, err := listSync(grantSource, context.Background(), scope, true)
 	if err == nil {
 		t.Fatal("expected error but got nil")
 	}
@@ -186,7 +231,7 @@ func KMS(t *testing.T) {
 	}
 
 	// Search grants
-	sdpSearchGrants, err := grantSource.Search(context.Background(), scope, keyID, true)
+	sdpSearchGrants, err := searchSync(grantSource, context.Background(), scope, keyID, true)
 	if err != nil {
 		t.Fatalf("failed to search KMS grants: %v", err)
 	}
@@ -227,7 +272,7 @@ func KMS(t *testing.T) {
 	}
 
 	// Search key policy by key ID
-	sdpSearchKeyPolicies, err := keyPolicySource.Search(context.Background(), scope, keyID, true)
+	sdpSearchKeyPolicies, err := searchSync(keyPolicySource, context.Background(), scope, keyID, true)
 	if err != nil {
 		t.Fatalf("failed to search KMS key policies: %v", err)
 	}

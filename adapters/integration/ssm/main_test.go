@@ -15,6 +15,8 @@ import (
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
 	"github.com/overmindtech/aws-source/tracing"
+	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/sdp-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -132,9 +134,23 @@ func TestIntegrationSSM(t *testing.T) {
 		ctx, span := tracer.Start(ctx, "SSM.List")
 		defer span.End()
 		start := time.Now()
-		items, err := adapter.List(ctx, scope, true)
-		if err != nil {
-			t.Errorf("Failed to list SSM parameters: %v", err)
+
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		adapter.ListStream(ctx, scope, false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		timeTaken := time.Since(start)

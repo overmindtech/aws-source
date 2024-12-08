@@ -8,8 +8,53 @@ import (
 	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
+
+func searchSync(adapter discovery.StreamingAdapter, ctx context.Context, scope, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.SearchStream(ctx, scope, query, ignoreCache, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("failed to search: %v", errs)
+	}
+
+	return items, nil
+}
+
+func listSync(adapter discovery.StreamingAdapter, ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.ListStream(ctx, scope, ignoreCache, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("failed to List: %v", errs)
+	}
+
+	return items, nil
+}
 
 func EC2(t *testing.T) {
 	ctx := context.Background()
@@ -39,7 +84,7 @@ func EC2(t *testing.T) {
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List instances
-	sdpListInstances, err := instanceAdapter.List(context.Background(), scope, true)
+	sdpListInstances, err := listSync(instanceAdapter, context.Background(), scope, true)
 	if err != nil {
 		t.Fatalf("failed to list EC2 instances: %v", err)
 	}
@@ -77,7 +122,7 @@ func EC2(t *testing.T) {
 
 	// Search instances
 	instanceARN := fmt.Sprintf("arn:aws:ec2:%s:%s:instance/%s", testAWSConfig.Region, accountID, instanceID)
-	sdpSearchInstances, err := instanceAdapter.Search(context.Background(), scope, instanceARN, true)
+	sdpSearchInstances, err := searchSync(instanceAdapter, context.Background(), scope, instanceARN, true)
 	if err != nil {
 		t.Fatalf("failed to search EC2 instances: %v", err)
 	}

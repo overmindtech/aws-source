@@ -16,7 +16,6 @@ import (
 	"github.com/overmindtech/sdp-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/sourcegraph/conc/iter"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -132,74 +131,7 @@ func addPolicyEntities(ctx context.Context, client IAMClient, details *PolicyDet
 	return nil
 }
 
-// PolicyListFunc Lists all attached policies. There is no way to list
-// unattached policies since I don't think it will be very valuable, there are
-// hundreds by default and if you aren't using them they aren't very interesting
-func policyListFunc(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
-	var span trace.Span
-	if log.GetLevel() == log.TraceLevel {
-		// Only create new spans on trace level logging
-		ctx, span = tracer.Start(ctx, "policyListFunc")
-		defer span.End()
-	} else {
-		span = trace.SpanFromContext(ctx)
-	}
-
-	policies := make([]types.Policy, 0)
-
-	var iamScope types.PolicyScopeType
-
-	if scope == "aws" {
-		iamScope = types.PolicyScopeTypeAws
-	} else {
-		iamScope = types.PolicyScopeTypeLocal
-	}
-
-	paginator := iam.NewListPoliciesPaginator(client, &iam.ListPoliciesInput{
-		OnlyAttached: true,
-		Scope:        iamScope,
-	})
-
-	for paginator.HasMorePages() {
-		out, err := paginator.NextPage(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		policies = append(policies, out.Policies...)
-	}
-
-	span.SetAttributes(
-		attribute.Int("ovm.aws.numPolicies", len(policies)),
-	)
-
-	policyDetails, err := iter.MapErr[types.Policy, *PolicyDetails](policies, func(p *types.Policy) (*PolicyDetails, error) {
-		details := PolicyDetails{
-			Policy: p,
-		}
-
-		err := addPolicyEntities(ctx, client, &details)
-		if err != nil {
-			return &details, err
-		}
-
-		err = addPolicyDocument(ctx, client, &details)
-		if err != nil {
-			return &details, err
-		}
-
-		return &details, nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return policyDetails, nil
-}
-
-func policyItemMapper(_, scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
+func policyItemMapper(_ *string, scope string, awsItem *PolicyDetails) (*sdp.Item, error) {
 	finalAttributes := struct {
 		*types.Policy
 		Document *policy.Policy
@@ -316,32 +248,60 @@ func policyListTagsFunc(ctx context.Context, p *PolicyDetails, client IAMClient)
 	return tags, nil
 }
 
+func policyListExtractor(ctx context.Context, output *iam.ListPoliciesOutput, client IAMClient) ([]*PolicyDetails, error) {
+	return iter.MapErr[types.Policy, *PolicyDetails](output.Policies, func(p *types.Policy) (*PolicyDetails, error) {
+		details := PolicyDetails{
+			Policy: p,
+		}
+
+		err := addPolicyEntities(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
+
+		err = addPolicyDocument(ctx, client, &details)
+		if err != nil {
+			return &details, err
+		}
+
+		return &details, nil
+	})
+}
+
 // NewPolicyAdapter Note that this policy adapter only support polices that are
 // user-created due to the fact that the AWS-created ones are basically "global"
 // in scope. In order to get this to work I'd have to change the way the adapter
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-adapter/issues/68
-func NewIAMPolicyAdapter(client *iam.Client, accountID string, _ string) *adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options] {
-	return &adapterhelpers.GetListAdapter[*PolicyDetails, IAMClient, *iam.Options]{
-		ItemType:        "iam-policy",
-		Client:          client,
-		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:       accountID,
-		Region:          "", // IAM policies aren't tied to a region
-		AdapterMetadata: policyAdapterMetadata,
-		// Some IAM policies are global, this means that their ARN doesn't
-		// contain an account name and instead just says "aws". Enabling this
-		// setting means these also work
+func NewIAMPolicyAdapter(client IAMClient, accountID string, _ string) *adapterhelpers.GetListAdapterV2[*iam.ListPoliciesInput, *iam.ListPoliciesOutput, *PolicyDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapterV2[*iam.ListPoliciesInput, *iam.ListPoliciesOutput, *PolicyDetails, IAMClient, *iam.Options]{
+		ItemType:               "iam-policy",
+		Client:                 client,
+		AccountID:              accountID,
+		Region:                 "",            // IAM policies aren't tied to a region
+		CacheDuration:          3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AdapterMetadata:        policyAdapterMetadata,
 		SupportGlobalResources: true,
-		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*PolicyDetails, error) {
-			return policyGetFunc(ctx, client, scope, query)
+		InputMapperList: func(scope string) (*iam.ListPoliciesInput, error) {
+			var iamScope types.PolicyScopeType
+			if scope == "aws" {
+				iamScope = types.PolicyScopeTypeAws
+			} else {
+				iamScope = types.PolicyScopeTypeLocal
+			}
+			return &iam.ListPoliciesInput{
+				OnlyAttached: true,
+				Scope:        iamScope,
+			}, nil
 		},
-		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*PolicyDetails, error) {
-			return policyListFunc(ctx, client, scope)
+		ListFuncPaginatorBuilder: func(client IAMClient, params *iam.ListPoliciesInput) adapterhelpers.Paginator[*iam.ListPoliciesOutput, *iam.Options] {
+			return iam.NewListPoliciesPaginator(client, params)
 		},
-		ListTagsFunc: policyListTagsFunc,
-		ItemMapper:   policyItemMapper,
+		ListExtractor: policyListExtractor,
+		GetFunc:       policyGetFunc,
+		ItemMapper:    policyItemMapper,
+		ListTagsFunc:  policyListTagsFunc,
 	}
 }
 

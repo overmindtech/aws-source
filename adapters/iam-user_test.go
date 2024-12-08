@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -142,19 +143,36 @@ func TestUserGetFunc(t *testing.T) {
 }
 
 func TestUserListFunc(t *testing.T) {
-	users, err := userListFunc(context.Background(), &TestIAMClient{}, "foo")
+	adapter := NewIAMUserAdapter(&TestIAMClient{}, "foo", "bar")
 
-	if err != nil {
-		t.Error(err)
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.ListStream(context.Background(), "foo.bar", false, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
-	if len(users) != 3 {
-		t.Errorf("expected 3 users, got %v", len(users))
+	if len(items) != 3 {
+		t.Errorf("expected 3 items, got %v", len(items))
 	}
 
-	for _, user := range users {
-		if len(user.UserGroups) != 3 {
-			t.Errorf("expected 3 groups, got %v", len(user.UserGroups))
+	for _, item := range items {
+		if err := item.Validate(); err != nil {
+			t.Error(err)
+		}
+		if len(item.LinkedItemQueries) != 3 {
+			t.Errorf("expected 3 linked item queries, got %v", len(item.LinkedItemQueries))
 		}
 	}
 }
@@ -195,7 +213,7 @@ func TestUserItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := userItemMapper("", "foo", &details)
+	item, err := userItemMapper(nil, "foo", &details)
 
 	if err != nil {
 		t.Error(err)

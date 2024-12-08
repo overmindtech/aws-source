@@ -19,7 +19,7 @@ func TestGroupItemMapper(t *testing.T) {
 		CreateDate: adapterhelpers.PtrTime(time.Now()),
 	}
 
-	item, err := groupItemMapper("", "foo", &zone)
+	item, err := groupItemMapper(nil, "foo", &zone)
 
 	if err != nil {
 		t.Error(err)

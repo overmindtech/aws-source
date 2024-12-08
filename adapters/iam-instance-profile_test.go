@@ -39,7 +39,7 @@ func TestInstanceProfileItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := instanceProfileItemMapper("", "foo", &profile)
+	item, err := instanceProfileItemMapper(nil, "foo", &profile)
 
 	if err != nil {
 		t.Error(err)
