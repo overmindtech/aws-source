@@ -23,23 +23,7 @@ func instanceProfileGetFunc(ctx context.Context, client *iam.Client, _, query st
 	return out.InstanceProfile, nil
 }
 
-func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.InstanceProfile, error) {
-	out, err := client.ListInstanceProfiles(ctx, &iam.ListInstanceProfilesInput{})
-
-	if err != nil {
-		return nil, err
-	}
-
-	zones := make([]*types.InstanceProfile, 0, len(out.InstanceProfiles))
-
-	for i := range out.InstanceProfiles {
-		zones = append(zones, &out.InstanceProfiles[i])
-	}
-
-	return zones, nil
-}
-
-func instanceProfileItemMapper(_, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
+func instanceProfileItemMapper(_ *string, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
@@ -118,18 +102,29 @@ func instanceProfileListTagsFunc(ctx context.Context, ip *types.InstanceProfile,
 	return tags
 }
 
-func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options] {
-	return &adapterhelpers.GetListAdapter[*types.InstanceProfile, *iam.Client, *iam.Options]{
+func NewIAMInstanceProfileAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListInstanceProfilesInput, *iam.ListInstanceProfilesOutput, *types.InstanceProfile, *iam.Client, *iam.Options] {
+	return &adapterhelpers.GetListAdapterV2[*iam.ListInstanceProfilesInput, *iam.ListInstanceProfilesOutput, *types.InstanceProfile, *iam.Client, *iam.Options]{
 		ItemType:        "iam-instance-profile",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:       accountID,
+		Region:          region,
 		AdapterMetadata: instanceProfileAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.InstanceProfile, error) {
 			return instanceProfileGetFunc(ctx, client, scope, query)
 		},
-		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.InstanceProfile, error) {
-			return instanceProfileListFunc(ctx, client, scope)
+		InputMapperList: func(scope string) (*iam.ListInstanceProfilesInput, error) {
+			return &iam.ListInstanceProfilesInput{}, nil
+		},
+		ListFuncPaginatorBuilder: func(client *iam.Client, params *iam.ListInstanceProfilesInput) adapterhelpers.Paginator[*iam.ListInstanceProfilesOutput, *iam.Options] {
+			return iam.NewListInstanceProfilesPaginator(client, params)
+		},
+		ListExtractor: func(_ context.Context, output *iam.ListInstanceProfilesOutput, _ *iam.Client) ([]*types.InstanceProfile, error) {
+			profiles := make([]*types.InstanceProfile, 0, len(output.InstanceProfiles))
+			for i := range output.InstanceProfiles {
+				profiles = append(profiles, &output.InstanceProfiles[i])
+			}
+			return profiles, nil
 		},
 		ListTagsFunc: func(ctx context.Context, ip *types.InstanceProfile, c *iam.Client) (map[string]string, error) {
 			return instanceProfileListTagsFunc(ctx, ip, c), nil

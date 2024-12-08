@@ -77,42 +77,7 @@ func getUserGroups(ctx context.Context, client IAMClient, userName *string) ([]t
 	return groups, nil
 }
 
-func userListFunc(ctx context.Context, client IAMClient, _ string) ([]*UserDetails, error) {
-	var out *iam.ListUsersOutput
-	var err error
-	users := make([]types.User, 0)
-
-	paginator := iam.NewListUsersPaginator(client, &iam.ListUsersInput{})
-
-	for paginator.HasMorePages() {
-		out, err = paginator.NextPage(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		users = append(users, out.Users...)
-	}
-
-	userDetails := make([]*UserDetails, 0, len(users))
-
-	for i := range users {
-		details := UserDetails{
-			User: &users[i],
-		}
-
-		err := enrichUser(ctx, client, &details)
-		if err != nil {
-			return nil, fmt.Errorf("failed to enrich user %s: %w", *details.User.UserName, err)
-		}
-
-		userDetails = append(userDetails, &details)
-	}
-
-	return userDetails, nil
-}
-
-func userItemMapper(_, scope string, awsItem *UserDetails) (*sdp.Item, error) {
+func userItemMapper(_ *string, scope string, awsItem *UserDetails) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem.User)
 
 	if err != nil {
@@ -170,22 +135,43 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 	return tags, nil
 }
 
-func NewIAMUserAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options] {
-	return &adapterhelpers.GetListAdapter[*UserDetails, IAMClient, *iam.Options]{
-		ItemType:        "iam-user",
-		Client:          client,
-		AccountID:       accountID,
-		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		Region:          region,
-		AdapterMetadata: iamUserAdapterMetadata,
+func NewIAMUserAdapter(client IAMClient, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListUsersInput, *iam.ListUsersOutput, *UserDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapterV2[*iam.ListUsersInput, *iam.ListUsersOutput, *UserDetails, IAMClient, *iam.Options]{
+		ItemType:      "iam-user",
+		Client:        client,
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:     accountID,
+		Region:        region,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 			return userGetFunc(ctx, client, scope, query)
 		},
-		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*UserDetails, error) {
-			return userListFunc(ctx, client, scope)
+		InputMapperList: func(scope string) (*iam.ListUsersInput, error) {
+			return &iam.ListUsersInput{}, nil
 		},
-		ListTagsFunc: userListTagsFunc,
-		ItemMapper:   userItemMapper,
+		ListFuncPaginatorBuilder: func(client IAMClient, input *iam.ListUsersInput) adapterhelpers.Paginator[*iam.ListUsersOutput, *iam.Options] {
+			return iam.NewListUsersPaginator(client, input)
+		},
+		ListExtractor: func(ctx context.Context, output *iam.ListUsersOutput, client IAMClient) ([]*UserDetails, error) {
+			userDetails := make([]*UserDetails, 0, len(output.Users))
+
+			for i := range output.Users {
+				details := UserDetails{
+					User: &output.Users[i],
+				}
+
+				err := enrichUser(ctx, client, &details)
+				if err != nil {
+					return nil, fmt.Errorf("failed to enrich user %s: %w", *details.User.UserName, err)
+				}
+
+				userDetails = append(userDetails, &details)
+			}
+
+			return userDetails, nil
+		},
+		ItemMapper:      userItemMapper,
+		ListTagsFunc:    userListTagsFunc,
+		AdapterMetadata: iamUserAdapterMetadata,
 	}
 }
 

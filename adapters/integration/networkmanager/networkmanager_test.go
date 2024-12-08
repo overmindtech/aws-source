@@ -9,8 +9,31 @@ import (
 	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/aws-source/adapters"
 	"github.com/overmindtech/aws-source/adapters/integration"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
+
+func searchSync(adapter discovery.StreamingAdapter, ctx context.Context, scope, query string, ignoreCache bool) ([]*sdp.Item, error) {
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.SearchStream(ctx, scope, query, ignoreCache, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("failed to search: %v", errs)
+	}
+
+	return items, nil
+}
 
 func NetworkManager(t *testing.T) {
 	ctx := context.Background()
@@ -63,10 +86,22 @@ func NetworkManager(t *testing.T) {
 	globalScope := adapterhelpers.FormatScope(accountID, "")
 
 	t.Run("Global Network", func(t *testing.T) {
-		// List global networks
-		globalNetworks, err := globalNetworkSource.List(ctx, globalScope, true)
-		if err != nil {
-			t.Fatalf("failed to list NetworkManager global networks: %v", err)
+		globalNetworks := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				globalNetworks = append(globalNetworks, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		globalNetworkSource.ListStream(ctx, globalScope, false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Fatalf("failed to list NetworkManager global networks: %v", errs)
 		}
 
 		if len(globalNetworks) == 0 {
@@ -105,7 +140,7 @@ func NetworkManager(t *testing.T) {
 			t.Fatalf("expected global scope %s, got %s", globalScope, globalNetwork.GetScope())
 		}
 
-		globalNetworks, err = globalNetworkSource.Search(ctx, globalScope, globalNetworkARN.(string), true)
+		globalNetworks, err = searchSync(globalNetworkSource, ctx, globalScope, globalNetworkARN.(string), true)
 		if err != nil {
 			t.Fatalf("failed to search NetworkManager global networks: %v", err)
 		}
@@ -125,7 +160,7 @@ func NetworkManager(t *testing.T) {
 
 		t.Run("Site", func(t *testing.T) {
 			// Search sites by the global network ID that they are created on
-			sites, err := siteSource.Search(ctx, globalScope, globalNetworkID, true)
+			sites, err := searchSync(siteSource, ctx, globalScope, globalNetworkID, true)
 			if err != nil {
 				t.Fatalf("failed to search for site: %v", err)
 			}
@@ -161,7 +196,7 @@ func NetworkManager(t *testing.T) {
 
 			t.Run("Link", func(t *testing.T) {
 				// Search links by the global network ID that they are created on
-				links, err := linkSource.Search(ctx, globalScope, globalNetworkID, true)
+				links, err := searchSync(linkSource, ctx, globalScope, globalNetworkID, true)
 				if err != nil {
 					t.Fatalf("failed to search for link: %v", err)
 				}
@@ -198,7 +233,7 @@ func NetworkManager(t *testing.T) {
 					// Search devices by the global network ID and site ID
 					// query format = globalNetworkID|siteID
 					queryDevice := fmt.Sprintf("%s|%s", globalNetworkID, siteID)
-					devices, err := deviceSource.Search(ctx, globalScope, queryDevice, true)
+					devices, err := searchSync(deviceSource, ctx, globalScope, queryDevice, true)
 					if err != nil {
 						t.Fatalf("failed to search for device: %v", err)
 					}
@@ -233,7 +268,7 @@ func NetworkManager(t *testing.T) {
 					deviceOneID := strings.Split(deviceOneCompositeID, "|")[1]
 
 					// Search devices by the global network ID
-					devicesByGlobalNetwork, err := deviceSource.Search(ctx, globalScope, globalNetworkID, true)
+					devicesByGlobalNetwork, err := searchSync(deviceSource, ctx, globalScope, globalNetworkID, true)
 					if err != nil {
 						t.Fatalf("failed to search for device by global network: %v", err)
 					}
@@ -243,7 +278,7 @@ func NetworkManager(t *testing.T) {
 					t.Run("Link Association", func(t *testing.T) {
 						// Search link associations by the global network ID, link ID
 						queryLALink := fmt.Sprintf("%s|link|%s", globalNetworkID, linkID)
-						linkAssociations, err := linkAssociationSource.Search(ctx, globalScope, queryLALink, true)
+						linkAssociations, err := searchSync(linkAssociationSource, ctx, globalScope, queryLALink, true)
 						if err != nil {
 							t.Fatalf("failed to search for link association: %v", err)
 						}
@@ -276,7 +311,7 @@ func NetworkManager(t *testing.T) {
 						}
 
 						// Search link associations by the global network ID
-						searchLinkAssociationsByGlobalNetwork, err := linkAssociationSource.Search(ctx, globalScope, globalNetworkID, true)
+						searchLinkAssociationsByGlobalNetwork, err := searchSync(linkAssociationSource, ctx, globalScope, globalNetworkID, true)
 						if err != nil {
 							t.Fatalf("failed to search for link association by global network: %v", err)
 						}
@@ -285,7 +320,7 @@ func NetworkManager(t *testing.T) {
 
 						// Search link associations by the global network ID and device ID
 						queryLADevice := fmt.Sprintf("%s|device|%s", globalNetworkID, deviceOneID)
-						linkAssociationsByDevice, err := linkAssociationSource.Search(ctx, globalScope, queryLADevice, true)
+						linkAssociationsByDevice, err := searchSync(linkAssociationSource, ctx, globalScope, queryLADevice, true)
 						if err != nil {
 							t.Fatalf("failed to search for link association by device: %v", err)
 						}
@@ -295,7 +330,7 @@ func NetworkManager(t *testing.T) {
 
 					t.Run("Connection", func(t *testing.T) {
 						// Search connections by the global network ID
-						connections, err := connectionSource.Search(ctx, globalScope, globalNetworkID, true)
+						connections, err := searchSync(connectionSource, ctx, globalScope, globalNetworkID, true)
 						if err != nil {
 							t.Fatalf("failed to search for connection: %v", err)
 						}
@@ -329,7 +364,7 @@ func NetworkManager(t *testing.T) {
 
 						// Search connections by global network ID and device ID
 						queryCon := fmt.Sprintf("%s|%s", globalNetworkID, deviceOneID)
-						connectionsByDevice, err := connectionSource.Search(ctx, globalScope, queryCon, true)
+						connectionsByDevice, err := searchSync(connectionSource, ctx, globalScope, queryCon, true)
 						if err != nil {
 							t.Fatalf("failed to search for connection by device: %v", err)
 						}

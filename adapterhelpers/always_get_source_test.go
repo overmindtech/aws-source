@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -141,11 +142,22 @@ func TestAlwaysGetSourceList(t *testing.T) {
 				return ""
 			},
 		}
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		items, err := lgs.List(context.Background(), "foo.bar", false)
+		lgs.ListStream(context.Background(), "foo.bar", false, stream)
+		stream.Close()
 
-		if err != nil {
-			t.Error(err)
+		if len(errs) != 0 {
+			t.Errorf("expected no errors, got %v", len(errs))
 		}
 
 		if len(items) != 6 {
@@ -178,16 +190,24 @@ func TestAlwaysGetSourceList(t *testing.T) {
 				return ""
 			},
 		}
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		_, err := lgs.List(context.Background(), "foo.bar", false)
+		lgs.ListStream(context.Background(), "foo.bar", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Fatal("expected error but got nil")
+		if len(errs) != 1 {
+			t.Fatalf("expected 1 error, got %v", len(errs))
 		}
 
 		qErr := &sdp.QueryError{}
-		if !errors.As(err, &qErr) {
-			t.Errorf("expected error to be a QueryError, got %v", err)
+		if !errors.As(errs[0], &qErr) {
+			t.Errorf("expected error to be a QueryError, got %v", errs[0])
 		} else {
 			if qErr.GetErrorString() != "output mapper error" {
 				t.Errorf("expected 'output mapper error', got '%v'", qErr.GetErrorString())
@@ -214,18 +234,28 @@ func TestAlwaysGetSourceList(t *testing.T) {
 				return []string{"", ""}, nil
 			},
 			GetFunc: func(ctx context.Context, client struct{}, scope, input string) (*sdp.Item, error) {
-				return &sdp.Item{}, errors.New("get func error")
+				return nil, errors.New("get func error")
 			},
 			GetInputMapper: func(scope, query string) string {
 				return ""
 			},
 		}
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		items, err := lgs.List(context.Background(), "foo.bar", false)
+		lgs.ListStream(context.Background(), "foo.bar", false, stream)
+		stream.Close()
 
-		// If GetFunc fails it doesn't cause an error
-		if err != nil {
-			t.Error(err)
+		if len(errs) != 0 {
+			t.Fatalf("expected 0 error, got %v", len(errs))
 		}
 
 		if len(items) != 0 {
@@ -266,26 +296,62 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 		}
 
 		t.Run("bad ARN", func(t *testing.T) {
-			_, err := lgs.Search(context.Background(), "foo.bar", "query", false)
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {
+					items = append(items, item)
+				},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err == nil {
+			lgs.SearchStream(context.Background(), "foo.bar", "query", false, stream)
+			stream.Close()
+
+			if len(errs) == 0 {
 				t.Error("expected error because the ARN was bad")
 			}
 		})
 
 		t.Run("good ARN but bad scope", func(t *testing.T) {
-			_, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:region:account:type/id", false)
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {
+					items = append(items, item)
+				},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err == nil {
+			lgs.SearchStream(context.Background(), "foo.bar", "arn:aws:service:region:account:type/id", false, stream)
+			stream.Close()
+
+			if len(errs) == 0 {
 				t.Error("expected error because the ARN had a bad scope")
 			}
 		})
 
 		t.Run("good ARN", func(t *testing.T) {
-			_, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id", false)
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {
+					items = append(items, item)
+				},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err != nil {
-				t.Error(err)
+			lgs.SearchStream(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id", false, stream)
+			stream.Close()
+
+			if len(errs) != 0 {
+				t.Error(errs[0])
 			}
 		})
 	})
@@ -325,10 +391,22 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 		}
 
 		t.Run("ARN", func(t *testing.T) {
-			items, err := lgs.Search(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id", false)
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {
+					items = append(items, item)
+				},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err != nil {
-				t.Error(err)
+			lgs.SearchStream(context.Background(), "foo.bar", "arn:aws:service:bar:foo:type/id", false, stream)
+			stream.Close()
+
+			if len(errs) != 0 {
+				t.Error(errs[0])
 			}
 
 			if len(items) != 1 {
@@ -337,18 +415,29 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 		})
 
 		t.Run("other search", func(t *testing.T) {
-			items, err := lgs.Search(context.Background(), "foo.bar", "id", false)
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {
+					items = append(items, item)
+				},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err != nil {
-				t.Error(err)
+			lgs.SearchStream(context.Background(), "foo.bar", "id", false, stream)
+			stream.Close()
+
+			if len(errs) != 0 {
+				t.Errorf("expected 0 error, got %v", len(errs))
 			}
 
 			if len(items) != 0 {
-				t.Errorf("expected 0 item, got %v", len(items))
+				t.Errorf("expected 0 items, got %v", len(items))
 			}
 		})
 	})
-
 	t.Run("with custom search logic", func(t *testing.T) {
 		var searchMapperCalled bool
 
@@ -380,10 +469,22 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 			},
 		}
 
-		_, err := lgs.Search(context.Background(), "foo.bar", "bar", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		if err != nil {
-			t.Error(err)
+		lgs.SearchStream(context.Background(), "foo.bar", "bar", false, stream)
+		stream.Close()
+
+		if len(errs) != 0 {
+			t.Error(errs[0])
 		}
 
 		if !searchMapperCalled {
@@ -425,10 +526,22 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 			},
 		}
 
-		items, err := ags.Search(context.Background(), "foo.bar", "id", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		if err != nil {
-			t.Error(err)
+		ags.SearchStream(context.Background(), "foo.bar", "id", false, stream)
+		stream.Close()
+
+		if len(errs) != 0 {
+			t.Error(errs[0])
 		}
 
 		if len(items) != 1 {
@@ -518,81 +631,108 @@ func TestAlwaysGetSourceCaching(t *testing.T) {
 	})
 
 	t.Run("list", func(t *testing.T) {
-		// list
-		first, err := s.List(ctx, "foo.eu-west-2", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		// First query
+		s.ListStream(ctx, "foo.eu-west-2", false, stream)
+		// Second time we're expecting caching
+		s.ListStream(ctx, "foo.eu-west-2", false, stream)
+		// Third time we're expecting no caching since we asked it to ignore
+		s.ListStream(ctx, "foo.eu-west-2", true, stream)
+		stream.Close()
+
+		if len(errs) != 0 {
+			for _, err := range errs {
+				t.Error(err)
+			}
+			t.Fatal("expected no errors")
+		}
+
+		if len(items) != 3 {
+			t.Errorf("expected 3 items, got %v", len(items))
+		}
+
+		firstGen, err := items[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].GetAttributes().Get("generation")
+		withCache, err := items[1].GetAttributes().Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCache, err := items[2].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// list again
-		withCache, err := s.List(ctx, "foo.eu-west-2", false)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
+		if firstGen != withCache {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCache)
 		}
 
-		if firstGen != withCacheGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
-		}
-
-		// list ignore cache
-		withoutCache, err := s.List(ctx, "foo.eu-west-2", true)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if withoutCacheGen == firstGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		if withoutCache == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCache)
 		}
 	})
 
 	t.Run("search", func(t *testing.T) {
-		// search
-		first, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		// First query
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false, stream)
+		// Second time we're expecting caching
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false, stream)
+		// Third time we're expecting no caching since we asked it to ignore
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true, stream)
+		stream.Close()
+
+		if len(errs) != 0 {
+			for _, err := range errs {
+				t.Error(err)
+			}
+			t.Fatal("expected no errors")
+		}
+
+		if len(items) != 3 {
+			t.Errorf("expected 3 items, got %v", len(items))
+		}
+
+		firstGen, err := items[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].GetAttributes().Get("generation")
+		withCache, err := items[1].GetAttributes().Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCache, err := items[2].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// search again
-		withCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
+		if firstGen != withCache {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCache)
 		}
 
-		if firstGen != withCacheGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
-		}
-
-		// search ignore cache
-		withoutCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if withoutCacheGen == firstGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		if withoutCache == firstGen {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCache)
 		}
 	})
 }

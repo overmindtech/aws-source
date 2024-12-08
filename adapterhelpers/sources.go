@@ -12,13 +12,14 @@ const DefaultMaxResultsPerPage = 100
 // https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#Client
 type ClientStructType any
 
-// InputType is the type of data that will be sent to the DesribeFunc. This is
-// typically a struct ending with the word Input such as:
+// InputType is the type of data that will be sent to the a List/Describe
+// function. This is typically a struct ending with the word Input such as:
 // https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterInput
 type InputType any
 
-// OutputType is the type of output to expect from the DescribeFunc, this is
-// usually named the same as the input type, but with `Output` on the end e.g.
+// OutputType is the type of output to expect from the List/Describe function,
+// this is usually named the same as the input type, but with `Output` on the
+// end e.g.
 // https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/eks@v1.26.0#DescribeClusterOutput
 type OutputType any
 

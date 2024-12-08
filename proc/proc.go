@@ -487,14 +487,17 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						adapters.NewSSMParameterAdapter(ssmClient, *callerID.Account, cfg.Region),
 					}
 
-					e.AddAdapters(configuredAdapters...)
+					err = e.AddAdapters(configuredAdapters...)
+					if err != nil {
+						return err
+					}
 
 					// Add "global" sources (those that aren't tied to a region, like
 					// cloudfront). but only do this once for the first region. For
 					// these APIs it doesn't matter which region we call them from, we
 					// get global results
 					if globalDone.CompareAndSwap(false, true) {
-						e.AddAdapters(
+						err = e.AddAdapters(
 							// Cloudfront
 							adapters.NewCloudfrontCachePolicyAdapter(cloudfrontClient, *callerID.Account),
 							adapters.NewCloudfrontContinuousDeploymentPolicyAdapter(cloudfrontClient, *callerID.Account),
@@ -518,6 +521,9 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 							adapters.NewNetworkManagerLinkAssociationAdapter(networkmanagerClient, *callerID.Account),
 							adapters.NewNetworkManagerConnectionAdapter(networkmanagerClient, *callerID.Account),
 						)
+						if err != nil {
+							return err
+						}
 					}
 					return nil
 				})

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -126,10 +127,22 @@ func TestCapacityProviderOutputMapper(t *testing.T) {
 func TestCapacityProviderAdapter(t *testing.T) {
 	adapter := NewECSCapacityProviderAdapter(&ecsTestClient{}, "", "")
 
-	items, err := adapter.List(context.Background(), "", false)
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
 
-	if err != nil {
-		t.Error(err)
+	adapter.ListStream(context.Background(), "", false, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
 	if len(items) != 3 {

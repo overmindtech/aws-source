@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -206,18 +207,6 @@ func TestPolicyGetFunc(t *testing.T) {
 	}
 }
 
-func TestPolicyListFunc(t *testing.T) {
-	policies, err := policyListFunc(context.Background(), &TestIAMClient{}, "foo")
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if len(policies) != 2 {
-		t.Errorf("expected 2 policies, got %v", len(policies))
-	}
-}
-
 func TestPolicyListTagsFunc(t *testing.T) {
 	tags, err := policyListTagsFunc(context.Background(), &PolicyDetails{
 		Policy: &types.Policy{
@@ -271,7 +260,7 @@ func TestPolicyItemMapper(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	item, err := policyItemMapper("", "foo", details)
+	item, err := policyItemMapper(nil, "foo", details)
 
 	if err != nil {
 		t.Error(err)
@@ -373,10 +362,22 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := adapter.List(ctx, adapterhelpers.FormatScope(account, ""), false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		if err != nil {
-			t.Error(err)
+		adapter.ListStream(ctx, adapterhelpers.FormatScope(account, ""), false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		for _, item := range items {
@@ -405,10 +406,19 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := adapter.Search(ctx, adapterhelpers.FormatScope(account, ""), arn.(string), false)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err != nil {
-				t.Error(err)
+			adapter.SearchStream(ctx, adapterhelpers.FormatScope(account, ""), arn.(string), false, stream)
+			stream.Close()
+
+			if len(errs) > 0 {
+				t.Error(errs)
 			}
 		})
 
@@ -420,9 +430,18 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := adapter.Search(ctx, "aws", arn.(string), false)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err == nil {
+			adapter.SearchStream(ctx, "aws", arn.(string), false, stream)
+			stream.Close()
+
+			if len(errs) == 0 {
 				t.Error("expected error, got nil")
 			}
 		})
@@ -432,9 +451,22 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 		ctx, span := tracer.Start(context.Background(), t.Name())
 		defer span.End()
 
-		items, err := adapter.List(ctx, "aws", false)
-		if err != nil {
-			t.Error(err)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		adapter.ListStream(ctx, "aws", false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		if len(items) == 0 {
@@ -467,9 +499,18 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := adapter.Search(ctx, adapterhelpers.FormatScope(account, ""), arn.(string), false)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err == nil {
+			adapter.SearchStream(ctx, adapterhelpers.FormatScope(account, ""), arn.(string), false, stream)
+			stream.Close()
+
+			if len(errs) == 0 {
 				t.Error("expected error, got nil")
 			}
 		})
@@ -482,10 +523,19 @@ func TestNewIAMPolicyAdapter(t *testing.T) {
 
 			arn, _ := items[0].GetAttributes().Get("Arn")
 
-			_, err := adapter.Search(ctx, "aws", arn.(string), false)
+			errs := make([]error, 0)
+			stream := discovery.NewQueryResultStream(
+				func(item *sdp.Item) {},
+				func(err error) {
+					errs = append(errs, err)
+				},
+			)
 
-			if err != nil {
-				t.Error(err)
+			adapter.SearchStream(ctx, "aws", arn.(string), false, stream)
+			stream.Close()
+
+			if len(errs) > 0 {
+				t.Error(errs)
 			}
 		})
 	})

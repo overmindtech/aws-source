@@ -13,19 +13,31 @@ import (
 	"github.com/micahhausler/aws-iam-policy/policy"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
 
 func (t *TestIAMClient) GetRole(ctx context.Context, params *iam.GetRoleInput, optFns ...func(*iam.Options)) (*iam.GetRoleOutput, error) {
 	return &iam.GetRoleOutput{
 		Role: &types.Role{
-			Path:                     adapterhelpers.PtrString("/service-role/"),
-			RoleName:                 adapterhelpers.PtrString("AWSControlTowerConfigAggregatorRoleForOrganizations"),
-			RoleId:                   adapterhelpers.PtrString("AROA3VLV2U27YSTBFCGCJ"),
-			Arn:                      adapterhelpers.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
-			CreateDate:               adapterhelpers.PtrTime(time.Now()),
-			AssumeRolePolicyDocument: adapterhelpers.PtrString("FOO"),
-			MaxSessionDuration:       adapterhelpers.PtrInt32(3600),
+			Path:       adapterhelpers.PtrString("/service-role/"),
+			RoleName:   adapterhelpers.PtrString("AWSControlTowerConfigAggregatorRoleForOrganizations"),
+			RoleId:     adapterhelpers.PtrString("AROA3VLV2U27YSTBFCGCJ"),
+			Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
+			CreateDate: adapterhelpers.PtrTime(time.Now()),
+			AssumeRolePolicyDocument: adapterhelpers.PtrString(`{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}`),
+			MaxSessionDuration: adapterhelpers.PtrInt32(3600),
 		},
 	}, nil
 }
@@ -43,13 +55,24 @@ func (t *TestIAMClient) ListRoles(context.Context, *iam.ListRolesInput, ...func(
 	return &iam.ListRolesOutput{
 		Roles: []types.Role{
 			{
-				Path:                     adapterhelpers.PtrString("/service-role/"),
-				RoleName:                 adapterhelpers.PtrString("AWSControlTowerConfigAggregatorRoleForOrganizations"),
-				RoleId:                   adapterhelpers.PtrString("AROA3VLV2U27YSTBFCGCJ"),
-				Arn:                      adapterhelpers.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
-				CreateDate:               adapterhelpers.PtrTime(time.Now()),
-				AssumeRolePolicyDocument: adapterhelpers.PtrString("FOO"),
-				MaxSessionDuration:       adapterhelpers.PtrInt32(3600),
+				Path:       adapterhelpers.PtrString("/service-role/"),
+				RoleName:   adapterhelpers.PtrString("AWSControlTowerConfigAggregatorRoleForOrganizations"),
+				RoleId:     adapterhelpers.PtrString("AROA3VLV2U27YSTBFCGCJ"),
+				Arn:        adapterhelpers.PtrString("arn:aws:iam::801795385023:role/service-role/AWSControlTowerConfigAggregatorRoleForOrganizations"),
+				CreateDate: adapterhelpers.PtrTime(time.Now()),
+				AssumeRolePolicyDocument: adapterhelpers.PtrString(`{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}`),
+				MaxSessionDuration: adapterhelpers.PtrInt32(3600),
 			},
 		},
 	}, nil
@@ -120,14 +143,28 @@ func TestRoleGetFunc(t *testing.T) {
 }
 
 func TestRoleListFunc(t *testing.T) {
-	roles, err := roleListFunc(context.Background(), &TestIAMClient{}, "foo")
+	adapter := NewIAMRoleAdapter(&TestIAMClient{}, "foo", "bar")
 
-	if err != nil {
-		t.Error(err)
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	adapter.ListStream(context.Background(), "foo.bar", false, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
-	if len(roles) != 1 {
-		t.Errorf("expected 1 role, got %b", len(roles))
+	if len(items) != 1 {
+		t.Errorf("expected 1 role, got %b", len(items))
 	}
 }
 
@@ -199,7 +236,7 @@ func TestRoleItemMapper(t *testing.T) {
 		},
 	}
 
-	item, err := roleItemMapper("", "foo", &role)
+	item, err := roleItemMapper(nil, "foo", &role)
 
 	if err != nil {
 		t.Fatal(err)

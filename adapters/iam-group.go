@@ -23,23 +23,7 @@ func groupGetFunc(ctx context.Context, client *iam.Client, _, query string) (*ty
 	return out.Group, nil
 }
 
-func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.Group, error) {
-	out, err := client.ListGroups(ctx, &iam.ListGroupsInput{})
-
-	if err != nil {
-		return nil, err
-	}
-
-	zones := make([]*types.Group, 0, len(out.Groups))
-
-	for i := range out.Groups {
-		zones = append(zones, &out.Groups[i])
-	}
-
-	return zones, nil
-}
-
-func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
+func groupItemMapper(_ *string, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
 	if err != nil {
@@ -56,18 +40,29 @@ func groupItemMapper(_, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	return &item, nil
 }
 
-func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options] {
-	return &adapterhelpers.GetListAdapter[*types.Group, *iam.Client, *iam.Options]{
+func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListGroupsInput, *iam.ListGroupsOutput, *types.Group, *iam.Client, *iam.Options] {
+	return &adapterhelpers.GetListAdapterV2[*iam.ListGroupsInput, *iam.ListGroupsOutput, *types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:       accountID,
+		Region:          region,
 		AdapterMetadata: iamGroupAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
 			return groupGetFunc(ctx, client, scope, query)
 		},
-		ListFunc: func(ctx context.Context, client *iam.Client, scope string) ([]*types.Group, error) {
-			return groupListFunc(ctx, client, scope)
+		InputMapperList: func(scope string) (*iam.ListGroupsInput, error) {
+			return &iam.ListGroupsInput{}, nil
+		},
+		ListFuncPaginatorBuilder: func(client *iam.Client, params *iam.ListGroupsInput) adapterhelpers.Paginator[*iam.ListGroupsOutput, *iam.Options] {
+			return iam.NewListGroupsPaginator(client, params)
+		},
+		ListExtractor: func(_ context.Context, output *iam.ListGroupsOutput, _ *iam.Client) ([]*types.Group, error) {
+			groups := make([]*types.Group, 0, len(output.Groups))
+			for i := range output.Groups {
+				groups = append(groups, &output.Groups[i])
+			}
+			return groups, nil
 		},
 		ItemMapper: groupItemMapper,
 	}

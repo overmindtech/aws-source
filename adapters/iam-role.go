@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/micahhausler/aws-iam-policy/policy"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
 	"github.com/overmindtech/sdp-go"
@@ -153,52 +152,7 @@ func getAttachedPolicies(ctx context.Context, client IAMClient, roleName string)
 	return attachedPolicies, nil
 }
 
-func roleListFunc(ctx context.Context, client IAMClient, _ string) ([]*RoleDetails, error) {
-	paginator := iam.NewListRolesPaginator(client, &iam.ListRolesInput{})
-	roles := make([]*RoleDetails, 0)
-	ctx, span := tracer.Start(ctx, "roleListFunc")
-	defer span.End()
-
-	mapper := iter.Mapper[types.Role, *RoleDetails]{
-		MaxGoroutines: 100,
-	}
-
-	for paginator.HasMorePages() {
-		out, err := paginator.NextPage(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-
-		newRoles, err := mapper.MapErr(out.Roles, func(role *types.Role) (*RoleDetails, error) {
-			details := RoleDetails{
-				Role: role,
-			}
-
-			err := enrichRole(ctx, client, &details)
-
-			if err != nil {
-				return nil, err
-			}
-
-			return &details, nil
-		})
-
-		if err != nil {
-			return nil, err
-		}
-
-		roles = append(roles, newRoles...)
-	}
-
-	span.SetAttributes(
-		attribute.Int("ovm.aws.numRoles", len(roles)),
-	)
-
-	return roles, nil
-}
-
-func roleItemMapper(_, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
+func roleItemMapper(_ *string, scope string, awsItem *RoleDetails) (*sdp.Item, error) {
 	enrichedRole := struct {
 		*types.Role
 		EmbeddedPolicies []embeddedPolicy
@@ -291,21 +245,51 @@ func roleListTagsFunc(ctx context.Context, r *RoleDetails, client IAMClient) (ma
 	return tags, nil
 }
 
-func NewIAMRoleAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options] {
-	return &adapterhelpers.GetListAdapter[*RoleDetails, IAMClient, *iam.Options]{
-		ItemType:        "iam-role",
-		Client:          client,
-		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
-		AccountID:       accountID,
-		AdapterMetadata: roleAdapterMetadata,
+func NewIAMRoleAdapter(client IAMClient, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListRolesInput, *iam.ListRolesOutput, *RoleDetails, IAMClient, *iam.Options] {
+	return &adapterhelpers.GetListAdapterV2[*iam.ListRolesInput, *iam.ListRolesOutput, *RoleDetails, IAMClient, *iam.Options]{
+		ItemType:      "iam-role",
+		Client:        client,
+		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
+		AccountID:     accountID,
+		Region:        region,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*RoleDetails, error) {
 			return roleGetFunc(ctx, client, scope, query)
 		},
-		ListFunc: func(ctx context.Context, client IAMClient, scope string) ([]*RoleDetails, error) {
-			return roleListFunc(ctx, client, scope)
+		InputMapperList: func(scope string) (*iam.ListRolesInput, error) {
+			return &iam.ListRolesInput{}, nil
 		},
-		ListTagsFunc: roleListTagsFunc,
-		ItemMapper:   roleItemMapper,
+		ListFuncPaginatorBuilder: func(client IAMClient, input *iam.ListRolesInput) adapterhelpers.Paginator[*iam.ListRolesOutput, *iam.Options] {
+			return iam.NewListRolesPaginator(client, input)
+		},
+		ListExtractor: func(ctx context.Context, output *iam.ListRolesOutput, client IAMClient) ([]*RoleDetails, error) {
+			roles := make([]*RoleDetails, 0)
+			mapper := iter.Mapper[types.Role, *RoleDetails]{
+				MaxGoroutines: 100,
+			}
+
+			newRoles, err := mapper.MapErr(output.Roles, func(role *types.Role) (*RoleDetails, error) {
+				details := RoleDetails{
+					Role: role,
+				}
+
+				err := enrichRole(ctx, client, &details)
+				if err != nil {
+					return nil, err
+				}
+
+				return &details, nil
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			roles = append(roles, newRoles...)
+			return roles, nil
+		},
+		ItemMapper:      roleItemMapper,
+		ListTagsFunc:    roleListTagsFunc,
+		AdapterMetadata: roleAdapterMetadata,
 	}
 }
 
