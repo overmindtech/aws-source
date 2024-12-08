@@ -171,8 +171,8 @@ func TestUserListFunc(t *testing.T) {
 		if err := item.Validate(); err != nil {
 			t.Error(err)
 		}
-		if len(item.LinkedItemQueries) != 3 {
-			t.Errorf("expected 3 linked item queries, got %v", len(item.LinkedItemQueries))
+		if len(item.GetLinkedItemQueries()) != 3 {
+			t.Errorf("expected 3 linked item queries, got %v", len(item.GetLinkedItemQueries()))
 		}
 	}
 }

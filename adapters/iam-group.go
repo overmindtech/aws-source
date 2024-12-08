@@ -23,22 +23,6 @@ func groupGetFunc(ctx context.Context, client *iam.Client, _, query string) (*ty
 	return out.Group, nil
 }
 
-func groupListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.Group, error) {
-	out, err := client.ListGroups(ctx, &iam.ListGroupsInput{})
-
-	if err != nil {
-		return nil, err
-	}
-
-	zones := make([]*types.Group, 0, len(out.Groups))
-
-	for i := range out.Groups {
-		zones = append(zones, &out.Groups[i])
-	}
-
-	return zones, nil
-}
-
 func groupItemMapper(_ *string, scope string, awsItem *types.Group) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 

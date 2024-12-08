@@ -23,22 +23,6 @@ func instanceProfileGetFunc(ctx context.Context, client *iam.Client, _, query st
 	return out.InstanceProfile, nil
 }
 
-func instanceProfileListFunc(ctx context.Context, client *iam.Client, _ string) ([]*types.InstanceProfile, error) {
-	out, err := client.ListInstanceProfiles(ctx, &iam.ListInstanceProfilesInput{})
-
-	if err != nil {
-		return nil, err
-	}
-
-	zones := make([]*types.InstanceProfile, 0, len(out.InstanceProfiles))
-
-	for i := range out.InstanceProfiles {
-		zones = append(zones, &out.InstanceProfiles[i])
-	}
-
-	return zones, nil
-}
-
 func instanceProfileItemMapper(_ *string, scope string, awsItem *types.InstanceProfile) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem)
 
