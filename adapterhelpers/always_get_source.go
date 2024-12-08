@@ -264,11 +264,8 @@ func (s *AlwaysGetAdapter[ListInput, ListOutput, GetInput, GetOutput, ClientStru
 
 		for _, input := range newGetInputs {
 			p.Go(func(ctx context.Context) error {
-				item, err := s.GetFunc(ctx, s.Client, scope, input)
-
-				if err != nil {
-					stream.SendError(WrapAWSError(err))
-				}
+				// Ignore the error here as we don't want to stop the whole process
+				item, _ := s.GetFunc(ctx, s.Client, scope, input)
 
 				if item != nil {
 					s.cache.StoreItem(item, s.cacheDuration(), ck)
