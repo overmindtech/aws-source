@@ -294,15 +294,39 @@ func (e E2ETest) Run(t *testing.T) {
 				t.Skip("list tests deliberately skipped")
 			}
 
+			items := make([]*sdp.Item, 0)
+			errs := make([]error, 0)
+
 			ctx, cancel := context.WithTimeout(context.Background(), e.Timeout)
 			defer cancel()
 
-			items, err := e.Adapter.List(ctx, scope, false)
-			if err != nil {
-				t.Error(err)
+			if streamingAdapter, ok := e.Adapter.(discovery.StreamingAdapter); ok {
+				stream := discovery.NewQueryResultStream(
+					func(item *sdp.Item) {
+						items = append(items, item)
+					},
+					func(err error) {
+						errs = append(errs, err)
+					},
+				)
+
+				streamingAdapter.ListStream(context.Background(), scope, false, stream)
+			} else if listableAdapter, ok := e.Adapter.(discovery.ListableAdapter); ok {
+				var err error
+				items, err = listableAdapter.List(ctx, scope, false)
+
+				if err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				t.Skip("adapter is not listable or streamable")
 			}
 
 			allNames := make(map[string]bool)
+
+			for _, err := range errs {
+				t.Error(err)
+			}
 
 			for _, item := range items {
 				if _, exists := allNames[item.UniqueAttributeValue()]; exists {
@@ -311,7 +335,7 @@ func (e E2ETest) Run(t *testing.T) {
 					allNames[item.UniqueAttributeValue()] = true
 				}
 
-				if err = item.Validate(); err != nil {
+				if err := item.Validate(); err != nil {
 					t.Error(err)
 				}
 
