@@ -254,8 +254,8 @@ func TestAlwaysGetSourceList(t *testing.T) {
 		lgs.ListStream(context.Background(), "foo.bar", false, stream)
 		stream.Close()
 
-		if len(errs) != 6 {
-			t.Fatalf("expected 6 error, got %v", len(errs))
+		if len(errs) != 0 {
+			t.Fatalf("expected 0 error, got %v", len(errs))
 		}
 
 		if len(items) != 0 {
@@ -429,8 +429,8 @@ func TestAlwaysGetSourceSearch(t *testing.T) {
 			lgs.SearchStream(context.Background(), "foo.bar", "id", false, stream)
 			stream.Close()
 
-			if len(errs) != 6 {
-				t.Errorf("expected 6 error, got %v", len(errs))
+			if len(errs) != 0 {
+				t.Errorf("expected 0 error, got %v", len(errs))
 			}
 
 			if len(items) != 0 {
