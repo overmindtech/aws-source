@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm/types"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
+	"github.com/overmindtech/sdp-go"
 )
 
 type mockSSMClient struct {
@@ -85,27 +87,51 @@ func TestSSMParameterAdapter(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		items, err := adapter.List(context.Background(), "123456789.us-east-1", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		if err != nil {
-			t.Fatal(err)
+		adapter.ListStream(context.Background(), "123456789.us-east-1", false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		if len(items) != 1 {
 			t.Errorf("expected 1 item, got %d", len(items))
 		}
 
-		err = items[0].Validate()
+		err := items[0].Validate()
 		if err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Search", func(t *testing.T) {
-		items, err := adapter.Search(context.Background(), "123456789.us-east-1", "arn:aws:ssm:us-east-1:1234567890:parameter/prod/*/service/example-service", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		if err != nil {
-			t.Fatal(err)
+		adapter.SearchStream(context.Background(), "123456789.us-east-1", "arn:aws:ssm:us-east-1:1234567890:parameter/prod/*/service/example-service", false, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		if len(items) != 0 {

@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"github.com/overmindtech/sdpcache"
 )
@@ -265,142 +266,130 @@ func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Get(ctx cont
 }
 
 // List Lists all items in a given scope
-func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) List(ctx context.Context, scope string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) ListStream(ctx context.Context, scope string, ignoreCache bool, stream *discovery.QueryResultStream) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.QueryError{
+		stream.SendError(&sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
-		}
+		})
+		return
 	}
 
 	if s.InputMapperList == nil {
-		return nil, &sdp.QueryError{
+		stream.SendError(&sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: fmt.Sprintf("list is not supported for %v resources", s.ItemType),
-		}
+		})
+		return
 	}
 
 	err := s.Validate()
 	if err != nil {
-		return nil, WrapAWSError(err)
+		stream.SendError(WrapAWSError(err))
+		return
 	}
 
 	s.ensureCache()
 	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_LIST, scope, s.ItemType, "", ignoreCache)
 	if qErr != nil {
-		return nil, qErr
+		stream.SendError(qErr)
+		return
 	}
 	if cacheHit {
-		return cachedItems, nil
+		for _, item := range cachedItems {
+			stream.SendItem(item)
+		}
+		return
 	}
-
-	var items []*sdp.Item
 
 	input, err := s.InputMapperList(scope)
 	if err != nil {
 		err = s.processError(err, ck)
-		return nil, err
+		stream.SendError(err)
+		return
 	}
 
-	items, err = s.describe(ctx, input, scope)
-	if err != nil {
-		err = s.processError(err, ck)
-		return nil, err
-	}
-
-	for _, item := range items {
-		s.cache.StoreItem(item, s.cacheDuration(), ck)
-	}
-
-	return items, nil
+	s.describe(ctx, nil, input, scope, ck, stream)
 }
 
 // Search Searches for AWS resources by ARN
-func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) Search(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) SearchStream(ctx context.Context, scope string, query string, ignoreCache bool, stream *discovery.QueryResultStream) {
 	if scope != s.Scopes()[0] {
-		return nil, &sdp.QueryError{
+		stream.SendError(&sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("requested scope %v does not match adapter scope %v", scope, s.Scopes()[0]),
-		}
+		})
+		return
 	}
 
 	if s.InputMapperSearch == nil {
-		return s.searchARN(ctx, scope, query, ignoreCache)
+		s.searchARN(ctx, scope, query, ignoreCache, stream)
 	} else {
-		return s.searchCustom(ctx, scope, query, ignoreCache)
+		s.searchCustom(ctx, scope, query, ignoreCache, stream)
 	}
 }
 
-func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchARN(ctx context.Context, scope string, query string, ignoreCache bool, stream *discovery.QueryResultStream) {
 	// Parse the ARN
 	a, err := ParseARN(query)
 
 	if err != nil {
-		return nil, WrapAWSError(err)
+		stream.SendError(WrapAWSError(err))
+		return
 	}
 
 	if a.ContainsWildcard() {
 		// We can't handle wildcards by default so bail out
-		return nil, &sdp.QueryError{
+		stream.SendError(&sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOTFOUND,
 			ErrorString: fmt.Sprintf("wildcards are not supported by adapter %v", s.Name()),
 			Scope:       scope,
-		}
+		})
+		return
 	}
 
 	if arnScope := FormatScope(a.AccountID, a.Region); arnScope != scope {
-		return nil, &sdp.QueryError{
+		stream.SendError(&sdp.QueryError{
 			ErrorType:   sdp.QueryError_NOSCOPE,
 			ErrorString: fmt.Sprintf("ARN scope %v does not match request scope %v", arnScope, scope),
 			Scope:       scope,
-		}
+		})
+		return
 	}
 
 	// this already uses the cache, so needs no extra handling
 	item, err := s.Get(ctx, scope, a.ResourceID(), ignoreCache)
 	if err != nil {
-		return nil, WrapAWSError(err)
+		stream.SendError(err)
+		return
 	}
 
-	return []*sdp.Item{item}, nil
+	stream.SendItem(item)
 }
 
 // searchCustom Runs custom search logic using the `InputMapperSearch` function
-func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ignoreCache bool) ([]*sdp.Item, error) {
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) searchCustom(ctx context.Context, scope string, query string, ignoreCache bool, stream *discovery.QueryResultStream) {
 	// We need to cache here since this is the only place it'll be called
 	s.ensureCache()
 	cacheHit, ck, cachedItems, qErr := s.cache.Lookup(ctx, s.Name(), sdp.QueryMethod_SEARCH, scope, s.ItemType, query, ignoreCache)
 	if qErr != nil {
-		return nil, qErr
+		stream.SendError(qErr)
+		return
 	}
 	if cacheHit {
-		return cachedItems, nil
+		for _, item := range cachedItems {
+			stream.SendItem(item)
+		}
+		return
 	}
 
 	input, err := s.InputMapperSearch(ctx, s.Client, scope, query)
 	if err != nil {
-		return nil, WrapAWSError(err)
+		stream.SendError(WrapAWSError(err))
+		return
 	}
 
-	items, err := s.describe(ctx, input, scope)
-	if err != nil {
-		err = s.processError(err, ck)
-		return nil, err
-	}
-
-	if s.PostSearchFilter != nil {
-		items, err = s.PostSearchFilter(ctx, query, items)
-		if err != nil {
-			err = s.processError(err, ck)
-			return nil, err
-		}
-	}
-
-	for _, item := range items {
-		s.cache.StoreItem(item, s.cacheDuration(), ck)
-	}
-
-	return items, nil
+	s.describe(ctx, &query, input, scope, ck, stream)
 }
 
 // Processes an error returned by the AWS API so that it can be handled by
@@ -422,43 +411,64 @@ func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) processError
 }
 
 // describe Runs describe on the given input, intelligently choosing whether to
-// run the paginated or unpaginated query
-func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) describe(ctx context.Context, input Input, scope string) ([]*sdp.Item, error) {
-	var output Output
-	var err error
-	var newItems []*sdp.Item
-
-	items := make([]*sdp.Item, 0)
-
+// run the paginated or unpaginated query. This handles caching, error handling,
+// and post-search filtering if the query param is passed
+func (s *DescribeOnlyAdapter[Input, Output, ClientStruct, Options]) describe(ctx context.Context, query *string, input Input, scope string, ck sdpcache.CacheKey, stream *discovery.QueryResultStream) {
 	if s.Paginated() {
 		paginator := s.PaginatorBuilder(s.Client, input)
 
 		for paginator.HasMorePages() {
-			output, err = paginator.NextPage(ctx)
+			output, err := paginator.NextPage(ctx)
 			if err != nil {
-				return nil, err
+				stream.SendError(s.processError(err, ck))
+				return
 			}
 
-			newItems, err = s.OutputMapper(ctx, s.Client, scope, input, output)
+			items, err := s.OutputMapper(ctx, s.Client, scope, input, output)
 			if err != nil {
-				return nil, err
+				stream.SendError(s.processError(err, ck))
+				return
 			}
 
-			items = append(items, newItems...)
+			if query != nil && s.PostSearchFilter != nil {
+				items, err = s.PostSearchFilter(ctx, *query, items)
+				if err != nil {
+					stream.SendError(s.processError(err, ck))
+					return
+				}
+			}
+
+			for _, item := range items {
+				s.cache.StoreItem(item, s.cacheDuration(), ck)
+				stream.SendItem(item)
+			}
 		}
 	} else {
-		output, err = s.DescribeFunc(ctx, s.Client, input)
+		output, err := s.DescribeFunc(ctx, s.Client, input)
 		if err != nil {
-			return nil, err
+			stream.SendError(s.processError(err, ck))
+			return
 		}
 
-		items, err = s.OutputMapper(ctx, s.Client, scope, input, output)
+		items, err := s.OutputMapper(ctx, s.Client, scope, input, output)
 		if err != nil {
-			return nil, err
+			stream.SendError(s.processError(err, ck))
+			return
+		}
+
+		if query != nil && s.PostSearchFilter != nil {
+			items, err = s.PostSearchFilter(ctx, *query, items)
+			if err != nil {
+				stream.SendError(s.processError(err, ck))
+				return
+			}
+		}
+
+		for _, item := range items {
+			s.cache.StoreItem(item, s.cacheDuration(), ck)
+			stream.SendItem(item)
 		}
 	}
-
-	return items, nil
 }
 
 // Weight Returns the priority weighting of items returned by this adapter.

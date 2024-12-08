@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2/types"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 )
 
@@ -102,9 +103,22 @@ func TestNewELBv2RuleAdapter(t *testing.T) {
 	listenerSource := NewELBv2ListenerAdapter(client, account, region)
 	ruleSource := NewELBv2RuleAdapter(client, account, region)
 
-	lbs, err := lbSource.List(context.Background(), lbSource.Scopes()[0], false)
-	if err != nil {
-		t.Fatal(err)
+	lbs := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			lbs = append(lbs, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	lbSource.ListStream(context.Background(), lbSource.Scopes()[0], false, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
 	if len(lbs) == 0 {
@@ -116,9 +130,22 @@ func TestNewELBv2RuleAdapter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	listeners, err := listenerSource.Search(context.Background(), listenerSource.Scopes()[0], fmt.Sprint(lbARN), false)
-	if err != nil {
-		t.Fatal(err)
+	listeners := make([]*sdp.Item, 0)
+	errs = make([]error, 0)
+	stream = discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			listeners = append(listeners, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
+
+	listenerSource.SearchStream(context.Background(), listenerSource.Scopes()[0], fmt.Sprint(lbARN), false, stream)
+	stream.Close()
+
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
 	if len(listeners) == 0 {

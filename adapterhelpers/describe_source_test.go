@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/overmindtech/discovery"
 	"github.com/overmindtech/sdp-go"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -254,11 +255,22 @@ func TestSearchARN(t *testing.T) {
 			return "fancy", nil
 		},
 	}
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
 
-	items, err := s.Search(context.Background(), "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id", false)
+	s.SearchStream(context.Background(), "account-id.region", "arn:partition:service:region:account-id:resource-type:resource-id", false, stream)
+	stream.Close()
 
-	if err != nil {
-		t.Error(err)
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
 	if len(items) != 1 {
@@ -298,11 +310,22 @@ func TestSearchCustom(t *testing.T) {
 			return input, nil
 		},
 	}
+	items := make([]*sdp.Item, 0)
+	errs := make([]error, 0)
+	stream := discovery.NewQueryResultStream(
+		func(item *sdp.Item) {
+			items = append(items, item)
+		},
+		func(err error) {
+			errs = append(errs, err)
+		},
+	)
 
-	items, err := s.Search(context.Background(), "account-id.region", "foo", false)
+	s.SearchStream(context.Background(), "account-id.region", "foo", false, stream)
+	stream.Close()
 
-	if err != nil {
-		t.Fatal(err)
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 
 	if len(items) != 1 {
@@ -317,11 +340,22 @@ func TestSearchCustom(t *testing.T) {
 		s.PostSearchFilter = func(ctx context.Context, query string, items []*sdp.Item) ([]*sdp.Item, error) {
 			return nil, nil
 		}
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
 
-		items, err := s.Search(context.Background(), "account-id.region", "bar", false)
+		s.SearchStream(context.Background(), "account-id.region", "bar", false, stream)
+		stream.Close()
 
-		if err != nil {
-			t.Fatal(err)
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		if len(items) != 0 {
@@ -353,10 +387,18 @@ func TestNoInputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 	})
 }
@@ -385,10 +427,18 @@ func TestNoOutputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 	})
 }
@@ -419,10 +469,18 @@ func TestNoDescribeFunc(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 	})
 }
@@ -462,14 +520,22 @@ func TestFailingInputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 
-		if !fooBar.MatchString(err.Error()) {
-			t.Errorf("expected error string '%v' to contain foobar", err.Error())
+		if !fooBar.MatchString(errs[0].Error()) {
+			t.Errorf("expected error string '%v' to contain foobar", errs[0].Error())
 		}
 	})
 }
@@ -507,14 +573,22 @@ func TestFailingOutputMapper(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 
-		if !fooBar.MatchString(err.Error()) {
-			t.Errorf("expected error string '%v' to contain foobar", err.Error())
+		if !fooBar.MatchString(errs[0].Error()) {
+			t.Errorf("expected error string '%v' to contain foobar", errs[0].Error())
 		}
 	})
 }
@@ -554,14 +628,22 @@ func TestFailingDescribeFunc(t *testing.T) {
 	})
 
 	t.Run("List", func(t *testing.T) {
-		_, err := s.List(context.Background(), "foo.eu-west-2", false)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err == nil {
-			t.Error("expected error but got nil")
+		if len(errs) == 0 {
+			t.Error("expected error but got none")
 		}
 
-		if !fooBar.MatchString(err.Error()) {
-			t.Errorf("expected error string '%v' to contain foobar", err.Error())
+		if !fooBar.MatchString(errs[0].Error()) {
+			t.Errorf("expected error string '%v' to contain foobar", errs[0].Error())
 		}
 	})
 }
@@ -624,10 +706,21 @@ func TestPaginated(t *testing.T) {
 	})
 
 	t.Run("paginating a List query", func(t *testing.T) {
-		items, err := s.List(context.Background(), "foo.eu-west-2", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+		s.ListStream(context.Background(), "foo.eu-west-2", false, stream)
+		stream.Close()
 
-		if err != nil {
-			t.Error(err)
+		if len(errs) > 0 {
+			t.Error(errs)
 		}
 
 		if len(items) != 3 {
@@ -722,81 +815,102 @@ func TestDescribeOnlySourceCaching(t *testing.T) {
 	})
 
 	t.Run("list", func(t *testing.T) {
-		// list
-		first, err := s.List(ctx, "foo.eu-west-2", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		// Fist list
+		s.ListStream(ctx, "foo.eu-west-2", false, stream)
+		// List again, expect caching
+		s.ListStream(ctx, "foo.eu-west-2", false, stream)
+		// List again, ignore cache
+		s.ListStream(ctx, "foo.eu-west-2", true, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
+		}
+
+		if len(items) != 3 {
+			t.Fatalf("expected 3 items, got %v", len(items))
+		}
+
+		firstGen, err := items[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].GetAttributes().Get("generation")
+		withCache, err := items[1].GetAttributes().Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCache, err := items[2].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// list again
-		withCache, err := s.List(ctx, "foo.eu-west-2", false)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
+		if firstGen != withCache {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCache)
 		}
 
-		if firstGen != withCacheGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
-		}
-
-		// list ignore cache
-		withoutCache, err := s.List(ctx, "foo.eu-west-2", true)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if withoutCacheGen == firstGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		if withoutCache == firstGen {
+			t.Errorf("without cache: expected generation %v, got %v", firstGen, withoutCache)
 		}
 	})
 
 	t.Run("search", func(t *testing.T) {
-		// search
-		first, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
+		items := make([]*sdp.Item, 0)
+		errs := make([]error, 0)
+		stream := discovery.NewQueryResultStream(
+			func(item *sdp.Item) {
+				items = append(items, item)
+			},
+			func(err error) {
+				errs = append(errs, err)
+			},
+		)
+
+		// First time
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false, stream)
+		// Search again, expect caching
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false, stream)
+		// Search again, ignore cache
+		s.SearchStream(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true, stream)
+		stream.Close()
+
+		if len(errs) > 0 {
+			t.Error(errs)
+		}
+
+		if len(items) != 3 {
+			t.Fatalf("expected 3 items, got %v", len(items))
+		}
+
+		firstGen, err := items[0].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
-		firstGen, err := first[0].GetAttributes().Get("generation")
+		withCache, err := items[1].GetAttributes().Get("generation")
+		if err != nil {
+			t.Fatal(err)
+		}
+		withoutCache, err := items[2].GetAttributes().Get("generation")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// search again
-		withCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", false)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withCacheGen, err := withCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
+		if firstGen != withCache {
+			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCache)
 		}
 
-		if firstGen != withCacheGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withCacheGen)
-		}
-
-		// search ignore cache
-		withoutCache, err := s.Search(ctx, "foo.eu-west-2", "arn:aws:test-type:eu-west-2:foo:test-item", true)
-		if err != nil {
-			t.Fatal(err)
-		}
-		withoutCacheGen, err := withoutCache[0].GetAttributes().Get("generation")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if withoutCacheGen == firstGen {
-			t.Errorf("with cache: expected generation %v, got %v", firstGen, withoutCacheGen)
+		if withoutCache == firstGen {
+			t.Errorf("without cache: expected generation %v, got %v", firstGen, withoutCache)
 		}
 	})
 }
