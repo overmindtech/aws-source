@@ -119,7 +119,7 @@ func domainNameOutputMapper(_, scope string, awsItem *types.DomainName) (*sdp.It
 	}
 
 	if awsItem.RegionalCertificateArn != nil {
-		if a, err := adapterhelpers.ParseARN(*awsItem.CertificateArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(*awsItem.RegionalCertificateArn); err == nil {
 			//+overmind:link acm-certificate
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
@@ -155,7 +155,7 @@ func domainNameOutputMapper(_, scope string, awsItem *types.DomainName) (*sdp.It
 	}
 
 	if awsItem.OwnershipVerificationCertificateArn != nil {
-		if a, err := adapterhelpers.ParseARN(*awsItem.CertificateArn); err == nil {
+		if a, err := adapterhelpers.ParseARN(*awsItem.OwnershipVerificationCertificateArn); err == nil {
 			//+overmind:link acm-certificate
 			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
 				Query: &sdp.Query{
