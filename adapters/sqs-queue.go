@@ -78,7 +78,8 @@ func NewSQSQueueAdapter(client sqsClient, accountID string, region string) *adap
 			var inputs []*sqs.GetQueueAttributesInput
 			for _, url := range output.QueueUrls {
 				inputs = append(inputs, &sqs.GetQueueAttributesInput{
-					QueueUrl: &url,
+					QueueUrl:       &url,
+					AttributeNames: []types.QueueAttributeName{"All"},
 				})
 			}
 			return inputs, nil
