@@ -53,6 +53,20 @@ func getFunc(ctx context.Context, client sqsClient, scope string, input *sqs.Get
 		Attributes:      attributes,
 		Scope:           scope,
 		Tags:            resourceTags,
+		LinkedItemQueries: []*sdp.LinkedItemQuery{
+			{
+				Query: &sdp.Query{
+					Type:   "http",
+					Method: sdp.QueryMethod_GET,
+					Query:  *input.QueueUrl,
+					Scope:  "global",
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			},
+		},
 	}, nil
 }
 
