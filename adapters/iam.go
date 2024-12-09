@@ -54,6 +54,7 @@ var ssmQueryExtractor = QueryExtractor{
 		// can also access /a/b. Even if a user has explicitly been denied
 		// access in IAM for parameter /a/b, they can still call the
 		// GetParametersByPath API operation recursively for /a and view /a/b.
+		// https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
 		//
 		// Because of this all ARNs essential with a wildcard for the path
 		a, err := adapterhelpers.ParseARN(resource)
