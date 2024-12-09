@@ -290,13 +290,13 @@ func TestPolicyItemMapper(t *testing.T) {
 			ExpectedScope:  "foo",
 		},
 		{
-			ExpectedType:   "*",
+			ExpectedType:   "iam-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:iam::609103258633:group/Developers",
 			ExpectedScope:  "609103258633",
 		},
 		{
-			ExpectedType:   "*",
+			ExpectedType:   "iam-group",
 			ExpectedMethod: sdp.QueryMethod_SEARCH,
 			ExpectedQuery:  "arn:aws:iam::609103258633:group/Operators",
 			ExpectedScope:  "609103258633",
