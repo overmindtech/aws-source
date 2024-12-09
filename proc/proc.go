@@ -384,12 +384,6 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						// Cloudwatch
 						adapters.NewCloudwatchAlarmAdapter(cloudwatchClient, *callerID.Account, cfg.Region),
 
-						// IAM
-						adapters.NewIAMGroupAdapter(iamClient, *callerID.Account, cfg.Region),
-						adapters.NewIAMInstanceProfileAdapter(iamClient, *callerID.Account, cfg.Region),
-						adapters.NewIAMRoleAdapter(iamClient, *callerID.Account, cfg.Region),
-						adapters.NewIAMUserAdapter(iamClient, *callerID.Account, cfg.Region),
-
 						// Lambda
 						adapters.NewLambdaFunctionAdapter(lambdaClient, *callerID.Account, cfg.Region),
 						adapters.NewLambdaLayerAdapter(lambdaClient, *callerID.Account, cfg.Region),
@@ -524,8 +518,12 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 							adapters.NewNetworkManagerLinkAssociationAdapter(networkmanagerClient, *callerID.Account),
 							adapters.NewNetworkManagerConnectionAdapter(networkmanagerClient, *callerID.Account),
 
-							// IAM policies aren't tied to a region
+							// IAM
 							adapters.NewIAMPolicyAdapter(iamClient, *callerID.Account),
+							adapters.NewIAMGroupAdapter(iamClient, *callerID.Account),
+							adapters.NewIAMInstanceProfileAdapter(iamClient, *callerID.Account),
+							adapters.NewIAMRoleAdapter(iamClient, *callerID.Account),
+							adapters.NewIAMUserAdapter(iamClient, *callerID.Account),
 						)
 						if err != nil {
 							return err
