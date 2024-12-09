@@ -96,6 +96,7 @@ func NewNetworkManagerTransitGatewayRouteTableAttachmentAdapter(client *networkm
 	return &adapterhelpers.GetListAdapter[*types.TransitGatewayRouteTableAttachment, *networkmanager.Client, *networkmanager.Options]{
 		Client:          client,
 		AccountID:       accountID,
+		Region:          region,
 		ItemType:        "networkmanager-transit-gateway-route-table-attachment",
 		AdapterMetadata: transitGatewayRouteTableAttachmentAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *networkmanager.Client, scope string, query string) (*types.TransitGatewayRouteTableAttachment, error) {

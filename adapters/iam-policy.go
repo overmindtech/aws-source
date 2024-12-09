@@ -274,7 +274,7 @@ func policyListExtractor(ctx context.Context, output *iam.ListPoliciesOutput, cl
 // is implemented so that it was mart enough to handle different scopes. This
 // has been added to the backlog:
 // https://github.com/overmindtech/aws-adapter/issues/68
-func NewIAMPolicyAdapter(client IAMClient, accountID string, _ string) *adapterhelpers.GetListAdapterV2[*iam.ListPoliciesInput, *iam.ListPoliciesOutput, *PolicyDetails, IAMClient, *iam.Options] {
+func NewIAMPolicyAdapter(client IAMClient, accountID string) *adapterhelpers.GetListAdapterV2[*iam.ListPoliciesInput, *iam.ListPoliciesOutput, *PolicyDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapterV2[*iam.ListPoliciesInput, *iam.ListPoliciesOutput, *PolicyDetails, IAMClient, *iam.Options]{
 		ItemType:               "iam-policy",
 		Client:                 client,
