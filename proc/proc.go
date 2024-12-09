@@ -525,7 +525,7 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 							adapters.NewNetworkManagerConnectionAdapter(networkmanagerClient, *callerID.Account),
 
 							// IAM policies aren't tied to a region
-							adapters.NewIAMPolicyAdapter(iamClient, *callerID.Account, cfg.Region),
+							adapters.NewIAMPolicyAdapter(iamClient, *callerID.Account),
 						)
 						if err != nil {
 							return err

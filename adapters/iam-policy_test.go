@@ -311,13 +311,13 @@ func TestPolicyItemMapper(t *testing.T) {
 }
 
 func TestNewIAMPolicyAdapter(t *testing.T) {
-	config, account, region := adapterhelpers.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	adapter := NewIAMPolicyAdapter(client, account, region)
+	adapter := NewIAMPolicyAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
