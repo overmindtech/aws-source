@@ -40,13 +40,12 @@ func groupItemMapper(_ *string, scope string, awsItem *types.Group) (*sdp.Item, 
 	return &item, nil
 }
 
-func NewIAMGroupAdapter(client *iam.Client, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListGroupsInput, *iam.ListGroupsOutput, *types.Group, *iam.Client, *iam.Options] {
+func NewIAMGroupAdapter(client *iam.Client, accountID string) *adapterhelpers.GetListAdapterV2[*iam.ListGroupsInput, *iam.ListGroupsOutput, *types.Group, *iam.Client, *iam.Options] {
 	return &adapterhelpers.GetListAdapterV2[*iam.ListGroupsInput, *iam.ListGroupsOutput, *types.Group, *iam.Client, *iam.Options]{
 		ItemType:        "iam-group",
 		Client:          client,
 		CacheDuration:   3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:       accountID,
-		Region:          region,
 		AdapterMetadata: iamGroupAdapterMetadata,
 		GetFunc: func(ctx context.Context, client *iam.Client, scope, query string) (*types.Group, error) {
 			return groupGetFunc(ctx, client, scope, query)

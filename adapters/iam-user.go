@@ -135,13 +135,12 @@ func userListTagsFunc(ctx context.Context, u *UserDetails, client IAMClient) (ma
 	return tags, nil
 }
 
-func NewIAMUserAdapter(client IAMClient, accountID string, region string) *adapterhelpers.GetListAdapterV2[*iam.ListUsersInput, *iam.ListUsersOutput, *UserDetails, IAMClient, *iam.Options] {
+func NewIAMUserAdapter(client IAMClient, accountID string) *adapterhelpers.GetListAdapterV2[*iam.ListUsersInput, *iam.ListUsersOutput, *UserDetails, IAMClient, *iam.Options] {
 	return &adapterhelpers.GetListAdapterV2[*iam.ListUsersInput, *iam.ListUsersOutput, *UserDetails, IAMClient, *iam.Options]{
 		ItemType:      "iam-user",
 		Client:        client,
 		CacheDuration: 3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AccountID:     accountID,
-		Region:        region,
 		GetFunc: func(ctx context.Context, client IAMClient, scope, query string) (*UserDetails, error) {
 			return userGetFunc(ctx, client, scope, query)
 		},

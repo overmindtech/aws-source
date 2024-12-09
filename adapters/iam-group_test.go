@@ -32,13 +32,13 @@ func TestGroupItemMapper(t *testing.T) {
 }
 
 func TestNewIAMGroupAdapter(t *testing.T) {
-	config, account, region := adapterhelpers.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	adapter := NewIAMGroupAdapter(client, account, region)
+	adapter := NewIAMGroupAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
