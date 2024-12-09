@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/micahhausler/aws-iam-policy/policy"
@@ -32,6 +33,108 @@ type IAMClient interface {
 	iam.ListUserTagsAPIClient
 }
 
+type QueryExtractorFunc func(resource string, actions []string) []*sdp.LinkedItemQuery
+
+// This struct extracts linked item queries from an IAM policy. It must provide
+// a `RelevantResources` regex which will be checked against the resources that
+// each statement is mapped to. If it matches, the `ExtractorFunc` will be
+// called with the resource and actions that are allowed to be performed on that
+// resource
+type QueryExtractor struct {
+	RelevantResources *regexp.Regexp
+	ExtractorFunc     QueryExtractorFunc
+}
+
+var ssmQueryExtractor = QueryExtractor{
+	RelevantResources: regexp.MustCompile("^arn:aws:ssm:"),
+	ExtractorFunc: func(resource string, actions []string) []*sdp.LinkedItemQuery {
+		// IAM for SSM works in a bit of a strange way: If a user has access to
+		// a path, then the user can access all levels of that path. For
+		// example, if a user has permission to access path /a, then the user
+		// can also access /a/b. Even if a user has explicitly been denied
+		// access in IAM for parameter /a/b, they can still call the
+		// GetParametersByPath API operation recursively for /a and view /a/b.
+		// https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
+		//
+		// Because of this all ARNs essential with a wildcard for the path
+		a, err := adapterhelpers.ParseARN(resource)
+		if err != nil {
+			return nil
+		}
+
+		return []*sdp.LinkedItemQuery{
+			{
+				Query: &sdp.Query{
+					Type:   "ssm-parameter",
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  a.String() + "*", // Wildcard at the end
+					Scope:  adapterhelpers.FormatScope(a.AccountID, a.Region),
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  true,
+					Out: true,
+				},
+			},
+		}
+	},
+}
+
+var fallbackQueryExtractor = QueryExtractor{
+	RelevantResources: regexp.MustCompile("^arn:"),
+	ExtractorFunc: func(resource string, actions []string) []*sdp.LinkedItemQuery {
+		arn, err := adapterhelpers.ParseARN(resource)
+		if err != nil {
+			return nil
+		}
+
+		// Since this could be an ARN to anything we are going to rely
+		// on the fact that we *usually* have a SEARCH method that
+		// accepts ARNs
+		scope := sdp.WILDCARD
+		if arn.AccountID != "aws" {
+			if arn.AccountID != "*" && arn.Region != "*" {
+				// If we have an account and region, then use those
+				scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
+			}
+		}
+
+		// We need to convert the item type from ARN format to Overmind
+		// format. Since we follow a pretty strict naming convention
+		// this should *usually* work. Overmind's naming conventions are
+		// based on the AWS CLI, e.g. `aws ec2 describe-instances` would
+		// be `ec2-instance`
+		overmindType := arn.Service + "-" + arn.Type()
+
+		// It would be good here if we had a way to definitely know what
+		// type a given ARN is, but I don't think the types are 1:1 so
+		// we are going to have to use a wildcard. This will cause a lot
+		// of failed searches which I don't love, but it will work
+		// itemType := sdp.WILDCARD
+
+		return []*sdp.LinkedItemQuery{
+			{
+				Query: &sdp.Query{
+					Type:   overmindType,
+					Method: sdp.QueryMethod_SEARCH,
+					Query:  arn.String(),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					In:  false,
+					Out: true,
+				},
+			},
+		}
+	},
+}
+
+// The ordered list of extractors to use. The first one that matches will be
+// used
+var extractors = []QueryExtractor{
+	ssmQueryExtractor,
+	fallbackQueryExtractor,
+}
+
 // Extracts linked item queries from an IAM policy. In this case we only link to
 // entities that are explicitly mentioned in the policy. If we were to link to
 // more you'd end up with way too many links since a policy might for example
@@ -39,8 +142,6 @@ type IAMClient interface {
 func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 	// We want to link all of the resources in the policy document, as long
 	// as they have a valid ARN
-	var arn *adapterhelpers.ARN
-	var err error
 	queries := make([]*sdp.LinkedItemQuery, 0)
 
 	if document == nil || document.Statements == nil {
@@ -66,7 +167,7 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 						if typ != "" {
 							queries = append(queries, &sdp.LinkedItemQuery{
 								Query: &sdp.Query{
-									Type:   "iam-role",
+									Type:   typ,
 									Method: sdp.QueryMethod_SEARCH,
 									Query:  arn.String(),
 									Scope:  adapterhelpers.FormatScope(arn.AccountID, arn.Region),
@@ -87,44 +188,16 @@ func LinksFromPolicy(document *policy.Policy) []*sdp.LinkedItemQuery {
 
 		if statement.Resource != nil {
 			for _, resource := range statement.Resource.Values() {
-				arn, err = adapterhelpers.ParseARN(resource)
-				if err != nil {
-					continue
-				}
+				// Try to extract links from the references resource using the
+				// configurable extractors
+				for _, extractor := range extractors {
+					if extractor.RelevantResources != nil && extractor.RelevantResources.MatchString(resource) {
+						queries = append(queries, extractor.ExtractorFunc(resource, statement.Action.Values())...)
 
-				// Since this could be an ARN to anything we are going to rely
-				// on the fact that we *usually* have a SEARCH method that
-				// accepts ARNs
-				scope := sdp.WILDCARD
-				if arn.AccountID != "aws" {
-					if arn.AccountID != "*" && arn.Region != "*" {
-						// If we have an account and region, then use those
-						scope = adapterhelpers.FormatScope(arn.AccountID, arn.Region)
-					} else {
-						// If we have wildcards then we need to search all
-						// accounts and regions
-						scope = "*"
+						// Only use the first one that matches
+						break
 					}
 				}
-
-				// It would be good here if we had a way to definitely know what
-				// type a given ARN is, but I don't think the types are 1:1 so
-				// we are going to have to use a wildcard. This will cause a lot
-				// of failed searches which I don't love, but it will work
-				itemType := sdp.WILDCARD
-
-				queries = append(queries, &sdp.LinkedItemQuery{
-					Query: &sdp.Query{
-						Type:   itemType,
-						Method: sdp.QueryMethod_SEARCH,
-						Query:  arn.String(),
-						Scope:  scope,
-					},
-					BlastPropagation: &sdp.BlastPropagation{
-						In:  false,
-						Out: true,
-					},
-				})
 			}
 		}
 	}
