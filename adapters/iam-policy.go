@@ -282,7 +282,7 @@ func NewIAMPolicyAdapter(client IAMClient, accountID string, _ string) *adapterh
 		Region:                 "",            // IAM policies aren't tied to a region
 		CacheDuration:          3 * time.Hour, // IAM has very low rate limits, we need to cache for a long time
 		AdapterMetadata:        policyAdapterMetadata,
-		SupportGlobalResources: true,
+		SupportGlobalResources: false, // This is disable for now until I work out how to handle global resources since yuo and up with many adapters in the same scope
 		InputMapperList: func(scope string) (*iam.ListPoliciesInput, error) {
 			var iamScope types.PolicyScopeType
 			if scope == "aws" {

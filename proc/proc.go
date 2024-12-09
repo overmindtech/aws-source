@@ -245,6 +245,10 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 					configCtx, configCancel := context.WithTimeout(ctx, 10*time.Second)
 					defer configCancel()
 
+					log.WithFields(log.Fields{
+						"region": cfg.Region,
+					}).Info("Initializing AWS source")
+
 					// Work out what account we're using. This will be used in item scopes
 					stsClient := sts.NewFromConfig(cfg)
 
@@ -383,7 +387,6 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						// IAM
 						adapters.NewIAMGroupAdapter(iamClient, *callerID.Account, cfg.Region),
 						adapters.NewIAMInstanceProfileAdapter(iamClient, *callerID.Account, cfg.Region),
-						adapters.NewIAMPolicyAdapter(iamClient, *callerID.Account, cfg.Region),
 						adapters.NewIAMRoleAdapter(iamClient, *callerID.Account, cfg.Region),
 						adapters.NewIAMUserAdapter(iamClient, *callerID.Account, cfg.Region),
 
@@ -520,6 +523,9 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 							adapters.NewNetworkManagerDeviceAdapter(networkmanagerClient, *callerID.Account),
 							adapters.NewNetworkManagerLinkAssociationAdapter(networkmanagerClient, *callerID.Account),
 							adapters.NewNetworkManagerConnectionAdapter(networkmanagerClient, *callerID.Account),
+
+							// IAM policies aren't tied to a region
+							adapters.NewIAMPolicyAdapter(iamClient, *callerID.Account, cfg.Region),
 						)
 						if err != nil {
 							return err
