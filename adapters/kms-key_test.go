@@ -89,6 +89,7 @@ func TestKMSGetFunc(t *testing.T) {
 }
 
 func TestNewKMSKeyAdapter(t *testing.T) {
+	t.Skip("This test is currently failing due to a key that none of us can read, even with admin permissions. I think we will need to speak with AWS support to work out how to delete it")
 	config, account, region := adapterhelpers.GetAutoConfig(t)
 	client := kms.NewFromConfig(config)
 
