@@ -143,7 +143,7 @@ func TestUserGetFunc(t *testing.T) {
 }
 
 func TestUserListFunc(t *testing.T) {
-	adapter := NewIAMUserAdapter(&TestIAMClient{}, "foo", "bar")
+	adapter := NewIAMUserAdapter(&TestIAMClient{}, "foo")
 
 	items := make([]*sdp.Item, 0)
 	errs := make([]error, 0)
@@ -156,7 +156,7 @@ func TestUserListFunc(t *testing.T) {
 		},
 	)
 
-	adapter.ListStream(context.Background(), "foo.bar", false, stream)
+	adapter.ListStream(context.Background(), "foo", false, stream)
 	stream.Close()
 
 	if len(errs) > 0 {
@@ -236,13 +236,13 @@ func TestUserItemMapper(t *testing.T) {
 }
 
 func TestNewIAMUserAdapter(t *testing.T) {
-	config, account, region := adapterhelpers.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	adapter := NewIAMUserAdapter(client, account, region)
+	adapter := NewIAMUserAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,

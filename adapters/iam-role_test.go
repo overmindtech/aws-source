@@ -143,7 +143,7 @@ func TestRoleGetFunc(t *testing.T) {
 }
 
 func TestRoleListFunc(t *testing.T) {
-	adapter := NewIAMRoleAdapter(&TestIAMClient{}, "foo", "bar")
+	adapter := NewIAMRoleAdapter(&TestIAMClient{}, "foo")
 
 	items := make([]*sdp.Item, 0)
 	errs := make([]error, 0)
@@ -156,7 +156,7 @@ func TestRoleListFunc(t *testing.T) {
 		},
 	)
 
-	adapter.ListStream(context.Background(), "foo.bar", false, stream)
+	adapter.ListStream(context.Background(), "foo", false, stream)
 	stream.Close()
 
 	if len(errs) > 0 {
@@ -261,13 +261,13 @@ func TestRoleItemMapper(t *testing.T) {
 }
 
 func TestNewIAMRoleAdapter(t *testing.T) {
-	config, account, region := adapterhelpers.GetAutoConfig(t)
+	config, account, _ := adapterhelpers.GetAutoConfig(t)
 	client := iam.NewFromConfig(config, func(o *iam.Options) {
 		o.RetryMode = aws.RetryModeAdaptive
 		o.RetryMaxAttempts = 10
 	})
 
-	adapter := NewIAMRoleAdapter(client, account, region)
+	adapter := NewIAMRoleAdapter(client, account)
 
 	test := adapterhelpers.E2ETest{
 		Adapter: adapter,
