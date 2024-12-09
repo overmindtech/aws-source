@@ -221,38 +221,11 @@ func ssmParameterOutputMapper(ctx context.Context, client ssmClient, scope strin
 
 func NewSSMParameterAdapter(client ssmClient, accountID string, region string) *adapterhelpers.DescribeOnlyAdapter[*ssm.DescribeParametersInput, *ssm.DescribeParametersOutput, ssmClient, *ssm.Options] {
 	return &adapterhelpers.DescribeOnlyAdapter[*ssm.DescribeParametersInput, *ssm.DescribeParametersOutput, ssmClient, *ssm.Options]{
-		Client:    client,
-		AccountID: accountID,
-		Region:    region,
-		ItemType:  "ssm-parameter",
-		AdapterMetadata: &sdp.AdapterMetadata{
-			Type:            "ssm-parameter",
-			Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
-			DescriptiveName: "SSM Parameter",
-			SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
-				Get:               true,
-				GetDescription:    "Get an SSM parameter by name",
-				List:              true,
-				ListDescription:   "List all SSM parameters",
-				Search:            true,
-				SearchDescription: "Search for SSM parameters by ARN. This supports ARNs from IAM policies that contain wildcards",
-			},
-			TerraformMappings: []*sdp.TerraformMapping{
-				{
-					TerraformMethod:   sdp.QueryMethod_GET,
-					TerraformQueryMap: "aws_ssm_parameter.name",
-				},
-				{
-					TerraformMethod:   sdp.QueryMethod_SEARCH,
-					TerraformQueryMap: "aws_ssm_parameter.arn",
-				},
-			},
-			PotentialLinks: []string{
-				"ip",
-				"http",
-				"dns",
-			},
-		},
+		Client:          client,
+		AccountID:       accountID,
+		Region:          region,
+		ItemType:        "ssm-parameter",
+		AdapterMetadata: ssmParameterAdapterMetadata,
 		InputMapperGet: func(scope, query string) (*ssm.DescribeParametersInput, error) {
 			return &ssm.DescribeParametersInput{
 				ParameterFilters: []types.ParameterStringFilter{
@@ -280,3 +253,32 @@ func NewSSMParameterAdapter(client ssmClient, accountID string, region string) *
 		},
 	}
 }
+
+var ssmParameterAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
+	Type:            "ssm-parameter",
+	Category:        sdp.AdapterCategory_ADAPTER_CATEGORY_CONFIGURATION,
+	DescriptiveName: "SSM Parameter",
+	SupportedQueryMethods: &sdp.AdapterSupportedQueryMethods{
+		Get:               true,
+		GetDescription:    "Get an SSM parameter by name",
+		List:              true,
+		ListDescription:   "List all SSM parameters",
+		Search:            true,
+		SearchDescription: "Search for SSM parameters by ARN. This supports ARNs from IAM policies that contain wildcards",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{
+			TerraformMethod:   sdp.QueryMethod_GET,
+			TerraformQueryMap: "aws_ssm_parameter.name",
+		},
+		{
+			TerraformMethod:   sdp.QueryMethod_SEARCH,
+			TerraformQueryMap: "aws_ssm_parameter.arn",
+		},
+	},
+	PotentialLinks: []string{
+		"ip",
+		"http",
+		"dns",
+	},
+})
