@@ -15,17 +15,17 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.43.3
 	github.com/aws/aws-sdk-go-v2/service/directconnect v1.30.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.38.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.195.0
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.52.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.197.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.52.2
 	github.com/aws/aws-sdk-go-v2/service/efs v1.34.1
-	github.com/aws/aws-sdk-go-v2/service/eks v1.53.0
+	github.com/aws/aws-sdk-go-v2/service/eks v1.54.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.28.6
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.1
 	github.com/aws/aws-sdk-go-v2/service/iam v1.38.2
 	github.com/aws/aws-sdk-go-v2/service/kms v1.37.7
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.1
-	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.4
-	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.1
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.5
+	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.2
 	github.com/aws/aws-sdk-go-v2/service/rds v1.92.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.46.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.0
