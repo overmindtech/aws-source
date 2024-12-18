@@ -11,6 +11,7 @@ import (
 const (
 	restAPISrc  = "rest-api"
 	resourceSrc = "resource"
+	methodSrc   = "method"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) error {
@@ -29,7 +30,13 @@ func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) 
 	}
 
 	// Create resource
-	_, err = createResource(ctx, logger, client, restApiID, rootResourceID, "test")
+	testResourceID, err := createResource(ctx, logger, client, restApiID, rootResourceID, "/test")
+	if err != nil {
+		return err
+	}
+
+	// Create method
+	err = createMethod(ctx, logger, client, restApiID, testResourceID, "GET")
 	if err != nil {
 		return err
 	}
