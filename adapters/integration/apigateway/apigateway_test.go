@@ -2,6 +2,7 @@ package apigateway
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
@@ -40,6 +41,13 @@ func APIGateway(t *testing.T) {
 	err = resourceApiSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate APIGateway resource adapter: %v", err)
+	}
+
+	methodSource := adapters.NewAPIGatewayMethodAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = methodSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway method adapter: %v", err)
 	}
 
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
@@ -154,5 +162,21 @@ func APIGateway(t *testing.T) {
 
 	if resourceUniqueAttrFromSearch != resourceUniqueAttrFromGet {
 		t.Fatalf("expected resource ID %s, got %s", resourceUniqueAttrFromSearch, resourceUniqueAttrFromGet)
+	}
+
+	// Get method
+	methodID := fmt.Sprintf("%s/GET", resourceUniqueAttrFromGet) // resourceUniqueAttribute contains the restApiID
+	method, err := methodSource.Get(ctx, scope, methodID, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway method: %v", err)
+	}
+
+	uniqueMethodAttr, err := method.GetAttributes().Get(method.GetUniqueAttribute())
+	if err != nil {
+		t.Fatalf("failed to get unique method attribute: %v", err)
+	}
+
+	if uniqueMethodAttr != methodID {
+		t.Fatalf("expected method ID %s, got %s", methodID, uniqueMethodAttr)
 	}
 }
