@@ -104,3 +104,38 @@ func createMethod(ctx context.Context, logger *slog.Logger, client *apigateway.C
 
 	return nil
 }
+
+func createMethodResponse(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID, resourceID *string, method, statusCode string) error {
+	// check if a method response with the same status code already exists
+	err := findMethodResponse(ctx, client, restAPIID, resourceID, method, statusCode)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating method response")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Method response already exists")
+		return nil
+	}
+
+	_, err = client.PutMethodResponse(ctx, &apigateway.PutMethodResponseInput{
+		RestApiId:  restAPIID,
+		ResourceId: resourceID,
+		HttpMethod: adapterhelpers.PtrString(method),
+		StatusCode: adapterhelpers.PtrString(statusCode),
+		ResponseModels: map[string]string{
+			"application/json": "Empty",
+		},
+		ResponseParameters: map[string]bool{
+			"method.response.header.Content-Type": true,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

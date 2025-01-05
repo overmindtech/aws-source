@@ -50,6 +50,13 @@ func APIGateway(t *testing.T) {
 		t.Fatalf("failed to validate APIGateway method adapter: %v", err)
 	}
 
+	methodResponseSource := adapters.NewAPIGatewayMethodResponseAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = methodResponseSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway method response adapter: %v", err)
+	}
+
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List restApis
@@ -179,4 +186,22 @@ func APIGateway(t *testing.T) {
 	if uniqueMethodAttr != methodID {
 		t.Fatalf("expected method ID %s, got %s", methodID, uniqueMethodAttr)
 	}
+
+	// Get method response
+	methodResponseID := fmt.Sprintf("%s/200", methodID)
+	methodResponse, err := methodResponseSource.Get(ctx, scope, methodResponseID, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway method response: %v", err)
+	}
+
+	uniqueMethodResponseAttr, err := methodResponse.GetAttributes().Get(methodResponse.GetUniqueAttribute())
+	if err != nil {
+		t.Fatalf("failed to get unique method response attribute: %v", err)
+	}
+
+	if uniqueMethodResponseAttr != methodResponseID {
+		t.Fatalf("expected method response ID %s, got %s", methodResponseID, uniqueMethodResponseAttr)
+	}
+
+	t.Log("APIGateway integration test completed")
 }

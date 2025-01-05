@@ -13,6 +13,7 @@ import (
 
 type apigatewayClient interface {
 	GetMethod(ctx context.Context, params *apigateway.GetMethodInput, optFns ...func(*apigateway.Options)) (*apigateway.GetMethodOutput, error)
+	GetMethodResponse(ctx context.Context, params *apigateway.GetMethodResponseInput, optFns ...func(*apigateway.Options)) (*apigateway.GetMethodResponseOutput, error)
 }
 
 func apiGatewayMethodGetFunc(ctx context.Context, client apigatewayClient, scope string, input *apigateway.GetMethodInput) (*sdp.Item, error) {
@@ -141,5 +142,4 @@ var apiGatewayMethodAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		Search:            true,
 		SearchDescription: "Search Methods by ARN",
 	},
-	PotentialLinks: []string{"apigateway-method-response"},
 })
