@@ -22,9 +22,15 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
-//go:generate sh -c "echo -n $(git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD) > commit.txt"
-//go:embed commit.txt
-var ServiceVersion string
+// ServiceVersion is the version of the service. This will be overridden by the
+// build system, using:
+// go build -ldflags "-X github.com/overmindtech/api-server/tracing.ServiceVersion=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)" -o your-app
+//
+// This allows our change detection workflow to work correctly. If we were
+// embedding the version here each time we would always produce a slightly
+// different compiled binary, and therefore it would look like there was a
+// change each time
+var ServiceVersion = "dev"
 
 func tracingResource() *resource.Resource {
 	// Identify your application using resource detection
