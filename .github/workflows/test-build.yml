@@ -35,7 +35,6 @@ jobs:
       - name: Go Generate
         run: |
           go generate ./...
-          cat tracing/commit.txt
 
       - name: Validate Docs Data
         run: |
