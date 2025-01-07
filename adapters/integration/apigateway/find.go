@@ -87,3 +87,26 @@ func findMethodResponse(ctx context.Context, client *apigateway.Client, restAPII
 
 	return nil
 }
+
+func findIntegration(ctx context.Context, client *apigateway.Client, restAPIID, resourceID *string, method string) error {
+	_, err := client.GetIntegration(ctx, &apigateway.GetIntegrationInput{
+		RestApiId:  restAPIID,
+		ResourceId: resourceID,
+		HttpMethod: &method,
+	})
+
+	if err != nil {
+		var notFoundErr *types.NotFoundException
+		if errors.As(err, &notFoundErr) {
+			return integration.NewNotFoundError(integration.ResourceName(
+				integration.APIGateway,
+				integrationSrc,
+				method,
+			))
+		}
+
+		return err
+	}
+
+	return nil
+}

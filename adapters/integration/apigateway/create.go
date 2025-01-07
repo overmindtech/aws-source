@@ -139,3 +139,32 @@ func createMethodResponse(ctx context.Context, logger *slog.Logger, client *apig
 
 	return nil
 }
+
+func createIntegration(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID, resourceID *string, method string) error {
+	// check if an integration with the same method already exists
+	err := findIntegration(ctx, client, restAPIID, resourceID, method)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating integration")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Integration already exists")
+		return nil
+	}
+
+	_, err = client.PutIntegration(ctx, &apigateway.PutIntegrationInput{
+		RestApiId:  restAPIID,
+		ResourceId: resourceID,
+		HttpMethod: adapterhelpers.PtrString(method),
+		Type:       "MOCK",
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

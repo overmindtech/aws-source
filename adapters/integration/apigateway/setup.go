@@ -13,6 +13,7 @@ const (
 	resourceSrc       = "resource"
 	methodSrc         = "method"
 	methodResponseSrc = "method-response"
+	integrationSrc    = "integration"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) error {
@@ -44,6 +45,12 @@ func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) 
 
 	// Create method response
 	err = createMethodResponse(ctx, logger, client, restApiID, testResourceID, "GET", "200")
+	if err != nil {
+		return err
+	}
+
+	// Create integration
+	err = createIntegration(ctx, logger, client, restApiID, testResourceID, "GET")
 	if err != nil {
 		return err
 	}

@@ -27,7 +27,7 @@ func APIGateway(t *testing.T) {
 
 	accountID := testAWSConfig.AccountID
 
-	t.Log("Running APIGateway integration test")
+	t.Log("Running APIGateway itgr test")
 
 	restApiSource := adapters.NewAPIGatewayRestApiAdapter(testClient, accountID, testAWSConfig.Region)
 
@@ -55,6 +55,13 @@ func APIGateway(t *testing.T) {
 	err = methodResponseSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate APIGateway method response adapter: %v", err)
+	}
+
+	integrationSource := adapters.NewAPIGatewayIntegrationAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = integrationSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway itgr adapter: %v", err)
 	}
 
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
@@ -201,6 +208,22 @@ func APIGateway(t *testing.T) {
 
 	if uniqueMethodResponseAttr != methodResponseID {
 		t.Fatalf("expected method response ID %s, got %s", methodResponseID, uniqueMethodResponseAttr)
+	}
+
+	// Get integration
+	integrationID := fmt.Sprintf("%s/GET", resourceUniqueAttrFromGet) // resourceUniqueAttribute contains the restApiID
+	itgr, err := integrationSource.Get(ctx, scope, integrationID, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway itgr: %v", err)
+	}
+
+	uniqueIntegrationAttr, err := itgr.GetAttributes().Get(itgr.GetUniqueAttribute())
+	if err != nil {
+		t.Fatalf("failed to get unique itgr attribute: %v", err)
+	}
+
+	if uniqueIntegrationAttr != integrationID {
+		t.Fatalf("expected integration ID %s, got %s", integrationID, uniqueIntegrationAttr)
 	}
 
 	t.Log("APIGateway integration test completed")
