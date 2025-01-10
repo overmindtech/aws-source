@@ -110,3 +110,24 @@ func findIntegration(ctx context.Context, client *apigateway.Client, restAPIID, 
 
 	return nil
 }
+
+func findAPIKeyByName(ctx context.Context, client *apigateway.Client, name string) (*string, error) {
+	result, err := client.GetApiKeys(ctx, &apigateway.GetApiKeysInput{
+		NameQuery: &name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result.Items) == 0 {
+		return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, apiKeySrc, name))
+	}
+
+	for _, apiKey := range result.Items {
+		if *apiKey.Name == name {
+			return apiKey.Id, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, apiKeySrc, name))
+}

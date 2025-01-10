@@ -168,3 +168,31 @@ func createIntegration(ctx context.Context, logger *slog.Logger, client *apigate
 
 	return nil
 }
+
+func createAPIKey(ctx context.Context, logger *slog.Logger, client *apigateway.Client, testID string) error {
+	// check if an API key with the same name already exists
+	id, err := findAPIKeyByName(ctx, client, integration.ResourceName(integration.APIGateway, apiKeySrc, testID))
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating API key")
+		} else {
+			return err
+		}
+	}
+
+	if id != nil {
+		logger.InfoContext(ctx, "API key already exists")
+		return nil
+	}
+
+	_, err = client.CreateApiKey(ctx, &apigateway.CreateApiKeyInput{
+		Name:    adapterhelpers.PtrString(integration.ResourceName(integration.APIGateway, apiKeySrc, testID)),
+		Tags:    resourceTags(apiKeySrc, testID),
+		Enabled: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

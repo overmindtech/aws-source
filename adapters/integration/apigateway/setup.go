@@ -14,6 +14,7 @@ const (
 	methodSrc         = "method"
 	methodResponseSrc = "method-response"
 	integrationSrc    = "integration"
+	apiKeySrc         = "api-key"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) error {
@@ -51,6 +52,12 @@ func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) 
 
 	// Create integration
 	err = createIntegration(ctx, logger, client, restApiID, testResourceID, "GET")
+	if err != nil {
+		return err
+	}
+
+	// Create API Key
+	err = createAPIKey(ctx, logger, client, testID)
 	if err != nil {
 		return err
 	}
