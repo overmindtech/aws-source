@@ -71,6 +71,13 @@ func APIGateway(t *testing.T) {
 		t.Fatalf("failed to validate APIGateway API key adapter: %v", err)
 	}
 
+	authorizerSource := adapters.NewAPIGatewayAuthorizerAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = authorizerSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway authorizer adapter: %v", err)
+	}
+
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
 
 	// List restApis
@@ -299,6 +306,74 @@ func APIGateway(t *testing.T) {
 
 	if apiKeyID != apiKeyIDFromSearch {
 		t.Fatalf("expected API key ID %s, got %s", apiKeyID, apiKeyIDFromSearch)
+	}
+
+	// Search authorizers by restApiID
+	authorizers, err := authorizerSource.Search(ctx, scope, restApiID, true)
+	if err != nil {
+		t.Fatalf("failed to search APIGateway authorizers: %v", err)
+	}
+
+	authorizerUniqueAttribute := authorizers[0].GetUniqueAttribute()
+
+	authorizerTestName := integration.ResourceName(integration.APIGateway, authorizerSrc, integration.TestID())
+	authorizerID, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		authorizerUniqueAttribute,
+		"Name",
+		authorizerTestName,
+		authorizers,
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get authorizer ID: %v", err)
+	}
+
+	// Get authorizer
+	query := fmt.Sprintf("%s/%s", restApiID, authorizerID)
+	authorizer, err := authorizerSource.Get(ctx, scope, query, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway authorizer: %v", err)
+	}
+
+	authorizerIDFromGet, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		authorizerUniqueAttribute,
+		"Name",
+		authorizerTestName,
+		[]*sdp.Item{authorizer},
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get authorizer ID from get: %v", err)
+	}
+
+	if authorizerID != authorizerIDFromGet {
+		t.Fatalf("expected authorizer ID %s, got %s", authorizerID, authorizerIDFromGet)
+	}
+
+	// Search authorizer by restApiID/name
+	query = fmt.Sprintf("%s/%s", restApiID, authorizerTestName)
+	authorizersFromSearch, err := authorizerSource.Search(ctx, scope, query, true)
+	if err != nil {
+		t.Fatalf("failed to search APIGateway authorizers: %v", err)
+	}
+
+	if len(authorizersFromSearch) == 0 {
+		t.Fatalf("no authorizers found")
+	}
+
+	authorizerIDFromSearch, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		authorizerUniqueAttribute,
+		"Name",
+		authorizerTestName,
+		authorizersFromSearch,
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get authorizer ID from search: %v", err)
+	}
+
+	if authorizerID != authorizerIDFromSearch {
+		t.Fatalf("expected authorizer ID %s, got %s", authorizerID, authorizerIDFromSearch)
 	}
 
 	t.Log("APIGateway integration test completed")
