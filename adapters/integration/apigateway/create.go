@@ -228,3 +228,30 @@ func createAuthorizer(ctx context.Context, logger *slog.Logger, client *apigatew
 
 	return nil
 }
+
+func createDeployment(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID string) error {
+	// check if a deployment with the same name already exists
+	id, err := findDeploymentByDescription(ctx, client, restAPIID, "test-deployment")
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating deployment")
+		} else {
+			return err
+		}
+	}
+
+	if id != nil {
+		logger.InfoContext(ctx, "Deployment already exists")
+		return nil
+	}
+
+	_, err = client.CreateDeployment(ctx, &apigateway.CreateDeploymentInput{
+		RestApiId:   &restAPIID,
+		Description: adapterhelpers.PtrString("test-deployment"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -152,3 +152,20 @@ func findAuthorizerByName(ctx context.Context, client *apigateway.Client, restAP
 
 	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, authorizerSrc, name))
 }
+
+func findDeploymentByDescription(ctx context.Context, client *apigateway.Client, restAPIID, description string) (*string, error) {
+	result, err := client.GetDeployments(ctx, &apigateway.GetDeploymentsInput{
+		RestApiId: &restAPIID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, deployment := range result.Items {
+		if *deployment.Description == description {
+			return deployment.Id, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, deploymentSrc, description))
+}
