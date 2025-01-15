@@ -39,7 +39,7 @@ require (
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/overmindtech/discovery v0.33.4
-	github.com/overmindtech/sdp-go v0.105.0
+	github.com/overmindtech/sdp-go v0.106.0
 	github.com/overmindtech/sdpcache v1.6.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/sourcegraph/conc v0.3.0
