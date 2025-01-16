@@ -100,15 +100,18 @@ func NewAPIGatewayStageAdapter(client *apigateway.Client, accountID string, regi
 		DisableList: true,
 		SearchFunc: func(ctx context.Context, client *apigateway.Client, scope string, query string) ([]*types.Stage, error) {
 			f := strings.Split(query, "/")
-			var restAPIID string
-			var deploymentID string
+			var input *apigateway.GetStagesInput
 
 			switch len(f) {
 			case 1:
-				restAPIID = f[0]
+				input = &apigateway.GetStagesInput{
+					RestApiId: &f[0],
+				}
 			case 2:
-				restAPIID = f[0]
-				deploymentID = f[1]
+				input = &apigateway.GetStagesInput{
+					RestApiId:    &f[0],
+					DeploymentId: &f[1],
+				}
 			default:
 				return nil, &sdp.QueryError{
 					ErrorType: sdp.QueryError_NOTFOUND,
@@ -119,10 +122,7 @@ func NewAPIGatewayStageAdapter(client *apigateway.Client, accountID string, regi
 				}
 			}
 
-			out, err := client.GetStages(ctx, &apigateway.GetStagesInput{
-				RestApiId:    &restAPIID,
-				DeploymentId: &deploymentID,
-			})
+			out, err := client.GetStages(ctx, input)
 			if err != nil {
 				return nil, err
 			}
@@ -148,7 +148,7 @@ var stageAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		Get:               true,
 		Search:            true,
 		GetDescription:    "Get an API Gateway Stage by its rest API ID and stage name: rest-api-id/stage-name",
-		SearchDescription: "Search for API Gateway Stages by their rest API ID or with rest API ID and their stage name: rest-api-id/stage-name",
+		SearchDescription: "Search for API Gateway Stages by their rest API ID or with rest API ID and deployment-id: rest-api-id/deployment-id",
 	},
 	PotentialLinks: []string{"wafv2-web-acl"},
 })

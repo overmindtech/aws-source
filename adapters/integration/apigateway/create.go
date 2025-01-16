@@ -229,25 +229,54 @@ func createAuthorizer(ctx context.Context, logger *slog.Logger, client *apigatew
 	return nil
 }
 
-func createDeployment(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID string) error {
+func createDeployment(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID string) (*string, error) {
 	// check if a deployment with the same name already exists
 	id, err := findDeploymentByDescription(ctx, client, restAPIID, "test-deployment")
 	if err != nil {
 		if errors.As(err, new(integration.NotFoundError)) {
 			logger.InfoContext(ctx, "Creating deployment")
 		} else {
-			return err
+			return nil, err
 		}
 	}
 
 	if id != nil {
 		logger.InfoContext(ctx, "Deployment already exists")
+		return id, nil
+	}
+
+	resp, err := client.CreateDeployment(ctx, &apigateway.CreateDeploymentInput{
+		RestApiId:   &restAPIID,
+		Description: adapterhelpers.PtrString("test-deployment"),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Id, nil
+}
+
+func createStage(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID, deploymentID string) error {
+	// check if a stage with the same name already exists
+	stgName := "dev"
+	err := findStageByName(ctx, client, restAPIID, stgName)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating stage")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Stage already exists")
 		return nil
 	}
 
-	_, err = client.CreateDeployment(ctx, &apigateway.CreateDeploymentInput{
-		RestApiId:   &restAPIID,
-		Description: adapterhelpers.PtrString("test-deployment"),
+	_, err = client.CreateStage(ctx, &apigateway.CreateStageInput{
+		RestApiId:    &restAPIID,
+		DeploymentId: &deploymentID,
+		StageName:    &stgName,
 	})
 	if err != nil {
 		return err

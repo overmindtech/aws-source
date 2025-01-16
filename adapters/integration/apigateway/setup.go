@@ -17,6 +17,7 @@ const (
 	apiKeySrc         = "api-key"
 	authorizerSrc     = "authorizer"
 	deploymentSrc     = "deployment"
+	stageSrc          = "stage"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) error {
@@ -71,7 +72,13 @@ func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) 
 	}
 
 	// Create Deployment
-	err = createDeployment(ctx, logger, client, *restApiID)
+	deploymentID, err := createDeployment(ctx, logger, client, *restApiID)
+	if err != nil {
+		return err
+	}
+
+	// Create Stage
+	err = createStage(ctx, logger, client, *restApiID, *deploymentID)
 	if err != nil {
 		return err
 	}

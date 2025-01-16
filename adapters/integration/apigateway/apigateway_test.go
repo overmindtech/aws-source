@@ -87,6 +87,13 @@ func APIGateway(t *testing.T) {
 		t.Fatalf("failed to validate APIGateway deployment adapter: %v", err)
 	}
 
+	stageSource := adapters.NewAPIGatewayStageAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = stageSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway stage adapter: %v", err)
+	}
+
 	// Tests ----------------------------------------------------------------------------------------------------------
 
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
@@ -456,6 +463,77 @@ func APIGateway(t *testing.T) {
 
 	if deploymentID != deploymentIDFromSearch {
 		t.Fatalf("expected deployment ID %s, got %s", deploymentID, deploymentIDFromSearch)
+	}
+
+	// Search stages by restApiID
+	stages, err := stageSource.Search(ctx, scope, restApiID, true)
+	if err != nil {
+		t.Fatalf("failed to search APIGateway stages: %v", err)
+	}
+
+	if len(stages) == 0 {
+		t.Fatalf("no stages found")
+	}
+
+	stageUniqueAttribute := stages[0].GetUniqueAttribute()
+
+	stageID, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		stageUniqueAttribute,
+		"StageName",
+		"dev",
+		stages,
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get stage ID: %v", err)
+	}
+
+	// Get stage
+	query = fmt.Sprintf("%s/dev", restApiID)
+	stage, err := stageSource.Get(ctx, scope, query, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway stage: %v", err)
+	}
+
+	stageIDFromGet, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		stageUniqueAttribute,
+		"StageName",
+		"dev",
+		[]*sdp.Item{stage},
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get stage ID from get: %v", err)
+	}
+
+	if stageID != stageIDFromGet {
+		t.Fatalf("expected stage ID %s, got %s", stageID, stageIDFromGet)
+	}
+
+	// Search stage by restApiID/deploymentID
+	query = fmt.Sprintf("%s/%s", restApiID, deploymentID)
+	stagesFromSearch, err := stageSource.Search(ctx, scope, query, true)
+	if err != nil {
+		t.Fatalf("failed to search APIGateway stages: %v", err)
+	}
+
+	if len(stagesFromSearch) == 0 {
+		t.Fatalf("no stages found")
+	}
+
+	stageIDFromSearch, err := integration.GetUniqueAttributeValueBySignificantAttribute(
+		stageUniqueAttribute,
+		"StageName",
+		"dev",
+		stagesFromSearch,
+		true,
+	)
+	if err != nil {
+		t.Fatalf("failed to get stage ID from search: %v", err)
+	}
+
+	if stageID != stageIDFromSearch {
+		t.Fatalf("expected stage ID %s, got %s", stageID, stageIDFromSearch)
 	}
 
 	t.Log("APIGateway integration test completed")
