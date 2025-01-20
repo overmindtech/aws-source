@@ -284,3 +284,34 @@ func createStage(ctx context.Context, logger *slog.Logger, client *apigateway.Cl
 
 	return nil
 }
+
+func createModel(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID string) error {
+	modelName := "testModel"
+
+	// check if a model with the same testID already exists
+	err := findModelByName(ctx, client, restAPIID, modelName)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating model")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Model already exists")
+		return nil
+	}
+
+	_, err = client.CreateModel(ctx, &apigateway.CreateModelInput{
+		RestApiId:   &restAPIID,
+		Name:        &modelName,
+		Schema:      adapterhelpers.PtrString("{}"),
+		ContentType: adapterhelpers.PtrString("application/json"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

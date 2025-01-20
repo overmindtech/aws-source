@@ -487,6 +487,7 @@ func InitializeAwsSourceEngine(ctx context.Context, ec *discovery.EngineConfig, 
 						adapters.NewAPIGatewayAuthorizerAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 						adapters.NewAPIGatewayDeploymentAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 						adapters.NewAPIGatewayStageAdapter(apigatewayClient, *callerID.Account, cfg.Region),
+						adapters.NewAPIGatewayModelAdapter(apigatewayClient, *callerID.Account, cfg.Region),
 
 						// SSM
 						adapters.NewSSMParameterAdapter(ssmClient, *callerID.Account, cfg.Region),

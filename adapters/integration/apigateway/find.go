@@ -184,10 +184,45 @@ func findStageByName(ctx context.Context, client *apigateway.Client, restAPIID, 
 				name,
 			))
 		}
+
+		return err
 	}
 
 	if result == nil {
-		return integration.NewNotFoundError(name)
+		return integration.NewNotFoundError(integration.ResourceName(
+			integration.APIGateway,
+			stageSrc,
+			name,
+		))
+	}
+
+	return nil
+}
+
+func findModelByName(ctx context.Context, client *apigateway.Client, restAPIID, name string) error {
+	result, err := client.GetModel(ctx, &apigateway.GetModelInput{
+		RestApiId: &restAPIID,
+		ModelName: &name,
+	})
+	if err != nil {
+		var notFoundErr *types.NotFoundException
+		if errors.As(err, &notFoundErr) {
+			return integration.NewNotFoundError(integration.ResourceName(
+				integration.APIGateway,
+				stageSrc,
+				name,
+			))
+		}
+
+		return err
+	}
+
+	if result == nil {
+		return integration.NewNotFoundError(integration.ResourceName(
+			integration.APIGateway,
+			stageSrc,
+			name,
+		))
 	}
 
 	return nil

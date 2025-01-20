@@ -50,6 +50,12 @@ func TestStageOutputMapper(t *testing.T) {
 				ExpectedQuery:  "rest-api-id/deployment-id",
 				ExpectedScope:  "scope",
 			},
+			{
+				ExpectedType:   "apigateway-rest-api",
+				ExpectedMethod: sdp.QueryMethod_GET,
+				ExpectedQuery:  "rest-api-id",
+				ExpectedScope:  "scope",
+			},
 		}
 
 		tests.Execute(t, item)

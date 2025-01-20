@@ -70,6 +70,20 @@ func stageOutputMapper(query, scope string, awsItem *types.Stage) (*sdp.Item, er
 		})
 	}
 
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "apigateway-rest-api",
+			Method: sdp.QueryMethod_GET,
+			Query:  restAPIID,
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// They are tightly coupled, so we need to propagate the blast to the linked item
+			In:  true,
+			Out: true,
+		},
+	})
+
 	return &item, nil
 }
 
