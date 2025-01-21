@@ -27,7 +27,7 @@ func convertGetAuthorizerOutputToAuthorizer(output *apigateway.GetAuthorizerOutp
 	}
 }
 
-func authorizerOutputMapper(scope string, awsItem *types.Authorizer) (*sdp.Item, error) {
+func authorizerOutputMapper(query, scope string, awsItem *types.Authorizer) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
@@ -39,6 +39,20 @@ func authorizerOutputMapper(scope string, awsItem *types.Authorizer) (*sdp.Item,
 		Attributes:      attributes,
 		Scope:           scope,
 	}
+
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "apigateway-rest-api",
+			Method: sdp.QueryMethod_GET,
+			Query:  strings.Split(query, "/")[0],
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// They are tightly coupled, so we need to propagate the blast to the linked item
+			In:  true,
+			Out: true,
+		},
+	})
 
 	return &item, nil
 }
@@ -107,8 +121,8 @@ func NewAPIGatewayAuthorizerAdapter(client *apigateway.Client, accountID string,
 
 			return items, nil
 		},
-		ItemMapper: func(_, scope string, awsItem *types.Authorizer) (*sdp.Item, error) {
-			return authorizerOutputMapper(scope, awsItem)
+		ItemMapper: func(query, scope string, awsItem *types.Authorizer) (*sdp.Item, error) {
+			return authorizerOutputMapper(query, scope, awsItem)
 		},
 	}
 }

@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"github.com/overmindtech/sdp-go"
 	"testing"
 	"time"
 
@@ -18,7 +19,7 @@ func TestDeploymentOutputMapper(t *testing.T) {
 		ApiSummary:  map[string]map[string]types.MethodSnapshot{},
 	}
 
-	item, err := deploymentOutputMapper("scope", awsItem)
+	item, err := deploymentOutputMapper("rest-api-id", "scope", awsItem)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -26,6 +27,17 @@ func TestDeploymentOutputMapper(t *testing.T) {
 	if err := item.Validate(); err != nil {
 		t.Error(err)
 	}
+
+	tests := adapterhelpers.QueryTests{
+		{
+			ExpectedType:   "apigateway-rest-api",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "rest-api-id",
+			ExpectedScope:  "scope",
+		},
+	}
+
+	tests.Execute(t, item)
 }
 
 func TestNewAPIGatewayDeploymentAdapter(t *testing.T) {

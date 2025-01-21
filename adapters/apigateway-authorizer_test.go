@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"github.com/overmindtech/sdp-go"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func TestAuthorizerOutputMapper(t *testing.T) {
 		AuthorizerResultTtlInSeconds: aws.Int32(300),
 	}
 
-	item, err := authorizerOutputMapper("scope", awsItem)
+	item, err := authorizerOutputMapper("rest-api-id", "scope", awsItem)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -32,6 +33,17 @@ func TestAuthorizerOutputMapper(t *testing.T) {
 	if err := item.Validate(); err != nil {
 		t.Error(err)
 	}
+
+	tests := adapterhelpers.QueryTests{
+		{
+			ExpectedType:   "apigateway-rest-api",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "rest-api-id",
+			ExpectedScope:  "scope",
+		},
+	}
+
+	tests.Execute(t, item)
 }
 
 func TestNewAPIGatewayAuthorizerAdapter(t *testing.T) {

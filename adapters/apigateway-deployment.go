@@ -21,7 +21,7 @@ func convertGetDeploymentOutputToDeployment(output *apigateway.GetDeploymentOutp
 	}
 }
 
-func deploymentOutputMapper(scope string, awsItem *types.Deployment) (*sdp.Item, error) {
+func deploymentOutputMapper(query, scope string, awsItem *types.Deployment) (*sdp.Item, error) {
 	attributes, err := adapterhelpers.ToAttributesWithExclude(awsItem, "tags")
 	if err != nil {
 		return nil, err
@@ -33,6 +33,20 @@ func deploymentOutputMapper(scope string, awsItem *types.Deployment) (*sdp.Item,
 		Attributes:      attributes,
 		Scope:           scope,
 	}
+
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "apigateway-rest-api",
+			Method: sdp.QueryMethod_GET,
+			Query:  strings.Split(query, "/")[0],
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// They are tightly coupled, so we need to propagate the blast to the linked item
+			In:  true,
+			Out: true,
+		},
+	})
 
 	return &item, nil
 }
@@ -101,8 +115,8 @@ func NewAPIGatewayDeploymentAdapter(client *apigateway.Client, accountID string,
 
 			return items, nil
 		},
-		ItemMapper: func(_, scope string, awsItem *types.Deployment) (*sdp.Item, error) {
-			return deploymentOutputMapper(scope, awsItem)
+		ItemMapper: func(query, scope string, awsItem *types.Deployment) (*sdp.Item, error) {
+			return deploymentOutputMapper(query, scope, awsItem)
 		},
 	}
 }
