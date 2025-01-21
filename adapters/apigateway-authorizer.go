@@ -123,4 +123,7 @@ var authorizerAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		GetDescription:    "Get an API Gateway Authorizer by its rest API ID and ID: rest-api-id/authorizer-id",
 		SearchDescription: "Search for API Gateway Authorizers by their rest API ID or with rest API ID and their name: rest-api-id/authorizer-name",
 	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_authorizer.id"},
+	},
 })

@@ -17,7 +17,7 @@ func convertGetDeploymentOutputToDeployment(output *apigateway.GetDeploymentOutp
 		Id:          output.Id,
 		CreatedDate: output.CreatedDate,
 		Description: output.Description,
-		ApiSummary: output.ApiSummary,
+		ApiSummary:  output.ApiSummary,
 	}
 }
 
@@ -116,5 +116,8 @@ var deploymentAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		Search:            true,
 		GetDescription:    "Get an API Gateway Deployment by its rest API ID and ID: rest-api-id/deployment-id",
 		SearchDescription: "Search for API Gateway Deployments by their rest API ID or with rest API ID and their description: rest-api-id/deployment-description",
+	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_deployment.id"},
 	},
 })

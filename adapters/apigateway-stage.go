@@ -165,4 +165,7 @@ var stageAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		SearchDescription: "Search for API Gateway Stages by their rest API ID or with rest API ID and deployment-id: rest-api-id/deployment-id",
 	},
 	PotentialLinks: []string{"wafv2-web-acl"},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_stage.id"},
+	},
 })

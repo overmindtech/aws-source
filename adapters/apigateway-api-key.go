@@ -123,4 +123,7 @@ var apiKeyAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		ListDescription:   "List all API Keys",
 		SearchDescription: "Search for API Keys by their name",
 	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_api_key.id"},
+	},
 })

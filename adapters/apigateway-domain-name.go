@@ -235,6 +235,6 @@ var apiGatewayDomainNameAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata
 	},
 	PotentialLinks: []string{"acm-certificate"},
 	TerraformMappings: []*sdp.TerraformMapping{
-		{TerraformQueryMap: "aws_api_gateway_domain_name.domain_name"},
+		{TerraformQueryMap: "aws_api_gateway_domain_name.id"},
 	},
 })

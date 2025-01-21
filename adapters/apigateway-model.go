@@ -111,4 +111,7 @@ var modelAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		GetDescription:    "Get an API Gateway Model by its rest API ID and model name: rest-api-id/model-name",
 		SearchDescription: "Search for API Gateway Models by their rest API ID: rest-api-id",
 	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_model.id"},
+	},
 })

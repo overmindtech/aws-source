@@ -132,4 +132,7 @@ var vpcLinkAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		ListDescription:   "List all VPC Links",
 		SearchDescription: "Search for VPC Links by their name",
 	},
+	TerraformMappings: []*sdp.TerraformMapping{
+		{TerraformQueryMap: "aws_api_gateway_vpc_link.id"},
+	},
 })
