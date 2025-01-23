@@ -160,4 +160,10 @@ var apiGatewayMethodAdapterMetadata = Metadata.Register(&sdp.AdapterMetadata{
 		Search:            true,
 		SearchDescription: "Search Methods by ARN",
 	},
+	PotentialLinks: []string{
+		"apigateway-integration",
+		"apigateway-authorizer",
+		"apigateway-request-validator",
+		"apigateway-method-response",
+	},
 })
