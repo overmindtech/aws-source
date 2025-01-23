@@ -2,6 +2,7 @@ package apigateway
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/overmindtech/aws-source/adapterhelpers"
@@ -40,6 +41,20 @@ func APIGateway(t *testing.T) {
 	err = resourceApiSource.Validate()
 	if err != nil {
 		t.Fatalf("failed to validate APIGateway resource adapter: %v", err)
+	}
+
+	methodSource := adapters.NewAPIGatewayMethodAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = methodSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway method adapter: %v", err)
+	}
+
+	methodResponseSource := adapters.NewAPIGatewayMethodResponseAdapter(testClient, accountID, testAWSConfig.Region)
+
+	err = methodResponseSource.Validate()
+	if err != nil {
+		t.Fatalf("failed to validate APIGateway method response adapter: %v", err)
 	}
 
 	scope := adapterhelpers.FormatScope(accountID, testAWSConfig.Region)
@@ -155,4 +170,38 @@ func APIGateway(t *testing.T) {
 	if resourceUniqueAttrFromSearch != resourceUniqueAttrFromGet {
 		t.Fatalf("expected resource ID %s, got %s", resourceUniqueAttrFromSearch, resourceUniqueAttrFromGet)
 	}
+
+	// Get method
+	methodID := fmt.Sprintf("%s/GET", resourceUniqueAttrFromGet) // resourceUniqueAttribute contains the restApiID
+	method, err := methodSource.Get(ctx, scope, methodID, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway method: %v", err)
+	}
+
+	uniqueMethodAttr, err := method.GetAttributes().Get(method.GetUniqueAttribute())
+	if err != nil {
+		t.Fatalf("failed to get unique method attribute: %v", err)
+	}
+
+	if uniqueMethodAttr != methodID {
+		t.Fatalf("expected method ID %s, got %s", methodID, uniqueMethodAttr)
+	}
+
+	// Get method response
+	methodResponseID := fmt.Sprintf("%s/200", methodID)
+	methodResponse, err := methodResponseSource.Get(ctx, scope, methodResponseID, true)
+	if err != nil {
+		t.Fatalf("failed to get APIGateway method response: %v", err)
+	}
+
+	uniqueMethodResponseAttr, err := methodResponse.GetAttributes().Get(methodResponse.GetUniqueAttribute())
+	if err != nil {
+		t.Fatalf("failed to get unique method response attribute: %v", err)
+	}
+
+	if uniqueMethodResponseAttr != methodResponseID {
+		t.Fatalf("expected method response ID %s, got %s", methodResponseID, uniqueMethodResponseAttr)
+	}
+
+	t.Log("APIGateway integration test completed")
 }

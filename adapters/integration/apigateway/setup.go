@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	restAPISrc  = "rest-api"
-	resourceSrc = "resource"
+	restAPISrc        = "rest-api"
+	resourceSrc       = "resource"
+	methodSrc         = "method"
+	methodResponseSrc = "method-response"
 )
 
 func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) error {
@@ -29,7 +31,19 @@ func setup(ctx context.Context, logger *slog.Logger, client *apigateway.Client) 
 	}
 
 	// Create resource
-	_, err = createResource(ctx, logger, client, restApiID, rootResourceID, "test")
+	testResourceID, err := createResource(ctx, logger, client, restApiID, rootResourceID, "/test")
+	if err != nil {
+		return err
+	}
+
+	// Create method
+	err = createMethod(ctx, logger, client, restApiID, testResourceID, "GET")
+	if err != nil {
+		return err
+	}
+
+	// Create method response
+	err = createMethodResponse(ctx, logger, client, restApiID, testResourceID, "GET", "200")
 	if err != nil {
 		return err
 	}

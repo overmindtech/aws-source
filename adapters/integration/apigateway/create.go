@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	"github.com/overmindtech/aws-source/adapterhelpers"
@@ -57,11 +58,84 @@ func createResource(ctx context.Context, logger *slog.Logger, client *apigateway
 	result, err := client.CreateResource(ctx, &apigateway.CreateResourceInput{
 		RestApiId: restAPIID,
 		ParentId:  parentID,
-		PathPart:  adapterhelpers.PtrString(path),
+		PathPart:  adapterhelpers.PtrString(cleanPath(path)),
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return result.Id, nil
+}
+
+func cleanPath(path string) string {
+	p, ok := strings.CutPrefix(path, "/")
+	if !ok {
+		return path
+	}
+
+	return p
+}
+
+func createMethod(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID, resourceID *string, method string) error {
+	// check if a method with the same name already exists
+	err := findMethod(ctx, client, restAPIID, resourceID, method)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating method")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Method already exists")
+		return nil
+	}
+
+	_, err = client.PutMethod(ctx, &apigateway.PutMethodInput{
+		RestApiId:         restAPIID,
+		ResourceId:        resourceID,
+		HttpMethod:        adapterhelpers.PtrString(method),
+		AuthorizationType: adapterhelpers.PtrString("NONE"),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createMethodResponse(ctx context.Context, logger *slog.Logger, client *apigateway.Client, restAPIID, resourceID *string, method, statusCode string) error {
+	// check if a method response with the same status code already exists
+	err := findMethodResponse(ctx, client, restAPIID, resourceID, method, statusCode)
+	if err != nil {
+		if errors.As(err, new(integration.NotFoundError)) {
+			logger.InfoContext(ctx, "Creating method response")
+		} else {
+			return err
+		}
+	}
+
+	if err == nil {
+		logger.InfoContext(ctx, "Method response already exists")
+		return nil
+	}
+
+	_, err = client.PutMethodResponse(ctx, &apigateway.PutMethodResponseInput{
+		RestApiId:  restAPIID,
+		ResourceId: resourceID,
+		HttpMethod: adapterhelpers.PtrString(method),
+		StatusCode: adapterhelpers.PtrString(statusCode),
+		ResponseModels: map[string]string{
+			"application/json": "Empty",
+		},
+		ResponseParameters: map[string]bool{
+			"method.response.header.Content-Type": true,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
