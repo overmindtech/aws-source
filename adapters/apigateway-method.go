@@ -97,6 +97,24 @@ func apiGatewayMethodGetFunc(ctx context.Context, client apigatewayClient, scope
 		})
 	}
 
+	for statusCode := range output.MethodResponses {
+		if input.RestApiId != nil && input.ResourceId != nil && input.HttpMethod != nil {
+			item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+				Query: &sdp.Query{
+					Type:   "apigateway-method-response",
+					Method: sdp.QueryMethod_GET,
+					Query:  fmt.Sprintf("%s/%s/%s/%s", *input.RestApiId, *input.ResourceId, *input.HttpMethod, statusCode),
+					Scope:  scope,
+				},
+				BlastPropagation: &sdp.BlastPropagation{
+					// They are tightly coupled
+					In:  true,
+					Out: true,
+				},
+			})
+		}
+	}
+
 	return item, nil
 }
 
