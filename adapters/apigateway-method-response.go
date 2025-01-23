@@ -3,7 +3,6 @@ package adapters
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
@@ -12,6 +11,13 @@ import (
 )
 
 func apiGatewayMethodResponseGetFunc(ctx context.Context, client apigatewayClient, scope string, input *apigateway.GetMethodResponseInput) (*sdp.Item, error) {
+	if input == nil {
+		return nil, &sdp.QueryError{
+			ErrorType:   sdp.QueryError_NOTFOUND,
+			ErrorString: "query must be in the format of: the rest-api-id/resource-id/http-method/status-code",
+		}
+	}
+
 	output, err := client.GetMethodResponse(ctx, input)
 	if err != nil {
 		return nil, err
@@ -73,12 +79,6 @@ func NewAPIGatewayMethodResponseAdapter(client apigatewayClient, accountID strin
 			// rest-api-id/resource-id/GET/200
 			f := strings.Split(query, "/")
 			if len(f) != 4 {
-				slog.Error(
-					"query must be in the format of: rest-api-id/resource-id/http-method/status-code",
-					"found",
-					query,
-				)
-
 				return nil
 			}
 
