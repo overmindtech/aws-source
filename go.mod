@@ -9,32 +9,32 @@ require (
 	github.com/MrAlias/otel-schema-utils v0.2.1-alpha
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/aws/aws-sdk-go-v2 v1.33.0
-	github.com/aws/aws-sdk-go-v2/config v1.29.0
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.53
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.6
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.51.6
-	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.44.4
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.43.8
-	github.com/aws/aws-sdk-go-v2/service/directconnect v1.30.6
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.39.4
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.199.2
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.53.7
-	github.com/aws/aws-sdk-go-v2/service/efs v1.34.4
-	github.com/aws/aws-sdk-go-v2/service/eks v1.56.4
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.28.11
-	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.6
-	github.com/aws/aws-sdk-go-v2/service/iam v1.38.6
-	github.com/aws/aws-sdk-go-v2/service/kms v1.37.12
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.6
-	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.9
-	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.5
-	github.com/aws/aws-sdk-go-v2/service/rds v1.93.6
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.48.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.73.1
-	github.com/aws/aws-sdk-go-v2/service/sns v1.33.12
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.8
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.56.6
-	github.com/aws/aws-sdk-go-v2/service/sts v1.33.8
+	github.com/aws/aws-sdk-go-v2/config v1.29.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.54
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.7
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.51.7
+	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.44.5
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.43.9
+	github.com/aws/aws-sdk-go-v2/service/directconnect v1.30.7
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.39.5
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.201.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.53.8
+	github.com/aws/aws-sdk-go-v2/service/efs v1.34.6
+	github.com/aws/aws-sdk-go-v2/service/eks v1.56.5
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing v1.28.12
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.7
+	github.com/aws/aws-sdk-go-v2/service/iam v1.38.7
+	github.com/aws/aws-sdk-go-v2/service/kms v1.37.13
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.7
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.10
+	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.6
+	github.com/aws/aws-sdk-go-v2/service/rds v1.93.7
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.48.2
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.0
+	github.com/aws/aws-sdk-go-v2/service/sns v1.33.14
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.9
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.56.7
+	github.com/aws/aws-sdk-go-v2/service/sts v1.33.9
 	github.com/aws/smithy-go v1.22.1
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/micahhausler/aws-iam-policy v0.4.2
@@ -69,12 +69,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.28 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.5.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.5.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.10.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.9 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.24.10 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.24.11 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.10 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
