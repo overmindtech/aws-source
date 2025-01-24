@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"github.com/overmindtech/sdp-go"
 	"testing"
 	"time"
 
@@ -152,7 +153,7 @@ func TestResourceOutputMapper(t *testing.T) {
 		},
 	}
 
-	item, err := resourceOutputMapper("rest-api-13", "scope", resource)
+	item, err := resourceOutputMapper("rest-api-id", "scope", resource)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,6 +161,17 @@ func TestResourceOutputMapper(t *testing.T) {
 	if err := item.Validate(); err != nil {
 		t.Error(err)
 	}
+
+	tests := adapterhelpers.QueryTests{
+		{
+			ExpectedType:   "apigateway-rest-api",
+			ExpectedMethod: sdp.QueryMethod_GET,
+			ExpectedQuery:  "rest-api-id",
+			ExpectedScope:  "scope",
+		},
+	}
+
+	tests.Execute(t, item)
 }
 
 func TestNewAPIGatewayResourceAdapter(t *testing.T) {

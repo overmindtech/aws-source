@@ -87,3 +87,143 @@ func findMethodResponse(ctx context.Context, client *apigateway.Client, restAPII
 
 	return nil
 }
+
+func findIntegration(ctx context.Context, client *apigateway.Client, restAPIID, resourceID *string, method string) error {
+	_, err := client.GetIntegration(ctx, &apigateway.GetIntegrationInput{
+		RestApiId:  restAPIID,
+		ResourceId: resourceID,
+		HttpMethod: &method,
+	})
+
+	if err != nil {
+		var notFoundErr *types.NotFoundException
+		if errors.As(err, &notFoundErr) {
+			return integration.NewNotFoundError(integration.ResourceName(
+				integration.APIGateway,
+				integrationSrc,
+				method,
+			))
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func findAPIKeyByName(ctx context.Context, client *apigateway.Client, name string) (*string, error) {
+	result, err := client.GetApiKeys(ctx, &apigateway.GetApiKeysInput{
+		NameQuery: &name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result.Items) == 0 {
+		return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, apiKeySrc, name))
+	}
+
+	for _, apiKey := range result.Items {
+		if *apiKey.Name == name {
+			return apiKey.Id, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, apiKeySrc, name))
+}
+
+func findAuthorizerByName(ctx context.Context, client *apigateway.Client, restAPIID, name string) (*string, error) {
+	result, err := client.GetAuthorizers(ctx, &apigateway.GetAuthorizersInput{
+		RestApiId: &restAPIID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result.Items) == 0 {
+		return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, authorizerSrc, name))
+	}
+
+	for _, authorizer := range result.Items {
+		if *authorizer.Name == name {
+			return authorizer.Id, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, authorizerSrc, name))
+}
+
+func findDeploymentByDescription(ctx context.Context, client *apigateway.Client, restAPIID, description string) (*string, error) {
+	result, err := client.GetDeployments(ctx, &apigateway.GetDeploymentsInput{
+		RestApiId: &restAPIID,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, deployment := range result.Items {
+		if *deployment.Description == description {
+			return deployment.Id, nil
+		}
+	}
+
+	return nil, integration.NewNotFoundError(integration.ResourceName(integration.APIGateway, deploymentSrc, description))
+}
+
+func findStageByName(ctx context.Context, client *apigateway.Client, restAPIID, name string) error {
+	result, err := client.GetStage(ctx, &apigateway.GetStageInput{
+		RestApiId: &restAPIID,
+		StageName: &name,
+	})
+	if err != nil {
+		var notFoundErr *types.NotFoundException
+		if errors.As(err, &notFoundErr) {
+			return integration.NewNotFoundError(integration.ResourceName(
+				integration.APIGateway,
+				stageSrc,
+				name,
+			))
+		}
+
+		return err
+	}
+
+	if result == nil {
+		return integration.NewNotFoundError(integration.ResourceName(
+			integration.APIGateway,
+			stageSrc,
+			name,
+		))
+	}
+
+	return nil
+}
+
+func findModelByName(ctx context.Context, client *apigateway.Client, restAPIID, name string) error {
+	result, err := client.GetModel(ctx, &apigateway.GetModelInput{
+		RestApiId: &restAPIID,
+		ModelName: &name,
+	})
+	if err != nil {
+		var notFoundErr *types.NotFoundException
+		if errors.As(err, &notFoundErr) {
+			return integration.NewNotFoundError(integration.ResourceName(
+				integration.APIGateway,
+				stageSrc,
+				name,
+			))
+		}
+
+		return err
+	}
+
+	if result == nil {
+		return integration.NewNotFoundError(integration.ResourceName(
+			integration.APIGateway,
+			stageSrc,
+			name,
+		))
+	}
+
+	return nil
+}

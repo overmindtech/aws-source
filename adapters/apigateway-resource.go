@@ -73,6 +73,20 @@ func resourceOutputMapper(query, scope string, awsItem *types.Resource) (*sdp.It
 		}
 	}
 
+	item.LinkedItemQueries = append(item.LinkedItemQueries, &sdp.LinkedItemQuery{
+		Query: &sdp.Query{
+			Type:   "apigateway-rest-api",
+			Method: sdp.QueryMethod_GET,
+			Query:  restApiID,
+			Scope:  scope,
+		},
+		BlastPropagation: &sdp.BlastPropagation{
+			// They are tightly coupled, so we need to propagate the blast to the linked item
+			In:  true,
+			Out: true,
+		},
+	})
+
 	return &item, nil
 }
 
