@@ -35,7 +35,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.8
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.56.6
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.8
-	github.com/aws/smithy-go v1.22.1
+	github.com/aws/smithy-go v1.22.2
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/micahhausler/aws-iam-policy v0.4.2
 	github.com/overmindtech/discovery v0.33.4
