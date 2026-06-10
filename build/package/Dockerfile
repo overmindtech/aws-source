@@ -1,5 +1,5 @@
 # Build the source binary
-FROM golang:1.23-alpine AS builder
+FROM golang:1.26-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/go/pkg \
     go generate ./... \
     && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-s -w -X github.com/overmindtech/aws-source/tracing.ServiceVersion=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)" -trimpath -o source main.go
 
-FROM alpine:3.21
+FROM alpine:3.24
 WORKDIR /
 COPY --from=builder /workspace/source .
 USER 65534:65534
