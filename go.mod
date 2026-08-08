@@ -30,7 +30,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/rds v1.93.7
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.48.2
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.74.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.3
 	github.com/aws/aws-sdk-go-v2/service/sns v1.33.14
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.37.9
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.56.7
