@@ -25,7 +25,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.7
 	github.com/aws/aws-sdk-go-v2/service/iam v1.38.7
 	github.com/aws/aws-sdk-go-v2/service/kms v1.37.13
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.69.7
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.88.5
 	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.44.10
 	github.com/aws/aws-sdk-go-v2/service/networkmanager v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/rds v1.93.7
